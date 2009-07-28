@@ -1,0 +1,153 @@
+plugin.tx_meta_feedit_pi1 {
+        _CSS_DEFAULT_STYLE (
+
+						/* CSS META_FEEDIT */
+						
+						/* Dynamic Tab menu (template.php) */
+						DIV.typo3-dyntabmenu-tabs { margin-top: 5px; padding-right: 20px; }
+						DIV.typo3-dyntabmenu-divs P.c-descr { font-style : italic; padding: 3px 10px 5px 10px; background: #e7dba8;  }
+						TABLE.typo3-dyntabmenu TD.tabact { color: #000; border: solid black 1px; background: #FFFFFF; }
+						TABLE.typo3-dyntabmenu TD.tab { color:#FFFFFF; border: solid #555 1px;  background: #CCCCCC; }
+						TABLE.typo3-dyntabmenu TD.tab_over, TABLE.typo3-dyntabmenu TD.tabact_over, TABLE.typo3-dyntabmenu TD.disabled_over { color:#000; border: solid #555 1px;  background: #EEEEEE; }
+						TABLE.typo3-dyntabmenu TD.disabled { color:#FFFFFF; border: solid #555 1px;  background: #cccccc; }
+						TABLE.typo3-dyntabmenu TD.tab_over, TABLE.typo3-dyntabmenu TD.tabact_over, TABLE.typo3-dyntabmenu TD.disabled_over { color:#000; border: solid #555 1px;  background: #EEEEEE; }
+						TABLE.typo3-dyntabmenu TD.tab, TABLE.typo3-dyntabmenu TD.tabact, TABLE.typo3-dyntabmenu TD.disabled, TABLE.typo3-dyntabmenu TD.tab_over, TABLE.typo3-dyntabmenu TD.tabact_over, TABLE.typo3-dyntabmenu TD.disabled_over  { border-radius: 3px; -moz-border-radius: 3px; border-bottom: 0px; }
+						TABLE.typo3-dyntabmenu TD A { color:#FFFFFF; text-decoration:none; display: block; width:100%; padding:2px; padding-left:5px; padding-right:5px; }
+						TABLE.typo3-dyntabmenu TD.tabact A, TABLE.typo3-dyntabmenu TD.tab_over A { color:#000;}
+						
+						.tx-metafeedit-pi1-form-field {
+						font-size: 12px;
+						margin:5;
+						width:96%;
+						background-color: #EFEFEF;
+						padding:5;
+						outline: Black thick;
+						margin-right: 10;
+						}
+						
+						.tx-metafeedit-pi1-form-error-field {
+						font-size: 14px;
+						font-family: Verdana, Arial, Helvetica, sans-serif;
+						font-weight: bold;
+							color:#990000;
+						}
+						.tx-metafeedit-pi1-header {
+						font-size: 14px;
+						font-family: Verdana, Arial, Helvetica, sans-serif;
+						font-weight: bold;
+							color:#990000;
+						}
+						.tx-metafeedit-pi1-form-label {
+						font-size: 14px;
+						font-family: Verdana, Arial, Helvetica, sans-serif;
+						font-weight: bold;
+							color:#FFFFFF;
+						width:100%;
+						background-color: #CCCCCC;
+						}
+						.tx-metafeedit-pi1-link {
+						font-size: 14px;
+						font-family: Verdana, Arial, Helvetica, sans-serif;
+						font-weight: bold;
+							color:#990000;
+						}
+						
+						.tx-metafeedit-pi1-editmenu-list {
+						font-size: 14px;
+						font-family: Verdana, Arial, Helvetica, sans-serif;
+						font-weight: bold;
+							color:#990000;
+						}
+						
+						.tx-metafeedit-pi1-editmenu-list  A{
+						font-size: 14px;
+						font-family: Verdana, Arial, Helvetica, sans-serif;
+						font-weight: bold;
+							color:#990000;
+						}
+						.tx-metafeedit-pi1-editmenu-list-table-header{
+						 background-color:#CCCCCC;
+						 text-align:left;
+						 font-size: 14px;
+						font-family: Verdana, Arial, Helvetica, sans-serif;
+						font-weight: bold;
+							color:#FFFFFF;
+						}
+						.tx-metafeedit-pi1-form-required-message {
+						font-size: 14px;
+						font-family: Verdana, Arial, Helvetica, sans-serif;
+						font-weight: bold;
+							color:#990000;
+						}
+						
+						.tx-metafeedit-pi1-editmenu-list-table-row {
+						 background-color:#EEEEEE;
+						text-align:left;
+						 font-size: 10px;
+						font-family: Verdana, Arial, Helvetica, sans-serif;
+						color:#000000;
+						}
+						.tx-metafeedit-pi1-editmenu-list a, a:visited{
+						color:#666666;
+							font-family: Verdana, Arial, Helvetica, sans-serif;
+							font-weight: bold;
+							font-size: 14px;
+							text-decoration:none;
+						
+						}
+						
+						.tx-metafeedit-pi1-editmenu-list a:hover{
+							color:#990000;
+							font-family: Verdana, Arial, Helvetica, sans-serif;
+							font-weight: bold;
+							font-size: 14px;
+							text-decoration:underline;
+						}
+.tx-metafeedit-advancedSearch ul.astabnav {
+    font: bold 11px verdana, arial, sans-serif;
+    list-style-type: none;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #6c6;
+    margin: 0;
+}
+
+.tx-metafeedit-advancedSearch ul.astabnav li {
+    float: left;
+    height: 21px;
+    background-color: #b3c9e4;
+    margin: 2px 2px 0 2px;
+    border: 1px solid #6c6;
+}
+
+.tx-metafeedit-advancedSearch ul.astabnav li.active {
+    border-bottom: 1px solid #fff;
+    background-color: #fff;
+}
+
+.tx-metafeedit-advancedSearch .astabnav a {
+    float: left;
+    display: block;
+    color: #666;
+    text-decoration: none;
+    padding: 4px;
+    background: none;
+    border:none;
+    line-height:none;
+background: url(/typo3conf/ext/meta_feedit/res/fondbtnhv.png)
+}
+
+.tx-metafeedit-advancedSearch .astabnav a:hover {
+    background: #fff;
+    line-height:none;
+    background: url(/typo3conf/ext/meta_feedit/res/fondbtn.png) repeat-x;
+}
+.tx-metafeedit-advancedSearch-action input[type=submit] {
+	background: url(/typo3conf/ext/meta_feedit/res/fondbtn.png) repeat-x;
+ 	color:#666; 
+	font-size:10px;
+	height:35px;
+	font-weight:bold;
+}
+th.mfdt-actions a { display:inline;}
+	)
+}

@@ -1,0 +1,1014 @@
+
+// PageInfo
+
+var combolistarray= new Array();
+var combolisttimerarray= new Array();
+var combolistsearcharray= new Array();
+
+PageInfo = {
+	getResolutionWidth  : function() { return self.screen.width; },
+	getResolutionHeight : function() { return self.screen.height; },
+	getColorDepth       : function() { return self.screen.colorDepth; },
+
+	getScrollLeft       : function() { var scrollLeft = 0; if (document.documentElement && document.documentElement.scrollLeft && document.documentElement.scrollLeft != 0) { scrollLeft = document.documentElement.scrollLeft; } if (document.body && document.body.scrollLeft && document.body.scrollLeft != 0) { scrollLeft = document.body.scrollLeft; } if (window.pageXOffset && window.pageXOffset != 0) { scrollLeft = window.pageXOffset; } return scrollLeft; },
+	getScrollTop        : function() { var scrollTop = 0; if (document.documentElement && document.documentElement.scrollTop && document.documentElement.scrollTop != 0) { scrollTop = document.documentElement.scrollTop; } if (document.body && document.body.scrollTop && document.body.scrollTop != 0) { scrollTop = document.body.scrollTop; } if (window.pageYOffset && window.pageYOffset != 0) { scrollTop = window.pageYOffset; } return scrollTop; },
+
+	getDocumentWidth    : function() { var documentWidth = 0; var w1 = document.body.scrollWidth; var w2 = document.body.offsetWidth; if (w1 > w2) { documentWidth = document.body.scrollWidth; } else { documentWidth = document.body.offsetWidth; } return documentWidth; },
+	getDocumentHeight   : function() { var documentHeight = 0; var h1 = document.body.scrollHeight; var h2 = document.body.offsetHeight; if (h1 > h2) { documentHeight = document.body.scrollHeight; } else { documentHeight = document.body.offsetHeight; } return documentHeight; },
+	getVisibleWidth     : function() { var visibleWidth = 0; if (self.innerWidth) { visibleWidth = self.innerWidth; } else if (document.documentElement && document.documentElement.clientWidth) { visibleWidth = document.documentElement.clientWidth; } else if (document.body) { visibleWidth = document.body.clientWidth; } return visibleWidth; },
+	getVisibleHeight    : function() { var visibleHeight = 0; if (self.innerHeight) { visibleHeight = self.innerHeight; } else if (document.documentElement && document.documentElement.clientHeight) { visibleHeight = document.documentElement.clientHeight; } else if (document.body) { visibleHeight = document.body.clientHeight; } return visibleHeight; },
+
+	getElementLeft      : function(element) { var element = (typeof element == "string") ? document.getElementById(element) : element; var left = element.offsetLeft; var oParent = element.offsetParent; while (oParent != null) { left += oParent.offsetLeft; oParent = oParent.offsetParent; } return left; },
+	getElementTop       : function(element) { var element = (typeof element == "string") ? document.getElementById(element) : element; var top = element.offsetTop; var oParent = element.offsetParent; while (oParent != null) { top += oParent.offsetTop; oParent = oParent.offsetParent; } return top; },
+	getElementWidth     : function(element) { var element = (typeof element == "string") ? document.getElementById(element) : element; return element.offsetWidth; },
+	getElementHeight    : function(element) { var element = (typeof element == "string") ? document.getElementById(element) : element; return element.offsetHeight; },
+
+	getMouseX           : function() { return PageInfo.mouseX; },
+	getMouseY           : function() { return PageInfo.mouseY; },
+
+
+	// HELPER CODE FOR TRACKING MOUSE POSITION
+	
+	mouseX: 0,
+	mouseY: 0,
+	onMouseMove: function(e) { e = (!e) ? window.event : e; PageInfo.mouseX = e.clientX + PageInfo.getScrollLeft(); PageInfo.mouseY = e.clientY + PageInfo.getScrollTop(); }
+};
+
+if (document.addEventListener) {
+	document.addEventListener("mousemove", PageInfo.onMouseMove, false);
+} else if (document.attachEvent) {
+	document.attachEvent("onmousemove", PageInfo.onMouseMove);
+};
+
+
+ShowRoom = {
+	imageName: "",
+	w: 0,
+	h: 0,
+	startX: 0,
+	startY: 0,
+	data:{},
+	cells: new Array(),
+	setcells: new Array(),
+	nbwrksetcells:0,
+	ncols:0,
+	nrows:0,
+	seanceid:0,
+	mouseIsDown: false,
+	mouseSquareDown: false,
+	loadingTextInterval: 0,
+	loaderImage: document.createElement("img"),
+	cellheight:6,
+	cellwidth:6,
+	totalcellwidth:0,
+	totalcellheight:0,
+	topmargin:96,
+	leftmargin:30,
+	topcellmargin:17,
+	bottomcellmargin:4,
+	leftcellmargin:2,
+	rightcellmargin:19,
+	validDimension: /^\d{1,4}$/ ,
+	showlightbox:true
+};
+
+ShowRoom.startDrag = function(){
+	if (typeof ShowRoom == "undefined") { return; }
+	with(ShowRoom.cropSquare.style){
+		left = PageInfo.getMouseX() + "px";
+		top = PageInfo.getMouseY() + "px";
+		width = "1px";
+		height = "1px";
+		display = "block";
+	}
+	ShowRoom.startX = PageInfo.getMouseX();
+	ShowRoom.startY = PageInfo.getMouseY();
+};
+
+ShowRoom.drag = function(){
+	if (typeof ShowRoom == "undefined") { return; }
+	//if (!ShowRoom.mouseIsDown && !ShowRoom.mouseSquareIsDown) { return; }
+	if (!ShowRoom.mouseIsDown) { return; }
+
+	// mouse is to the right of starting point
+	if (PageInfo.getMouseX() - ShowRoom.startX > 0) {
+		ShowRoom.cropSquare.style.width = PageInfo.getMouseX() - ShowRoom.startX + "px";
+	} else{ // mouse is to the left of starting point
+		ShowRoom.cropSquare.style.left = PageInfo.getMouseX() + "px";
+		ShowRoom.cropSquare.style.width = ShowRoom.startX - PageInfo.getMouseX() + "px";
+	}
+	// mouse is below the starting point
+	if (PageInfo.getMouseY() - ShowRoom.startY > 0) {
+		ShowRoom.cropSquare.style.height = PageInfo.getMouseY() - ShowRoom.startY + "px";
+	} else { // mouse is above the starting point
+		ShowRoom.cropSquare.style.top = PageInfo.getMouseY() + "px";
+		ShowRoom.cropSquare.style.height = ShowRoom.startY - PageInfo.getMouseY() + "px";
+	}
+	ShowRoom.activateDraggedOverCells();
+};
+
+ShowRoom.activateDraggedOverCells= function() {
+	if (!ShowRoom.mouseIsDown) { return; }
+	var wx = winplan.element.style.left;
+	var i= wx.indexOf('px');
+	wx=wx.substring(0,i);	
+	var wy = winplan.element.style.top;
+	var i= wy.indexOf('px');
+	wy=wy.substring(0,i);	
+	var sx=winplan.content.scrollLeft;
+	var sy=winplan.content.scrollTop;
+
+	var x1=ShowRoom.startX-ShowRoom.leftmargin-wx+sx;
+	var y1=ShowRoom.startY-ShowRoom.topmargin-wy+sy;
+	var x2=PageInfo.getMouseX()-ShowRoom.leftmargin-wx+sx;
+	var y2=PageInfo.getMouseY()-ShowRoom.topmargin-wy+sy;
+	
+	if (x1<0) x1=0;
+	if (x2<0) x2=0;
+	if (y1<0) y1=0;
+	if (y2<0) y2=0;
+	
+	var col1=ShowRoom.ncols-Math.floor(x1/ShowRoom.totalcellwidth);
+	var col2=ShowRoom.ncols-Math.floor(x2/ShowRoom.totalcellwidth);
+	var row1=ShowRoom.nrows-Math.floor(y1/ShowRoom.totalcellheight);
+	var row2=ShowRoom.nrows-Math.floor(y2/ShowRoom.totalcellheight);
+	
+	if (col1>ShowRoom.ncols) col1=ShowRoom.ncols;
+	if (col2>ShowRoom.ncols) col2=ShowRoom.ncols;
+	if (row1>ShowRoom.nrows) row1=ShowRoom.nrows;
+	if (row2>ShowRoom.nrows) row2=ShowRoom.nrows;
+	if (col1<0) col1=1;
+	if (col2<0) col2=1;
+	if (row1<0) row1=1;
+	if (row2<0) row2=1;
+
+	
+	if (col1>col2) {
+		col=col1;
+		col1=col2;
+		col2=col;
+	}
+	if (row1>row2) {
+		row=row1;
+		row1=row2;
+		row2=row;
+	}
+  var data;
+	if (col1>0 && row1>0 && col2>0 && row2>0) {
+		for (col=col1; col<=col2; col++) {
+			for (row=row1; row<=row2; row++) {
+				w=ShowRoom.cells[col][row].widget;
+				if ((w.attributes['class'].value=='i1' || w.attributes['class'].value=='i2') && !ShowRoom.setcells[col][row]) {
+					ShowRoom.setcells[col][row]=true;
+					ShowRoom.nbwrksetcells++;
+					data=w.attributes['name'].value.split('-');					
+					// Put ajax call to bookplace here ...
+					ShowRoom.showlightbox=false;
+					var j=1;
+					w.className='ii';
+					if (row==row2 && col==col2) {j=1 };
+					document.f.d.value=j;
+					document.f.s.value=data[0];
+					document.f.v.value=w.style.backgroundColor;
+					document.f.e2.value=data[2];
+					document.f.e.value=data[1];
+					document.f.c.value=row+'-'+col;
+					tx_metabookingprocessFormData(xajax.getFormValues('f'));
+				}				
+			}
+		}
+	}
+	//document.getElementById("showroomdebug").innerHTML = "wptop : "+ wy + "wpleft : "+ wx  +"mouse x,y:" + PageInfo.getMouseX() + "," +PageInfo.getMouseY()+ " x1,y1:"+x1 + "," + y1 + " x2,y2:"+x2 + "," + y2 + " col1,row1:"+col1 + "," + row1 + " col2,row2:"+col2 + "," + row2 ;
+};
+
+
+ShowRoom.addEvent = function(obj, evt, func){
+	if (/safari/i.test(navigator.userAgent) && evt == "dblclick") {
+		obj.ondblclick = func;
+	}else if (window.addEventListener){
+		obj.addEventListener(evt, func, false);
+	}else if (window.attachEvent){
+		obj.attachEvent("on" + evt, func);
+	}
+};
+
+ShowRoom.blockRow=function(row,col) {
+	for (i=1;i<=ShowRoom.ncols;i++) {
+		cell=document.getElementById('b-'+row+'-'+i);
+		if (i!=col && (ShowRoom.cells[i][row].type==1 || ShowRoom.cells[i][row].type==2)) cell.className='i9';
+	}
+	ShowRoom.cells[col][row].type=4;
+};
+
+ShowRoom.unblockRow=function(row) {
+	//alert('r'+row);
+	for (i=1;i<=ShowRoom.ncols;i++) {
+		cell=document.getElementById('b-'+row+'-'+i);
+		if (ShowRoom.cells[i][row].type==1 || ShowRoom.cells[i][row].type==2) cell.className='i'+ShowRoom.cells[i][row].type;
+	}
+};
+
+ShowRoom.createCell= function(cell,col,row) {
+	acell=new Array();
+	acell['left']=ShowRoom.leftmargin+(col*ShowRoom.totalcellwidth)+"px";
+	acell['top']=ShowRoom.leftmargin+(row*ShowRoom.totalcellheight)+"px";
+	acell['x']=ShowRoom.leftmargin+(col*ShowRoom.totalcellwidth)+ShowRoom.leftcellmargin;
+	acell['y']=ShowRoom.leftmargin+(row*ShowRoom.totalcellheight)+ShowRoom.topmargin;
+	acell['height']=ShowRoom.cellheight+"px";
+	acell['width']=ShowRoom.cellwidth+"px";
+	acell['id']='b-'+row+'-'+col;
+	//acell['widget']=document.getElementById(acell['id']);
+	//acell['widget']=cell;
+	acell['serie']='';
+	acell['type']='';
+	//var data;
+	//ShowRoom.addEvent(acell['widget'], "mousedown", function(){ obj=(IE?event.srcElement:this);obj.className='ii';ShowRoom.mouseSquareIsDown = true;ShowRoom.showlightbox=false;document.f.d.value=0;data=obj.attributes['name'].value.split('-');document.f.s.value=data[0];document.f.v.value=obj.style.backgroundColor;document.f.e2.value=data[2];document.f.e.value=data[1];document.f.c.value=row+'-'+col;tx_metabookingprocessFormData(xajax.getFormValues('f'));});
+	//ShowRoom.addEvent(acell['widget'], "mouseup", function(){ ShowRoom.mouseSquareIsDown = false; });
+	//ShowRoom.addEvent(acell['widget'], "mouseout", function(){ ShowRoom.mouseSquareIsDown = false; });
+
+	ShowRoom.cells[col][row]=acell;
+	ShowRoom.setcells[col][row]=false;
+};
+
+ShowRoom.activateCell= function(col,row) {
+	acell=document.getElementById('b-'+row+'-'+col);
+	ShowRoom.cells[col][row].widget=acell;
+	ShowRoom.addEvent(acell, "mousedown", function(){ obj=(IE?event.srcElement:this);obj.className='ii';ShowRoom.mouseSquareIsDown = true;ShowRoom.showlightbox=false;document.f.d.value=0;var data=obj.attributes['name'].value.split('-');document.f.s.value=data[0];document.f.v.value=obj.style.backgroundColor;document.f.e2.value=data[2];document.f.e.value=data[1];document.f.c.value=row+'-'+col;tx_metabookingprocessFormData(xajax.getFormValues('f'));});
+	ShowRoom.addEvent(acell, "mouseup", function(){ ShowRoom.mouseSquareIsDown = false; });
+	ShowRoom.addEvent(acell, "mouseout", function(){ ShowRoom.mouseSquareIsDown = false; });
+};
+
+// initialize les donn�es..
+
+ShowRoom.init = function(nrows,ncols){	
+	IE = (document.all);
+
+	ShowRoom.workZone = document.getElementById("workZone");
+	ShowRoom.cropSquare = ShowRoom.cropSquare==null?document.createElement("div"):ShowRoom.cropSquare;
+	ShowRoom.totalcellwidth=ShowRoom.leftcellmargin+ShowRoom.cellwidth+ShowRoom.rightcellmargin;
+	ShowRoom.totalcellheight=ShowRoom.topcellmargin+ShowRoom.cellheight+ShowRoom.bottomcellmargin;
+	ShowRoom.workZone.style.position="static";
+	ShowRoom.workZone.style.top="0px";
+	ShowRoom.workZone.style.left="0px";
+	ShowRoom.workZone.style.width=(ShowRoom.ncols*ShowRoom.totalcellwidth)+"px";
+	ShowRoom.workZone.style.height=(ShowRoom.nrows*ShowRoom.totalcellheight)+"px";
+	
+	document.getElementById("showroomdebug").style.position="absolute";	
+	document.getElementById("showroomdebug").style.top="90px";
+	document.getElementById("showroomdebug").style.display="block";
+	document.getElementById("showroomdebug").style.left="500px";
+	document.getElementById("showroomdebug").style.zIndex="9000";
+
+	with (ShowRoom.cropSquare.style){
+		position = "absolute";
+		zIndex = 1000;
+		border = "1px dotted #000";
+		cursor = "pointer";
+		display = "none";
+	};
+	
+
+	var bodyNode = document.getElementsByTagName("body").item(0);
+	bodyNode.appendChild(ShowRoom.cropSquare);
+	
+	ShowRoom.ncols=ncols;
+	ShowRoom.nrows=nrows;
+	/*
+	for ( var col = 1 ; col <= ShowRoom.ncols ; col++ ) {
+		ShowRoom.cells[col]= new Array();
+		ShowRoom.setcells[col]= new Array();
+		for ( var row = 1 ; row <= ShowRoom.nrows ; row++ ) {
+			ShowRoom.createCell(col,row);
+		}
+	};
+	*/
+	var bodyNode = document.getElementsByTagName("body").item(0);
+	bodyNode.appendChild(ShowRoom.cropSquare);	
+	ShowRoom.addEvent(document, "mouseup", function(){ ShowRoom.mouseIsDown = false;ShowRoom.cropSquare.style.display='none';});
+	ShowRoom.addEvent(document, "mouseout", function(){ obj=(IE?event.srcElement:this); if(obj.id=='workZone') {ShowRoom.mouseIsDown = false;ShowRoom.mouseSquareIsDown = false;};});
+	ShowRoom.addEvent(ShowRoom.workZone, "mouseover", function(){ ShowRoom.workZone.style.cursor = "crosshair"; });
+	ShowRoom.addEvent(ShowRoom.workZone, "mousedown", function(){ShowRoom.mouseIsDown = true;ShowRoom.startDrag();});
+	ShowRoom.addEvent(ShowRoom.workZone, "mousemove", function(){ShowRoom.drag();});
+	ShowRoom.addEvent(ShowRoom.workZone, "mouseup", function(){ ShowRoom.mouseIsDown = false;ShowRoom.mouseSquareIsDown = false;});
+	
+};
+
+ShowRoom.endDrag = function(row,col,res) {
+	ShowRoom.nbwrksetcells--;
+	if (ShowRoom.nbwrksetcells<=0) {
+		document.xajax_form_mode.cmd.value='refreshprereservations';
+	  tx_metabookingprocessFormData(xajax.getFormValues('xajax_form_mode'));
+	};
+	if (res) ShowRoom.cells[col][row].type=4;
+}
+
+ShowRoom.resetcell = function(row,col) {
+	cell=document.getElementById('b-'+row+'-'+col);
+	cell.className='i'+ShowRoom.cells[col][row].type;
+}
+
+ShowRoom.drawRoom= function(json) {
+	//alert(json);
+	var jdata=eval('('+json+')');
+	ShowRoom.data=jdata;	
+	ShowRoom.init(jdata.p.nr,jdata.p.nc);
+	var wz=document.getElementById("workZone");
+	var d=document.createElement("div");
+	var t=document.createElement("table");
+	t.className='grid-table';
+	t.id='plan';
+	t.unselectable='on';
+	d.appendChild(t);	
+
+	for (col=1;col<= ShowRoom.ncols;col++) {
+		ShowRoom.cells[col]= new Array();
+		ShowRoom.setcells[col]= new Array();
+	};
+	var nbr=jdata.p.rs.length;
+	for (i=0;i<nbr; i++) {
+		row=jdata.p.rs[i];
+		nbc=row.cs.length;
+		var tr=document.createElement("tr")
+		tr.className='r';
+		tr.unselectable='on';
+		t.appendChild(tr);	
+
+		var	td=document.createElement("td");
+		with (td){
+			className="tdc";
+			//style.background=col.b;
+		};
+		td.unselectable='on';
+		tr.appendChild(td);
+ 		txt=document.createTextNode(jdata.p.nr-i);
+ 		//txt.unselectable='on';
+		td.appendChild(txt);
+		
+		for (j=0; j<nbc; j++) {
+			col=row.cs[j];
+
+		var	td=document.createElement("td");
+			with (td){
+				className="tdc";
+				//style.background=col.b;
+			};
+			
+			td.unselectable='on';
+			tr.appendChild(td);
+			var divcell=document.createElement("div");
+			divcell.className="c";
+  		divcell.unselectable='on';
+  		td.appendChild(divcell);
+			
+			b=document.createElement("b");
+			b.unselectable='on';
+			divcell.appendChild(b);
+			
+			if (col.v) {
+				txt1=document.createTextNode(col.v);
+				//txt1.unselectable='on';
+				b.appendChild(txt1);
+			}
+			br=document.createElement("br");
+			br.unselectable='on';
+			divcell.appendChild(br);
+			if (col.v2) {
+				txt2=document.createTextNode(col.v2);
+				divcell.appendChild(txt2);
+			} else {
+				txt2=document.createTextNode('\u00a0');
+				divcell.appendChild(txt2);
+			}
+			//alert('t1');
+			//txt2.unselectable='on';
+			var divplace=document.createElement("div");
+			divplace.id='b-'+row.r+'-'+col.c;
+	    divplace.setAttribute('name',$name=col.s+'-'+col.v+'-'+col.v2+'-'+col.t+'-'+col.b);
+  		divplace.unselectable='on';
+			divplace.className='i'+col.t;
+			divcell.appendChild(divplace);			
+			ShowRoom.createCell(divplace,col.c,row.r);
+	    if (col.s) ShowRoom.cells[col.c][row.r].serie=col.s;
+	    if (col.t) ShowRoom.cells[col.c][row.r].type=col.t;    
+		}
+	}
+	wz.innerHTML=d.innerHTML;
+	for ( var col = 1 ; col <= ShowRoom.ncols ; col++ ) {
+		for ( var row = 1 ; row <= ShowRoom.nrows ; row++ ) {
+			ShowRoom.activateCell(col,row);
+		}
+	};
+};
+
+//Helper  Javascripts
+
+function moneyFormat(textObj) {
+   var newValue = textObj.value;
+   var decAmount = "";
+   var dolAmount = "";
+   var decFlag = false;
+   var aChar = "";
+
+   // ignore all but digits and decimal points.
+   
+   for(i=0; i < newValue.length; i++) {
+      aChar = newValue.substring(i,i+1);
+      if(aChar >= "0" && aChar <= "9") {
+         if(decFlag) {
+            decAmount = "" + decAmount + aChar;
+         }
+         else {
+            dolAmount = "" + dolAmount + aChar;
+         }
+      }
+      if(aChar == ".") {
+         if(decFlag) {
+            dolAmount = "";
+            break;
+         }
+         decFlag=true;
+      }
+   }
+
+   // Ensure that at least a zero appears for the dollar amount.
+
+   if(dolAmount == "") {
+      dolAmount = "0";
+   }
+   // Strip leading zeros.
+   if(dolAmount.length > 1) {
+      while(dolAmount.length > 1 && dolAmount.substring(0,1) == "0") {
+         dolAmount = dolAmount.substring(1,dolAmount.length);
+      }
+   }
+// Round the decimal amount.
+   if(decAmount.length > 2) {
+      if(decAmount.substring(2,3) > "4") {
+         decAmount = parseInt(decAmount.substring(0,2)) + 1;
+         if(decAmount < 10) {
+            decAmount = "0" + decAmount;
+         }
+         else {
+            decAmount = "" + decAmount;
+         }
+      }
+      else {
+         decAmount = decAmount.substring(0,2);
+      }
+      if (decAmount == 100) {
+         decAmount = "00";
+         dolAmount = parseInt(dolAmount) + 1;
+      }
+   }
+
+   // Pad right side of decAmount
+   if(decAmount.length == 1) {
+      decAmount = decAmount + "0";
+   }
+   if(decAmount.length == 0) {
+      decAmount = decAmount + "00";
+   }
+
+   // Check for negative values and reset textObj
+   if(newValue.substring(0,1) != "-" ||
+         (dolAmount == "0" && decAmount == "00")) {
+      textObj.value = dolAmount + "." + decAmount;
+
+   }
+   else{
+      textObj.value = "-" + dolAmount + "." + decAmount;
+   }
+};
+
+function moneyControl(textObj) {
+   var newValue = textObj.value;
+   var decAmount = "";
+   var dolAmount = "";
+   var decFlag = false;
+   var aChar = "";
+
+   // ignore all but digits and decimal points.
+   for(i=0; i < newValue.length; i++) {
+      aChar = newValue.substring(i,i+1);
+      if(aChar >= "0" && aChar <= "9") {
+         if(decFlag) {
+            decAmount = "" + decAmount + aChar;
+         }
+         else {
+            dolAmount = "" + dolAmount + aChar;
+         }
+      }
+
+      if(aChar == ".") {
+         if(decFlag) {
+            dolAmount = "";
+            break;
+         }
+         decFlag=true;
+      }
+   }
+
+   // Strip leading zeros.
+   if(dolAmount.length > 1) {
+      while(dolAmount.length > 1 && dolAmount.substring(0,1) == "0") {
+         dolAmount = dolAmount.substring(1,dolAmount.length);
+      }
+   }
+
+	 // Round the decimal amount.
+   if(decAmount.length > 2) {
+         decAmount = decAmount.substring(0,2);
+    }
+
+
+   // Check for negative values and reset textObj
+
+      	if(newValue.substring(0,1) != "-") {
+      	} else {
+         if(decFlag) {
+      			textObj.value = "-" + dolAmount + "." + decAmount;
+      		} else {
+      			textObj.value = "-" + dolAmount;
+      		}
+      	}
+
+};
+
+function z(val) {
+	ret=val;
+	if (isNaN(val)) ret=0.0;
+	return ret;
+}
+
+function majreglement(field) {
+		var textobj=document.getElementById(field);
+		if (field!='') moneyControl(textobj);
+		var mtcheque=Math.round(z(parseFloat(document.getElementById('mtcheque').value))*100)/100;
+		var mtespeces=Math.round(z(parseFloat(document.getElementById('mtespeces').value))*100)/100;
+		var mtvirement=Math.round(z(parseFloat(document.getElementById('mtvirement').value))*100)/100;
+		var mtchequevacance=Math.round(z(parseFloat(document.getElementById('mtchequevacance').value))*100)/100;
+		var mtcartecredit=Math.round(z(parseFloat(document.getElementById('mtcartecredit').value))*100)/100;
+		var mtcartecreditspectacle=Math.round(z(parseFloat(document.getElementById('mtcartecreditspectacle').value))*100)/100;
+		
+		//var mtcartecreditspectacle=0.0;
+		
+		var mtrendu=Math.round(z(parseFloat(document.getElementById('mtrendu').value))*100)/100;
+		var mtrenducheque=Math.round(z(parseFloat(document.getElementById('mtrenducheque').value))*100)/100;
+		var mtrestedu=Math.round(z(parseFloat(document.getElementById('mtrestedu').value))*100)/100;
+		var mttotal=Math.round(z(parseFloat(document.getElementById('mttotal').value))*100)/100;
+		var ch_num=document.getElementById('ch_num').value;
+		var ch_banque=document.getElementById('ch_banque').value;
+		var ch_ville=document.getElementById('ch_ville').value;
+	
+ 		var total=mtcheque+mtchequevacance+mtespeces+mtvirement+mtcartecredit+mtcartecreditspectacle+mtrestedu-mtrendu-mtrenducheque;
+
+ 		var mtresteducalc=Math.round((mttotal-total)*100)/100;
+ 		var errormsg="";
+ 		//var errormsg="Total: " + total +" = Chèque:" + mtcheque + " ANCV: " + mtchequevacance + " + " + " Espèces:" + mtespeces + " + " + " Virement:" + mtvirement + " + " + " Carte Crédit:" + mtcartecredit + " + " + " Carte Crédit Spectacle:" + mtcartecreditspectacle + " + " + " Reste dû:" + mtrestedu + " - " + " Rendu Espèces:" + mtrendu + " - " + " Rendu Chèque:" + mtrenducheque;
+
+ 		if (mtcheque < 0.0) errormsg=errormsg+'<H1>Attention le montant chèque est  négatif !</H1>';
+ 		if (mtespeces < 0.0) errormsg=errormsg+'<H1>Attention le montant espèces est négatif !</H1>';
+ 		if (mtvirement < 0.0) errormsg=errormsg+'<H1>Attention le montant virement est négatif !</H1>';
+ 		if (mtchequevacance < 0.0) errormsg=errormsg+'<H1>Attention le montant chèque vacance est négatif !</H1>';
+ 		if (mtcartecredit < 0.0) errormsg=errormsg+'<H1>Attention le montant carte crédit est négatif !</H1>';
+ 		if (mtcartecreditspectacle < 0.0) errormsg=errormsg+'<H1>Attention le montant carte crédit spectacle est négatif !</H1>';
+ 		if (mtrestedu < 0.0) errormsg=errormsg+'<H1>Attention le montant reste dû est négatif !</H1>';
+ 		if (mtrendu < 0.0) errormsg=errormsg+'<H1>Attention le montant rendu est négatif !</H1>';
+ 		if (mtrenducheque < 0.0) errormsg=errormsg+'<H1>Attention le montant rendu chèque est négatif !</H1>';
+		if (mtresteducalc < 0.0) errormsg=errormsg+'<H1>Le montant réglé dépasse le prix des produits !</H1>';
+ 		if (mtcheque != 0.0 && ( ch_num=='' || ch_banque=='' || ch_ville=='')) errormsg=errormsg+'<H1>Montant chèque saisie sans numéro, banque ou ville !</H1>';
+		var mtarendre=0.00;
+		if (mtresteducalc<0.00)  		{
+			mtarendre=mtresteducalc;
+			mtresteducalc=0.00;
+		}
+ 		var mtresteduhtml='<H1>'+mtresteducalc+' &euro; </H1>';
+ 		mtarendrehtml='<H1>'+ mtarendre + '&euro; </H1>';
+ 		var mtarendrehtml='<H1>'+mtarendre+' &euro; </H1>';
+ 		document.getElementById("mtarendre").innerHTML=mtarendrehtml;
+ 		document.getElementById("mtresteducalc").innerHTML=mtresteduhtml;
+ 		document.getElementById("reglementmessage").innerHTML=errormsg;
+ }
+
+
+var loadingImage = 'http://lapasserelle.dyndns.org/typo3conf/ext/meta_booking/res/loading4.gif';		
+var closeButton = 'close.gif';		
+function getPageScroll(){
+
+	var yScroll;
+
+	if (self.pageYOffset) {
+		yScroll = self.pageYOffset;
+	} else if (document.documentElement && document.documentElement.scrollTop){	 // Explorer 6 Strict
+		yScroll = document.documentElement.scrollTop;
+	} else if (document.body) {// all other Explorers
+		yScroll = document.body.scrollTop;
+	}
+
+	arrayPageScroll = new Array('',yScroll) 
+	return arrayPageScroll;
+}
+function getPageSize(){
+	
+	var xScroll, yScroll;
+	
+	if (window.innerHeight && window.scrollMaxY) {	
+		xScroll = document.body.scrollWidth;
+		yScroll = window.innerHeight + window.scrollMaxY;
+	} else if (document.body.scrollHeight > document.body.offsetHeight){ // all but Explorer Mac
+		xScroll = document.body.scrollWidth;
+		yScroll = document.body.scrollHeight;
+	} else { // Explorer Mac...would also work in Explorer 6 Strict, Mozilla and Safari
+		xScroll = document.body.offsetWidth;
+		yScroll = document.body.offsetHeight;
+	}
+	
+	var windowWidth, windowHeight;
+	if (self.innerHeight) {	// all except Explorer
+		windowWidth = self.innerWidth;
+		windowHeight = self.innerHeight;
+	} else if (document.documentElement && document.documentElement.clientHeight) { // Explorer 6 Strict Mode
+		windowWidth = document.documentElement.clientWidth;
+		windowHeight = document.documentElement.clientHeight;
+	} else if (document.body) { // other Explorers
+		windowWidth = document.body.clientWidth;
+		windowHeight = document.body.clientHeight;
+	}	
+	
+	// for small pages with total height less then height of the viewport
+	if(yScroll < windowHeight){
+		pageHeight = windowHeight;
+	} else { 
+		pageHeight = yScroll;
+	}
+
+	// for small pages with total width less then width of the viewport
+	if(xScroll < windowWidth){	
+		pageWidth = windowWidth;
+	} else {
+		pageWidth = xScroll;
+	}
+
+
+	arrayPageSize = new Array(pageWidth,pageHeight,windowWidth,windowHeight) 
+	return arrayPageSize;
+};
+
+// makes combolist disappear after 3 seconds 
+
+function combolistfade(comboid) {
+  if (combolistarray[comboid]!='wait') {
+		document.getElementById('cl_res_'+comboid).style.display='none';
+		combolistsearcharray[comboid]='';
+  } else {
+  	combolisttimerarray[comboid]=setTimeout("combolistfade('"+comboid+"');",3000);
+	}
+}
+
+function combolistkeyup(pagesize,idwidget,prefix,callbacks,eventdata) {
+	if (eventdata<14||eventdata>=32 ) {
+		if (!(prefix+idwidget in combolistsearcharray)) {combolistsearcharray[prefix+idwidget]='';}; 
+		if (combolistsearcharray[prefix+idwidget].length==0 || eventdata==13) {
+			combolistsearcharray[prefix+idwidget]=document.getElementById('cl_i'+prefix+idwidget).value;
+			combolistarray[prefix+idwidget]='wait';
+			document.getElementById('cl_logo_'+prefix+idwidget).className='wait';
+			ShowRoom.showlightbox=false;
+			document.xajax_form_mode.eventdata.value=eventdata;
+			document.xajax_form_mode.pagesize.value=pagesize;
+			document.xajax_form_mode.mode.value=2;
+			document.xajax_form_mode.pdfExport.value='';
+			document.xajax_form_mode.callbacks.value=callbacks;
+			document.xajax_form_mode.cmd.value='combolist';
+			document.xajax_form_mode.prefix.value=prefix;
+			document.xajax_form_mode.code.value=idwidget;
+			document.xajax_form_mode.data.value=document.getElementById('cl_i'+prefix+idwidget).value;
+			document.xajax_form_mode.page.value=1;
+			tx_metabookingprocessFormData(xajax.getFormValues('xajax_form_mode'));
+		};
+	};
+}
+
+function combolistfireback(comboid,pagesize,idwidget,prefix,callbacks,eventdata) {
+	if(combolistsearcharray[comboid]!=document.getElementById('cl_i'+comboid).value) {
+		combolistsearcharray[comboid]=document.getElementById('cl_i'+comboid).value;
+		combolistarray[comboid]='wait';
+		document.getElementById('cl_logo_'+prefix+idwidget).className='wait';
+		document.xajax_form_mode.eventdata.value=eventdata;
+		document.xajax_form_mode.pagesize.value=pagesize;
+		document.xajax_form_mode.mode.value=2;
+		document.xajax_form_mode.pdfExport.value='';
+		document.xajax_form_mode.callbacks.value=callbacks;
+		document.xajax_form_mode.cmd.value='combolist';
+		document.xajax_form_mode.prefix.value=prefix;
+		document.xajax_form_mode.code.value=idwidget;
+		document.xajax_form_mode.data.value=combolistsearcharray[comboid];
+		document.xajax_form_mode.page.value=1;
+		tx_metabookingprocessFormData(xajax.getFormValues('xajax_form_mode'));
+	} else {
+		combolistsearcharray[comboid]='';
+	};
+}
+function combolistmouseover(comboid) {
+	combolistarray[comboid]='wait';
+	if (document.getElementById('cl_i'+comboid).value.length>0) document.getElementById('cl_res_'+comboid).style.display='block';
+  clearTimeout(combolisttimerarray[comboid]);
+}
+function combolistmouseout(comboid) {
+	combolistarray[comboid]='out';
+  combolisttimerarray[comboid]=setTimeout("combolistfade('"+comboid+"');",3000);
+}
+
+function combolistdraw(json) {
+	//alert('combolistdraw');
+	var jdata=eval('('+json+')');
+	var linkarray=new Array();
+	var linkcount=0;
+	var res=document.getElementById('cl_res_'+jdata.prefix+jdata.idwidget);
+	combolistarray[jdata.prefix+jdata.idwidget]='wait';
+	var d=document.createElement("div");
+	var t=document.createElement("table");
+	d.appendChild(t);	
+	var nbl=jdata.ls.length;	
+	var nbr=jdata.rs.length;
+	//alert('nbl:'+nbl+', nbr:'+nbr);
+	if (nbr==0) {
+		res.innerHTML='';
+		res.style.display='none';
+	} else {
+		// header
+
+		var nbc=jdata.cbs.length;
+		var c=nbc;
+		var callbacks='';
+		for (i=0;i<nbc; i++) {
+			callbacks=callbacks+jdata.cbs[i].id;
+			if (i<(nbc-1)) callbacks=callbacks+',';
+		}
+		//modif CMD pour corriger le probleme de la recherche de bus
+		//'document.xajax_form_mode.code.value=\''.$id.'\';'.
+		var trh=document.createElement("tr");
+		t.appendChild(trh);
+		if (jdata.nbpages>0) {
+			var td=document.createElement("td");
+			trh.appendChild(td);
+			if (jdata.page>1) {
+				var a=document.createElement("a");
+				a.href="#";
+				a.id="link"+jdata.prefix+jdata.idwidget+linkcount;
+				linkarray[a.id]="ShowRoom.showlightbox=false;ajxcall('"+callbacks+"','"+jdata.prefix+"','"+jdata.idwidget+"','"+jdata.pagesize+"',"+(jdata.page-1)+");";
+				linkcount++;
+				td.appendChild(a);
+				txt1=document.createTextNode('<<');
+				a.appendChild(txt1);
+			}
+			
+			var td=document.createElement("td");
+			td.colspan=nbl-2;
+			td.align='center';
+			trh.appendChild(td);
+			if (jdata.nbpages>1) {
+				var txt2=document.createTextNode('Page '+jdata.page+' sur '+jdata.nbpages);
+				td.appendChild(txt2);
+			}
+
+			var td=document.createElement("td");
+			td.align='right';
+			trh.appendChild(td);
+			if (jdata.nbpages>0 && jdata.page < jdata.nbpages) {
+				var a=document.createElement("a");
+				a.href="#";
+				a.id="link"+jdata.prefix+jdata.idwidget+linkcount;
+				linkarray[a.id]="ShowRoom.showlightbox=false;ajxcall('"+callbacks+"','"+jdata.prefix+"','"+jdata.idwidget+"','"+jdata.pagesize+"',"+(jdata.page+1)+");";
+				linkcount++;
+				td.appendChild(a);
+				txt3=document.createTextNode('>>');
+				a.appendChild(txt3);
+			}
+		}		
+
+		// libelles ...
+		var tr=document.createElement("tr");
+		t.appendChild(tr);	
+		
+		for (i=0;i<nbl; i++) {
+			lib=jdata.ls[i].l;
+		  var td=document.createElement("td");
+		  tr.appendChild(td);
+		  txt1=document.createTextNode(lib);
+		  td.appendChild(txt1);
+		}
+		// Donn�es 
+		for (i=0;i<nbr; i++) {
+				var tr=document.createElement("tr");
+				r=jdata.rs[i];
+				if (r.s) {
+					//alert(r.s);
+					tr.style.background=r.s;
+				}
+		    t.appendChild(tr);
+		    for (j=0;j<nbl; j++) {
+					var td=document.createElement("td");
+		    	tr.appendChild(td);
+					var a=document.createElement("a");
+		    	td.appendChild(a);
+		    	var ltxt=r["i"+j];
+		  		txt=document.createTextNode(ltxt);
+		  		a.href='#';
+		    	a.appendChild(txt);
+					a.id="link"+jdata.prefix+jdata.idwidget+linkcount;
+					linkarray[a.id]="document.xajax_form_mode.cmd.value='combolist';document.xajax_form_mode.code.value='"+jdata.idwidget+"';document.xajax_form_mode.prefix.value='"+jdata.prefix+"';document.xajax_form_mode.data.value='"+r.id+"';document.xajax_form_mode.mode.value=3;document.xajax_form_mode.pdfExport.value='';tx_metabookingprocessFormData(xajax.getFormValues('xajax_form_mode'));";
+					linkcount++;
+		    	//ShowRoom.addEvent(a, "click", function(){document.xajax_form_mode.cmd.value='combolist';document.xajax_form_mode.mode.value=3;document.xajax_form_mode.pdfExport.value='';tx_metabookingprocessFormData(xajax.getFormValues('xajax_form_mode'));});
+					//a.onClick=eval("function() {document.xajax_form_mode.cmd.value='combolist';document.xajax_form_mode.code.value='"+jdata.idwidget+"';document.xajax_form_mode.prefix.value='"+jdata.prefix+"';document.xajax_form_mode.data.value='"+r.id+"';document.xajax_form_mode.mode.value=3;document.xajax_form_mode.pdfExport.value='';tx_metabookingprocessFormData(xajax.getFormValues('xajax_form_mode'));}");
+		    }
+	  }
+	  //alert('donnees');
+
+	  // footer
+		var trh=document.createElement("tr");
+		t.appendChild(trh);
+		if (jdata.nbpages>0) {
+			var td=document.createElement("td");
+			trh.appendChild(td);
+			if (jdata.page>1) {
+				var a=document.createElement("a");
+				a.href="#";
+				a.id="link"+jdata.prefix+jdata.idwidget+linkcount;
+				linkarray[a.id]="ShowRoom.showlightbox=false;ajxcall('"+callbacks+"','"+jdata.prefix+"','"+jdata.idwidget+"','"+jdata.pagesize+"',"+(jdata.page-1)+");";
+				linkcount++;
+				td.appendChild(a);
+				txt1=document.createTextNode('<<');
+				a.appendChild(txt1);
+			}
+			
+			var td=document.createElement("td");
+			td.colspan=nbl-2;
+			td.align='center';
+			trh.appendChild(td);
+			if (jdata.nbpages>1) {
+				var txt2=document.createTextNode('Page '+jdata.page+' sur '+jdata.nbpages);
+				td.appendChild(txt2);
+			}
+
+			var td=document.createElement("td");
+			td.align='right';
+			trh.appendChild(td);
+			if (jdata.nbpages>0 && jdata.page < jdata.nbpages) {
+				var a=document.createElement("a");
+				a.href="#";
+				a.id="link"+jdata.prefix+jdata.idwidget+linkcount;
+				linkarray[a.id]="ShowRoom.showlightbox=false;ajxcall('"+callbacks+"','"+jdata.prefix+"','"+jdata.idwidget+"','"+jdata.pagesize+"',"+(jdata.page+1)+");";
+				linkcount++;
+				td.appendChild(a);
+				txt3=document.createTextNode('>>');
+				a.appendChild(txt3);
+			}
+		}		
+		res.innerHTML=d.innerHTML
+		// link setup for firefox
+		
+		
+		//nbl=linkarray.length;
+		for (i=0;i<linkcount;i++) {
+			var el=document.getElementById("link"+jdata.prefix+jdata.idwidget+i);
+			//ShowRoom.addEvent(el,'click',linkarray["link"+jdata.prefix+jdata.idwidget+i]);				
+			var fobj=new Function('event',linkarray["link"+jdata.prefix+jdata.idwidget+i]+"if(event.preventDefault){event.preventDefault();};event.returnValue = false;");
+			ShowRoom.addEvent(el,'click',fobj);	
+		}
+		res.style.display='block';
+	}
+}
+
+function ajxcall(callbacks,prefix,idwidget,pagesize,page) {
+		document.getElementById('cl_logo_'+prefix+idwidget).className='wait';
+		document.xajax_form_mode.mode.value=2;
+		document.xajax_form_mode.callbacks.value=callbacks;
+		document.xajax_form_mode.cmd.value='combolist';
+		document.xajax_form_mode.prefix.value=prefix;
+		document.xajax_form_mode.code.value=idwidget;
+		document.xajax_form_mode.pagesize.value=pagesize;
+		document.xajax_form_mode.eventdata.value='';
+		document.xajax_form_mode.data.value=document.getElementById('cl_i'+prefix+idwidget).value;
+		document.xajax_form_mode.page.value=page;
+	  tx_metabookingprocessFormData(xajax.getFormValues('xajax_form_mode'));
+}
+
+//--- LightBox();
+
+function showLightbox()
+{
+	if (!ShowRoom.showlightbox) return;
+	// prep objects
+	var objOverlay = document.getElementById('overlay');
+	var objLoadingImage = document.getElementById('loadingImage');
+	var arrayPageSize = getPageSize();
+	var arrayPageScroll = getPageScroll();
+	if (objLoadingImage) {
+		objLoadingImage.style.top = (arrayPageScroll[1] + ((arrayPageSize[3] - 35 - objLoadingImage.height) / 2) + 'px');
+		objLoadingImage.style.left = (((arrayPageSize[0] - 20 - objLoadingImage.width) / 2) + 'px');
+		objLoadingImage.style.display = 'block';
+	}
+	objOverlay.style.height = (arrayPageSize[1] + 'px');
+	objOverlay.style.display = 'block';
+};
+
+function hideLightbox()
+{
+	// get objects
+	objOverlay = document.getElementById('overlay');
+
+
+	// hide lightbox and overlay
+	objOverlay.style.display = 'none';
+
+
+	// make select boxes visible
+	selects = document.getElementsByTagName("select");
+    for (i = 0; i != selects.length; i++) {
+		selects[i].style.visibility = "visible";
+	}
+	document.onkeypress = '';
+	ShowRoom.showlightbox=true;
+};
+
+function initLightbox()
+{
+	if (!document.getElementsByTagName){ return; }
+	var objBody = document.getElementsByTagName("body").item(0);
+	var objOverlay = document.createElement("div");
+	objOverlay.setAttribute('id','overlay');
+	objOverlay.onclick = function () {hideLightbox(); return false;}
+	objOverlay.style.display = 'none';
+	objOverlay.style.position = 'absolute';
+	objOverlay.style.top = '0';
+	//objOverlay.style.border = '12px solid';
+	objOverlay.style.left = '0';
+	objOverlay.style.zIndex = '5000';
+ 	objOverlay.style.width = '100%';
+	objBody.insertBefore(objOverlay, objBody.firstChild);
+	var arrayPageSize = getPageSize();
+	var arrayPageScroll = getPageScroll();
+	var imgPreloader = new Image();
+	imgPreloader.onload=function(){
+
+		var objLoadingImageLink = document.createElement("a");
+		objLoadingImageLink.setAttribute('href','#');
+		objLoadingImageLink.onclick = function () {hideLightbox(); return false;}
+		objOverlay.appendChild(objLoadingImageLink);
+		
+		var objLoadingImage = document.createElement("img");
+		objLoadingImage.src = loadingImage;
+		objLoadingImage.setAttribute('id','loadingImage');
+		objLoadingImage.style.position = 'absolute';
+		objLoadingImage.style.zIndex = '150';
+		objLoadingImageLink.appendChild(objLoadingImage);
+
+		imgPreloader.onload=function(){};	//	clear onLoad, as IE will flip out w/animated gifs
+
+		return false;
+	}
+
+	imgPreloader.src = loadingImage;
+};
+
+function showWindowSpectateurs(content) {
+		winspect = new Window({className: 'mac_os_x', title: 'Spectateurs', top: 80, left : 0, width:250, height:350, destroyOnClose: true, closable: false, draggable: true,showEffect:Element.show,hideEffect:Element.hide, recenterAuto:false});
+		winspect.getContent().update(content);
+		winspect.show();
+};
+
+function showWindowTickets(content) {
+		wintickets = new Window({className: 'mac_os_x', title: 'Transactions en cours', top: 80, left : 470, width:545, height:350, destroyOnClose: true, closable: false, draggable: true,showEffect:Element.show,hideEffect:Element.hide, recenterAuto:false});
+		wintickets.getContent().update(content);
+		wintickets.show();
+};
+
+function showWindowTarifs(content) {
+		wintarifs = new Window({className: 'mac_os_x', title: 'Tarifs/Réservations/Billets', top: 80, left : 260, width:200, height:350, destroyOnClose: true, closable: false, draggable: true,showEffect:Element.show,hideEffect:Element.hide, recenterAuto:false});
+		wintarifs.getContent().update(content);
+		wintarifs.show();
+};
+
+function showWindowPrereservations(content) {
+		winpreresas = new Window({className: 'mac_os_x', title: 'Préréservations', top: 480, left : 0, width:1015, height:300, destroyOnClose: true, closable: false, draggable: true,showEffect:Element.show,hideEffect:Element.hide, recenterAuto:false});
+		winpreresas.getContent().update(content);
+		winpreresas.show();
+};
+
+function showWindowSeances(content) {
+		winplan = new Window({className: 'mac_os_x', title: 'Plan séances', top: 80, left : 0, width:1015, height:350, destroyOnClose: false, closable: true, draggable: true,showEffect:Element.show,hideEffect:Element.hide, recenterAuto:false});
+		winplan.getContent().update(content);
+		//winplan.show();
+};
+
+function showWindowCaisse(content) {
+		wincaisse = new Window({className: 'mac_os_x', title: 'Caisse', top: 80, left : 0, width:900, height:600, destroyOnClose: false, closable: true, draggable: true,showEffect:Element.show,hideEffect:Element.hide, recenterAuto:false});
+		wincaisse.getContent().update(content);
+		//wincaisse.showCenter(1);
+};
+
+function showWindowErrors(content) {
+		winerrors = new Window({className: 'mac_os_x', title: 'Erreurs', top: 80, left : 0, width:900, height:600, destroyOnClose: false, closable: true, draggable: true,showEffect:Element.show,hideEffect:Element.hide, recenterAuto:false});
+		winerrors.getContent().update(content);
+		//wincaisse.showCenter(1);
+};

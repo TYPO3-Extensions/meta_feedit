@@ -1,0 +1,142 @@
+// META FEEDIT ACTIONS
+
+plugin.tx_metafeedit_pi1.stdWrap.tx_metafeedit_actions.image.typolink {
+	parameter.field=page
+	useCacheHash=1
+	ATagParams.dataWrap = alt="{field:tooltip}" title="{field:tooltip}"
+}
+
+
+/**
+ * Page object - XML output
+ */
+
+
+meta_feedit_ajax = PAGE
+meta_feedit_ajax.typeNum=9002
+meta_feedit_ajax.10 = TEMPLATE
+meta_feedit_ajax.10 {
+   template = FILE
+   template.file = EXT:meta_feedit/res/indexajax.html
+   template.file = typo3conf/ext/meta_feedit/res/indexajax.html
+	 workOnSubpart = DOCUMENT_BODY
+	 subparts {
+    DOCUMENT_CONTENU < styles.content.get
+	 }
+}
+
+
+meta_feedit  = PAGE
+meta_feedit {
+	
+	// Page type ID
+	typeNum = 9001
+	
+	// No cache
+	config.no_cache = 1
+	
+	// Page alternate generation script
+	config.pageGenScript = EXT:meta_feedit/xml_output.php
+	
+	// Hide admin panel
+	config.admPanel = 0
+}
+
+
+plugin.tx_metafeedit_pi1.stdWrap.tx_metafeedit_actions.title.typolink {
+	parameter.field=page
+	useCacheHash=1
+	ATagParams.dataWrap = alt="{field:tooltip}" title="{field:tooltip}"
+}
+
+// META DOCS
+
+plugin.tx_metafeedit_pi1.metafeedit {
+
+# warning, these definitions might change in future releases!
+  # IMPORTANT: be sure to have an element called "unknown" and
+  # "source" (the latter only if you want to use the source code
+  # beautifier)
+  ### to add: flash, ps, password, reload, iso, diff, makefile
+  map_type_to_icon {
+    folder   = folder.png
+    move_up  = move_up.png
+    link     = mime.png
+    unknown  = mime.png
+    folder_denied = folder_denied.png
+    file_denied   = mime_denied.png
+    image1   = image.png
+    image2   = draw.png
+    video    = video.jpg
+    sound    = sound.png
+    archiv   = tar.png
+    backup   = mime.png
+    text     = txt.png
+    html     = html.png
+    xml      = html.png
+    asm      = source.png
+    c        = source.png
+    cpp      = source.png
+    cheader  = source.png
+    css      = source.png
+    java     = source.png
+    jscript  = source.png
+    latex    = source.png
+    makefile = source.png
+    modula2  = source.png
+    mysql    = source.png
+    pascal   = source.png
+    perl     = source.png
+    php      = source.png
+    shellscript = source.png
+    source   = source.png
+    #pdf      = pdf.png
+    ps       = pdf.png
+  }
+
+  # map file types to file extensions
+  # warning, these definitions might change in future releases!
+  
+  map_player_to_ext {
+    # slideshow = .gif|.jpg|.jpeg|.png|.bmp
+  	image 			 = .gif|.jpg|.jpeg|.png|.bmp|.pdf
+    flvplayer    = .flv
+    #wildside_flash_mp3_player = .mp3
+    fe_mp3player = .mp3
+    sr_quicktime = .mov
+    rg_realmedia = .rm
+  }
+  
+  map_type_to_ext {
+    image1   = .gif|.jpg|.jpeg|.png|.pdf
+    image2   = .bmp|.tga|.psd|.psp
+    video    = .avi|.mov|.mpg|.mpeg|.asf|.wmv|.qt|.flv|.rm
+    sound    = .mp3|.ogg|.wma|.wav|.au
+    archiv   = .tar|.gz|.bz2|.rar|.zip|.z
+    backup   = .bak|~
+    text     = .txt|.asc|.doc|.sxw
+    html     = .htm|.html
+    xml      = .xml|.xsl|.csv
+   	asm      = .8|.a|.a86|.asm|.s
+    c        = .c
+    cpp      = .cpp|.c++
+    cheader  = .h
+    css      = .css
+    java     = .j|.jav|.java
+    jscript  = .js
+    latex    = .latex|.dtx|.tex
+    makefile = makefile
+    modula2  = .m2|.mod
+    mysql    = .sql
+    pascal   = .pas
+    perl     = .pl
+    php      = .php|.php3|.php4|.phtml|.phtm|.phps
+    shellscript = .sh
+    source   = .pas|.mod
+    #pdf      = .pdf
+    ps       = .ps
+  }
+
+
+
+}

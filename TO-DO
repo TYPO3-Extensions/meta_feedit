@@ -1,0 +1,10 @@
+* List mode
+  Searche by alphabetecal order on label field
+  Search by category
+
+* Edit & Create Mode
+  Eval values
+  Override value
+  afterSave function in BE
+* General
+  Error messages in localLang

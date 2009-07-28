@@ -1,0 +1,45 @@
+add new changes on top of this file)
+
+
+0.0.25 : 
+Updated documentation & language files (thanks to Chris Paige [chris@ready-set-go.biz])
+Php 5.2.1 compatibility thanks to Kraus, Bjoern [kraus@phoenix-medien.de]
+Corrected bug on getParentJoin and minor MM bugs.
+Added new user functions calls for programming framework ...
+
+0.0.23: Corrected bug on sr_staticinfo Added php4 compatibility for htmlspecialchars_decode
+0.0.22: Many bug corrections Possibility to use code from external classes new stdwraps ..
+0.0.21: Corrected language overlay bugs Corrected XHTML bugs Added datagrid functionnality
+0.0.20: corrected pb on mediaplayer
+0.0.19: handles multilingual records added language mark in flexform for template
+
+05-07-06 Christophe Monard (cmonard@metaphore.fr)
+
+    * V 0.0.4
+        - added create templates (saved + mail)
+	- added edit templates (saved + mail)
+	- added delete templates (saved + mail)
+	- added setFixed templates
+
+28-06-06 Christophe Balisky (cbalisky@metaphore.fr)
+
+    * V 0.0.3
+	- CSS 96% width for fields
+
+24-06-06 Christophe Balisky (cbalisky@metaphore.fr)
+
+    * V 0.0.2
+	- added dynamic table and fields throught TCA
+	- now we can edit in FE without being logged in.
+
+24-06-06 Christophe Balisky (cbalisky@metaphore.fr)
+
+    * V 0.0.1
+	- added static css_styles
+	- ext_emconf.php is updated  
+	- corrected div bug in template
+
+06-06-06 Christophe Balisky (cbalisky@metaphore.fr)
+
+    * Initial release
+

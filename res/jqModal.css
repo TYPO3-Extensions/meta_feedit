@@ -1,0 +1,43 @@
+/* jqModal base Styling courtesy of;
+	Brice Burgess <bhb@iceburg.net> */
+
+/* The Window's CSS z-index value is respected (takes priority). If none is supplied,
+	the Window's z-index value will be set to 3000 by default (via jqModal.js). */
+	
+.jqmWindow {
+    display: none;
+    position: fixed;
+    top: 17%;
+    left: 50%;    
+    margin-left: -300px;
+    width: auto;
+    height: auto;
+    background-color: #EEE;
+    color: #333;
+    border: 1px solid black;
+    padding: 12px;
+}
+#modalWindow {    
+		width: 1024px;
+    height: 800px;
+}
+
+.jqmContent {width:100%;height:90%}
+.jqDrag {cursor: move;}
+.jqmTitle {background-color:white;color:black;}
+
+.jqmOverlay { background-color: #000; }
+img.jqResize {position: absolute; right: 2px; bottom: 2px;cursor:nw-resize;}
+.jqmTitle {
+	border:1px solid #AAA;
+	margin-right:1px;
+	padding-right:10px;
+	padding-left:10px;
+	background: url(/typo3conf/ext/meta_feedit/res/fondbtn.png) repeat-x;
+	line-height:20px;
+	color:#666; 
+	font-size:10px;
+	font-weight:bold;
+	text-decoration:none
+}
+
