@@ -841,6 +841,7 @@ class tx_metafeedit_lib {
 		$ftable = $table?$table:$conf['table'];
 		$relTable=$ftable;
 		foreach ($fNA as $f) {
+        if (strstr($f,'--fse--') || strstr($f,'--fsb--'))     continue;
 		    $relTable=$ftable;
 			//ugly hack by CMD
 			if ($f!="sorting") {
@@ -1331,10 +1332,11 @@ class tx_metafeedit_lib {
     					$dataArr[$_fN] = time() + 24 * 60 * 60 * intval(substr($conf[$fe_adminLib->conf['cmdKey']."."]["overrideValues."][$fN], 3));
     				}
     				if ($conf['TCAN'][$table]['columns'][$fNiD]['config']['eval'] == 'date' && !empty($dataArr[$fN])) {
-    				    $values = strftime(($conf['dateformat']?$conf['dateformat']:'%e-%m-%Y'),$dataArr[$fN]);
+    				    $values = strftime(($conf['dateformat']?$conf['dateformat']: 
+    				    ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y')),$dataArr[$fN]);
     				}
     				else if($conf['TCAN'][$table]['columns'][$fNiD]['config']['eval'] == 'datetime' && !empty($dataArr[$fN])) {
-    				    $values = strftime(($conf['datetimeformat']?$conf['datetimeformat']:'%H:%M %e-%m-%Y'),$dataArr[$fN]);
+    				    $values = strftime(($conf['datetimeformat']?$conf['datetimeformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y')),$dataArr[$fN]);
     				}
     				// wwwURL check
     				if (in_array('wwwURL', t3lib_div::trimexplode(',', $conf[$fe_adminLib->cmd."."]['evalValues.'][$fN]))) {
@@ -1486,6 +1488,13 @@ class tx_metafeedit_lib {
 					$FT = $conf['TCAN'][$table]['columns'][$fNiD]["config"]["foreign_table"];
 					$label = $conf['label.'][$FT]?$conf['label.'][$FT]:
 					$conf['TCAN'][$FT]['ctrl']['label'];
+										
+					$label_alt = $conf['label_alt.'][$FT]?$conf['label_alt.'][$FT]: 
+						$conf['TCAN'][$FT]['ctrl']['label_alt'];
+
+					$label_alt_force = $conf['label_alt_force.'][$FT]?$conf['label_alt_force.'][$FT]: 
+						$conf['TCAN'][$FT]['ctrl']['label_alt_force'];
+						
 					if ($dataArr[$fN]) {
 						if ($conf['TCAN'][$table]['columns'][$fNiD]["config"]["MM"] && $dataArr[$conf['uidField']]) {
 							// from mm-relation
@@ -1523,6 +1532,7 @@ class tx_metafeedit_lib {
 						while ($resRow = mysql_fetch_assoc($res)) {
 							$this->cObj->start($resRow, $conf['TCAN'][$table]['columns'][$fNiD]["config"]["foreign_table"]);
 							$resLabel = $resRow[$label];
+							$resLabel_alt = $resRow[$label_alt];
 							if ($statictable) {
 								$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
 								$resLabel = $this->getLL('language_'.$code, $conf);
@@ -1531,7 +1541,11 @@ class tx_metafeedit_lib {
 								}
 							}
 							$resLabel = $this->cObj->stdWrap($resLabel, $conf['evalWrap.'][$fN.'.']);
-							$vals[] = $resLabel;
+							$resLabel_alt = $this->cObj->stdWrap($resLabel_alt, $conf['evalWrap.'][$fN.'.']);
+
+							$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
+							$tempLabel = $tempLabel ? $tempLabel : $resLabel_alt;
+							$vals[] = $tempLabel;
 						}
 						$this->cObj->start($d, $table);
 						$cc = count($vals);
@@ -2325,8 +2339,12 @@ class tx_metafeedit_lib {
 
 		} else {
             $label = $conf['label.'][$foreignTable]?$conf['label.'][$foreignTable]:$conf['TCAN'][$foreignTable]['ctrl']['label'];
-			$whereClause='';
-
+			
+            $label_alt = $conf['label_alt.'][$foreignTable]?$conf['label_alt.'][$foreignTable]:$conf['TCAN'][$foreignTable]['ctrl']['label_alt'];
+            
+            $label_alt_force = $conf['label_alt_force.'][$foreignTable]?$conf['label_alt_force.'][$foreignTable]:$conf['TCAN'][$foreignTable]['ctrl']['label_alt_force'];
+            
+          $whereClause='';
 			//if ($TCAN[$foreignTable]['ctrl']['languageField'] && $TCAN[$foreignTable]['ctrl']['transOrigPointerField']) {
       //$whereClause .= ' AND '.$TCAN[$foreignTable]['ctrl']['transOrigPointerField'].'=0 ';
 			//}
@@ -2426,7 +2444,8 @@ class tx_metafeedit_lib {
 
 	   		if ($n>$max) break;
 	 			$n++;
-				$resLabel=$resRow[$label];
+				$resLabel = $resRow[$label];
+				$resLabel_alt = $resRow[$label_alt];
 				if ($conf['general.']['labels.'][$fN.'.']['userFunc_alterRow']) {
 					t3lib_div::callUserFunction($conf['general.']['labels.'][$fN.'.']['userFunc_alterRow'], $resRow, $conf);
 				}
@@ -2438,6 +2457,9 @@ class tx_metafeedit_lib {
 					foreach ($tslabels as $tslabel) {
 							//$resRow=$this->processDataArray($resRow,$conf);
 							$resLabel.=$resLabel?" ".($resRow["EVAL_".$tslabel]?$resRow["EVAL_".$tslabel]:$resRow[$tslabel]):($resRow["EVAL_".$tslabel]?$resRow["EVAL_".$tslabel]:$resRow[$tslabel]);
+
+							$resLabel_alt.=$resLabel_alt ?" ".($resRow["EVAL_".$tslabel]?$resRow["EVAL_".$tslabel]:$resRow[$tslabel]):($resRow["EVAL_".$tslabel]?$resRow["EVAL_".$tslabel]:$resRow[$tslabel]);
+
 					}
 				}
 				if ($statictable) {
@@ -2445,8 +2467,11 @@ class tx_metafeedit_lib {
 		        	$resLabel = $this->getLL('language_'.$code,$conf);
 		        	if( !$resLabel ) { $resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset); } // CBY  what is this static Info charset ???
 				}
-				$resRow['tx_metafeedit_resLabel']=$resLabel;
-				$sortAux[]=$resLabel;
+				
+				$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
+				$tempLabel = $tempLabel ? $tempLabel : $resLabel_alt;
+				$resRow['tx_metafeedit_resLabel']=$tempLabel;
+				$sortAux[]=$tempLabel;
 				$sortTab[]=$resRow;
       }
 			mysql_free_result($res);
