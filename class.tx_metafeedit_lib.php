@@ -3989,10 +3989,7 @@ for use in the selector
 						//krumo($curTable);
 						//$sql['advancedWhere'].=" AND ".$curTable['relTableAlias'].".".$curTable['fNiD']." LIKE '$valeur' ";
 						$champ=($curTable['tableAlias'])?$curTable['relTableAlias'].".".$curTable['fNiD']:$curTable['relTableAlias']."_".$curTable['fieldAlias'];
-						$sql['advancedWhere'].=" AND (".$champ." LIKE '$valeur' ";
-						$sql['advancedWhere'].=" OR ".$champ." LIKE '%$valeur' ";
-						$sql['advancedWhere'].=" OR ".$champ." LIKE '$valeur%' ";
-						$sql['advancedWhere'].=" OR ".$champ." LIKE '%$valeur%') ";
+						$sql['advancedWhere'].=" AND FIND_IN_SET('$valeur',$champ)"; 
 					} else {
 						//$mmTable=$conf['TCAN'][$curTable['table']]['columns'][$key]['config']['MM'];
 						$mmTable=$conf['TCAN'][$curTable['relTable']]['columns'][$key]['config']['MM'];
