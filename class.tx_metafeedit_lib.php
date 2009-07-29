@@ -2476,6 +2476,16 @@ class tx_metafeedit_lib {
       }
 			mysql_free_result($res);
 
+
+/*****************
+Feature #4054
+
+Location for some sort of hook 
+to compile additional information 
+for use in the selector
+
+***************/
+
 			if ($statictable) {
 				//array_multisort($sortAux, SORT_ASC, $sortTab);
 
@@ -2487,6 +2497,14 @@ class tx_metafeedit_lib {
 			foreach($sortTab as $resRow) {	
 					$selected = in_array($resRow[$conf['uidField']],$uids)?"selected":"";
 				$selected=$selected?$selected:($resRow[$conf['uidField']]==$forceVal?'selected':'');
+				/*************
+        Feature #4054
+
+				This option statement would be 
+				where some kind of hook might be 
+				placed to adjust output information
+				in the selector
+				*************/
           			$options .= '<option value="'.$resRow[$conf['uidField']].'" '.$selected.'>'.$resRow['tx_metafeedit_resLabel'].'</option>';
 			}
 		}
