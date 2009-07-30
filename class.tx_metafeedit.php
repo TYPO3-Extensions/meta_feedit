@@ -375,7 +375,7 @@ class tx_metafeedit extends  tslib_pibase {
        
          if (is_array($conf['_LOCAL_LANG.'])){
             foreach($conf['_LOCAL_LANG.'] as $key=>$valarr) {
-            	$nkey=substr($key,0,2);
+		$nkey=substr($key,0,strpos($key,'.')); 
             	foreach($valarr as $skey=>$sval) {
 					//modif cmd - on ne regénère pas - met chaque info dans une clef précise - on garde au minimum table.champ, le reste est ajoute ensuite
 					if (is_array($sval)) {
