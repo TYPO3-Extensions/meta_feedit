@@ -2900,7 +2900,7 @@ for use in the selector
 
 		if (!$conf['ajax.']['ajaxOn'])	$tmp.='<td align="left">###ACTION-BACK###</td><td>###ACTION-NEW###</td>';
 		$tmp.='<td align="right"><div class="'.$caller->pi_getClassName('actions').' '.$caller->pi_getClassName('edit-actions').'">'.$conf['actions.']['useractions'].$conf['actions.']['delete'].'</div></td><td>###ACTION-PDF###</td>';
-		$tmp.='</tr></td>';
+		$tmp.='</tr></table>';
 		return $tmp;
 	}
     /**
