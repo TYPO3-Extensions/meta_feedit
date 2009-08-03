@@ -3695,8 +3695,10 @@ evalFunc.USmode =
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
 		$fsbc=0;
 		$fsi=0;
-		if ($conf['list.']['advancedSearchAjaxSelector']) {   // RSG make advanced search tabs optional
 		$ret='<div id="'.$this->caller->pi_getClassName('as').'_asfilter_'.$conf['pluginId'].'" class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-text').' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-text').' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-text-'.$curTable['fNiD']).'">'.$filter.'</div>';
+		
+		if ($conf['list.']['advancedSearchAjaxSelector']) {   // RSG make advanced search tabs optional
+		
 		$searchTabs=array();
 		$searchTabs[]='<li class="active"><a id="'.$this->caller->pi_getClassName('as').'_asfilter_'.$conf['pluginId'].'_a" href="#">'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</a></li>';
 		} //
