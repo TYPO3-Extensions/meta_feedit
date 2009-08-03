@@ -314,5 +314,6 @@ th.mfdt-actions a { display:inline;}
 	font-family:"Trebuchet MS",Arial,Helvetica,sans-serif;
 	font-size:13px;
 }
+.tx-metafeedit > table {clear:both;}
 )
 }
