@@ -3695,9 +3695,11 @@ evalFunc.USmode =
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
 		$fsbc=0;
 		$fsi=0;
+		if ($conf['list.']['advancedSearchAjaxSelector']) {   // RSG make advanced search tabs optional
 		$ret='<div id="'.$this->caller->pi_getClassName('as').'_asfilter_'.$conf['pluginId'].'" class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-text').' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-text').' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-text-'.$curTable['fNiD']).'">'.$filter.'</div>';
 		$searchTabs=array();
 		$searchTabs[]='<li class="active"><a id="'.$this->caller->pi_getClassName('as').'_asfilter_'.$conf['pluginId'].'_a" href="#">'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</a></li>';
+		} //
 		foreach($fieldArray as $FN) {
 			$params=t3lib_div::trimExplode(';',$FN);
 		  if ($params[0]!='--div--') {
@@ -3735,8 +3737,10 @@ evalFunc.USmode =
 					$type=($curTable['fNiD']=='crdate' && (string)$type=='')?'date':$type;
 					$Lib='<div class="'.$this->caller->pi_getClassName('asl').'">'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</div>';
 					    //$fN=str_replace('.','_',$fN);
+					    if ($conf['list.']['advancedSearchAjaxSelector']) {  // rsg
 					$searchTabs[]='<li><a id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'_a" href="#">'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</a></li>';
-					$div='<div id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'" style="display:none;" class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type.'-'.$curTable['fNiD']).'">'.$Lib;
+					} //
+					$div='<div id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'" '. ($conf['list.']['advancedSearchAjaxSelector']? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type.'-'.$curTable['fNiD']).'">'.$Lib;  // rsg adjust
 					$value=' value="###ASFIELD_'.$FN.'_VAL###"';
 					switch((string)$type) {
 					case 'text':
@@ -3814,7 +3818,9 @@ evalFunc.USmode =
 			$ret.='</fieldset>';
 			$fsbc--;
 		}
-		$ret=$cnt.'<ul class="astabnav">'.implode("",$searchTabs)."</ul>".$ret;
+		
+		$ret=$cnt.($conf['list.']['advancedSearchAjaxSelector'] ? '<ul class="astabnav">'.implode("",$searchTabs)."</ul>" : '').$ret;  //RSG adjust
+		
 		$ret.='<div '.$this->caller->pi_classParam('advancedSearch-actions').'><div '.$this->caller->pi_classParam('advancedSearch-action').'>';
 		$ret.='<div '.$this->caller->pi_classParam('advancedSearch-action').'><input type="submit" name="submit" value="'.($conf['edit.']['preview']?$this->metafeeditlib->getLL("advanced_search_label",$conf):$this->metafeeditlib->getLL("advanced_search_label",$conf)).'"'.$this->caller->pi_classParam('form-submit').' /></div>';
 		$ret.='<div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('advancedSearch-action').' '.$this->caller->pi_getClassName('as_reset').'"><a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[reset]['.$conf['pluginId'].']=1">'.$this->metafeeditlib->getLL("advanced_search_reset",$conf).'</a></div>';
