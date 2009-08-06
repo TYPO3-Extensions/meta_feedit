@@ -2617,7 +2617,7 @@ for use in the selector
 	function getListItemActionsLib(&$conf) {
 		$ret='';
 		if (!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions'])) {
-			$ret='<th class="mfdt-actions">'.$this->getLL('actions',$conf).'<a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[resetorderby]['.$conf['pluginId'].']=1">'.$this->getLL('order_by_reset',$conf).'</th>';
+			$ret='<th class="mfdt-actions">'.$this->getLL('actions',$conf). ($conf['list.']['sortFields'] ? '<a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[resetorderby]['.$conf['pluginId'].']=1">'. $this->getLL('order_by_reset',$conf) .'</a>' : '').'</th>';  // rsg
 		}
 		return $ret;
 	}
