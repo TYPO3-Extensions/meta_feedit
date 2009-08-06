@@ -3796,7 +3796,7 @@ evalFunc.USmode =
 							$ret.=$ajaxWidgets->comboList($this->metafeeditlib->getLLFromLabel($label,$conf),'','','handleData','setData',$this->metafeeditlib->getLLFromLabel($label,$conf),15,$conf,$FN);
 						  } else {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
-							$name = ' name="'.($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
+							$name = ' name="'.($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" ':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
     						$ret.=$div.'<select size="1"'.$name.$this->caller->pi_classParam('form-asfield').'>';   						
 							$SO='###AS_FIELD_'.$FN.'###';
 							$ret.=$SO.'</select>';
