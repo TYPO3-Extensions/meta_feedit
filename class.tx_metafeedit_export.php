@@ -208,7 +208,6 @@ class tx_metafeedit_export {
 				$marginbottom=$s->attributes()->mb;		
 				$format=array($s->attributes()->w,$s->attributes()->h);
 		}
-		//print_r($format) ; die();
 		$unit='mm';
 		$pdf = new tx_metafeedit_pdf($orientation, $unit, $format);
 		$pdf->AddFont('3OF9','','3OF9.php');
@@ -248,15 +247,17 @@ class tx_metafeedit_export {
 			$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
 			$pdf->Ln(2);	
 		}
+		
 		$fs=9;
-		// on met la taille et la police d'impression
+		
+		// We set height and font
 		
 		$this->getPolice($police);
 		$this->getFont($font);
 		$pdf->SetFont($font,'',$police);
 		$alt=0;
 
-		// Contenu
+		// Content
 		$pdf->setFillColor(125,125,125);
 		$height = ($this->confTS[$this->pluginId.'.']['list.']['height'])?$this->confTS[$this->pluginId.'.']['list.']['height']:(($this->confTS['default.']['list.']['height'])?$this->confTS['default.']['list.']['height']:($pdf->cellsize?$pdf->cellsize:5)); // hauteur de la ligne pdf
 		$r=0;
@@ -413,9 +414,9 @@ class tx_metafeedit_export {
 			}
 		}
 
-		// La feuille est de dimension 21 x 29.7- cmd reduit a 20 pour conserver la marge
+		// Page size is 21 x 29.7- reduced to 20 to preserve margin.
 		if ($taille <200) $orientation='P';	// portrait
-		else $orientation='L';				// paysage
+		else $orientation='L';				// landscape
 
 		$format=A4;
 		$unit='mm';
@@ -451,19 +452,19 @@ class tx_metafeedit_export {
 		$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
 		$pdf->Ln(2);
 		
-		// on met la taille et la police d'impression
+		// we set font and size
 		
 		$this->getPolice($police);
 		$this->getFont($font);
 		$pdf->SetFont($font,'',$police);
-		$alt=0;
+		$alt=1;
 
-		// Contenu
+		// Content 
 		$pdf->setFillColor(125,125,125);
 		$height = ($this->confTS[$this->pluginId.'.']['list.']['height'])?$this->confTS[$this->pluginId.'.']['list.']['height']:(($this->confTS['default.']['list.']['height'])?$this->confTS['default.']['list.']['height']:($pdf->cellsize?$pdf->cellsize:5)); // hauteur de la ligne pdf
 		$r=0;
 		foreach($xml->tr as $row) {
-			$x=0; //compteur des colonnes
+			$x=0; //column counter 
 			if ($alt>1) {							// changement de couleur 1 ligne sur 2
 				$alt=0;
 				$pdf->setFillColor(200,200,200);
@@ -482,19 +483,18 @@ class tx_metafeedit_export {
 				$val = $col->data;
 				$result = ereg("(^[0-9]+([\.0-9]*))$" , $val);
 
-				// Affichage du signe € sur l'export PDF CBY : a virer !!!
+				// Currency handling € CBY should not be here !!!
 				if ($this->conf['list.']['euros'] && $result) $val .= ' €';
 
 				if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
 					$vala=t3lib_div::trimexplode(',',$val);
 					$img='';
 				 	$myx=$pdf->getX();
-					$pdf->Cell($taille,$height,'',1,0,'L',1);
+					$pdf->Cell($size,$height,'',1,0,'L',1);
 					$pdf->setX($myx);
 
 					foreach($vala as $v) {
 						$img=PATH_site.($v?$col->img->dir.'/'.$v:'');
-						//$pdf->Image($img,$pdf->getX(),$pdf->getY()+0.5,$size/1.05, $size/1.3);
 						$imginfo=getimagesize($img);
 						if (is_array($imginfo)) {
 							$w=$imginfo[0];
@@ -538,8 +538,8 @@ class tx_metafeedit_export {
 				$x++;
 			}
 			$pdf->setFillColor(255,255,255);
-			$pdf->setX($pdf->getX()+0.1);
-			$pdf->Cell(100000,$height,'',0,0,'L',1);
+			//$pdf->setX($pdf->getX()+0.1);			$pdf->setX(213.33);
+			//$pdf->Cell(100000,$height,'',0,0,'L',1);
 			$pdf->Ln();
 			$r++;
 		}
@@ -620,7 +620,7 @@ class tx_metafeedit_export {
 				$val .= "\n";
 				$cpt--;
 			}
-			$cpt=0;   		// on ne sais jamais ^^
+			$cpt=0;   		// just in case
 			
 			$pdf->setXY( ($marginl? 20 : $nbx*$size*9+20), ($marginh ? 35 : $posy+25));
 			$marginl=0;
