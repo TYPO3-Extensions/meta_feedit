@@ -415,6 +415,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->markerArray['###THIS_URL###'] = htmlspecialchars(t3lib_div::getIndpEnv('TYPO3_REQUEST_DIR'));
 
 		$FEUSER=$GLOBALS['TSFE']->fe_user->user;
+		if (!is_array($FEUSER)) $FEUSER=array();
 		$this->markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $FEUSER, '', TRUE, 'FEUSER_FIELD_', $this->conf['general.']['xhtml']);
 
 		// Setting cmdKey which is either 'edit' or 'create'
@@ -487,7 +488,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 		// If incoming data is seen...
 		if (is_array($this->dataArr))	{
-      if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc incoming data start:']=$this->metafeeditlib->displaytime()." Seconds";
+			if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc incoming data start:']=$this->metafeeditlib->displaytime()." Seconds";
 
 			// Evaluation of data:
 			if (is_array($this->dataArr['grid'])) {
@@ -515,7 +516,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 											
 									}
 									$this->dataArr=$dataArr2;
-								  $this->parseValues();
+									$this->parseValues();
 									$this->overrideValues();
 									$this->evalValues();
 									if ($this->conf['evalFunc'])	{
@@ -556,7 +557,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$this->dataArr=$saveData;
 
 		  } else {
-		  				//krumo($this->dataArr);
+		  		//krumo($this->dataArr);
 
 		        // We are in normal List or edit mode
 				$this->parseValues();
@@ -580,27 +581,32 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
             if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Incoming data end:']=$this->metafeeditlib->displaytime()." Seconds";
 		  }
 		} else {
-		  // We have no incoming data
-      if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc No incoming data start:']=$this->metafeeditlib->displaytime()." Seconds";
+			// We have no incoming data
+			if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc No incoming data start:']=$this->metafeeditlib->displaytime()." Seconds";
 			//moved before creating default value, else it will be unseted
 			$this->dataArr=$dataArr;
 
 			$this->defaultValues($this->conf);	// If no incoming data, this will set the default values.
 		 	// here we  load overrideValues !
 			// override value arr to transmit to fe_adminLib
-      $fNA=$this->metafeeditlib->getOverrideFields($this->conf['inputvar.']['cmd'],$this->conf);
-      foreach($fNA as $fN) {
-      	$val=$this->metafeeditlib->getOverrideValue($fN,$this->conf['inputvar.']['cmd'],$this->conf,$this->cObj);
-      	$dataArr[$fN]=$val;
-			}
-			
+			$fNA=$this->metafeeditlib->getOverrideFields($this->conf['inputvar.']['cmd'],$this->conf);
+			foreach($fNA as $fN) {
+				$val=$this->metafeeditlib->getOverrideValue($fN,$this->conf['inputvar.']['cmd'],$this->conf,$this->cObj);
+				$dataArr[$fN]=$val;
+				$this->dataArr[$fN]=$val;
+			}			
 			$this->currentArr=$dataArr;
+			// ugly hack to handle checkboxes properly
+			$this->dataArr['tx_metafeedit_dont_ctrl_checkboxes']=1;
 
-			if (is_array($this->dataArr)) $this->parseValues(1);
+			if (is_array($this->dataArr) && count($this->dataArr)>1) {
+				$this->parseValues(1);
+				//echo $this->conf['cmdKey'];
+				$this->evalValues();
+
+			}
 			if ($this->conf['evalFunc'])	{
-				// ugly hack to handle checkboxes properly
-				$this->dataArr['tx_metafeedit_dont_ctrl_checkboxes']=1;
-				$this->dataArr = $this->userProcess('evalFunc',$this->dataArr);
+					$this->dataArr = $this->userProcess('evalFunc',$this->dataArr);
 			}
             if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc No incoming data end:']=$this->metafeeditlib->displaytime()." Seconds";
 
@@ -632,16 +638,16 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 			if (($this->conf[$this->conf['inputvar.']['cmd'].'.']['statusScreen'] && ($this->conf['inputvar.']['cmd']=='edit' || $this->conf['inputvar.']['cmd']=='create')) ||  ($this->conf['inputvar.']['cmd']!='edit' && $this->conf['inputvar.']['cmd']!='create')) {
             if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Status screen start:']=$this->metafeeditlib->displaytime()." Seconds";
-				$this->conf['cmdmode']='status';
+			$this->conf['cmdmode']='status';
 
-				// Output message
-				// this should be message in Edit Screen;
+			// Output message
+			// this should be message in Edit Screen;
 
-				$templateCode = $this->cObj->getSubpart($this->templateCode, '###TEMPLATE_'.$key.'_SAVED###');
-				$this->metafeeditlib->setCObjects($this->conf,$this->markerArray,$templateCode,$this->currentArr);
-				// ???
-				$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $this->currentArr, '', TRUE, 'FIELD_', $this->conf['general.']['xhtml']);
-				$content = $this->cObj->substituteMarkerArray($templateCode, $markerArray);
+			$templateCode = $this->cObj->getSubpart($this->templateCode, '###TEMPLATE_'.$key.'_SAVED###');
+			$this->metafeeditlib->setCObjects($this->conf,$this->markerArray,$templateCode,$this->currentArr);
+			// ???
+			$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $this->currentArr, '', TRUE, 'FIELD_', $this->conf['general.']['xhtml']);
+			$content = $this->cObj->substituteMarkerArray($templateCode, $markerArray);
             if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Status screen end:']=$this->metafeeditlib->displaytime()." Seconds";
 			} else {
 				// no status screen we want too stay on the edit form if in create mode we must switch to edit template
@@ -734,11 +740,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
             if ($this->conf['performanceaudit']) $this->perfArray['Conf TCAN size ']=strlen(serialize($this->conf['TCAN']))." Bytes"; 
             if ($this->conf['performanceaudit']) $this->perfArray['Conf LOCALLANG size ']=strlen(serialize($this->conf['LOCAL_LANG']))." Bytes"; 
             if ($this->conf['performanceaudit']) $this->perfArray['Conf Template size ']=strlen(serialize($this->conf['templateContent']))." Bytes"; 
-						if ($this->conf['debug.']['krumo'] && t3lib_extmgm::isLoaded('krumo')) {
-							krumo($this->conf);
-							krumo($this->conf['TCAN']);
-							krumo($this->conf['LOCAL_LANG']);
-						}
+			if ($this->conf['debug.']['krumo'] && t3lib_extmgm::isLoaded('krumo')) {
+				krumo($this->conf);
+				krumo($this->conf['TCAN']);
+				krumo($this->conf['LOCAL_LANG']);
+			}
 	    }
 	    
 	    // Draw RTEs :	        
@@ -1121,7 +1127,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
                                         $this->failureMsg[$theField][]=$this->metafeeditlib->getLL('error_no_upload_path',$this->conf);
 				}
 			}
-				// Implode the list of filenames
+			// Implode the list of filenames
 			$this->dataArr[$theField] = implode(',',$fileNameList);
 		}
 		if ($this->failure) {
@@ -1138,9 +1144,10 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 */
 
 	function overrideValues()	{
-		// Addition of overriding values
 		
+		// Addition of overriding values		
 		// TODO add check and warnings on non existent fields ...
+		
 		if (is_array($this->conf[$this->conf['cmdKey'].'.']['overrideValues.']))	{
 			reset($this->conf[$this->conf['cmdKey'].'.']['overrideValues.']);
 			while(list($theField,$theValue)=each($this->conf[$this->conf['cmdKey'].'.']['overrideValues.']))	{
@@ -1222,12 +1229,14 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		while(list(,$theField)=each($this->requiredArr))	{
 			if (!trim($this->dataArr[$theField]) )	{
 				if ($this->conf['TCAN'][$this->theTable]['columns'][$theField]['config']['type']=='group' && $this->conf['TCAN'][$this->theTable]['columns'][$theField]['config']['internal_type']=='file')	{
+					
 					if (!trim($this->dataArr[$theField.'_file']) )	{
+					
 						$tempArr[]=$theField;
 					}
-				}else {
-				$tempArr[]=$theField;
-			}
+				} else {
+					$tempArr[]=$theField;
+				}
 			}
 		}
 
@@ -1305,8 +1314,17 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						break;
 						case 'required':
 							if (!trim($this->dataArr[$theField]))	{
-								$tempArr[]=$theField;
-								$this->failureMsg[$theField][] = $this->getFailure($theField, $theCmd, $this->metafeeditlib->getLL('error_value_required',$this->conf));
+								if ($this->conf['TCAN'][$this->theTable]['columns'][$theField]['config']['type']=='group' && $this->conf['TCAN'][$this->theTable]['columns'][$theField]['config']['internal_type']=='file')	{
+									if (!trim($this->dataArr[$theField.'_file']) )	{
+										$tempArr[]=$theField;
+										$this->failureMsg[$theField][] = $this->getFailure($theField, $theCmd, $this->metafeeditlib->getLL('error_value_required',$this->conf));
+
+									}
+								} else {
+									$tempArr[]=$theField;
+									$this->failureMsg[$theField][] = $this->getFailure($theField, $theCmd, $this->metafeeditlib->getLL('error_value_required',$this->conf));
+								}
+								//print_r($this->dataArr);
 							}
 						break;
 						case 'atLeast':
@@ -1351,20 +1369,20 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						break;
 						//should go in parse values ?
 						case 'wwwURL':
-                                                        if ($this->dataArr[$theField]) {
-                                                                $wwwURLOptions = array (
-                                                                'AssumeProtocol' => 'http' ,
-                                                                        'AllowBracks' => TRUE ,
-                                                                        'AllowedProtocols' => array(0 => 'http', 1 => 'https', ) ,
-                                                                        'Require' => array('Protocol' => FALSE , 'User' => FALSE , 'Password' => FALSE , 'Server' => TRUE , 'Resource' => FALSE , 'TLD' => TRUE , 'Port' => FALSE , 'QueryString' => FALSE , 'Anchor' => FALSE , ) ,
-                                                                        'Forbid' => array('Protocol' => FALSE , 'User' => TRUE , 'Password' => TRUE , 'Server' => FALSE , 'Resource' => FALSE , 'TLD' => FALSE , 'Port' => TRUE , 'QueryString' => FALSE , 'Anchor' => FALSE , ) ,
-                                                                        );
-                                                                $wwwURLResult = tx_metafeedit_srfeuserregister_pi1_urlvalidator::_ValURL($this->dataArr[$theField], $wwwURLOptions);
-                                                                if ($wwwURLResult['Result'] = 'EW_OK' ) {
-                                                                        $this->dataArr[$theField] = $wwwURLResult['Value'];
-                                                                }
-                                                        }
-                                                        break;
+								if ($this->dataArr[$theField]) {
+										$wwwURLOptions = array (
+										'AssumeProtocol' => 'http' ,
+												'AllowBracks' => TRUE ,
+												'AllowedProtocols' => array(0 => 'http', 1 => 'https', ) ,
+												'Require' => array('Protocol' => FALSE , 'User' => FALSE , 'Password' => FALSE , 'Server' => TRUE , 'Resource' => FALSE , 'TLD' => TRUE , 'Port' => FALSE , 'QueryString' => FALSE , 'Anchor' => FALSE , ) ,
+												'Forbid' => array('Protocol' => FALSE , 'User' => TRUE , 'Password' => TRUE , 'Server' => FALSE , 'Resource' => FALSE , 'TLD' => FALSE , 'Port' => TRUE , 'QueryString' => FALSE , 'Anchor' => FALSE , ) ,
+												);
+										$wwwURLResult = tx_metafeedit_srfeuserregister_pi1_urlvalidator::_ValURL($this->dataArr[$theField], $wwwURLOptions);
+										if ($wwwURLResult['Result'] = 'EW_OK' ) {
+												$this->dataArr[$theField] = $wwwURLResult['Value'];
+										}
+								}
+								break;
 					}
 				}
 				$this->markerArray['###EVAL_ERROR_FIELD_'.$theField.'###'] = is_array($this->failureMsg[$theField]) ? implode('<br />',$this->failureMsg[$theField]) : '';
@@ -1470,7 +1488,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 					//$this->currentArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$newId);
 					//$this->userProcess_alt($this->conf['create.']['userFunc_afterSave'],$this->conf['create.']['userFunc_afterSave.'],array('rec'=>$this->currentArr));
-					//krumo($this->dataArr);
 			
 				$theUid = $this->dataArr[$conf['uidField']];
 				$this->markerArray['###REC_UID###'] = $theUid;
@@ -1914,13 +1931,13 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
     * @param	[type]		$
     * @return	[type]		...
     */
+	
 	function displayListScreen($TABLES,$DBSELECT,&$conf)	{
     if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc displaylist start:']=$this->metafeeditlib->displaytime()." Seconds";
 	  //-- initialisation
 		$conf['cmdmode']='list';
 		$content='';
 		$DEBUG='';
-		//echo "123";
 		$dispDir= $conf['list.']['displayDirection']?$conf['list.']['displayDirection']:'Right'; //-- this should be handled in template choice...
 		//global $TCA;
 		//$pluginId=$conf['pluginId'];
@@ -2727,13 +2744,13 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 				if ($this->conf['blogData']) $this->preview=1; 
 				// we check if edit or preview mode is allowed ...
 				if (!$this->conf['edit'] && !$this->preview )	{	// If editing is enabled
-			     $content.='Edit-option or Preview-option is not set in TypoScript';
-					 return $content;
+					$content.='Edit-option or Preview-option is not set in TypoScript';
+					return $content;
 				}
 				
-			  if ($this->conf['disableEdit'] && !$this->preview )	{	// If editing is enabled
-			     $content.='Edit-option or Preview-option is not set in TypoScript';
-					 return $content;
+				if ($this->conf['disableEdit'] && !$this->preview )	{	// If editing is enabled
+					$content.='Edit-option disabled and Preview-option is not set in TypoScript';
+					return $content;
 				}
 
 				if ($this->aCAuth($origArr) || $this->metafeeditlib->DBmayFEUserEdit($this->theTable,$origArr, $GLOBALS['TSFE']->fe_user->user,$this->conf['allowedGroups'],$this->conf['fe_userEditSelf'],$this->conf))	{	// Display the form, if access granted.
