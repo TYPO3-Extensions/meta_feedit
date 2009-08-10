@@ -856,11 +856,11 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		//==================================================================================
 		// JAVASCRIPT LIBRARIES ...
 		if ($mfconf['ajax.']['ajaxOn'] && !t3lib_div::_GP('ajx')) {
-			$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'jquery'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jquery.js"></script>';
-			$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'jqmodal'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jqModal.js"></script>';
-			$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'meta_feedit_jquery'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/meta_feedit_ajax.js"></script>';
-			$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'jqDnR'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jqDnR.js"></script>';
-			$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'AC_RunActiveContent'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/AC_RunActiveContent.js"></script>';
+			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jquery'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jquery.js"></script>';
+			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jqmodal'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jqModal.js"></script>';
+			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_ajax'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/meta_feedit_ajax.js"></script>';
+			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jqDnR'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jqDnR.js"></script>';
+			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_AC_RunActiveContent'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/AC_RunActiveContent.js"></script>';
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'prototype'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/prototype.js"></script>';
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'windows'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/window.js"></script>';
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'effects'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/effects.js"></script>';
@@ -870,7 +870,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'windowscss'] = '<link href="'.t3lib_extMgm::siteRelPath($this->extKey).'res/themes/default.css" rel="stylesheet" type="text/css"/>';
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'windowscss2'] = '<link href="'.t3lib_extMgm::siteRelPath($this->extKey).'res/themes/mac_os_x.css" rel="stylesheet" type="text/css"/>';
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'windowscssdbg'] = '<link href="'.t3lib_extMgm::siteRelPath($this->extKey).'res/themes/debug.css" rel="stylesheet" type="text/css"/>';
-			$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'jqModalcss'] = '<link href="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jqModal.css" rel="stylesheet" type="text/css"/>';
+			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jqModalcss'] = '<link href="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jqModal.css" rel="stylesheet" type="text/css"/>';
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['meta_feedit'] = '$().ready(function() {$(\'#modalWindow\').jqm({overlay: 70,modal: true,trigger: \'a\',target: \'#jqmContent\'});});$(\'#modalWindow\').jqmShow();';
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['meta_feedit'] = 'jQuery().ready(function() {jQuery(\'#modalWindow\').jqm({overlay: 70,modal: true,trigger: \'.jqModal\',target: \'#jqmContent\',onHide: closeModal,onShow: openInFrame});jQuery(\'#modalWindow\').jqmShow();});';
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['meta_feedit'] = 'jQuery().ready(function() {jQuery(\'#modalWindow\').jqm();});';
