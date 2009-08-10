@@ -315,5 +315,6 @@ th.mfdt-actions a { display:inline;}
 	font-size:13px;
 }
 .tx-metafeedit > table {clear:both;}
+.tx-metafeedit th a {white-space : nowrap;}
 )
 }
