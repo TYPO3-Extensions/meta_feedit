@@ -1941,6 +1941,12 @@ class tx_metafeedit extends  tslib_pibase {
 							$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table'],$val);
 							$val=$rec[$conf['TCAN'][$conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']]['ctrl']['label']];
 						}
+						if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
+						  $val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
+						}
+						if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['type'] == 'check') { 
+						  $val = $this->metafeeditlib->getLLFromLabel(($val?'check_yes': 'check_no'), $conf); 
+						}
 						$recherche .= $val;
     			    }
     			}
