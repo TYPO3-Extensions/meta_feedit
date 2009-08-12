@@ -375,7 +375,7 @@ class tx_metafeedit extends  tslib_pibase {
        
          if (is_array($conf['_LOCAL_LANG.'])){
             foreach($conf['_LOCAL_LANG.'] as $key=>$valarr) {
-		$nkey=substr($key,0,strpos($key,'.')); 
+				$nkey=substr($key,0,strpos($key,'.')); 
             	foreach($valarr as $skey=>$sval) {
 					//modif cmd - on ne regénère pas - met chaque info dans une clef précise - on garde au minimum table.champ, le reste est ajoute ensuite
 					if (is_array($sval)) {
@@ -921,7 +921,9 @@ class tx_metafeedit extends  tslib_pibase {
       	$values = '###FIELD_EVAL_'.$fN.'###';
       }
       // special cases requiring presentation transformation
-      if($conf['TCAN'][$table]['columns'][$fNiD]['config']["eval"]=='date'||$conf['TCAN'][$table]['columns'][$fNiD]['config']["eval"]=='datetime') $values = '###FIELD_EVAL_'.$fN.'###';
+	  $evals=t3lib_div::trimexplode(',',$conf['TCAN'][$table]['columns'][$fNiD]['config']["eval"]);
+	  
+      if(in_array('date',$evals) || in_array('datetime',$evals)) $values = '###FIELD_EVAL_'.$fN.'###';
       if (in_array('wwwURL',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
       if (in_array('email',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
 
@@ -930,10 +932,10 @@ class tx_metafeedit extends  tslib_pibase {
 
       // Format the values.                TODO: This only shows the date on a nice format if it is send to the page, not if it is from an overrideValue.
       if($isPassword) $values = '********';
-      else if($conf['TCAN'][$table]['columns'][$fNiD]['config']["eval"]=='date' && !empty($feData[$masterTable][$fN])) {
-				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'),$feData[$masterTable][$fN]);
-      } else if($conf['TCAN'][$table]['columns'][$fNiD]['config']["eval"]=='datetime' && !empty($feData[$masterTable][$fN])) {
-				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'),$feData[$masterTable][$fN]);
+      else if(in_array('date',$evals) && !empty($feData[$masterTable][$fN])) {
+				$values = strftime("%e-%m-%Y",$feData[$masterTable][$fN]);
+      } else if(in_array('datetime',$evals) && !empty($feData[$masterTable][$fN])) {
+				$values = strftime("%H:%M %e-%m-%Y",$feData[$masterTable][$fN]);
       }
 
       if($displayTwice) {
@@ -1930,12 +1932,16 @@ class tx_metafeedit extends  tslib_pibase {
     			if($val) {
     			    
      			    $ftA=$this->metafeeditlib->getForeignTableFromField($key,$conf,'',array());               
-   				    $recherche .= ($recherche?',<br />':'').$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'], $conf).':';
-    				//$recherche .= ($recherche?', ':'').$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['label'], $conf).':';
+   				    $recherche .= ($recherche?',<br />':'').$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'], $conf).': ';
     				if (is_array($val)) {
     				    $recherche .= $val['op'].' '.$val['val'].' , '.$val['valsup'];    				    
     			    } else {
-    				    $recherche .= $val;
+						//TODO handle multiple values...
+						if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']) {
+							$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table'],$val);
+							$val=$rec[$conf['TCAN'][$conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']]['ctrl']['label']];
+						}
+						$recherche .= $val;
     			    }
     			}
     		}
@@ -1943,7 +1949,7 @@ class tx_metafeedit extends  tslib_pibase {
     	
     	$filter='<div id="blockfiltre">';
     	$filter2="";
-    	if($conf['inputvar.']['advancedSearch']) $filter2.='<tr> <td class="searchf">'.$this->metafeeditlib->getLL("filtre_recherche",$conf).'<br />'.($recherche? $recherche : $this->metafeeditlib->getLL("search_nothing",$conf)).'</td></tr>';
+    	if($conf['inputvar.']['advancedSearch']) $filter2.='<tr> <td class="searchf">'.$this->metafeeditlib->getLL("filtre_recherche",$conf).'<br />'.($recherche? $recherche : "aucun").'</td></tr>';
     	if ($conf['inputvar.']['sortLetter']) $filter2.= '<tr><td class="searchf">'.$this->metafeeditlib->getLL("filtre_lettre",$conf).$conf['inputvar.']['sortLetter'].' </td></tr>';
     	if ($filter2) $filter.='<table>'.$filter2.'</table>';
     	$filter .= '</div>';
@@ -3202,15 +3208,11 @@ evalFunc.USmode =
 	 */
   function getJSBefore(&$conf) {
 	if (t3lib_extMgm::isLoaded('kb_md5fepw') && !t3lib_div::_GP('ajx')) $GLOBALS['TSFE']->additionalHeaderData['MD5_script'] = '<script type="text/javascript" src="typo3/md5.js"></script>';
-
-
+	$GLOBALS['TSFE']->additionalHeaderData['t3lib_jsfunc']='<script type="text/javascript" src="t3lib/jsfunc.evalfield.js"></script>';
+	$filepath=PATH_site.TYPO3_mainDir.'/js/tabmenu.js';
+	if (file_exists($filepath)) $GLOBALS['TSFE']->additionalHeaderData['typo3_js_tabmenu']='<script type="text/javascript" src="typo3/js/tabmenu.js"></script>';
     $formName = $this->table.'_form';
-
-    $result .=  '<script type="text/javascript" src="t3lib/jsfunc.evalfield.js"></script>';
-	   // <script type="text/javascript">
 /*<![CDATA[*/
-		$filepath=PATH_site.TYPO3_mainDir.'/js/tabmenu.js';
-		if (file_exists($filepath)) $result .=  '<script type="text/javascript" src="typo3/js/tabmenu.js"></script>';
 		$script='	
 		var DTM_array = new Array();
 		var DTM_currentTabs = new Array();
@@ -3547,9 +3549,6 @@ evalFunc.USmode =
 	
      ';
 /*]]>*/
-//	    </script>
-//';
-
 
    	if (!$GLOBALS['TSFE']->config['config']['removeDefaultJS']) {
   		$result.='<script type="text/javascript">'.$script.'</script>';
