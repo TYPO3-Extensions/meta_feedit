@@ -1087,7 +1087,8 @@ class tx_metafeedit extends  tslib_pibase {
         $type = $conf['TCAN'][$masterTable]["columns"][$fN]['config']["type"];
         switch((string)$type) {
             case "input":
-								$onchange = 'onblur="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"'.' onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';
+				//$onchange = 'onblur="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"'.' onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';
+				$onchange = 'onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';
                 $evalValuesArr = t3lib_div::trimExplode(',',$conf[$cmd.'.']['evalValues.'][$fN]);
                 $displayTwice = false;
                 $isPassword = false;
@@ -1340,14 +1341,11 @@ class tx_metafeedit extends  tslib_pibase {
 							$size .= ' multiple ';
 							$onchange = ' onchange="feedit_manipulateMultipleSelect(\''.$fieldName.'\')" ';
 							$srow = '<select '.$size.' '.$onchange.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_select">';
-							//$hr = '<input type="hidden" name="'.$fieldName.'" value="'.implode(",",$uids).'">';
 							$hr = '<input type="hidden" name="'.$fieldName.'" />';
 						}
 						
                     }
                 }
-                //$row .= '<select '.$size.' '.$onchange.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_select">
-                //$row .= '<select '.$size.' '.$onchange.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']">
                 $row .= $srow .$options.'</select>'.$hr;
                 return $row.$EVAL_ERROR_FIELD;
                 break;
@@ -3160,49 +3158,28 @@ function getGridExcelTemplate(&$conf){
 	 * @return	[type]		...
 	 */
 function getFormJs($formName,&$conf) {
+	$result.='
+	function feedit_'.$formName.'Set(theField, evallist, is_in, checkbox, checkboxValue,checkbox_off){
+		var theFObj = new evalFunc_dummy (evallist,is_in, checkbox, checkboxValue);
+        var feValField = theField+"_feVal";
+		evalFunc.respectTimeZones ='.($GLOBALS['TYPO3_CONF_VARS']['SYS']['respectTimeZones']?'1':'0').';
+		evalFunc.USmode ='.($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?'1':'0').';
+		if(!(document.'.$formName.' && document.'.$formName.'[theField] && document.'.$formName.'[feValField])) return;
+		theValue = document.'.$formName.'[theField].value;
+		document.'.$formName.'[feValField].value = evalFunc.outputObjValue(theFObj, theValue);
+	}
 
-	        $result.='
-
-            function feedit_'.$formName.'Set(theField, evallist, is_in, checkbox, checkboxValue,checkbox_off){
-	      var theFObj = new evalFunc_dummy (evallist,is_in, checkbox, checkboxValue);
-              var feValField = theField+"_feVal";
-              
-evalFunc.respectTimeZones =
-'.($GLOBALS['TYPO3_CONF_VARS']['SYS']['respectTimeZones']?'1':'0').';
-evalFunc.USmode =
-'.($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?'1':'0').';
-
-
-if(!(document.'.$formName.' && document.'.$formName.'[theField] && document.'.$formName.'[feValField])) return;
-
-      theValue = document.'.$formName.'[theField].value;
-/*              valField = theField.substring(0,theField.length-1)+"_hrv]";
-	      document.'.$formName.'[theField].value = theValue;
-alert(theValue); */
-      document.'.$formName.'[feValField].value = evalFunc.outputObjValue(theFObj, theValue);
-	    }
-
-	    function feedit_'.$formName.'Get(theField, evallist, is_in, checkbox, checkboxValue,checkbox_off){
-	      var theFObj = new evalFunc_dummy (evallist,is_in, checkbox, checkboxValue);
-	      
-	          evalFunc.respectTimeZones =
-'.($GLOBALS['TYPO3_CONF_VARS']['SYS']['respectTimeZones']?'1':'0').';
-evalFunc.USmode =
-'.($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?'1':'0').';
-
-      if (checkbox_off){
-		document.'.$formName.'[theField].value=checkboxValue;
-	      }else{
-		document.'.$formName.'[theField].value = evalFunc.evalObjValue(theFObj, document.'.$formName.'[theField+"_feVal"].value);
-                  /*if(document.'.$formName.'[theField].value.length==0)
-                  for(idx=1; eval = feedit_split(evallist,",",idx);idx++);
-                     if(eval == "required") {
-                       alert("Feltet skal udfyldes");
-                }*/
-	      }
-	     feedit_'.$formName.'Set(theField, evallist, is_in, checkbox, checkboxValue,checkbox_off);
-	    }
-';
+	function feedit_'.$formName.'Get(theField, evallist, is_in, checkbox, checkboxValue,checkbox_off){
+		var theFObj = new evalFunc_dummy(evallist,is_in, checkbox, checkboxValue);
+		evalFunc.respectTimeZones ='.($GLOBALS['TYPO3_CONF_VARS']['SYS']['respectTimeZones']?'1':'0').';
+		evalFunc.USmode ='.($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?'1':'0').';		
+		if (checkbox_off){
+			document.'.$formName.'[theField].value=checkboxValue;
+	    }else{
+			document.'.$formName.'[theField].value = evalFunc.evalObjValue(theFObj, document.'.$formName.'[theField+"_feVal"].value);
+	     }
+	    feedit_'.$formName.'Set(theField, evallist, is_in, checkbox, checkboxValue,checkbox_off);
+	}';
 	return $result;
 }
 
@@ -3222,16 +3199,15 @@ evalFunc.USmode =
 		$script='	
 		var DTM_array = new Array();
 		var DTM_currentTabs = new Array();
-	        function typoSetup() {
-					/* this.passwordDummy = "********";*/
-					this.decimalSign = ".";
-				}
+	    function typoSetup() {
+			this.passwordDummy = "********";
+			this.decimalSign = ".";
+		}
 		var TS = new typoSetup();
-	        var evalFunc = new evalFunc();';
-
- $script.=$this->getFormJs($formName,$conf);
- $script.=$this->getFormJs('tx_metafeedit_comments_form',$conf);
- $script.='
+	    var evalFunc = new evalFunc();';
+	$script.=$this->getFormJs($formName,$conf);
+	$script.=$this->getFormJs('tx_metafeedit_comments_form',$conf);
+	$script.='
 	/**
 	 * [Describe function...]
 	 *
@@ -3274,7 +3250,6 @@ evalFunc.USmode =
                }
                if(newList.length!=0)
                  newList = newList.substring(0,newList.length-1);
-		/*alert(newList);*/
                document.'.$formName.'[theField].value = newList;
                selObj.options[rem_i] = null;
 
@@ -3381,7 +3356,6 @@ evalFunc.USmode =
 			for (var num=0;   num<myArray.length;   num++)
 			{	
 				piece=myArray[num];
-				//alert(piece);
 				for (a=0;a<liste;a++)	{
 					
 					if (fObjSel.options[a].value==piece)	{
@@ -3709,7 +3683,7 @@ evalFunc.USmode =
 		} //
 		foreach($fieldArray as $FN) {
 			$params=t3lib_div::trimExplode(';',$FN);
-		  if ($params[0]!='--div--') {
+			if ($params[0]!='--div--') {
 			// gestion des fieldset
 			if ($params[0]=='--fse--' && $fsbc) {
 				$ret.='</fieldset>';
