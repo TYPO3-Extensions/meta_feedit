@@ -6,8 +6,8 @@
 
 $LOCAL_LANG = Array (
 	'default' => Array (
-    'pi1_title' => 'FE Edition Meta',
-    'pi1_plus_wiz_description' => 'Adds a frontend form for submitting and editing of tables to your page',
+		'pi1_title' => 'FE Edition Meta',
+		'pi1_plus_wiz_description' => 'Adds a frontend form for submitting and editing of tables to your page',
 		'back_label' => 'Back',
 		'new_label' => 'New',
 		'login_required_message' => 'Frontend login is required to view this page',
@@ -15,6 +15,7 @@ $LOCAL_LANG = Array (
 		'grid_rows_cols' => 'Rows / Cols ',
 		'grid_header' => 'Data Grid',
 		'crdate' => 'Creation date',
+		'uid' => 'Unique Identifier',
 		'edit_grid_description' => 'You may edit Grid Data here',
 		'edit_delete_label' => 'Delete Record',
 		'edit_order_up_label' => 'Move up Record',
@@ -176,14 +177,15 @@ $LOCAL_LANG = Array (
 	),
 	'fr' => Array (	
 		'crdate' => 'Date de création',
-    'pi1_title' => 'FE Edition Meta',
-    'pi1_plus_wiz_description' => 'Adds a frontend form for submitting and editing of tables to your page.',
+		'uid' => 'identifiant unique',
+		'pi1_title' => 'FE Edition Meta',
+		'pi1_plus_wiz_description' => 'Adds a frontend form for submitting and editing of tables to your page.',
 		'pi_list_browseresults_displays'=>'Affichage des enregistrements ###SPAN_BEGIN###%s &agrave; %s</span> sur ###SPAN_BEGIN###%s</span>',
 		'pi_list_searchBox_search'=>'Chercher',
 		'pi_list_browseresults_prev' =>'< Précédent',
 		'pi_list_browseresults_next'=>'Suivant >',
 		'pi_list_browseresults_page'=> 'Page',
-    'pi1_title' => 'FE Edition Meta',
+		'pi1_title' => 'FE Edition Meta',
 		'grid_rows_cols' => 'Lignes / Colonnes ',
 		'grid_header' => 'Data Grid',
 		'edit_grid_description' => 'Vous pouvez &eacute;diter les informations de la grille ici',
