@@ -28,6 +28,7 @@ $LOCAL_LANG = Array (
 		'tx_metafeedit_comments.crdate' => 'Creation date/time',
 		'tx_metafeedit_comments.tstamp' => 'Last update',
 		'tx_metafeedit_general.crdate' => 'Creation date',
+		'tx_metafeedit_general.uid' => 'Unique Id',
 
 		'tt_content.list_type_pi1' => 'Meta FE Edit',
 	),
