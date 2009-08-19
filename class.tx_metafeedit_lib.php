@@ -205,7 +205,8 @@ class tx_metafeedit_lib {
 		* @param [type]  $P: ...
 		* @param [type]  $cObj: ...
 		* @return [type]  ...
-		*/      
+		*/
+		
 		function getData($val, $P, &$cObj) {
 			//example of val : links=text:<LINK [-]TS_var:metaFE*tags*METAFEEDIT_PAGE_blog [-] text:>[-]TS_var:metaFE*tags*METAFEEDIT_LIEN_VOIR_news [-] text:</LINK>
 
@@ -226,7 +227,7 @@ class tx_metafeedit_lib {
 				$key = trim($parts[1]);
 				if ((string)$key != '') {
 					switch(strtolower(trim($parts[0]))) {
-					  //EXT:meta_booking/class.tx_metabooking_userfunc.php:&tx_metabooking_userfunc->PaymentEntityAfterWhereNoAnd
+					    //EXT:meta_booking/class.tx_metabooking_userfunc.php:&tx_metabooking_userfunc->PaymentEntityAfterWhereNoAnd
 						//dans le cas de ts_var (recuperation de variable definie dans le setup evalue a partie des constants->pas directement les constantes)
 						case 'ext':
 						  $arr=array();
@@ -1325,10 +1326,11 @@ class tx_metafeedit_lib {
     					$dataArr[$_fN] = time() + 24 * 60 * 60 * intval(substr($conf[$fe_adminLib->conf['cmdKey']."."]["overrideValues."][$fN], 3));
     				}
     				if (in_array('date',$evals) && !empty($dataArr[$fN])) {
-    				    $values = strftime(($conf['dateformat']?$conf['dateformat']:'%e-%m-%Y'),$dataArr[$fN]);
+    				    $values = strftime(($conf['dateformat']?$conf['dateformat']:($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y')),$dataArr[$fN]);
+
     				}
     				else if(in_array('datetime',$evals) && !empty($dataArr[$fN])) {
-    				    $values = strftime(($conf['datetimeformat']?$conf['datetimeformat']:'%H:%M %e-%m-%Y'),$dataArr[$fN]);
+    				    $values = strftime(($conf['datetimeformat']?$conf['datetimeformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y')),$dataArr[$fN]);
     				}
     				// wwwURL check
     				if (in_array('wwwURL', t3lib_div::trimexplode(',', $conf[$fe_adminLib->cmd."."]['evalValues.'][$fN]))) {
