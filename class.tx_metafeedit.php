@@ -933,9 +933,9 @@ class tx_metafeedit extends  tslib_pibase {
       // Format the values.                TODO: This only shows the date on a nice format if it is send to the page, not if it is from an overrideValue.
       if($isPassword) $values = '********';
       else if(in_array('date',$evals) && !empty($feData[$masterTable][$fN])) {
-				$values = strftime("%e-%m-%Y",$feData[$masterTable][$fN]);
+				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'),$feData[$masterTable][$fN]);
       } else if(in_array('datetime',$evals) && !empty($feData[$masterTable][$fN])) {
-				$values = strftime("%H:%M %e-%m-%Y",$feData[$masterTable][$fN]);
+				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'),$feData[$masterTable][$fN]);
       }
 
       if($displayTwice) {
@@ -1953,7 +1953,7 @@ class tx_metafeedit extends  tslib_pibase {
     	
     	$filter='<div id="blockfiltre">';
     	$filter2="";
-    	if($conf['inputvar.']['advancedSearch']) $filter2.='<tr> <td class="searchf">'.$this->metafeeditlib->getLL("filtre_recherche",$conf).'<br />'.($recherche? $recherche : "aucun").'</td></tr>';
+    	if($conf['inputvar.']['advancedSearch']) $filter2.='<tr> <td class="searchf">'.$this->metafeeditlib->getLL("filtre_recherche",$conf).'<br />'.($recherche? $recherche : $this->metafeeditlib->getLL("search_nothing",$conf)).'</td></tr>';
     	if ($conf['inputvar.']['sortLetter']) $filter2.= '<tr><td class="searchf">'.$this->metafeeditlib->getLL("filtre_lettre",$conf).$conf['inputvar.']['sortLetter'].' </td></tr>';
     	if ($filter2) $filter.='<table>'.$filter2.'</table>';
     	$filter .= '</div>';
