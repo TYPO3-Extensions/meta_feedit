@@ -1493,7 +1493,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				$this->markerArray['###REC_UID###'] = $theUid;
 				$origArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$theUid);		// Fetches the original record to check permissions
 				if ($conf['edit'] && ($GLOBALS['TSFE']->loginUser || !$conf['requireLogin'] || $this->aCAuth($origArr)))	{	// Must be logged in in order to edit  (OR be validated by email) or requireLogin is unchecked
-					$newFieldList = implode(',',array_intersect(explode(',',$conf['fieldList']),t3lib_div::trimExplode(',',$conf['edit.']['fields'],1)));
+					$newFieldList = implode(',',array_intersect(explode(',',$conf['fieldList']),t3lib_div::trimExplode(',',$conf['edit.']['show_fields'],1)));
 
 
 					if ($this->aCAuth($origArr) || $this->metafeeditlib->DBmayFEUserEdit($this->theTable,$origArr,$GLOBALS['TSFE']->fe_user->user,$conf['allowedGroups'],$conf['fe_userEditSelf'],$conf))	{
