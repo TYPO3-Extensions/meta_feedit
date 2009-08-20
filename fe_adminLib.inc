@@ -2945,7 +2945,7 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 		}
 		
 		$content = $this->cObj->stdWrap($content,$this->conf['edit.']['formWrap.']);
-		$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($currentArr), $this->theTable.'_form',  'FE['.$this->theTable.']', $this->conf['fieldList'].$this->additionalUpdateFields);
+		$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($currentArr), $this->theTable.'_form',  'FE['.$this->theTable.']', $this->conf['edit.']['show_fields'].$this->additionalUpdateFields);
 		$content.=$this->conf['blog.']['allowComments']?$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($currentArr), 'tx_metafeedit_comments_form',  'FE[tx_metafeedit_comments]', $this->conf['blogFieldList']):'';
 		return $content;
 	}
