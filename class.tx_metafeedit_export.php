@@ -107,13 +107,13 @@ class tx_metafeedit_export {
 	
 	function CreatePDFButtonDetail(&$conf,&$caller,$form=true,$id='') {
 		// traitement du champ PDF
-		$onclick=($form?'':' onclick="document.'.$conf['table'].'_form.tx_metafeedit_exporttype.value=\'PDF\'"');
+			$onclick=($form?'':' onclick="document.'.$this->pluginId.'_form.PDF'.$this->pluginId.'_rU.value='.$id.';document.'.$this->pluginId.'_form.submit();return false;"');
 			return '<div class="'.$caller->pi_getClassName('action').' '.$caller->pi_getClassName('action-pdf').'">'.
 			($form?'<form action="'.$GLOBALS['TSFE']->id.'.html?" method="post" target="_blank">
 				<input type="hidden" name="no_cache" value="1"/>
-				<input type="hidden" id="PDF'.$id.'_et" name="tx_metafeedit[exporttype]" value="PDF"/>':'').
-				'<input type="hidden" id="PDF'.$id.'_cmd" name="cmd['.$this->pluginId.']" value="edit"/>'.
-				'<input type="hidden" id="PDF'.$id.'_rU" name="rU['.$this->pluginId.']" value="'.$id.'"/>'.
+				<input type="hidden" id="PDF'.$this->pluginId.'_et" name="tx_metafeedit[exporttype]" value="PDF"/>'.
+				'<input type="hidden" id="PDF'.$this->pluginId.'_cmd" name="cmd['.$this->pluginId.']" value="edit"/>'.
+				'<input type="hidden" id="PDF'.$this->pluginId.'_rU" name="rU['.$this->pluginId.']" value="'.$id.'"/>':'').
 				'<input type="submit" class="btnPDF" name="'.$this->prefixId.'[submit_button]"'.$onclick.' value="Impression PDF" id="submitPDF'.$id.'" title="Impression PDF"/><br/>'.
 			($form?'</form>':'').
 			'</div>';
@@ -263,6 +263,7 @@ class tx_metafeedit_export {
 		$r=0;
 		// We print rows...
 		foreach($xml->tr as $row) {
+			if (isset($row->spec->attributes()->ap)) $pdf->addPage();
 			// we change color 
 			$x=0; //compteur des colonnes
 			if ($alt>1) {							// changement de couleur 1 ligne sur 2
@@ -294,10 +295,10 @@ class tx_metafeedit_export {
 				if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
 					$vala=t3lib_div::trimexplode(',',$val);
 					$img='';
-				 	$myx=isset($col->spec->attributes()->x)?$col->spec->attributes()->x:$pdf->getX();
+				 	$myx=isset($col->spec->attributes()->x)?(float)$col->spec->attributes()->x:$pdf->getX();
 				 	$oldy=$pdf->GetY();
 				 	if (isset($col->spec->attributes()->y)) {				 		
-				 		$pdf->SetY($col->spec->attributes()->y);
+				 		$pdf->SetY((float)$col->spec->attributes()->y);
 				 	}
 					if (!is_object($col->spec)) $pdf->Cell($taille,$height,'',1,0,'L',1);					
 					$pdf->SetX($myx);
@@ -313,17 +314,21 @@ class tx_metafeedit_export {
 							if ($imgi[3]) $img=$imgi[3];
 						}
 						$imginfo=getimagesize($img);
-						//print_r($imginfo);
-						//die(i);
 						if (is_array($imginfo)) {
 							$w=$imginfo[0];
 							$h=$imginfo[1];
-							$imgh=$height-1;
-							if (isset($col->img->attributes()->h)) $imgh=$col->img->attributes()->h; //height override
-							$pdf->Image($img,$pdf->GetX()+0.5,$pdf->GetY()+0.5,0,  $imgh);
+							$imgh=0;
+							$imgw=0;
+							$imgx=$pdf->GetX();
+							$imgy=$pdf->GetY();
+							if (isset($col->img->attributes()->h)) $imgh=(float)$col->img->attributes()->h; //height override
+							if (isset($col->img->attributes()->w)) $imgw=(float)$col->img->attributes()->w; //width override
+							if (isset($col->img->attributes()->x)) $imgx=(float)$col->img->attributes()->x; //x override
+							if (isset($col->img->attributes()->y)) $imgy=(float)$col->img->attributes()->y; //x override
+							$pdf->Image($img,$imgx,$imgy,$imgw,$imgh);
 							//$pdf->Image($img,$pdf->GetX()+0.5,$pdf->GetY()+0.5);
-							$pdf->Rect($pdf->GetX()+0.5, $pdf->GetY()+0.5, ($imgh/$h)*$w, $imgh );
-							$pdf->SetX($pdf->GetX()+(($imgh/$h)*$w));
+							$pdf->Rect($imgx, $imgy, ($imgh/$h)*$w, $imgh );
+							$pdf->SetX($imgx+(($imgh/$h)*$w));
 						}
 					}
 					$pdf->SetX($size+$pdf->leftmargin);	

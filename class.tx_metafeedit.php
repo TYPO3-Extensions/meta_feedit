@@ -239,16 +239,13 @@ class tx_metafeedit extends  tslib_pibase {
     	if (!$this->id_field) $this->id_field='uid';
     	$conf["table_label"]=$this->id_field;
     
-    	// init $this->RTEObj if rtehtmlarea is availiable
-    	//if(t3lib_extmgm::isLoaded('rtehtmlarea') && !$this->RTEObj)
-        //$this->RTEObj = t3lib_div::makeInstance('tx_rtehtmlarea_pi2');//&t3lib_BEfunc::RTEgetObj();//
-        // TODO : move next lines tpo pi1 ...
+        // TODO : move next lines to pi1 ...
 		if ($conf['list.']['advancedSearch']) {
 			$conf['keep_piVars']= $conf['keep_piVars']? $conf['keep_piVars'].',advancedSearch':'advancedSearch';
 		}
 		
-		$this->LoadLanguageConf($conf);
  		$this->LoadTCAs($conf);
+		$this->LoadLanguageConf($conf);
    
 		/**** Init Robert Lemkes dateselectlib if it is loaded  ****/
 		if(t3lib_extmgm::isLoaded('rlmp_dateselectlib')) tx_rlmpdateselectlib::includeLib();
@@ -263,21 +260,32 @@ class tx_metafeedit extends  tslib_pibase {
     
     function LoadTCAs(&$conf) {
         #    $GLOBALS['TSFE']->includeTCA(); // Uncomment cause extensions using this API should be able to modify TCA array before used here.
-  	    if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after Language size ']=strlen(serialize($conf))." Bytes"; 
+  	    if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf before LoadTCA size ']=strlen(serialize($conf))." Bytes"; 
         
         t3lib_div::loadTCA($this->table);
         //t3lib_div::loadTCA('tx_metafeedit_comments');
-        
+	    $conf['uidField']=$GLOBALS['TCA'][$this->table]['ctrl']['uidField']?$GLOBALS['TCA'][$this->table]['ctrl']['uidField']:'uid';
+   		if ($conf['debug']) echo t3lib_div::view_array(array('UIDFIELD'=>$conf['uidField']));
+		/**** CONFIGURE TCA ****/
+		// here we should calculate fieldList from showFields, evalFields, and override fields..
+		$GLOBALS['TCA'][$this->table]["feInterface"]["fe_admin_fieldList"] = $conf['create.']['fields'] ? $conf['create.']['fields'].($conf['edit.']['fields']?','.$conf['edit.']['fields']:'') : $conf['edit.']['fields'];
+		if($conf['fe_cruser_id'])
+			$GLOBALS['TCA'][$this->table]['ctrl']['fe_cruser_id'] = $conf['fe_cruser_id'];
+		if($conf['fe_crgroup_id'] && $conf['allowedGroups']) {
+  			$GLOBALS['TCA'][$this->table]['ctrl']['fe_crgroup_id'] = $conf['fe_crgroup_id'];
+		}
+        $this->metafeeditlib->makeTypo3TCAForTable($GLOBALS['TCA'],$this->table);
+
         // We handle Foreign Table TCA definitions here ...
         
         $FTRels=explode(',',$conf['foreignTables']);
-        $FTs=array();
+		$FTs=array();
         $FTs[$this->table]=$this->table;
+		
         foreach ($FTRels as $FTRel) {
         	if ($FTRel && $GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table'];
         }
-        
-        // We handle foreign tables of fields
+         // We handle foreign tables of fields
         $lfields=t3lib_div::trimexplode(',',$conf['list.']['show_fields']);
         foreach ($lfields as $lf) {
         	if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
@@ -293,55 +301,38 @@ class tx_metafeedit extends  tslib_pibase {
         foreach ($lfields as $lf) {
         	if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
         }
-        
+        // We add fe_user table just in case we need feuser join.		
         if (!in_array('fe_users',$FTs)) $FTs['fe_users']='fe_users';
         if (!in_array('tx_metafeedit_comments',$FTs)) $FTs['tx_metafeedit_comments']='tx_metafeedit_comments';
         $conf['TCATables']=$FTs;
-        //krumo($conf['TCATables']);
-
 		//We handle here tables from other software than T3 !!
 		//TODO : We should do this for every foreign table
-	    $conf['uidField']=$GLOBALS["TCA"][$this->table]['ctrl']['uidField']?$GLOBALS["TCA"][$this->table]['ctrl']['uidField']:'uid';
-   		if ($conf['debug']) echo t3lib_div::view_array(array('UIDFIELD'=>$conf['uidField']));
-
-		foreach($FTs as $FTable) {
-		    $this->metafeeditlib->makeTypo3TCAForTable($conf['TCAN'],$FTable);
-    }
-
-		if ($conf["extTables"]) {
-  		  $extKeys=t3lib_div::trimExplode(chr(10),$conf["extTables"]);
-  			$this->mergeExtendingTCAs($extKeys);
-		}
 
 		//cmd load item proc func
-		foreach ($GLOBALS["TCA"][$this->table]['columns'] as $keyField => $fieldValues) {
-			if ($GLOBALS["TCA"][$this->table]['columns'][$keyField]["config"]["itemsProcFunc"]) {
-				$procExt = t3lib_extMgm::extPath(tx_div::guessKey($GLOBALS["TCA"][$this->table]['columns'][$keyField]["config"]["itemsProcFunc"]));
-				$procExtKey = explode('->', $GLOBALS["TCA"][$this->table]['columns'][$keyField]["config"]["itemsProcFunc"]);
-				if (is_array($procExtKey)) include_once($procExt.'class.'.$procExtKey[0].'.php');
+		foreach ($GLOBALS['TCA'][$this->table]['columns'] as $keyField => $fieldValues) {
+			if ($GLOBALS['TCA'][$this->table]['columns'][$keyField]["config"]["itemsProcFunc"]) {
+				$procExt = t3lib_extMgm::extPath(tx_div::guessKey($GLOBALS['TCA'][$this->table]['columns'][$keyField]["config"]["itemsProcFunc"]));
+				$procExtKey = explode('->', $GLOBALS['TCA'][$this->table]['columns'][$keyField]["config"]["itemsProcFunc"]);
+				if (is_array($procExtKey) && file_exists($procExt.'class.'.strtolower ($procExtKey[0]).'.php')) include_once($procExt.'class.'.strtolower ($procExtKey[0]).'.php');
 			}
+		}		
+		if ($conf["extTables"]) {
+			$extKeys=t3lib_div::trimExplode(chr(10),$conf["extTables"]);
+  			$this->mergeExtendingTCAs($extKeys);
 		}
 		
-
-		/**** CONFIGURE TCA ****/
-		// here we should calculate fieldList from showFields, evalFields, and override fields..
-		$GLOBALS["TCA"][$this->table]["feInterface"]["fe_admin_fieldList"] = $conf['create.']['fields'] ? $conf['create.']['fields'].($conf['edit.']['fields']?','.$conf['edit.']['fields']:'') : $conf['edit.']['fields'];
-		if($conf['fe_cruser_id'])
-  		$GLOBALS["TCA"][$this->table]['ctrl']['fe_cruser_id'] = $conf['fe_cruser_id'];
-		if($conf['fe_crgroup_id'] && $conf['allowedGroups']) {
-  			$GLOBALS["TCA"][$this->table]['ctrl']['fe_crgroup_id'] = $conf['fe_crgroup_id'];
+		$conf['TCAN'][$this->table]=$GLOBALS['TCA'][$this->table];
+		foreach($FTs as $FTable) {
+		    $this->metafeeditlib->makeTypo3TCAForTable($conf['TCAN'],$FTable);
 		}
-     $conf['TCAN'][$this->table]=$GLOBALS["TCA"][$this->table];//CBYTCAN
 		
 	    // Set private TCA var
-		//$this->TCA = &$GLOBALS["TCA"][$this->table];
-		//$this->TCAN = &$GLOBALS["TCA"]; // can I remove this ?
-  	if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after TCA size 0 ']=strlen(serialize($conf))." Bytes"; 
-		  //krumo($conf['TCAN']);
-	    //$conf['TCAN']=&$GLOBALS["TCA"]; // 400 K ...
-		  //krumo($conf['TCAN']);
+		//$this->TCA = &$GLOBALS['TCA'][$this->table];
+		//$this->TCAN = &$GLOBALS['TCA']; // can I remove this ?
+		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after TCA size 0 ']=strlen(serialize($conf))." Bytes"; 
+	    //$conf['TCAN']=&$GLOBALS['TCA']; // 400 K ...
 
-  	  if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after TCA size ']=strlen(serialize($conf))." Bytes"; 
+		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after LoadTCA size ']=strlen(serialize($conf))." Bytes"; 
     }
     
   	
@@ -382,7 +373,7 @@ class tx_metafeedit extends  tslib_pibase {
             	        $svala=$sval;
             	        foreach($svala as $skey2=>$sval) {
             	            $skey2=$skey.$skey2;
-							while (is_array($sval)) {  // if fieldname has several '.' in it we regenrate whole name  here...
+							while (is_array($sval)) {  // if fieldname has several '.' in it we regenerate whole name  here...
 		            	        $svalb=$sval;
 		            	        foreach($svalb as $skey3=>$sval) {
 		            	            $skey2.=$skey3;
@@ -393,16 +384,6 @@ class tx_metafeedit extends  tslib_pibase {
 					} else {
 						$this->LOCAL_LANG[$nkey][$skey]=$sval;
 					}
-					//old version by CBY
-					/*
-					while (is_array($sval)) {  // if fieldname has several '.' in it we regenrate whole name  here...
-            	        $svala=$sval;
-            	        foreach($svala as $skey2=>$sval) {
-            	            $skey.=$skey2;
-            	        }
-            	    }
-            		$this->LOCAL_LANG[$nkey][$skey]=$sval;
-					//*/
             	}
             }
         }
@@ -569,8 +550,6 @@ class tx_metafeedit extends  tslib_pibase {
         case 'edit':
           $template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
           $template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
-	        //Ajout Charlotte 30/04 
-	        
 	        if ($conf['piVars']['exporttype']) {
 	          if ($conf['list.']['csv']) $template .= array_search('getCSVTemplate',$callerMethods) || array_search('getCSVTemplate',$callerMethods)?  $this->caller->getCSVTemplate($conf) : $this->getCSVTemplate($conf);
 	          if ($conf['list.']['excel']) $template .= array_search('getExcelTemplate',$callerMethods) || array_search('getExcelTemplate',$callerMethods)?  $this->caller->getExcelTemplate($conf) : $this->getExcelTemplate($conf);
@@ -639,18 +618,18 @@ class tx_metafeedit extends  tslib_pibase {
 				}
              } else {
                 if($fN=='--fse--' && $fsc) {
-                	$out_array[$out_sheet][]='</fieldset>';
+                	$out_array[$out_sheet][]='</fieldset></div';
                 	$fsc--;
 	             }
                 if($fN=='--fsb--') {
                     if ($fsc) {
-                    	$out_array[$out_sheet][]='</fieldset>';
+                    	$out_array[$out_sheet][]='</fieldset></div>';
                     	$fsc--;
                     }
     	      		$fsc++;        			
     	      		$fsclib='';
     	      		if ($conf['list.']['fieldSetNames.'][$fsi]) $fsclib='<legend>'.$conf['list.']['fieldSetNames.'][$fsi].'</legend>';
-					$out_array[$out_sheet][]='<fieldset>'.$fsclib;
+					$out_array[$out_sheet][]='<div class="'.$this->caller->pi_getClassName('form-row').'"><fieldset>'.$fsclib;
 					$fsi++;
 				}
 				
@@ -887,7 +866,6 @@ class tx_metafeedit extends  tslib_pibase {
     $masterTable=$cmd=='blog'?'tx_metafeedit_comments':$conf['table'];
     $res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',array());
     $Lib=$this->metafeeditlib->getLLFromLabel($res['fieldLabel'],$conf);
-    //$fN=str_replace('.','_',$fN);
     $fN=str_replace('.','_',$res['fieldAlias']); // is the str_replace necessary ?
     $table=$res['relTable'];
     $fNiD=$res['fNiD'];
@@ -917,7 +895,7 @@ class tx_metafeedit extends  tslib_pibase {
       }
       $values = '###FIELD_'.$fN.'###';
       //if ($std[$fN.'.']) {
-      if	($std[$fNiD.'.'] || $std[$table.'.'][$fNiD.'.'] || $std[$fN.'.'] || $std[$table.'.'][$fN.'.']) {
+      if ($std[$fNiD.'.'] || $std[$table.'.'][$fNiD.'.'] || $std[$fN.'.'] || $std[$table.'.'][$fN.'.']) {
       	$values = '###FIELD_EVAL_'.$fN.'###';
       }
       // special cases requiring presentation transformation
@@ -930,7 +908,9 @@ class tx_metafeedit extends  tslib_pibase {
 
       $feData = t3lib_div::_POST("FE");
 
-      // Format the values.                TODO: This only shows the date on a nice format if it is send to the page, not if it is from an overrideValue.
+      // Format the values.                
+	  // TODO: This only shows the date on a nice format if it is send to the page, not if it is from an overrideValue.
+	  
       if($isPassword) $values = '********';
       else if(in_array('date',$evals) && !empty($feData[$masterTable][$fN])) {
 				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'),$feData[$masterTable][$fN]);
@@ -976,7 +956,7 @@ class tx_metafeedit extends  tslib_pibase {
 				  			$orClause = '';
 				  			foreach($uids as $uid) $orClause .= $orClause ? 'OR '.$conf['uidField'].' LIKE \''.$uid.'\'' : $conf['uidField'].' = \''.$uid.'\'';
 							$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$ForeignTable,$orClause);
-							$label= $conf['label.'][$ForeignTable]?$conf['label.'][$ForeignTable]:$GLOBALS["TCA"][$ForeignTable]['ctrl']['label'];
+							$label= $conf['label.'][$ForeignTable]?$conf['label.'][$ForeignTable]:$GLOBALS['TCA'][$ForeignTable]['ctrl']['label'];
 			          			if($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(),'sql error');
 			          			$values = '';
 			          			while($resRow = mysql_fetch_assoc($res)) {
@@ -995,7 +975,7 @@ class tx_metafeedit extends  tslib_pibase {
       $FT=$conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'];
       if($FT) {  // reference to elements from another table
         $label = $conf['label.'][$FT]?$conf['label.'][$FT]:$GLOBALS['TCA'][$FT]['ctrl']['label'];
-	$feData = $conf['inputvar.']['fedata'];
+		$feData = $conf['inputvar.']['fedata'];
 	if($feData[$masterTable][$fN]) {
 	  $uids = t3lib_div::trimExplode(',',$feData[$masterTable][$fN]);
 	  $orClause = '';
@@ -1003,7 +983,6 @@ class tx_metafeedit extends  tslib_pibase {
 	  $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$conf['TCAN'][$table]['columns'][$fNiD]['config']["foreign_table"],$orClause);
 	  if($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(),'sql error');
 	  $values = '';
-	  //MMMMMMMMMM
 	  while($resRow = mysql_fetch_assoc($res)) {
 	    $values .= $values ? ', ' . $resRow[$label] : $resRow[$label];
 	  }
@@ -1028,11 +1007,14 @@ class tx_metafeedit extends  tslib_pibase {
       break;
     case "text":
         $values = '###FIELD_'.$fN.'###';
-        $feData = $conf['inputvar.']['fedata'];
+		if ($std[$fNiD.'.'] || $std[$table.'.'][$fNiD.'.'] || $std[$fN.'.'] || $std[$table.'.'][$fN.'.']) {
+			$values = '###FIELD_EVAL_'.$fN.'###';
+		}
+		$feData = $conf['inputvar.']['fedata'];
         if($feData[$masterTable]['_TRANSFORM_'.$fN]) { // if rte output, we need to process it instead of parsing it through htmlspecialchar as the other values gets.
             $dataArr = $feData[$masterTable];
-            $dataArr = $this->metafeeditlib->rteProcessDataArr($dataArr, $masterTable, $fN, 'db',$conf);
-            $dataArr = $this->metafeeditlib->rteProcessDataArr($dataArr, $masterTable, $fN, 'rte',$conf);
+            $dataArr = $this->metafeeditlib->rteProcessDataArr($dataArr, $masterTable, $fN, 'db',$conf,'getPreviewFieldCode');
+            $dataArr = $this->metafeeditlib->rteProcessDataArr($dataArr, $masterTable, $fN, 'rte',$conf,'getPreviewFieldCode');
             $values = $dataArr[$fN];
         }
         return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
@@ -1046,8 +1028,7 @@ class tx_metafeedit extends  tslib_pibase {
       break;
     }
   }
-
-    
+  
     /**
     * Gets the fieldcode for field ($fN) of the form. This depends on the fields type.
     *
@@ -1066,14 +1047,11 @@ class tx_metafeedit extends  tslib_pibase {
         if (($cmd=="edit" || $cmd=='create') && in_array($fN, $readOnlyArr)) {
         	return $this->getPreviewFieldCode($cmd,$conf,$fN,1);
         }
-        
 
         // blog hack !! to be changed
         $masterTable=$cmd=='blog'?'tx_metafeedit_comments':$conf['table'];
-				//echo $cmd;
-				//if ($cmd=='blog') {print_r($conf[$cmd.'.']); die(uuu);}
-
-
+		//echo $cmd;
+		//if ($cmd=='blog') {print_r($conf[$cmd.'.']); die(uuu);}
         $gridMark=$bgrid?'###GRIDCELL###':'';
         $gridMarkAlt=$bgrid?'###GRIDCELLALT###':'';
         $fieldName = 'FE['.$masterTable.']'.$gridMark.'['.$fN.']';
@@ -1120,26 +1098,26 @@ class tx_metafeedit extends  tslib_pibase {
                 	$conf['additionalJS_end']['feedit_'.$fN.'_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
                     return
                 		'<input alt="'.$gridMarkAlt.'" title="'.$gridMarkAlt.'" type="'.$type.'" name="'.$fieldName.'_feVal" id="'.$fieldName.'_feVal" '.$class.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange.' />' .
-                		'<input type="hidden" name="'.$fieldName.'" />'.($bgrid?'':'<div '.$this->caller->pi_classParam('form-button-date').' >') .
+                		'<input type="hidden" name="'.$fieldName.'" />'.($bgrid?'':'<span '.$this->caller->pi_classParam('form-button-date').' >') .
                     // inserts button for rlmp_dateselectlib
                     (t3lib_extmgm::isLoaded('rlmp_dateselectlib') && !empty($conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']) ?
                     (is_int(array_search('date',t3lib_div::trimExplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"])))
                     ?
-                    tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'))))
+                    tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'))))
                     :
                     (is_int(array_search('datetime',t3lib_div::trimExplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval'])))
                     ?
-                    tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldDateTimeFormat'=> ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'))))
+                    tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=> ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'))))
                     : ''))
-                    : '')."</div>".$EVAL_ERROR_FIELD;
+                    : '')."</span>".$EVAL_ERROR_FIELD;
                 }
                 break;
             case "text":
                 // Get the specialConf for the field. Placed in type array.
-                $specialConf = $this->metafeeditlib->getFieldSpecialConf($masterTable,$fN,$conf);
-                
+				// TODO : how do we get a valid rte type if we don't have uid value of record ? 
+				$specialConf = $this->metafeeditlib->getFieldSpecialConf($masterTable,$fN,$conf,$feData[$masterTable]);
                 /**** USE RTE OR NOT  ****/
-                //if(!empty($specialConf) && is_object($this->RTEObj) && $this->RTEObj->isAvailable()) {   // use RTE    
+                // TODO transmit record type or record uid to know if RTE is necessary.
                 if(!empty($specialConf) && t3lib_extmgm::isLoaded('rtehtmlarea')) {   // use RTE    
                 	$this->RTEcounter++;
                 	//$conf['RTE'][$this->RTEcounter]['formName']=$this->formName = $masterTable.'_form';
@@ -1151,18 +1129,18 @@ class tx_metafeedit extends  tslib_pibase {
                 	$pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
                 	$this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];
   		   	        $this->RTEObj = t3lib_div::makeInstance('tx_rtehtmlarea_pi2');//&t3lib_BEfunc::RTEgetObj();
-		    	    		$pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
-		            	$this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];
+		    	    $pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
+		            $this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];
 
                 	$this->thePidValue = $GLOBALS['TSFE']->id;
 					
                 	//$RTEItem ='###RTE_'.$this->RTEcounter.'###';
-               	   $conf['RTE'][$this->RTEcounter]['cmdmode']=$cmdmode;
+               	    $conf['RTE'][$this->RTEcounter]['cmdmode']=$cmdmode;
                 	//$conf['RTE'][$this->RTEcounter]['table']=$masterTable;
                 	//$conf['RTE'][$this->RTEcounter]['PA']=$this->PA;
-									//$conf['RTEItem'][$this->RTEcounter] = $this->RTEObj->drawRTE($this,$masterTable,$fN,$row=array(), $this->PA, $this->specConf, $this->thisConfig, $this->RTEtypeVal, '', $this->thePidValue);
-									$RTEItem = $this->RTEObj->drawRTE($this,$masterTable,$fN,$row=array(), $this->PA, $this->specConf, $this->thisConfig, $this->RTEtypeVal, '', $this->thePidValue);
-                  return $RTEItem . '<div'.$this->caller->pi_classParam('rte-clearer').'></div>'.$EVAL_ERROR_FIELD;
+					//$conf['RTEItem'][$this->RTEcounter] = $this->RTEObj->drawRTE($this,$masterTable,$fN,$row=array(), $this->PA, $this->specConf, $this->thisConfig, $this->RTEtypeVal, '', $this->thePidValue);
+					$RTEItem = $this->RTEObj->drawRTE($this,$masterTable,$fN,$row=array(), $this->PA, $this->specConf, $this->thisConfig, $this->RTEtypeVal, '', $this->thePidValue);
+					return $RTEItem . '<div'.$this->caller->pi_classParam('rte-clearer').'></div>'.$EVAL_ERROR_FIELD;
                 } else {                                                                   // dont use RTE
     	            return '<textarea'.$defaultParams.' cols="'.$conf['TCAN'][$masterTable]["columns"][$fN]['config']["cols"].'" rows="'.$conf['TCAN'][$masterTable]["columns"][$fN]['config']["rows"].'" ></textarea>'.$EVAL_ERROR_FIELD; // removed wrap="VIRTUAL"
                 }
@@ -1480,31 +1458,31 @@ class tx_metafeedit extends  tslib_pibase {
 							// Pdf presentation ???
 							$ret.='<td><data>'.$FCode.'</data><size>'.$size.'</size></td>';	
 						}
-    			  break;
+						break;
     				case 'csv' :
-    				// No presentation data
-    				$ret.='"'.str_replace('"','""',$FCode).'";';	
-    			  break;
+						// No presentation data
+						$ret.='"'.str_replace('"','""',$FCode).'";';	
+						break;
     				case 'xls' :
 						
-    				if( $conf['TCAN'][$masterTable]['columns'][$FN]['config']['type']== 'group' &&  $conf['TCAN'][$masterTable]['columns'][$FN]['config']['internal_type']=='file') {
-								//$dir=$conf['TCAN'][$masterTable]['columns'][$FN]['config']['uploadfolder'];
-								$FCode='###FIELD_EVAL_'.$FN.'###';
+						if( $conf['TCAN'][$masterTable]['columns'][$FN]['config']['type']== 'group' &&  $conf['TCAN'][$masterTable]['columns'][$FN]['config']['internal_type']=='file') {
+									//$dir=$conf['TCAN'][$masterTable]['columns'][$FN]['config']['uploadfolder'];
+									$FCode='###FIELD_EVAL_'.$FN.'###';
 
 						}					
-        		if ($cols) {
-        			$ret.=$type?$FCode:'<div class="'.$this->caller->pi_getClassName('list_table_field').' '.$this->caller->pi_getClassName('list_table_field_'.$FN).'">'.$FCode.'</div>';
-        		} else {
-        			$ret.='<td '.($conf['list.']['align.'][$FN]?'align="'.$conf['list.']['align.'][$FN].'"':'').'>'.($textmode?'':'<div class="'.$this->caller->pi_getClassName('list_field').' '.$this->caller->pi_getClassName('list_field_'.$FN).'">').$FCode.($textmode?'':'</div>').'</td>';
-        		}   			        
-    			  break;
-    			  default:
-        		if ($cols) {
-        			$ret.=$type?$FCode:'<div class="'.$this->caller->pi_getClassName('list_table_field').' '.$this->caller->pi_getClassName('list_table_field_'.$FN).'">'.$FCode.'</div>';
-        		} else {
-        			$ret.='<td '.($conf['list.']['align.'][$FN]?'align="'.$conf['list.']['align.'][$FN].'"':'').'>'.($textmode?'':'<div class="'.$this->caller->pi_getClassName('list_field').' '.$this->caller->pi_getClassName('list_field_'.$FN).'">').$FCode.($textmode?'':'</div>').'</td>';
-        		}   			        
-    		  }
+						if ($cols) {
+							$ret.=$type?$FCode:'<div class="'.$this->caller->pi_getClassName('list_table_field').' '.$this->caller->pi_getClassName('list_table_field_'.$FN).'">'.$FCode.'</div>';
+						} else {
+							$ret.='<td '.($conf['list.']['align.'][$FN]?'align="'.$conf['list.']['align.'][$FN].'"':'').'>'.($textmode?'':'<div class="'.$this->caller->pi_getClassName('list_field').' '.$this->caller->pi_getClassName('list_field_'.$FN).'">').$FCode.($textmode?'':'</div>').'</td>';
+						}   			        
+						break;
+					default:
+						if ($cols) {
+							$ret.=$type?$FCode:'<div class="'.$this->caller->pi_getClassName('list_table_field').' '.$this->caller->pi_getClassName('list_table_field_'.$FN).'">'.$FCode.'</div>';
+						} else {
+							$ret.='<td '.($conf['list.']['align.'][$FN]?'align="'.$conf['list.']['align.'][$FN].'"':'').'>'.($textmode?'':'<div class="'.$this->caller->pi_getClassName('list_field').' '.$this->caller->pi_getClassName('list_field_'.$FN).'">').$FCode.($textmode?'':'</div>').'</td>';
+						}   			        
+					  }
     		  /*
     			if ($textmode) {
     				if ($cols) {
@@ -1764,15 +1742,14 @@ class tx_metafeedit extends  tslib_pibase {
   function getBlogDataFields(&$conf) {
 	$fields=$conf['blog.']['show_fields']?$conf['blog.']['show_fields']:'firstname,surname,email,homepage,place,crdate,entry,entrycomment';
 	$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
-	//$cols=$conf['blog.']['nbCols'];
-	$ret='<tr><td>';
+	$ret='<tr><td><fieldset class="tx-metafeedit-blog-comment"><legend>Comm</legend>';
 	foreach($fieldArray as $FN) {
 		$params=explode(';',$FN);
-			$FCode=$this->getPreviewFieldCode('blog',$conf,$FN,0);
-			$Lib=$this->metafeeditlib->getLLFromLabel($conf['TCAN']['tx_metafeedit_comments']['columns'][trim($FN)]['label'],$conf);
-			$ret.='<div class="'.$this->caller->pi_getClassName('blog_field').' '.$this->caller->pi_getClassName('blog_field_'.$FN).'"><div class="'.$this->caller->pi_getClassName('blog_label').'">'.$Lib.'</div>'.$FCode.'</div>';
+		$FCode=$this->getPreviewFieldCode('blog',$conf,$FN,0);
+		$Lib=$this->metafeeditlib->getLLFromLabel($conf['TCAN']['tx_metafeedit_comments']['columns'][trim($FN)]['label'],$conf);
+		$ret.='<div class="'.$this->caller->pi_getClassName('blog_field').' '.$this->caller->pi_getClassName('blog_field_'.$FN).'"><div class="'.$this->caller->pi_getClassName('blog_label').'">'.$Lib.'</div>'.$FCode.'</div>';
 	}
-	$ret.='</td></tr>';
+	$ret.='</fieldset></td></tr>';
 	return $ret;
   }
 
@@ -1918,7 +1895,7 @@ class tx_metafeedit extends  tslib_pibase {
     	// Begin...
     	$tmp='<!-- ###TEMPLATE_EDITMENU### begin -->';
     	// TOP ACTIONS TAG	
-    	$tmp.= '<table style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-TOP###</td></tr></table>';
+    	$tmp.= '<table  class="tx-metafeedit-top-actions" style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-TOP###</td></tr></table>';
     	
     	// TODO  We get Search Filter here (MUST BE REPLACED by tag !!!!!)....
     	// TODO Put all this in function getSearchFilter ..
@@ -1953,7 +1930,7 @@ class tx_metafeedit extends  tslib_pibase {
     	
     	$filter='<div id="blockfiltre">';
     	$filter2="";
-    	if($conf['inputvar.']['advancedSearch']) $filter2.='<tr> <td class="searchf">'.$this->metafeeditlib->getLL("filtre_recherche",$conf).'<br />'.($recherche? $recherche : $this->metafeeditlib->getLL("search_nothing",$conf)).'</td></tr>';
+    	if($conf['inputvar.']['advancedSearch']) $filter2.='<tr> <td class="searchf">'.$this->metafeeditlib->getLL("filtre_recherche",$conf).'<br />'.($recherche? $recherche : "aucun").'</td></tr>';
     	if ($conf['inputvar.']['sortLetter']) $filter2.= '<tr><td class="searchf">'.$this->metafeeditlib->getLL("filtre_lettre",$conf).$conf['inputvar.']['sortLetter'].' </td></tr>';
     	if ($filter2) $filter.='<table>'.$filter2.'</table>';
     	$filter .= '</div>';
@@ -1994,8 +1971,8 @@ class tx_metafeedit extends  tslib_pibase {
     	// MEDIAPLAYER TAGS
     	$tmp.='</table>###MEDIAPLAYER###'.($conf['blog.']['showComments']?'###MEDIA_ACTION_BLOG###':'').'###PAGENAV###';
     	// BOTTOM ACTION TAGS
-    	$tmp.= '</div><table style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-BOTTOM###</td></tr></table></div>';
-    if ($conf['ajax.']['ajaxOn']) $tmp.= '<div id="modalWindow" class="jqmWindow">
+    	$tmp.= '</div></div><table class="tx-metafeedit-bottom-actions" style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-BOTTOM###</td></tr></table>';
+		if ($conf['ajax.']['ajaxOn']) $tmp.= '<div id="modalWindow" class="jqmWindow">
         <div id="jqmTitle" class="jqmTitle jqDrag">
             <button class="jqmClose">
                X
@@ -2089,12 +2066,12 @@ function getCalendarTemplate(&$conf) {
 	$tmp.=($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-calendar').'">'.$this->metafeeditlib->getLL("edit_calendar_header",$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-grid').'">'.$this->metafeeditlib->getLL("edit_grid_description",$conf).'</div>').'
 	<div'.$this->caller->pi_classParam('editmenu-calendar').'>';
 	$tmp.='<!-- ###WEEKDIV### begin --><div'.$this->caller->pi_classParam('cal-week').'>';
-			$tmp.='<!-- ###HOURLIBDIV### begin --><div'.$this->caller->pi_classParam('cal-hourlib-###NATTR###').'>###HOURLIB###';
-			$tmp.='</div><!-- ###HOURLIBDIV### end -->';
-		$tmp.='<!-- ###DAYDIV### begin --><div'.$this->caller->pi_classParam('cal-day').'><div class="cal-day-title">###DAY###</div>';
-			$tmp.='<!-- ###HOURDIV### begin --><div'.$this->caller->pi_classParam('cal-hour-###NATTR###').'>###HOUR###';
-			$tmp.='</div><!-- ###HOURDIV### end -->';
-		$tmp.='</div><!-- ###DAYDIV### end -->';
+	$tmp.='<!-- ###HOURLIBDIV### begin --><div'.$this->caller->pi_classParam('cal-hourlib-###NATTR###').'>###HOURLIB###';
+	$tmp.='</div><!-- ###HOURLIBDIV### end -->';
+	$tmp.='<!-- ###DAYDIV### begin --><div'.$this->caller->pi_classParam('cal-day').'><div class="cal-day-title">###DAY###</div>';
+	$tmp.='<!-- ###HOURDIV### begin --><div'.$this->caller->pi_classParam('cal-hour-###NATTR###').'>###HOUR###';
+	$tmp.='</div><!-- ###HOURDIV### end -->';
+	$tmp.='</div><!-- ###DAYDIV### end -->';
 	$tmp.='</div><!-- ###WEEKDIV### end -->';
 	$tmp.='<!-- ###CATCTNRDIV### begin --><div'.$this->caller->pi_classParam('cal-catctnr').'><div '.$this->caller->pi_classParam('cal-cat-title').'>###CATTITLE###</div>';
 	$tmp.='<!-- ###CATDIV### begin --><div id="txmfedtcalcat-###NCAT###" class="txmfedtccat '.$this->caller->pi_getClassName('cal-cat-###NCAT###').'"><div class="mfedtcalcatimg">&nbsp;</div>###CALCAT###';
@@ -2133,17 +2110,19 @@ function getCalendarTemplate(&$conf) {
 	'.($conf['text_in_top_of_form']?'<div'.$this->caller->pi_classParam('form-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_form'],$conf['text_in_top_of_form.']).'</div>':'').'
 	<div'.$this->caller->pi_classParam('error').'><!-- -->###EVAL_ERROR###</div>
 	<div'.$this->caller->pi_classParam('form-wrap').'>
+	<form id="'.$conf['pluginId'].'_form" name="'.$conf['pluginId'].'_form" method="POST" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'">
+	<input type="hidden" name="no_cache" value="1">
+	<input type="hidden" id="tx_metafeedit_exporttype" name="tx_metafeedit[exporttype]" value="">
+	<input type="hidden" id="PDF'.$conf['pluginId'].'_et" name="tx_metafeedit[exporttype]" value="PDF"/>
+	<input type="hidden" id="PDF'.$conf['pluginId'].'_cmd" name="cmd['.$conf['pluginId'].']" value="edit"/>
+	<input type="hidden" id="PDF'.$conf['pluginId'].'_rU" name="rU['.$conf['pluginId'].']" value="0"/>
+	</form>
 	<form name="'.$this->table.'_form" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'" onsubmit="'.implode(';', $this->additionalJS_submit).'">
-	'.$this->HTMLFormEdit.'
-	<div'.$this->caller->pi_classParam('form-row').'>
-	###HIDDENFIELDS###
-	###ACTION-SAVE###
-	</div>
-	</form>';
+	'.$this->HTMLFormEdit.'###HIDDENFIELDS###';
 	$tmp.=$this->metafeeditlib->getEditActions($conf,$this);
-	$tmp.='</div>';
-  // Why was this deactivated ?
-  if ($conf['blog.']['showComments']) $tmp.=$this->getBlogTemplate($conf);
+	$tmp.='</form></div>';
+	// Why was this deactivated ?
+	if ($conf['blog.']['showComments']) $tmp.=$this->getBlogTemplate($conf);
 	$tmp.='<!-- ###TEMPLATE_EDIT### end-->';
   return $tmp;
 }
@@ -2212,9 +2191,9 @@ function getCalendarTemplate(&$conf) {
 		'.($conf['text_in_top_of_blog']?'<div'.$this->caller->pi_classParam('blog-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_blog'],$conf['text_in_top_of_blog.']).'</div>':'').'
 		<div'.$this->caller->pi_classParam('blog-wrap').'><div'.$this->caller->pi_classParam('error').'>###EVAL_BLOG_ERROR###</div><table><!-- ###BLOG-COMMENTS### begin --><!-- ###BLOG-COMMENT### begin -->';
 		$t2.=$this->getBlogDataFields($conf).'<!-- ###BLOG-COMMENT### end --><!-- ###BLOG-COMMENTS### end --></table>';
-		if ($conf['blog.']['allowComments']) $t2.='<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-blog').'">'.$this->metafeeditlib->getLL("blog_new_comment",$conf).'</h1><div'.$this->caller->pi_classParam('blog-comment-submit-form').'><form name="tx_metafeedit_comments_form" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'">
-		'.$this->getBlogFormFields($conf).($conf['blog.']['captcha']?'<div'.$this->caller->pi_classParam('error').'>###EVAL_BLOG_ERROR###</div>
-		<!--###CAPTCHA_INSERT### this subpart is removed if CAPTCHA is not enabled! -->
+		if ($conf['blog.']['allowComments']) $t2.='<div'.$this->caller->pi_classParam('blog-comment-submit-form').'><fieldset class="tx-metafeedit-blog"><legend>'.$this->metafeeditlib->getLL("blog_new_comment",$conf).'</legend><form name="tx_metafeedit_comments_form" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'">
+		'.'<fieldset class="tx-metafeedit-blog-data">'.$this->getBlogFormFields($conf).($conf['blog.']['captcha']?'<div'.$this->caller->pi_classParam('error').'>###EVAL_BLOG_ERROR###</div>
+		</fieldset><fieldset class="tx-metafeedit-blog-data"><!--###CAPTCHA_INSERT### this subpart is removed if CAPTCHA is not enabled! -->
 		<div class="'.$this->caller->pi_getClassName('captcha').'">
 		<label for="'.$this->prefixId.'-captcha_response">###SR_FREECAP_NOTICE###</label>
 		###SR_FREECAP_CANT_READ###
@@ -2225,7 +2204,7 @@ function getCalendarTemplate(&$conf) {
 		<!--###CAPTCHA_INSERT###-->':'').'<div'.$this->caller->pi_classParam('blog-row').'><input type="hidden" name="cmd['.$pluginId.']" value="edit" /><input type="hidden" name="blog['.$pluginId.']" value="1" />
 		<input type="hidden" name="rU['.$pluginId.']" value="###FIELD_uid###" />
 		<input type="submit" name="submit['.$pluginId.']" value="'.$this->metafeeditlib->getLL("blog_submit_label",$conf).'"'.$this->caller->pi_classParam('blog-submit').' />
-		</div></form></div>';
+		</div></fieldset></form></fieldset></div>';
 	$t2.=$conf['no_action']?'':'<table style="width:100%"><tr><td align="left"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div></td><td align="right"><div class="'.$this->caller->pi_getClassName('actions').' '.$this->caller->pi_getClassName('preview-actions').'">'.$conf['actions.']['useractions'].'</div>';
 	$t2.='</td></tr></table></div>';
 	$tmp.=$this->cObj->stdWrap($t2,$conf['blogWrap.']);
@@ -3639,7 +3618,7 @@ function getFormJs($formName,&$conf) {
 		$ret.='<table>
 				<tbody><tr>
 					<td><input id="tx_metafeedit.sword.'.$conf['pluginId'].'" name="tx_metafeedit[sword]['.$conf['pluginId'].']" value="###FTSEARCHBOXVAL###" class="tx-metafeedit-searchbox-sword" type="text" /></td>
-					<td><input value="Search" class="tx-metafeedit-searchbox-button" type="submit" /><input name="no_cache" value="1" type="hidden" /><input name="tx_metafeedit[pointer]['.$conf['pluginId'].']" value="" type="hidden" /></td>
+					<td><button value="Search" class="'.$this->caller->pi_getClassName('form-submit').' '.$this->caller->pi_getClassName('searchbox-button').'" type="submit">'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</button><input name="no_cache" value="1" type="hidden" /><input name="tx_metafeedit[pointer]['.$conf['pluginId'].']" value="" type="hidden" /></td>
 				</tr>
 
 			</tbody></table>
@@ -3803,7 +3782,7 @@ function getFormJs($formName,&$conf) {
 		$ret=$cnt.($conf['list.']['advancedSearchAjaxSelector'] ? '<ul class="astabnav">'.implode("",$searchTabs)."</ul>" : '').$ret;  //RSG adjust
 		
 		$ret.='<div '.$this->caller->pi_classParam('advancedSearch-actions').'><div '.$this->caller->pi_classParam('advancedSearch-action').'>';
-		$ret.='<div '.$this->caller->pi_classParam('advancedSearch-action').'><input type="submit" name="submit" value="'.($conf['edit.']['preview']?$this->metafeeditlib->getLL("advanced_search_label",$conf):$this->metafeeditlib->getLL("advanced_search_label",$conf)).'"'.$this->caller->pi_classParam('form-submit').' /></div>';
+		$ret.='<div '.$this->caller->pi_classParam('advancedSearch-action').'><button type="submit" name="submit" value="'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'" class="'.$this->caller->pi_getClassName('form-submit').' '.$this->caller->pi_getClassName('searchbox-button').'">'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</button></div>';
 		$ret.='<div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('advancedSearch-action').' '.$this->caller->pi_getClassName('as_reset').'"><a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[reset]['.$conf['pluginId'].']=1">'.$this->metafeeditlib->getLL("advanced_search_reset",$conf).'</a></div>';
 		$ret.= '</div></div></form></div>';
 		return $ret;

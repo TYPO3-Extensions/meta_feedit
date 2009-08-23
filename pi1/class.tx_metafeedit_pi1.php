@@ -286,7 +286,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['preOrderByString']=$lconf['listPreOrderByString'];
 		$mfconf['list.']['havingString']=$lconf['listHavingString'];
 		$mfconf['list.']['jumpPageOnGroupBy']=$lconf['listJumpPageOnGroupBy'];
-		$mfconf['list.']['rUJoinField']=$lconf['rUJoinField'];
+		$mfconf['list.']['rUJoinField']=$lconf['rUJoinField']?$lconf['rUJoinField']:'uid';
 		$mfconf['list.']['groupByFields']=$lconf['groupByFields'];
 		$mfconf['list.']['groupByFieldBreaks']=$lconf['groupByFieldBreaks'];
 		$mfconf['list.']['hiddenGroupByField.']=$conf['list.']['hiddenGroupByField.'];
@@ -540,7 +540,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			
 		// ts config from plugin meta_feedit_pi1
 
-		$mfconf['stdWrap.']=$conf['stdWrap.'];
 
 		$mfconf['whereClause.']=$this->metafeeditlib->getMetaFeeditVar2($mfconf,'whereClause.');
 		$mfconf['select.']=$this->metafeeditlib->getMetaFeeditVar2($mfconf,'select.');
@@ -564,12 +563,15 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['originTable']=$conf['originTable'];
 		$mfconf['originUidsField']=$conf['originUidsField'];
 		$mfconf['label.']=$conf['label.'];
+
+		//stdWraps ...
+		
+		$mfconf['stdWrap.']=$conf['stdWrap.'];
 		$mfconf['fileWrap.']=$conf['fileWrap.'];
 		$mfconf['list.']['formWrap.']=$conf['listFormWrap.'];
 		$mfconf['list.']['stdWrap.']=$conf['list.']['stdWrap.'];
 		$mfconf['list.']['actionStdWrap.']=$conf['list.']['actionStdWrap.'];
-
-		$mfconf['list.']['item_stdWrap.']=$conf['list_item_stdWrap.']?$conf['list_item_stdWrap.']:$conf['list.']['item_stdWrap.'];
+		$mfconf['list.']['item_stdWrap.']=$conf['list_item_stdWrap.']?$conf['list_item_stdWrap.']:$conf['list.']['item_stdWrap.']; //deprecated use ['list.']['stdWrap.'] instead
 		$mfconf['list.']['groupByFields.']['stdWrap.']=$conf['list_groupByFields_stdWrap.'];
 		$mfconf['list.']['icon_thumbSize.']=$conf['list.']['icon_thumbSize.'];
 		$mfconf['list.']['asFieldSetNames.']=$conf[$pluginId.'.']['list.']['asFieldSetNames.']?$conf[$pluginId.'.']['list.']['asFieldSetNames.']:$conf['default.']['list.']['asFieldSetNames.'];
@@ -605,6 +607,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['userFunc_afterWhere']=$conf[$pluginId.'.']['list.']['userFunc_afterWhere'];
 		$mfconf['list.']['userFunc_afterMark']=$conf[$pluginId.'.']['list.']['userFunc_afterMark'];
 		$mfconf['list.']['userFunc_afterItemMark']=$conf[$pluginId.'.']['list.']['userFunc_afterItemMark'];
+		$mfconf['list.']['userFunc_alterSortTabs']=$conf[$pluginId.'.']['list.']['userFunc_alterSortTabs'];
+		$mfconf['list.']['userFunc_alterSortOptions']=$conf[$pluginId.'.']['list.']['userFunc_alterSortOptions'];
 		$mfconf['grid.']['userFunc_afterRowWhere']=$conf[$pluginId.'.']['grid.']['userFunc_afterRowWhere']; 
 		$mfconf['grid.']['userFunc_afterColWhere']=$conf[$pluginId.'.']['grid.']['userFunc_afterColWhere']; 
 		$mfconf['grid.']['userFunc_afterSecondaryColWhere']=$conf[$pluginId.'.']['grid.']['userFunc_afterSecondaryColWhere']; 
@@ -631,7 +635,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		foreach($OArr as $ORV) {
 			$OVs=explode('=',$ORV,2);
 			if (count($OVs)==2) {
-				//$mfconf['list.']['calcfields']=$mfconf['list.']['calcfields.']?trim($OVs[0]):$mfconf['list.']['calcfields.'].','.trim($OVs[0]);
 				$mfconf['list.']['phpcalcfields.'][trim($OVs[0])]=trim($OVs[1]);
 				if ($OVs[0]) $CVArr[]=$OVs[0];
 			}		
