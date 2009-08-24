@@ -618,7 +618,7 @@ class tx_metafeedit extends  tslib_pibase {
 				}
              } else {
                 if($fN=='--fse--' && $fsc) {
-                	$out_array[$out_sheet][]='</fieldset></div';
+                	$out_array[$out_sheet][]='</fieldset></div>';
                 	$fsc--;
 	             }
                 if($fN=='--fsb--') {
