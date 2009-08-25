@@ -1266,7 +1266,8 @@ class tx_metafeedit_lib {
 	function getFieldList(&$conf) {
 		switch($conf['inputvar.']['cmd']) {
                case 'edit':
-                        $conf['fieldList']=implode(',',t3lib_div::trimExplode(',',$conf['edit.']['fields'],1));
+                        
+                        $conf['fieldList']=implode(',',array_intersect(t3lib_div::trimExplode(',',$conf['edit.']['fields'],1),array_merge(t3lib_div::trimExplode(',',$conf['edit.']['show_fields'],1), t3lib_div::trimExplode(',',$conf['edit.']['readonlyFields'],1) )));
                    break;
                    default:
                       $conf['fieldList']=implode(',',t3lib_div::trimExplode(',',$conf['create.']['fields'],1));
