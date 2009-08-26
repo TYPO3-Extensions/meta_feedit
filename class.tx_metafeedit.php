@@ -1954,7 +1954,7 @@ class tx_metafeedit extends  tslib_pibase {
 		if ($conf['inputvar.']['sortLetter'])  $filterArray[]=$this->metafeeditlib->getLL("filtre_lettre",$conf).' "'.$conf['inputvar.']['sortLetter'].'"';
 		if (is_array($conf['inputvar.']['advancedSearch'])) {
     		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
-    			if($val) {
+    			if($this->metafeeditlib->is_extent($val)){
      			    $ftA=$this->metafeeditlib->getForeignTableFromField($key,$conf,'',array());
 					$recherche='';
    				    $recherche .= $this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'], $conf).' ';
