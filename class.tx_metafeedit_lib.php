@@ -2542,8 +2542,8 @@ class tx_metafeedit_lib {
 			}
 			mysql_free_result($res);
 
-			if ($conf['general.']['list.']['userFunc_alterSortTabs']) {
-			  $_params = array ('sortTab' => &$sortTab, 'sortAux' => &$sortAux, 'table' => $table, 'fN' => $fN  ); 
+if ($conf['general.']['list.']['userFunc_alterSortTabs']) {
+			  $_params = array ('sortTab' => &$sortTab, 'sortAux' => &$sortAux, 'table' => $table, 'fN' => $fN , 'forceEmptyOption'=> $forceEmptyOption ,'forceVal' => $forceVal ); 
         t3lib_div::callUserFunction($conf['general.']['list.']['userFunc_alterSortTabs'],  $_params , $conf);
 			}
 			
