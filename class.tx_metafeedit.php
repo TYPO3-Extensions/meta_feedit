@@ -109,26 +109,6 @@ class tx_metafeedit extends  tslib_pibase {
         if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init done :']=$this->metafeeditlib->displaytime()." Seconds"; 
         // command specific initialisation 
         $this->initCmd($conf);
-				//DRAW RTE
-				/*
-				if (count($conf['RTE'])) {
-						$pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
-						$this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];
-						$this->thePidValue = $GLOBALS['TSFE']->id;
-				}
-				foreach($conf['RTE'] as $key=>$RTE) {
-					if ($RTE['cmdmode']=='edit' || $RTE['cmdmode']=='create' ) {
-		                $this->RTEcounter=$key;
-		                $this->formName =$conf['RTE'][$key]['formName'];
-						$this->strEntryField = $conf['RTE'][$key]['field'];
-						$conf['RTE'][$key]['spec']=$this->specConf = $specialConf;                
-						$this->PA=$conf['RTE'][$key]['PA'];
-						$this->RTEObj = t3lib_div::makeInstance('tx_rtehtmlarea_pi2');//&t3lib_BEfunc::RTEgetObj();
-						$conf['RTEItem'][$key] = $this->RTEObj->drawRTE($this,$conf['RTE'][$key]['table'],$conf['RTE'][$key]['field'],$row=array(), $this->PA, $this->specConf, $this->thisConfig, $this->RTEtypeVal, '', $this->thePidValue);
-					}
-				}
-				*/
-		
         $this->conf=&$conf; // to be removed !!!  Can it be removed ? CBY
         if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init feAconf done :']=$this->metafeeditlib->displaytime()." Seconds"; 
         if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after Init feAConf size ']=strlen(serialize($conf))." Bytes"; 
@@ -1010,13 +990,15 @@ class tx_metafeedit extends  tslib_pibase {
 		if ($std[$fNiD.'.'] || $std[$table.'.'][$fNiD.'.'] || $std[$fN.'.'] || $std[$table.'.'][$fN.'.']) {
 			$values = '###FIELD_EVAL_'.$fN.'###';
 		}
-		$feData = $conf['inputvar.']['fedata'];
+		/*$feData = $conf['inputvar.']['fedata'];
+		//TODO BIG PB HERE check if this is necessary
         if($feData[$masterTable]['_TRANSFORM_'.$fN]) { // if rte output, we need to process it instead of parsing it through htmlspecialchar as the other values gets.
             $dataArr = $feData[$masterTable];
+			echo "TRANSFORM===================";
             $dataArr = $this->metafeeditlib->rteProcessDataArr($dataArr, $masterTable, $fN, 'db',$conf,'getPreviewFieldCode');
             $dataArr = $this->metafeeditlib->rteProcessDataArr($dataArr, $masterTable, $fN, 'rte',$conf,'getPreviewFieldCode');
             $values = $dataArr[$fN];
-        }
+        }*/
         return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
         break;
     default:
@@ -1098,7 +1080,7 @@ class tx_metafeedit extends  tslib_pibase {
                 	$conf['additionalJS_end']['feedit_'.$fN.'_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
                     return
                 		'<input alt="'.$gridMarkAlt.'" title="'.$gridMarkAlt.'" type="'.$type.'" name="'.$fieldName.'_feVal" id="'.$fieldName.'_feVal" '.$class.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange.' />' .
-                		'<input type="hidden" name="'.$fieldName.'" />'.($bgrid?'':'<span '.$this->caller->pi_classParam('form-button-date').' >') .
+                		'<input type="hidden" name="'.$fieldName.'" />'.($bgrid?'':'') .
                     // inserts button for rlmp_dateselectlib
                     (t3lib_extmgm::isLoaded('rlmp_dateselectlib') && !empty($conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']) ?
                     (is_int(array_search('date',t3lib_div::trimExplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"])))
@@ -1109,7 +1091,7 @@ class tx_metafeedit extends  tslib_pibase {
                     ?
                     tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=> ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'))))
                     : ''))
-                    : '')."</span>".$EVAL_ERROR_FIELD;
+                    : '').$EVAL_ERROR_FIELD;
                 }
                 break;
             case "text":
@@ -1120,9 +1102,7 @@ class tx_metafeedit extends  tslib_pibase {
                 // TODO transmit record type or record uid to know if RTE is necessary.
                 if(!empty($specialConf) && t3lib_extmgm::isLoaded('rtehtmlarea')) {   // use RTE    
                 	$this->RTEcounter++;
-                	//$conf['RTE'][$this->RTEcounter]['formName']=$this->formName = $masterTable.'_form';
-                	//$conf['RTE'][$this->RTEcounter]['field']=$this->strEntryField = $fN;
-                	$this->PA['itemFormElName'] = $fieldName;
+                 	$this->PA['itemFormElName'] = $fieldName;
                 	$feData = $conf['inputvar.']['fedata'];
                 	$this->PA['itemFormElValue'] = $feData[$masterTable][$fN];
                 	$conf['RTE'][$this->RTEcounter]['spec']=$this->specConf = $specialConf; 
@@ -1134,11 +1114,7 @@ class tx_metafeedit extends  tslib_pibase {
 
                 	$this->thePidValue = $GLOBALS['TSFE']->id;
 					
-                	//$RTEItem ='###RTE_'.$this->RTEcounter.'###';
                	    $conf['RTE'][$this->RTEcounter]['cmdmode']=$cmdmode;
-                	//$conf['RTE'][$this->RTEcounter]['table']=$masterTable;
-                	//$conf['RTE'][$this->RTEcounter]['PA']=$this->PA;
-					//$conf['RTEItem'][$this->RTEcounter] = $this->RTEObj->drawRTE($this,$masterTable,$fN,$row=array(), $this->PA, $this->specConf, $this->thisConfig, $this->RTEtypeVal, '', $this->thePidValue);
 					$RTEItem = $this->RTEObj->drawRTE($this,$masterTable,$fN,$row=array(), $this->PA, $this->specConf, $this->thisConfig, $this->RTEtypeVal, '', $this->thePidValue);
 					return $RTEItem . '<div'.$this->caller->pi_classParam('rte-clearer').'></div>'.$EVAL_ERROR_FIELD;
                 } else {                                                                   // dont use RTE
@@ -1897,50 +1873,9 @@ class tx_metafeedit extends  tslib_pibase {
     	// TOP ACTIONS TAG	
     	$tmp.= '<table  class="tx-metafeedit-top-actions" style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-TOP###</td></tr></table>';
     	
-    	// TODO  We get Search Filter here (MUST BE REPLACED by tag !!!!!)....
-    	// TODO Put all this in function getSearchFilter ..
-        //-- Should be put in fe_adminLib
-    	$cont = $conf['inputvar.']['advancedSearch'];
-    	$recherche='';
-    	if (is_array($conf['inputvar.']['advancedSearch'])) {
-    		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
-    			if($val) {
-    			    
-     			    $ftA=$this->metafeeditlib->getForeignTableFromField($key,$conf,'',array());               
-   				    $recherche .= ($recherche?',<br />':'').$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'], $conf).': ';
-    				if (is_array($val)) {
-    				    $recherche .= $val['op'].' '.$val['val'].' , '.$val['valsup'];    				    
-    			    } else {
-						//TODO handle multiple values...
-						if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']) {
-							$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table'],$val);
-							$val=$rec[$conf['TCAN'][$conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']]['ctrl']['label']];
-						}
-						if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
-						  $val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
-						}
-						if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['type'] == 'check') { 
-						  $val = $this->metafeeditlib->getLLFromLabel(($val?'check_yes': 'check_no'), $conf); 
-						}
-						$recherche .= $val;
-    			    }
-    			}
-    		}
-    	}
-    	
-    	$filter='<div id="blockfiltre">';
-    	$filter2="";
-    	if($conf['inputvar.']['advancedSearch']) $filter2.='<tr> <td class="searchf">'.$this->metafeeditlib->getLL("filtre_recherche",$conf).'<br />'.($recherche? $recherche : "aucun").'</td></tr>';
-    	if ($conf['inputvar.']['sortLetter']) $filter2.= '<tr><td class="searchf">'.$this->metafeeditlib->getLL("filtre_lettre",$conf).$conf['inputvar.']['sortLetter'].' </td></tr>';
-    	if ($filter2) $filter.='<table>'.$filter2.'</table>';
-    	$filter .= '</div>';
-    	
-    	//$tmp.=$filter;
-    	//-- end filter ...
-    	
-    	$tmp.='<div'.$this->caller->pi_classParam('editmenu').'>'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_header",$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_description",$conf).'</div>').' 
+       	$tmp.='<div'.$this->caller->pi_classParam('editmenu').'>'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_header",$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_description",$conf).'</div>').' 
     	<div'.$this->caller->pi_classParam('error').'><!-- -->###EVAL_ERROR###</div>
-    	<div'.$this->caller->pi_classParam('editmenu-list').'>'.($conf['list.']['searchBox']?$this->cObj->stdWrap($this->searchBox($conf),$conf['list.']['searchBox.']):'').($conf['list.']['alphabeticalSearch']?$this->cObj->stdWrap($this->alphabeticalSearch($conf),$conf['list.']['alphabeticalSearch.']):'').($conf['list.']['advancedSearch']?$this->cObj->stdWrap($this->advancedSearch($conf,$filter),$conf['list.']['advancedSearch.']):'').($conf['list.']['calendarSearch']?$this->cObj->stdWrap($this->calendarSearch(),$conf['list.']['calendarSearch.']):'');;
+    	<div'.$this->caller->pi_classParam('editmenu-list').'>'.$this->getSearchBox(&$conf);
     
     	$tmp.='<table '.$this->caller->pi_classParam('editmenu-list-table').' style="width: 100%;">'.($conf['list.']['nbCols']?'':'<tr'.$this->caller->pi_classParam('editmenu-list-table-header').'>###ACTIONS-LIST-LIB###'.$this->getListFields($conf).'</tr>').'<!-- ###ALLITEMS### begin -->';
     	// Group By processing
@@ -2005,7 +1940,66 @@ class tx_metafeedit extends  tslib_pibase {
     	$tmp.='<!-- ###TEMPLATE_EDITMENU### end -->';
     	return $tmp;
     }
+	
+	function getSearchBox(&$conf) {	
+	   	// TODO  We get Search Filter here (MUST BE REPLACED by tag !!!!!)....
+    	// TODO Put all this in function getSearchFilter ..
+        //-- Should be put in fe_adminLib
+		$fulltext=$conf['inputvar.']['sword']?$this->metafeeditlib->getLL("fulltext_search",$conf).' "'.$conf['inputvar.']['sword'].'"':'';
+		$obs=t3lib_div::trimexplode(':',$conf['inputvar.']['sort']);
+		$orderby=$obs[0]?$this->metafeeditlib->getLL("order_by",$conf).' '.$obs[0].' '.($obs[1]?$this->metafeeditlib->getLL("ascending",$conf):$this->metafeeditlib->getLL("descending",$conf)):'';
+		$filterArray=array();
+    	$recherche='';
+ 		if ($fulltext) $filterArray[]=$fulltext;
+		if ($conf['inputvar.']['sortLetter'])  $filterArray[]=$this->metafeeditlib->getLL("filtre_lettre",$conf).' "'.$conf['inputvar.']['sortLetter'].'"';
+		if (is_array($conf['inputvar.']['advancedSearch'])) {
+    		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
+    			if($val) {
+     			    $ftA=$this->metafeeditlib->getForeignTableFromField($key,$conf,'',array());
+					$recherche='';
+   				    $recherche .= $this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'], $conf).' ';
+    				if (is_array($val)) {
+    				    $recherche .= $val['op'].' '.$val['val'].' , '.$val['valsup'];    				    
+    			    } else {
+						//TODO handle multiple values...
+						if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']) {
+							if (!$conf['TCAN'][$conf['table']]['columns'][$key]['config']['MM']) {
+								$vals=explode(',',$val);
+								$vs=array();
+								foreach($vals as $v) {
+									$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table'],$v);
+									$vs[]=$rec[$conf['TCAN'][$conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']]['ctrl']['label']];
+								}
+								$val=implode(', ',$vs);
+							}
+						} else if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
+							$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
+						} else if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['type'] == 'check') { 
+							$val = $this->metafeeditlib->getLLFromLabel(($val?'check_yes': 'check_no'), $conf); 
+						}
+						$recherche .= $val;
+    			    }
+					if ($recherche) $filterArray[]=$recherche;
+    			}
+    		}
+    	}
+		if ($orderby) $filterArray[]=$orderby;
 
+		// Should all be replaceD by marker and evaluation should be done in metafeedit_lib called from feadminlib.inc
+    	/*$filter='<div id="blockfiltre">';
+    	$filter2=$this->metafeeditlib->getLL("filtre_recherche",$conf).'<br />';
+		if ($fulltext) $filter2.= '<tr><td class="searchf">'.$fulltext.' </td></tr>';
+		if($conf['inputvar.']['advancedSearch']) $filter2.='<tr><td class="searchf">'.($recherche? $recherche : $this->metafeeditlib->getLL("search_nothing",$conf)).'</td></tr>';
+    	if ($conf['inputvar.']['sortLetter']) $filter2.= '<tr><td class="searchf">'.$this->metafeeditlib->getLL("filtre_lettre",$conf).$conf['inputvar.']['sortLetter'].' </td></tr>';
+     	if ($this->piVars['sort']) $filter2.= '<tr><td class="searchf">'.$orderby.' </td></tr>';
+		if ($filter2) $filter.='<table>'.$filter2.'</table>';
+    	$filter .= '</div>';
+   		*/
+		$searchFlag=((boolean)$conf['list.']['searchBox'] || (boolean)$conf['list.']['alphabeticalSearch'] || (bool)$conf['list.']['advancedSearch'] || (bool)$conf['list.']['calendarSearch']);
+		$ret=($searchFlag?'<fieldset class="tx-metafeedit-fs-searchbox"><legend>'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</legend><span class="tx-metafeedit-sb-filter">'.implode(', ',$filterArray).'</span>'.$this->cObj->stdWrap($this->advancedSearch($conf,$filter),$conf['list.']['advancedSearch.']).'</fieldset>':'');
+		return $ret;
+	}
+	
     /**
     * getListNoItemTemplate : generates template for empty lists ...
     *
@@ -2923,9 +2917,6 @@ function getCSVTemplate(&$conf)
 	
 	if ($conf['inputvar.']['sortLetter'])
 	$tmp.= '  tri par la lettre: '.$conf['inputvar.']['sortLetter'];
-	
-	
-	
 	$tmp.=($conf['list.']['nbCols']?'':$this->getListFields($conf,true)).chr(10).'<!-- ###ALLITEMS### begin -->';
 	$GROUPBYFIELDS=$this->getGroupByFields($conf,true);
 	if ($conf['list.']['displayDirection']=='Down') {
@@ -3599,7 +3590,7 @@ function getFormJs($formName,&$conf) {
 	 */
 	function alphabeticalSearch(&$conf) {
 		$ret='<div'.$this->caller->pi_classParam('alphabeticalSearch').'>';
-		for ($i="A"; $i != "AA"; $i++) $ret.='<div'.$this->caller->pi_classParam('lettersearch').'><a href="###FORM_URL###&amp;'.$this->prefixId.'['.sortLetter.']['.$conf['pluginId'].']='.$i.'">'.$i.'</a></div>'; 
+		for ($i="A"; $i != "AA"; $i++) $ret.='<div'.$this->caller->pi_classParam('lettersearch').'><a '.(($conf['inputvar.']['sortLetter']==$i)?'class="mfdt-set"':'').' href="###FORM_URL###&amp;'.$this->prefixId.'['.sortLetter.']['.$conf['pluginId'].']='.$i.'">'.$i.'</a></div>'; 
 
 		$ret.='<div'.$this->caller->pi_classParam('lettersearch').'><a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'['.reset.']['.$conf['pluginId'].']=1">'.$this->metafeeditlib->getLL("alphabetical_search_all",$conf).'</a></div>'; 
 		$ret.='</div>';
@@ -3653,59 +3644,72 @@ function getFormJs($formName,&$conf) {
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
 		$fsbc=0;
 		$fsi=0;
-		$ret='<div id="'.$this->caller->pi_getClassName('as').'_asfilter_'.$conf['pluginId'].'" class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-text').' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-text').' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-text-'.$curTable['fNiD']).'">'.$filter.'</div>';
+		$ret='';//'<div id="'.$this->caller->pi_getClassName('as').'_asfilter_'.$conf['pluginId'].'" class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-text').' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-text').' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-text-'.$curTable['fNiD']).'">'.$filter.'</div>';
 		
-		if ($conf['list.']['advancedSearchAjaxSelector']) {   // RSG make advanced search tabs optional
+		if ($conf['ajax.']['ajaxOn']) {
+			$searchTabs=array();
+			//$searchTabs[]='<li class="active"><a id="'.$this->caller->pi_getClassName('as').'_asfilter_'.$conf['pluginId'].'_a" href="#">'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</a></li>';
+		}
+		$first=true;
+		if ($conf['list.']['searchBox']) {
+			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($conf['inputvar.']['sword']?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_searchbox_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'"><i>&nbsp;</i>'.$this->metafeeditlib->getLL('fulltext_search',$conf).'</a></li>';
+			$ret.='<div id="'.$this->caller->pi_getClassName('as').'_searchbox_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-searchbox').'">'.$this->cObj->stdWrap($this->searchBox($conf),$conf['list.']['searchBox.']).'</div>';					
+		    $first=false;
+		}
+		if ($conf['list.']['alphabeticalSearch']) {
+			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($conf['inputvar.']['sortLetter']?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_alphabeticalsearch_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'"><i>&nbsp;</i>'.$this->metafeeditlib->getLL('alphabetical_search',$conf).'</a></li>';
+			$ret.='<div id="'.$this->caller->pi_getClassName('as').'_alphabeticalsearch_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-alphabeticalsearch').'">'.$this->cObj->stdWrap($this->alphabeticalSearch($conf),$conf['list.']['alphabeticalSearch.']).'</div>';					
+		    $first=false;
+		}
+		if ($conf['list.']['calendarSearch']) {
+			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li><a id="'.$this->caller->pi_getClassName('as').'_calendarsearch_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'"><i>&nbsp;</i>'.$this->metafeeditlib->getLL('calendar_search',$conf).'</a></li>';
+			$ret.='<div id="'.$this->caller->pi_getClassName('as').'_calendarsearch_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-alphabeticalsearch').'">'.$this->cObj->stdWrap($this->calendarSearch(),$conf['list.']['calendarSearch.']).'</div>';					
+		    $first=false;
+		}
 		
-		$searchTabs=array();
-		$searchTabs[]='<li class="active"><a id="'.$this->caller->pi_getClassName('as').'_asfilter_'.$conf['pluginId'].'_a" href="#">'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</a></li>';
-		} //
-		foreach($fieldArray as $FN) {
-			$params=t3lib_div::trimExplode(';',$FN);
-			if ($params[0]!='--div--') {
-			// gestion des fieldset
-			if ($params[0]=='--fse--' && $fsbc) {
-				$ret.='</fieldset>';
-				if ($fsbc) $fsbc--;
+		if ($conf['list.']['advancedSearch']) {
+			foreach($fieldArray as $FN) {
+				$params=t3lib_div::trimExplode(';',$FN);
+				if ($params[0]!='--div--') {
+					// gestion des fieldset
+					if ($params[0]=='--fse--' && $fsbc) {
+						$ret.='</fieldset>';
+						if ($fsbc) $fsbc--;
 						continue;
-			}
-			if ($params[0]=='--fsb--') {
-				if ($fsbc) {
-					$ret.='</fieldset>';
-					$fsbc--;
-				}
-				$fsbc++;
-				$ret.='<fieldset class="'.$this->caller->pi_getClassName('as-fs').' '.$this->caller->pi_getClassName('as-fs-'.$params[1]).'">';
-				if ($conf['list.']['asFieldSetNames.'][$fsi]) $ret.='<legend>'.$conf['list.']['asFieldSetNames.'][$fsi].'</legend>';
-				$fsi++;
+					}
+					if ($params[0]=='--fsb--') {
+						if ($fsbc) {
+							$ret.='</fieldset>';
+							$fsbc--;
+						}
+						$fsbc++;
+						$ret.='<fieldset class="'.$this->caller->pi_getClassName('as-fs').' '.$this->caller->pi_getClassName('as-fs-'.$params[1]).'">';
+						if ($conf['list.']['asFieldSetNames.'][$fsi]) $ret.='<legend>'.$conf['list.']['asFieldSetNames.'][$fsi].'</legend>';
+						$fsi++;
 						continue;
-			}
-
+					}
 					//modif CMD - prise en compte des tables etrangère dans l'AS
 					$curTable = $this->metafeeditlib->getForeignTableFromField($FN, $conf,'',array());
-					//krumo($conf['TCAN'][$curTable['relTable']]);
 					$type = $conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
-					if(($conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['eval']=='date' || $conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['eval']=='datetime')) $type=date;
+					$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['eval']);
+					
+					if(in_array('date',$evals) || in_array('datetime',$evals)) $type=date;
 					//TODO : metre cette modification de type de donnée en surcharge de TCA
-					// $markerArray['###FIELD_EVAL_crdate###'] = strftime(($conf['datetimeformat']?$conf['datetimeformat']:"%H:%M %e-%m-%Y"),$crow['crdate']);
 					//$GLOBALS['TCA'][$this->table]['columns'][$GLOBALS['TCA'][$this->table]['ctrl']['crdate']]['config']['eval']='datetime';
 					//$GLOBALS['TCA'][$this->table]['columns'][$GLOBALS['TCA'][$this->table]['ctrl']['crdate']]['config']['type']='input';
 					//$GLOBALS['TCA'][$this->table]['columns'][$GLOBALS['TCA'][$this->table]['ctrl']['crdate']]['label']=$this->table.'.'.$GLOBALS['TCA'][$this->table]['ctrl']['cr
 					//dans le meta_feedit.php
-					//$label=($curTable['fNiD']=='crdate' && (string)$type=='')?'LLL:EXT:'.$curTable['table'].'.'.$curTable['fNiD']:$conf['TCAN'][$curTable['table']]['columns'][trim($curTable['fNiD'])]['label'];
 					$label=$curTable['fieldLabel'];
 					$type=($curTable['fNiD']=='crdate' && (string)$type=='')?'date':$type;
 					$Lib='<div class="'.$this->caller->pi_getClassName('asl').'">'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</div>';
-					    //$fN=str_replace('.','_',$fN);
-					    if ($conf['list.']['advancedSearchAjaxSelector']) {  // rsg
-					$searchTabs[]='<li><a id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'_a" href="#">'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</a></li>';
-					} //
-					$div='<div id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'" '. ($conf['list.']['advancedSearchAjaxSelector']? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type.'-'.$curTable['fNiD']).'">'.$Lib;  // rsg adjust
+					if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($conf['inputvar.']['advancedSearch'][$FN]?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'"><i>&nbsp;</i>'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</a></li>';
+					$div='<div id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type.'-'.$curTable['fNiD']).'">'.$Lib;
+					$first=false;
 					$value=' value="###ASFIELD_'.$FN.'_VAL###"';
 					switch((string)$type) {
 					case 'text':
 					case 'input':
-							$ret.=$div.'<input type="text" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"'.$value.$this->caller->pi_classParam('form-asfield').' /></div>';
+						$ret.=$div.'<input type="text" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"'.$value.$this->caller->pi_classParam('form-asfield').' /></div>';
 						break;
 					case 'date':
 						  $value=' value="###ASFIELD_'.$FN.'_VAL###"';
@@ -3713,16 +3717,16 @@ function getFormJs($formName,&$conf) {
 						  $ret.=$div.'<input type="radio" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_equal" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][op]" value="=" ###ASCHECKEDEQUAL### /><label for="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_equal">=</label>';
 						  $ret.='<input type="radio" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_inf" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][op]" value="<" ###ASCHECKEDINF### /><label for="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_inf">&lt;</label>';
 						  $ret.='<input type="radio" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_sup" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][op]" value=">" ###ASCHECKEDSUP### /><label for="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_sup">&gt;</label>';
-						  $ret.='<input type="text" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][val]" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.val" value="###ASFIELD_'.$FN.'_VAL###" '.$this->caller->pi_classParam('form-asfield').' />'.(t3lib_extmgm::isLoaded('rlmp_dateselectlib')?tx_rlmpdateselectlib::getInputButton($this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.val',array('calConf.'=>array('inputFieldDateTimeFormat'=> ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y')))):'');
+						  $ret.='<input type="text" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][val]" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.val" value="###ASFIELD_'.$FN.'_VAL###" '.$this->caller->pi_classParam('form-asfield').' />'.(t3lib_extmgm::isLoaded('rlmp_dateselectlib')?tx_rlmpdateselectlib::getInputButton($this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.val',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y')))):'');
 						  $ret.='<input type="radio" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_between" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][op]" value="><" ###ASCHECKEDBETWEEN###/><label for="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_between">&gt;&lt;</label>';
-						  $ret.='<input type="text" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][valsup]" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.valsup" value="###ASFIELD_'.$FN.'_VALSUP###" '.$this->caller->pi_classParam('form-asfield').'/>'.(t3lib_extmgm::isLoaded('rlmp_dateselectlib')?tx_rlmpdateselectlib::getInputButton($this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.valsup',array('calConf.'=>array('inputFieldDateTimeFormat'=> ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y')))):'');
+						  $ret.='<input type="text" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][valsup]" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.valsup" value="###ASFIELD_'.$FN.'_VALSUP###" '.$this->caller->pi_classParam('form-asfield').'/>'.(t3lib_extmgm::isLoaded('rlmp_dateselectlib')?tx_rlmpdateselectlib::getInputButton($this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.valsup',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y')))):'');
 						  $ret.='</div>';
 						  break;
 					  case 'group':
 						  break;
 					  case 'radio':
 						//modif CMD on récup la val courante pour l'afficher en tant que selectionné
-						$val = $conf['piVars']['advancedSearch'][$conf['pluginId']][$FN];
+						$val = is_array($conf['piVars']['advancedSearch'])?$conf['piVars']['advancedSearch'][$conf['pluginId']][$FN]:'';
 						$ret.=$div;
 						for ($i = 0; $i < count ($conf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items']); ++$i) {
 							$ckecked='';
@@ -3746,16 +3750,16 @@ function getFormJs($formName,&$conf) {
 				
 					case 'select':
 						// For select fields we either draw  ajax seletion widget or we relace with getselectoptions ...
-						if ($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['foreign_table'] && ($conf['list.']['advancedSearchAjaxSelector'] || $conf['list.']['advancedSearchAjaxSelector.'][$FN])) {
-						//if ($conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['foreign_table'] && ($conf['list.']['advancedSearchAjaxSelector'] || $conf['list.']['advancedSearchAjaxSelector.'][$FN])) {
+						if ($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['foreign_table'] && $conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']==1 && ($conf['list.']['advancedSearchAjaxSelector'] || $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector.'][$FN])) {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'widgets'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/widgets.js"></script>';
 							$ajaxWidgets = t3lib_div::makeInstance('tx_metafeedit_widgets');
 							$ajaxWidgets->init($this->prefixId,$this->metafeeditlib);
-							$ret.=$ajaxWidgets->comboList($this->metafeeditlib->getLLFromLabel($label,$conf),'','','handleData','setData',$this->metafeeditlib->getLLFromLabel($label,$conf),15,$conf,$FN);
-						  } else {
+							//$ret.=$ajaxWidgets->comboList($this->metafeeditlib->getLLFromLabel($label,$conf),'','','handleData','setData',$this->metafeeditlib->getLLFromLabel($label,$conf),15,$conf,$FN);
+							$ret.=$div.$ajaxWidgets->comboList('','','','handleData','setData','',15,$conf,$FN).'</div>';
+						} else {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
-							$name = ' name="'.($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" ':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
-    						$ret.=$div.'<select size="1"'.$name.$this->caller->pi_classParam('form-asfield').'>';   						
+							$name = ' name="'.($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
+							$ret.=$div.'<select '.($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']?'size="'.$conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'].'" ':'').$name.$this->caller->pi_classParam('form-asfield').'>';
 							$SO='###AS_FIELD_'.$FN.'###';
 							$ret.=$SO.'</select>';
 							if ($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']>1) {
@@ -3772,15 +3776,14 @@ function getFormJs($formName,&$conf) {
 					default:
 						break;
 					}
+				}
+			}
+			if ($fsbc) {
+				$ret.='</fieldset>';
+				$fsbc--;
 			}
 		}
-		if ($fsbc) {
-			$ret.='</fieldset>';
-			$fsbc--;
-		}
-		
-		$ret=$cnt.($conf['list.']['advancedSearchAjaxSelector'] ? '<ul class="astabnav">'.implode("",$searchTabs)."</ul>" : '').$ret;  //RSG adjust
-		
+		$ret=$cnt.($conf['ajax.']['ajaxOn'] ? '<ul class="astabnav">'.implode("",$searchTabs)."</ul>" : '').$ret;
 		$ret.='<div '.$this->caller->pi_classParam('advancedSearch-actions').'><div '.$this->caller->pi_classParam('advancedSearch-action').'>';
 		$ret.='<div '.$this->caller->pi_classParam('advancedSearch-action').'><button type="submit" name="submit" value="'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'" class="'.$this->caller->pi_getClassName('form-submit').' '.$this->caller->pi_getClassName('searchbox-button').'">'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</button></div>';
 		$ret.='<div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('advancedSearch-action').' '.$this->caller->pi_getClassName('as_reset').'"><a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[reset]['.$conf['pluginId'].']=1">'.$this->metafeeditlib->getLL("advanced_search_reset",$conf).'</a></div>';

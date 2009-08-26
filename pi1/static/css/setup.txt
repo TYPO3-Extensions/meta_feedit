@@ -11,7 +11,7 @@ TABLE.typo3-dyntabmenu TD.tab_over, TABLE.typo3-dyntabmenu TD.tabact_over, TABLE
 TABLE.typo3-dyntabmenu TD.tab, TABLE.typo3-dyntabmenu TD.tabact, TABLE.typo3-dyntabmenu TD.disabled, TABLE.typo3-dyntabmenu TD.tab_over, TABLE.typo3-dyntabmenu TD.tabact_over, TABLE.typo3-dyntabmenu TD.disabled_over{border-radius:3px; -moz-border-radius:3px; border-bottom:0px}
 TABLE.typo3-dyntabmenu TD A{color:#CCC; text-decoration:none; display:block; width:100%; padding:2px; padding-left:5px; padding-right:5px}
 TABLE.typo3-dyntabmenu TD.tabact A, TABLE.typo3-dyntabmenu TD.tab_over A{font-weight:bolder; color:#000}
-.tx-metafeedit-error{font-size:14x;  margin:5px;  width:99%;  background-color:#FEEFFF; font-weight:bold; color:#900;  padding:0em;  align:left;  outline:Black thick;  margin-right:10px}
+.tx-metafeedit-error{border:1px solid #A00000;font-size:14x;  margin:5px;  width:99%;  background-color:#FEEFFF; font-weight:bold; color:#900;  padding:0em;  align:left;  outline:Black thick;  margin-right:10px;border_bottom:1px solid #A00000;}
 .tx-metafeedit-form-wrap form{border:1px solid #AAA;background-color:#EFEFEF;}
 .tx-metafeedit-form-row{background-color:#EFEFEF;}
 .tx-metafeedit-form-field{font-size:12px; background-color:#EFEFEF; padding:5px; align:left; outline:Black thick;}
@@ -23,6 +23,7 @@ TABLE.typo3-dyntabmenu TD.tabact A, TABLE.typo3-dyntabmenu TD.tab_over A{font-we
 .tx-metafeedit-form-button-date button{height:24px}
 .tx-metafeedit-form-button-date button i{background-image:url(/typo3conf/ext/meta_feedit/res/calendar.png); width:16px;height:16px;display:block;}
 button{white-space:nowrap;padding:0px;margin:0px;position:relative;margin-right:1px;margin-bottom:1px;}
+button {height:22px;background: url(/typo3conf/ext/meta_feedit/res/fondbtn.png) repeat-x;color:#666; font-size:10px;font-weight:bold;text-decoration:none;}
 fieldset {margin-bottom:5px;}
 .tx-metafeedit-blog-itemwrap{margin:5px; width:97%; background-color:#9F9F9F; padding:5px; text-align:left}
 .tx-metafeedit-blog_label{text-align:left;float:left;width:10em}
@@ -88,7 +89,6 @@ fieldset {margin-bottom:5px;}
 .tx-metafeedit-navigation-actions .tx-metafeedit-link{font-size:14px;  font-weight:bold; color:#900; float:left; margin-right:10px}
 .tx-metafeedit-navigation-actions .tx-metafeedit-action{font-size:14px;  font-weight:bold; color:#900; float:left; margin-right:10px}
 .tx-metafeedit-action {float:left;}
-
 .tx-metafeedit-action-pdf, .tx-metafeedit-action-csv, .tx-metafeedit-action-excel {width: 35px; height: 35px;}
 .tx-metafeedit-action{background-color:#fff; font-size:12px; color:#444; font-weight:bold; border:0px; text-decoration:none}
 .tx-metafeedit-action-SAVE{padding:5px;display: table-cell;vertical-align: middle;background-repeat:no-repeat;width:100px;height:40px;}
@@ -104,7 +104,6 @@ fieldset {margin-bottom:5px;}
 .jqmClose i{padding:0px;margin:0px;position:absolute;background-position:-5 -5;background-image:url(/typo3conf/ext/meta_feedit/res/cancel.png); width:16px;height:16px;display:block;}
 .jqmClose {width:30px;height:25px;padding:0px;margin:0px;display:inline;}
 .tx-metafeedit-link a {display:block;float:left;border:1px solid #AAA;margin-right:1px;padding-right:10px;padding-left:10px;background: url(/typo3conf/ext/meta_feedit/res/fondbtn.png) repeat-x;line-height:20px;color:#666; font-size:10px;font-weight:bold;text-decoration:none}
-button {display:block;height:22px;border:1px solid #AAA;background: url(/typo3conf/ext/meta_feedit/res/fondbtn.png) repeat-x;color:#666; font-size:10px;font-weight:bold;text-decoration:none}
 .tx-metafeedit-link a:hover,button:hover {color:#900;background: url(/typo3conf/ext/meta_feedit/res/fondbtnhv.png) repeat-x;}
 .tx-metafeedit-link a:visited{color:#666; font-size:10px; font-family:Verdana,Arial,Helvetica,sans-serif; font-weight:bold; text-decoration:none}
 .tx-metafeedit-link-csv a{ line-height:2.5em;  padding-top:1.6em;  padding-bottom:1.6em;  padding-left:1.8em;  background-image:url("/typo3conf/ext/meta_feedit/res/csv_petit.png");  background-repeat:no-repeat; background-position:0% 60%}
@@ -127,8 +126,6 @@ button {display:block;height:22px;border:1px solid #AAA;background: url(/typo3co
 .tx-metafeedit-link-preview .tx-metafeedit-link {padding-top:1.5em;padding-bottom:1.5em;}
 .tx-metafeedit-link-delete-ko { height:2em;}
 .tx-metafeedit-link-delete-ok { height:2em;}
-
-
 #metafeedit-calendar{empty-cells:show; margin:10px auto 0; width:155px;  background-color:#fff; font-family:Verdana,Arial,Helvetica,sans-serif;  font-size:1em}
 #metafeedit-calendar caption{background-color:#fff}
 #metafeedit-calendar td{background-color:#ccc}
@@ -140,7 +137,6 @@ button {display:block;height:22px;border:1px solid #AAA;background: url(/typo3co
 #metafeedit-calendar caption{text-align:center; width:100%}
 #metafeedit-calendar td{padding:3px 0; text-align:center}
 #metafeedit-calendar td.pad:hover{background-color:#fff}
-
 .tx-metafeedit-grid-row-alt-1 TD{background:#FFF; border:1px; border-style:solid; font-weight:bold}
 .tx-metafeedit-grid-row-alt-2 TD{background:#EEE; border:1px; border-style:solid; font-weight:bold}
 .tx-metafeedit-grid-table{border-collapse:collapse}
@@ -150,7 +146,7 @@ button {display:block;height:22px;border:1px solid #AAA;background: url(/typo3co
 .tx-metafeedit-alphabeticalSearch {float:left;width:45em;}
 /*.tx-metafeedit-searchbox form{ padding-left:1.5em;  background-image:url("/typo3conf/ext/meta_feedit/res/loupe_petit.png");  background-repeat:no-repeat; background-position:0% 0em}*/
 .tx-metafeedit-advancedSearch{float:left;width:100%;clear:both}
-.tx-metafeedit-asl {clear:left;white-space: nowrap;}
+.tx-metafeedit-asl {font-weight:normal;clear:left;white-space: nowrap;color:#333;font-size:11px}
 .tx-metafeedit-advancedSearch-check{margin-right:15px;float:left;margin-bottom:5px}
 
 .tx-metafeedit-calendarSearch{clear:left}
@@ -242,22 +238,25 @@ border:1px solid #000000;
 	width:20px;
 	display:block;
 	float:left;
-	background: url(/typo3conf/ext/meta_feedit/res/sortdesc.png) no-repeat;
+	background: url(/typo3conf/ext/meta_feedit/res/button_down.gif) no-repeat;
 }
 .tx-metafeedit-editmenu-list-table-header th a.mfedt_sortdesc i{
 	width:20px;
 	display:block;
 	float:left;
-	background: url(/typo3conf/ext/meta_feedit/res/sortasc.png) no-repeat;
+	background: url(/typo3conf/ext/meta_feedit/res/button_up.gif) no-repeat;
 }
 .tx-metafeedit-advancedSearch ul.astabnav {
     font: bold 11px verdana, arial, sans-serif;
     list-style-type: none;
     padding-bottom: 24px;
+	margin-bottom:5px;
     border-bottom: 1px solid #6c6;
     margin: 0;
 }
-
+.tx-metafeedit-advancedSearch-actions {
+	margin-top:5px;
+}
 .tx-metafeedit-advancedSearch ul.astabnav li {
     float: left;
     height: 21px;
@@ -319,5 +318,9 @@ th.mfdt-actions a { display:inline;}
 }
 .tx-metafeedit > table {clear:both;}
 .tx-metafeedit th a {white-space : nowrap;}
+.tx-metafeedit-sb-filter {font-size:10px;color:#777;}
+.astabnav li.set a i{ float:left;display:block;width:20px;background:url("/typo3conf/ext/meta_feedit/res/checked.png") no-repeat 0px 0px;}
+a.mfdt-set,a.mfdt-set:hover {color:red;}
+.tx-metafeedit-fs-searchbox{padding:2px}
 )
 }

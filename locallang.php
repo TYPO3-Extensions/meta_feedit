@@ -3,13 +3,17 @@
  * Language labels for extension "mth_feedit"
  *
  */
-
 $LOCAL_LANG = Array (
 	'default' => Array (
 		'pi1_title' => 'FE Edition Meta',
 		'pi1_plus_wiz_description' => 'Adds a frontend form for submitting and editing of tables to your page',
 		'back_label' => 'Back',
 		'new_label' => 'New',
+		'fulltext_search' => 'Fulltext search',
+		'alphabetical_search' => 'Alphabetical search',
+		'calendar_search' => 'Calendar search',
+		'fulltext_search' => 'Fulltext search',
+		'order_by' => 'Ordered by',
 		'login_required_message' => 'Frontend login is required to view this page',
 		'edit_header_prefix' => 'Edit: ',
 		'grid_rows_cols' => 'Rows / Cols ',
@@ -183,6 +187,10 @@ $LOCAL_LANG = Array (
 		'sorting' => 'index de tri',
 		'pid' => 'ID de page',
 		'tstamp' => 'Date de modification',
+		'fulltext_search' => 'Recherche plein texte',
+		'alphabetical_search' => 'Recherche alphabétique',
+		'calendar_search' => 'Recherche calendaire',
+		'order_by' => 'Ordonné par',
 		'pi1_title' => 'FE Edition Meta',
 		'pi1_plus_wiz_description' => 'Adds a frontend form for submitting and editing of tables to your page.',
 		'pi_list_browseresults_displays'=>'Affichage des enregistrements ###SPAN_BEGIN###%s &agrave; %s</span> sur ###SPAN_BEGIN###%s</span>',

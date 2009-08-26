@@ -216,8 +216,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['fe_crgroup']=$lconf['fecrgroup_field'];
 		
 		// CBY : pluginId !!! must add flexformupdate here ...
-		
-		$pluginId=$mfconf['pluginId']=$lconf['pluginId']?$lconf['pluginId']:$this->cObj->data['uid'];
+		$mfconf['general.']['pluginUid']=$this->cObj->data['uid'];
+		$pluginId=$mfconf['pluginId']=$lconf['pluginId']?$lconf['pluginId']:$this->cObj->data['uid'];	
 		$mfconf['general.']['authTpl']=$lconf['generalAuthTemplate'];
 		$mfconf['general.']['noPermTpl']=$lconf['generalNoPermTemplate'];
 		$mfconf['general.']['fe_cruser_id']=$lconf['fecruser_field'];

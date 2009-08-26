@@ -189,7 +189,6 @@ class tx_metafeedit_lib {
 					return $data;
 				} else {
 					if (strpos($theValue, ':') > 0) $data = $this->getData($theValue, 0, $cObj);
-
 					return $data;
 				}
 			}
@@ -1169,7 +1168,6 @@ class tx_metafeedit_lib {
 				$ret.=$this->cObj->substituteMarkerArray($blogCommentTpl, $markerArray);
 		}
 		$ret=$this->cObj->substituteSubpart($blogCommentsTpl,'###BLOG-COMMENT###',$ret);
-
 		$ret=$this->cObj->substituteSubpart($blogTpl,'###BLOG-COMMENTS###',$ret);
 		if ($conf['blog.']['captcha'] && !is_object($this->freeCap)) die ("Plugin Meta Feedit, Blog, Captcha : you have selected captcha spam protection but sr_freecap extention is not loaded !");
 		if (is_object($this->freeCap) && $conf['blog.']['captcha']) {
@@ -1215,6 +1213,7 @@ class tx_metafeedit_lib {
   			$GLOBALS['TCA'][$this->table]['ctrl']['fe_crgroup_id'] = $conf['fe_crgroup_id'];
 		}*/
 		// if no configuration for column sortby we add one
+		
 		if($GLOBALS['TCA'][$FTable]['ctrl']['sortby'] && !is_array($GLOBALS['TCA'][$FTable]['columns'][$GLOBALS['TCA'][$FTable]['ctrl']['sortby']])) {
 			$GLOBALS['TCA'][$FTable]['columns'][$GLOBALS['TCA'][$FTable]['ctrl']['sortby']]=array(
 				'exclude'=>1,
@@ -1265,13 +1264,12 @@ class tx_metafeedit_lib {
     */
 	function getFieldList(&$conf) {
 		switch($conf['inputvar.']['cmd']) {
-               case 'edit':
-                        
-                        $conf['fieldList']=implode(',',array_intersect(t3lib_div::trimExplode(',',$conf['edit.']['fields'],1),array_merge(t3lib_div::trimExplode(',',$conf['edit.']['show_fields'],1), t3lib_div::trimExplode(',',$conf['edit.']['readonlyFields'],1) )));
-                   break;
-                   default:
-                      $conf['fieldList']=implode(',',t3lib_div::trimExplode(',',$conf['create.']['fields'],1));
-                  break;
+		case 'edit':
+			$conf['fieldList']=implode(',',t3lib_div::trimExplode(',',$conf['edit.']['fields'],1));
+			break;
+		default:
+			$conf['fieldList']=implode(',',t3lib_div::trimExplode(',',$conf['create.']['fields'],1));
+			break;
          }
          // <CBY>
          if (!$conf['fieldList']) {
@@ -1285,7 +1283,7 @@ class tx_metafeedit_lib {
          if (!$conf['fieldList']) {
            $conf['fieldList']=implode(',',t3lib_div::trimExplode(',',$conf['TCAN'][$conf['table']]['interface']['showRecordFieldList'],1));
          }
-	       $conf['blogFieldList']=$this->getBlogFieldList($conf) ;
+	     $conf['blogFieldList']=$this->getBlogFieldList($conf) ;
 	}
 
 	/**
@@ -1296,7 +1294,7 @@ class tx_metafeedit_lib {
 	 */
 	function getBlogFieldList(&$conf) {
 		$fields=$conf['blog.']['show_fields']?$conf['blog.']['show_fields']:'firstname,surname,email,homepage,place,crdate,entry,entrycomment';
-	return $fields;
+		return $fields;
 	}
 
 	/**
@@ -1357,7 +1355,6 @@ class tx_metafeedit_lib {
                 continue;
             }
 					
-
 			switch($type) {
 				case 'input':
     				// if evaltype is date or datetime and overrideValue is 'now' we transform it into the current timestamp + the int following 'now'.
@@ -1389,7 +1386,8 @@ class tx_metafeedit_lib {
     				if (!in_array('date',$evals) && !in_array('datetime',$evals)) $fe_adminLib->internal['searchFieldList'] .= ",".$fN;
     				break;
 				case 'text':
-					$dataArr = $this->rteProcessDataArr($dataArr, $table, $fN, 'db',$conf,"user_processDataArray");
+					//$dataArr = $this->rteProcessDataArr($dataArr, $table, $fN, 'db',$conf,"user_processDataArray");
+					$dataArr = $this->rteProcessDataArr($dataArr, $table, $fN, 'rte',$conf,"user_processDataArray");
     				$fe_adminLib->internal['searchFieldList'] .= ",".$fN;
     				break;
 				case 'radio' :
@@ -1402,12 +1400,12 @@ class tx_metafeedit_lib {
     
     				if ($value === 'on' || $value === 1 || $value === '1') {
     					$dataArr[$_fN] = 1;
-    					$dataArr['EVAL_'.$_fN] = $this->getLLFromLabel('check_yes',$conf);
+    					$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png">':$this->getLLFromLabel('check_yes',$conf);
     				} else {
     					// No value, what should we do ?
     
     					$dataArr[$_fN] = 0;
-    					$dataArr['EVAL_'.$_fN] = $this->getLLFromLabel('check_no',$conf);
+    					$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list')?'':$this->getLLFromLabel('check_no',$conf);
     				}
     				break;
 				case 'group':
@@ -1659,15 +1657,15 @@ class tx_metafeedit_lib {
 					//if (in_array('invert',t3lib_div::trimexplode(',',$conf[$fe_adminLib->cmd."."]['evalValues.'][$F]))) $invert=1;
 					if ($dataArr[$F] != 1) {
 						$dataArr[$F] = 0;
-    					$dataArr['EVAL_'.$F] = $this->getLLFromLabel('check_no',$conf);
+    					$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'':$this->getLLFromLabel('check_no',$conf);
 						if ($invert) {
 							$dataArr[$F] = 1;
-							$dataArr['EVAL_'.$F] = $this->getLLFromLabel('check_yes',$conf);
+							$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png">':$this->getLLFromLabel('check_yes',$conf);
 						}
 					} else {
 						if ($invert) {
 							$dataArr[$F] = 0;
-							$dataArr['EVAL_'.$F] = $this->getLLFromLabel('check_no',$conf);
+							$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'':$this->getLLFromLabel('check_no',$conf);
 						}
 					}
 					break;
@@ -1749,7 +1747,7 @@ class tx_metafeedit_lib {
     				1;
 				break;
 				case 'text':
-					$dataArr = $this->rteProcessDataArr($dataArr, $table, $fN, 'rte',$conf,'user_updateArray');
+					//$dataArr = $this->rteProcessDataArr($dataArr, $table, $fN, 'rte',$conf,'user_updateArray');
     				break;
 			}
 			//MODIF CBY ....
@@ -1789,13 +1787,12 @@ class tx_metafeedit_lib {
 					//echo "<br>after $mode ..rte".$dataArr['_TRANSFORM_'.$fN].'/'.$this->RTEObj->transformContent('rte', $dataArr[$fN], $table, $fN, $dataArr, $this->specConf, $this->thisConfig, '', $this->thePidValue);;
 					$pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
 					//print_r($pageTSConfig['RTE.']['default.']['FE.']);
-					$this->thisConfig = array();//$pageTSConfig['RTE.']['default.']['FE.'];
+					$this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];//array();//
 					$this->thePidValue = $GLOBALS['TSFE']->id;
 					$dataArr[$fN] = $this->RTEObj->transformContent($mode, $dataArr[$fN], $table, $fN, $dataArr, $this->specConf, $this->thisConfig, '', $this->thePidValue);		
 				}
 			}
 		}
-
 		return $dataArr;
 	}
 
@@ -2061,7 +2058,7 @@ class tx_metafeedit_lib {
 					}
 				}
 				break;
-				case 'select':
+			case 'select':
 
 				if ($conf['TCAN'][$table]['columns'][$fN]['config']['MM']) {
 					//its a MM relation

@@ -387,8 +387,6 @@ var refreshModal = function(hash)
                 newWidth = $modalWindow.width();
             }
             var newLeft = Math.floor(parseInt(jQuery(window).width() / 2) - parseInt(newWidth) / 2);
-
-
             // do the animation so that the windows stays on center of screen despite resizing
             $modalWindow.css({
                 width: newWidth,

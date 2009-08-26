@@ -313,7 +313,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 		$this->metafeeditlib->getFieldList($this->conf);
 		$fArr=t3lib_div::trimexplode(',',$this->conf['fieldList']);
-    foreach($fArr as $fN) {
+		foreach($fArr as $fN) {
 			$this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'###']='';
 			//MODIF CBY
 			$this->markerArray['###FIELD_EVAL_'.$fN.'###']='';
@@ -325,7 +325,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		}
 		//Si blog
 		$fbArr=t3lib_div::trimexplode(',',$this->conf['blogFieldList']);
-    foreach($fbArr as $fN) {
+		foreach($fbArr as $fN) {
 			$this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'###']='';
 
 			//$this->markerArray['###FIELD_EVAL_'.$fN.'###']='';
@@ -1457,6 +1457,20 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 * @see init()
 	 */
 	function save(&$conf)	{
+		// Before Save transformations for RTE
+		foreach($this->dataArr as $fN=>$val) {
+			$res = $this->metafeeditlib->getForeignTableFromField($fN, $conf,'',array());			
+			$table = $res['relTable']; //we get field sourcetable...
+			$fNiD = $res['fNiD'];
+			switch((string)$conf['TCAN'][$table]['columns'][fNiD]['config']['type']) {
+				case 'text':
+					$dataArr = $this->rteProcessDataArr($this->dataArr, $table, $fN, 'db', $conf, "user_processDataArray");
+				break;
+			} 
+			
+		}
+		//print_r($this->dataArr);
+		
 		switch($conf['inputvar.']['cmd'])	{
 			case 'edit':
 				if ($conf['blogData']) {
@@ -1475,6 +1489,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				$origArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$theUid);		// Fetches the original record to check permissions
 				if ($conf['edit'] && ($GLOBALS['TSFE']->loginUser || !$conf['requireLogin'] || $this->aCAuth($origArr)))	{	// Must be logged in in order to edit  (OR be validated by email) or requireLogin is unchecked
 					$newFieldList = implode(',',array_intersect(explode(',',$conf['fieldList']),t3lib_div::trimExplode(',',$conf['edit.']['show_fields'],1)));
+					//$newFieldList = implode(',',array_intersect(explode(',',$conf['fieldList']),t3lib_div::trimExplode(',',$conf['edit.']['fields'],1)));
 
 
 					if ($this->aCAuth($origArr) || $this->metafeeditlib->DBmayFEUserEdit($this->theTable,$origArr,$GLOBALS['TSFE']->fe_user->user,$conf['allowedGroups'],$conf['fe_userEditSelf'],$conf))	{
@@ -1861,7 +1876,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			//$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $this->dataArr, '', TRUE, 'FIELD_', $conf['general.']['xhtml']);
 			if ($conf['create.']['preview'] && !$this->previewLabel)	{$markerArray['###HIDDENFIELDS###'].= '<input type="hidden" name="preview['.$pluginId.']" value="1" />';}
 			$content = $this->cObj->substituteMarkerArray($templateCode, $markerArray);
-			$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($this->dataArr), $this->theTable.'_form', 'FE['.$this->theTable.']', $conf['fieldList'].$this->additionalUpdateFields);
+			// $content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($this->dataArr), $this->theTable.'_form', 'FE['.$this->theTable.']', $conf['fieldList'].$this->additionalUpdateFields);
+			$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($currentArr), $this->theTable.'_form',  'FE['.$this->theTable.']', $this->conf['edit.']['show_fields'].$this->additionalUpdateFields);
 		} else { die('PLUGIN META FEEDIT : Create mode not allowed !');}
 		return $content;
 	}
@@ -2958,7 +2974,7 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 						$this->userProcess_alt($this->conf['setfixed.']['userFunc_afterSave'],$this->conf['setfixed.']['userFunc_afterSave.'],array('rec'=>$this->currentArr, 'origRec'=>$origArr));
 					}
 
-						// Outputting template
+					// Outputting template
 					//$this->markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $origArr, '', TRUE, 'FIELD_', $this->conf['general.']['xhtml']);
 					$this->markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $origArr, '', TRUE, 'FIELD_', FALSE);
 					$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_SETFIXED_OK_'.$sFK.'###');
@@ -3507,7 +3523,6 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 	}
 
 }
-
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/meta_feedit/fe_adminLib.inc'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/meta_feedit/fe_adminLib.inc']);
