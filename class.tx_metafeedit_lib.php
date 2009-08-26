@@ -2543,7 +2543,8 @@ class tx_metafeedit_lib {
 			mysql_free_result($res);
 
 			if ($conf['general.']['list.']['userFunc_alterSortTabs']) {
-				t3lib_div::callUserFunction($conf['general.']['list.']['userFunc_alterSortTabs'], $sortTab, $conf);
+			  $_params = array ('sortTab' => &$sortTab, 'sortAux' => &$sortAux, 'table' => $table, 'fN' => $fN  ); 
+        t3lib_div::callUserFunction($conf['general.']['list.']['userFunc_alterSortTabs'],  $_params , $conf);
 			}
 			
 			if ($statictable) {
