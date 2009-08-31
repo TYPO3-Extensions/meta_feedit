@@ -1562,13 +1562,7 @@ class tx_metafeedit_lib {
 							$this->cObj->start($resRow, $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']);
 							$resLabel = $resRow[$label];
 							$resLabel_alt = $resRow[$label_alt];
-							if ($statictable) {
-								$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
-								$resLabel = $this->getLL('language_'.$code, $conf);
-								if (!$resLabel ) {
-									$resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset);
-								}
-							}
+
 							$resLabel = $this->cObj->stdWrap($resLabel, $conf['evalWrap.'][$fN.'.']);
 							$resLabel_alt = $this->cObj->stdWrap($resLabel_alt, $conf['evalWrap.'][$fN.'.']);
 							$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
@@ -2530,11 +2524,7 @@ class tx_metafeedit_lib {
 								$resLabel_alt.=$resLabel_alt ?" ".($resRow["EVAL_".$tslabel]?$resRow["EVAL_".$tslabel]:$resRow[$tslabel]):($resRow["EVAL_".$tslabel]?$resRow["EVAL_".$tslabel]:$resRow[$tslabel]);
 						}
 					}
-					if ($statictable) {
-						$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
-						$resLabel = $this->getLL('language_'.$code,$conf);
-						if( !$resLabel ) { $resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset); } // CBY  what is this static Info charset ???
-					}					
+	
 					$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
 					$tempLabel = $tempLabel ? $tempLabel : $resLabel_alt;
 					$resRow['tx_metafeedit_resLabel']=$tempLabel;
@@ -2548,10 +2538,7 @@ class tx_metafeedit_lib {
         t3lib_div::callUserFunction($conf['general.']['list.']['userFunc_alterSortTabs'],  $_params , $conf);
 			}
 			
-			if ($statictable) {
-				//array_multisort($sortAux, SORT_ASC, $sortTab);
 
-			}
 			if (!$conf['select.'][$fN.'.']['dontDoOrder'] && ($conf['inputvar.']['cmd']=='edit' || $conf['inputvar.']['cmd']=='create')) {
 				array_multisort($sortAux, SORT_ASC, $sortTab);
 			}
