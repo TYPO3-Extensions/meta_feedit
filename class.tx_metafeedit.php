@@ -1984,8 +1984,13 @@ class tx_metafeedit extends  tslib_pibase {
 										$val=implode(', ',$vs);
 									}
 								} else if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
-									$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
-								}
+//									$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
+                foreach ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'] as $index => $value) {
+									if ($val == $conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$index][1]) {
+									$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$index][0],$conf) ;
+									
+								}	}
+								} //rsg
 								break;
 							case 'radio' :
 								$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
