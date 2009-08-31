@@ -183,10 +183,11 @@ fieldset {margin-bottom:5px;}
 .meta_cl{float:left;}
 .meta_cli{clear:right;}
 .meta_clr{position:absolute;z-index:500;border:1px solid;background:#ffffff;}
-.wait {background:white;height:16px;width:16px;cursor:pointer;background:white url(/typo3conf/ext/meta_feedit/res/loading1.gif)}
-.wdgt_arr {float:left;background:white;height:15px;width:15px;cursor:pointer;background:white url(/typo3conf/ext/meta_feedit/res/arrow.gif);border:1px solid;margin-right:10px;margin-top:1px;padding:0}
+.wait{float:right;border:1px solid #eee;background:white;height:16px;width:16px;}
+.wait i {display:block;background:url(/typo3conf/ext/meta_feedit/res/loading1.gif);background-repeat:no-repeat;}
+.wdgt_arr {float:left;background:white;height:15px;width:15px;cursor:pointer;background:white url(/typo3conf/ext/meta_feedit/res/button_down.gif);border:1px solid;margin-right:1px;margin-top:1px;padding:0}
 .wdgt_input{height:15px;margin:0px;padding:0px;}
-.wdgt_logo{margin-right:10px;padding:0px;}
+/*.wdgt_logo{margin-right:10px;padding:0px;}*/
 .meta_cli table{border-collapse:collapse;padding:0px;margin:0px}
 .meta_cli table td{border-collapse:collapse;padding:0px;margin:0px}
 gb {display:none;}
@@ -310,7 +311,8 @@ background: url(/typo3conf/ext/meta_feedit/res/fondbtnhv.png)
 }
 th.mfdt-actions a { display:inline;}
 
-.tx-metafeedit-form-wrap a img {border:medium none;}
+.tx-metafeedit-form-wrap a img {border:0px;}
+.typo3-dyntabmenu tr td a img {height:0px;width:0px}
 .tx-metafeedit {
 	color:#6E6E6E;
 	font-family:"Trebuchet MS",Arial,Helvetica,sans-serif;
@@ -320,7 +322,16 @@ th.mfdt-actions a { display:inline;}
 .tx-metafeedit th a {white-space : nowrap;}
 .tx-metafeedit-sb-filter {font-size:10px;color:#777;}
 .astabnav li.set a i{ float:left;display:block;width:20px;background:url("/typo3conf/ext/meta_feedit/res/checked.png") no-repeat 0px 0px;}
-a.mfdt-set,a.mfdt-set:hover {color:red;}
+a.mfdt-set,a.mfdt-set:hover,a.mfdt-set:visited{color:red;}
 .tx-metafeedit-fs-searchbox{padding:2px}
+.activeLinkWrap a,.activeLinkWrap a:visited {color:red;font-size:10px}
+.activeLinkWrap a:hover {color:maroon;}
+.tx-metafeedit-editmenu-list div.browseBoxWrap {
+background-color:#e0efff;
+border:1px solid #666666;
+margin:3px;
+padding:3px;
+}
+
 )
 }

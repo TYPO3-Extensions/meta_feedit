@@ -1230,21 +1230,21 @@ class tx_metafeedit_sqlengine {
 			//$conf['debug.']['debugString'].="<br> internal 0 ### :".$this->feadminlib->internal['descFlag']." ob :".$this->feadminlib->internal['orderBy'];
 
 			if ($this->feadminlib->internal['orderBy'])    {
-	  		$sql['orderBy'] = $sql['orderBy']?$sql['orderBy'].','.$table.'.'.$this->feadminlib->internal['orderBy'].($this->feadminlib->internal['descFlag']?' DESC':' ASC') : ' ORDER BY '.$table.'.'.$this->feadminlib->internal['orderBy'].($this->feadminlib->internal['descFlag']?' DESC':' ASC');
+	  			$sql['orderBy'] = $sql['orderBy']?$sql['orderBy'].','.$table.'.'.$this->feadminlib->internal['orderBy'].($this->feadminlib->internal['descFlag']?' DESC':' ASC') : ' ORDER BY '.$table.'.'.$this->feadminlib->internal['orderBy'].($this->feadminlib->internal['descFlag']?' DESC':' ASC');
 			}
     }
 
 		//MODIF CBY if ($conf['list.']['orderByFields'] && !$this->piVars['sort']){
 		if ($conf['list.']['orderByFields'] && !$conf['inputvar.']['sort']){
 			$orderByFields = explode(',', $conf['list.']['orderByFields']);
-      foreach($orderByFields as $fieldName) {
+			foreach($orderByFields as $fieldName) {
 				$fN2=t3lib_div::trimexplode(':',$fieldName);
 				$fieldName=$fN2[0];
 				$dir=" ".$fN2[1];
 				if ($fN2[2]) {
-        	$sql['orderBy'] = $sql['orderBy']?$sql['orderBy'].','.$fieldName.$dir :$fieldName.$dir;
+					$sql['orderBy'] = $sql['orderBy']?$sql['orderBy'].','.$fieldName.$dir :$fieldName.$dir;
 				} else {
-        	$sql['orderBy'] = $sql['orderBy']?$sql['orderBy'].','.$table.'.'.$fieldName.$dir :$table.'.'.$fieldName.$dir;
+					$sql['orderBy'] = $sql['orderBy']?$sql['orderBy'].','.$table.'.'.$fieldName.$dir :$table.'.'.$fieldName.$dir;
 				}
 			}
 		}

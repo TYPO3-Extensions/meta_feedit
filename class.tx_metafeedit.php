@@ -167,8 +167,6 @@ class tx_metafeedit extends  tslib_pibase {
         $this->metafeeditlib=t3lib_div::makeInstance('tx_metafeedit_lib');
   	}    
 
-
-
     /**
     * initialize : initializes object...
     *
@@ -265,7 +263,8 @@ class tx_metafeedit extends  tslib_pibase {
         foreach ($FTRels as $FTRel) {
         	if ($FTRel && $GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table'];
         }
-         // We handle foreign tables of fields
+        
+		// We handle foreign tables of fields
         $lfields=t3lib_div::trimexplode(',',$conf['list.']['show_fields']);
         foreach ($lfields as $lf) {
         	if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
@@ -300,6 +299,11 @@ class tx_metafeedit extends  tslib_pibase {
 			$extKeys=t3lib_div::trimExplode(chr(10),$conf["extTables"]);
   			$this->mergeExtendingTCAs($extKeys);
 		}
+
+		//TODO : allow general TCA override here.
+		//This will allow to handle tables from other software than T3 !!
+		//array_merge($GLOBALS['TCA'][$this->table],$conf...);		
+		//TODO Cache TCA array here, include timestamp of plugin id... if timestamp is update renew cache...basically saving plugin once will renw cache.
 		
 		$conf['TCAN'][$this->table]=$GLOBALS['TCA'][$this->table];
 		foreach($FTs as $FTable) {
@@ -931,7 +935,7 @@ class tx_metafeedit extends  tslib_pibase {
 					if ($MMTable && !$Prepend) {
 						if($feData[$masterTable][$fN]) {
 							//$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$MMTable,'uid_local=\''.$uid.'\'','sorting');
-			          			//if(mysql_num_rows($MMres)!=$feData[$masterTable][$fN]) die("Wrong number of selections reached");
+			          		//if(mysql_num_rows($MMres)!=$feData[$masterTable][$fN]) die("Wrong number of selections reached");
 				  			$uids = t3lib_div::trimExplode(',',$feData[$masterTable][$fN]);
 				  			$orClause = '';
 				  			foreach($uids as $uid) $orClause .= $orClause ? 'OR '.$conf['uidField'].' LIKE \''.$uid.'\'' : $conf['uidField'].' = \''.$uid.'\'';
@@ -1032,8 +1036,6 @@ class tx_metafeedit extends  tslib_pibase {
 
         // blog hack !! to be changed
         $masterTable=$cmd=='blog'?'tx_metafeedit_comments':$conf['table'];
-		//echo $cmd;
-		//if ($cmd=='blog') {print_r($conf[$cmd.'.']); die(uuu);}
         $gridMark=$bgrid?'###GRIDCELL###':'';
         $gridMarkAlt=$bgrid?'###GRIDCELLALT###':'';
         $fieldName = 'FE['.$masterTable.']'.$gridMark.'['.$fN.']';
@@ -1111,9 +1113,7 @@ class tx_metafeedit extends  tslib_pibase {
   		   	        $this->RTEObj = t3lib_div::makeInstance('tx_rtehtmlarea_pi2');//&t3lib_BEfunc::RTEgetObj();
 		    	    $pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
 		            $this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];
-
                 	$this->thePidValue = $GLOBALS['TSFE']->id;
-					
                	    $conf['RTE'][$this->RTEcounter]['cmdmode']=$cmdmode;
 					$RTEItem = $this->RTEObj->drawRTE($this,$masterTable,$fN,$row=array(), $this->PA, $this->specConf, $this->thisConfig, $this->RTEtypeVal, '', $this->thePidValue);
 					return $RTEItem . '<div'.$this->caller->pi_classParam('rte-clearer').'></div>'.$EVAL_ERROR_FIELD;
@@ -1213,12 +1213,12 @@ class tx_metafeedit extends  tslib_pibase {
                     if($feData[$masterTable][$fN]) {                                // from post var
                         $uids = explode(",",$feData[$masterTable][$fN]);
                     } elseif($conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"] && $uid) {  // from mm-relation
-                    		$mmTable=$conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"];
+                    	$mmTable=$conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"];
                         $MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'',$mmTable.'.sorting');
                         if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
-                        
-                        if(mysql_num_rows($MMres)!=$rec[$fN])
-                        debug("Wrong number of selections reached");
+                        $cnt=mysql_num_rows($MMres);
+                        if($cnt!=$rec[$fN]);
+                        debug("class.tx_metafeedit.php::tx_metafeedit->getFormFieldCode(): Wrong number ($MMres<>$cnt) of selections reached for  field $fN of table $masterTable, mm:  $mmTable");
                         while($MMrow = mysql_fetch_assoc($MMres))
                         $uids[] = $MMrow["uid_foreign"];
                     } else {                                                        // clean from DB
@@ -1947,40 +1947,62 @@ class tx_metafeedit extends  tslib_pibase {
         //-- Should be put in fe_adminLib
 		$fulltext=$conf['inputvar.']['sword']?$this->metafeeditlib->getLL("fulltext_search",$conf).' "'.$conf['inputvar.']['sword'].'"':'';
 		$obs=t3lib_div::trimexplode(':',$conf['inputvar.']['sort']);
-		$orderby=$obs[0]?$this->metafeeditlib->getLL("order_by",$conf).' '.$obs[0].' '.($obs[1]?$this->metafeeditlib->getLL("ascending",$conf):$this->metafeeditlib->getLL("descending",$conf)):'';
+		$orderby=$obs[0]?$this->metafeeditlib->getLL("order_by",$conf).' '.$this->metafeeditlib->getLL($obs[0],$conf).' '.($obs[1]?$this->metafeeditlib->getLL("ascending",$conf):$this->metafeeditlib->getLL("descending",$conf)):'';
 		$filterArray=array();
     	$recherche='';
  		if ($fulltext) $filterArray[]=$fulltext;
 		if ($conf['inputvar.']['sortLetter'])  $filterArray[]=$this->metafeeditlib->getLL("filtre_lettre",$conf).' "'.$conf['inputvar.']['sortLetter'].'"';
 		if (is_array($conf['inputvar.']['advancedSearch'])) {
     		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
-    			if($this->metafeeditlib->is_extent($val)){
+    			if($this->metafeeditlib->is_extent($val)) {
      			    $ftA=$this->metafeeditlib->getForeignTableFromField($key,$conf,'',array());
 					$recherche='';
-   				    $recherche .= $this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'], $conf).' ';
-    				if (is_array($val)) {
-    				    $recherche .= $val['op'].' '.$val['val'].' , '.$val['valsup'];    				    
-    			    } else {
-						//TODO handle multiple values...
-						if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']) {
-							if (!$conf['TCAN'][$conf['table']]['columns'][$key]['config']['MM']) {
-								$vals=explode(',',$val);
-								$vs=array();
-								foreach($vals as $v) {
-									$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table'],$v);
-									$vs[]=$rec[$conf['TCAN'][$conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']]['ctrl']['label']];
-								}
-								$val=implode(', ',$vs);
+   					if (is_array($val)) {
+						$isset=($this->metafeeditlib->is_extent($val['op']) && ($this->metafeeditlib->is_extent($val['val'])||$this->metafeeditlib->is_extent($val['valsup'])));				
+						if ($isset) {
+							switch($val['op']) {
+							case '><' :
+								$recherche .= ($this->metafeeditlib->is_extent($val['val'])&&$this->metafeeditlib->is_extent($val['valsup']))?$val['val'].' &lt; '.$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'], $conf).' &gt; '.$val['valsup']:'';
+								break;
+							default:
+								$recherche .= $this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'], $conf).' '.($this->metafeeditlib->is_extent($val)?$val['op'].' '.$val['val']:'');
 							}
-						} else if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
-							$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
-						} else if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['type'] == 'check') { 
-							$val = $this->metafeeditlib->getLLFromLabel(($val?'check_yes': 'check_no'), $conf); 
+						} 
+					} else {
+						$type=$conf['TCAN'][$conf['table']]['columns'][$key]['config']['type'];
+						switch ($type) {
+							//TODO handle multiple values...
+							case 'select' :
+								if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']) {
+									if (!$conf['TCAN'][$conf['table']]['columns'][$key]['config']['MM']) {
+										$vals=explode(',',$val);
+										$vs=array();
+										foreach($vals as $v) {
+											$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table'],$v);
+											$vs[]=$rec[$conf['TCAN'][$conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']]['ctrl']['label']];
+										}
+										$val=implode(', ',$vs);
+									}
+								} else if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
+									$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
+								}
+								break;
+							case 'radio' :
+								$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
+								break;
+
+							case 'check' :
+								$val = $this->metafeeditlib->getLLFromLabel(($val?'check_yes': 'check_no'), $conf); 
+								break;
+							case 'input' :
+								break;
+							default:
+								$val=$val.'('.$type.')';
 						}
-						$recherche .= $val;
-    			    }
-					if ($recherche) $filterArray[]=$recherche;
-    			}
+						$recherche .= $this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'], $conf).'='.$val;
+					}
+ 					if ($recherche) $filterArray[]=$recherche;
+				}
     		}
     	}
 		if ($orderby) $filterArray[]=$orderby;
@@ -2144,14 +2166,14 @@ function getCalendarTemplate(&$conf) {
 		<input type="submit" name="doNotSave['.$pluginId.']" value="'.$this->metafeeditlib->getLL("edit_preview_donotsave_label",$conf).'"'.$this->caller->pi_classParam('preview-donotsave').' />
 		<input type="submit" name="submit['.$pluginId.']" value="'.$this->metafeeditlib->getLL("edit_preview_submit_label",$conf).'"'.$this->caller->pi_classParam('preview-submit').' />
 		':'
-		<table style="width:100%"><tr><td align="left">'.($conf['no_action']?'':'<div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div></td><td align="right"><div class="'.$this->caller->pi_getClassName('actions').' '.$this->caller->pi_getClassName('preview-actions').'">'.$conf['actions.']['useractions'].'</div>').'</td></tr></table>
+		<table style="width:100%"><tr><td align="left">'.($conf['no_action']?'':($conf['ajax.']['ajaxOn']?'':'<div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div>').'</td><td align="right"><div class="'.$this->caller->pi_getClassName('actions').' '.$this->caller->pi_getClassName('preview-actions').'">'.$conf['actions.']['useractions'].'</div>').'</td></tr></table>
 	').'<!-- ###PREVIEWACTIONS### end -->
 	</div>
 	</form>
 	</div>';
 	$tmp.=$this->cObj->stdWrap($t2,$conf['previewWrap.']);
   if ($conf['blog.']['showComments']) $tmp.=$this->getBlogTemplate($conf);
-	$tmp.='<!-- ###TEMPLATE_EDIT_PREVIEW### end-->';
+  $tmp.='<!-- ###TEMPLATE_EDIT_PREVIEW### end-->';
   return $tmp;
 }
 
@@ -2642,7 +2664,6 @@ function getEditDataNotifyEmailTemplate(&$conf) {
     if ($conf['edit.']['dataNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### begin -->'.$conf['edit.']['dataNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### end-->';
 	return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### begin -->
 [Auto Generated Message] Consultancy record edited.
-
         <!--###SUB_RECORD###-->
         '.$this->makeTEXTPreview('all',$conf).'
 
@@ -3702,7 +3723,8 @@ function getFormJs($formName,&$conf) {
 					$label=$curTable['fieldLabel'];
 					$type=($curTable['fNiD']=='crdate' && (string)$type=='')?'date':$type;
 					$Lib='<div class="'.$this->caller->pi_getClassName('asl').'">'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</div>';
-					if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($conf['inputvar.']['advancedSearch'][$FN]?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'"><i>&nbsp;</i>'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</a></li>';
+					$isset=is_array($conf['inputvar.']['advancedSearch'][$FN])?($this->metafeeditlib->is_extent($conf['inputvar.']['advancedSearch'][$FN]['op']) && ($this->metafeeditlib->is_extent($conf['inputvar.']['advancedSearch'][$FN]['val'])||$this->metafeeditlib->is_extent($conf['inputvar.']['advancedSearch'][$FN]['valsup']))):$this->metafeeditlib->is_extent($conf['inputvar.']['advancedSearch'][$FN]);
+					if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($isset?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'"><i>&nbsp;</i>'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</a></li>';
 					$div='<div id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type.'-'.$curTable['fNiD']).'">'.$Lib;
 					$first=false;
 					$value=' value="###ASFIELD_'.$FN.'_VAL###"';
@@ -3729,7 +3751,7 @@ function getFormJs($formName,&$conf) {
 						$val = is_array($conf['piVars']['advancedSearch'])?$conf['piVars']['advancedSearch'][$conf['pluginId']][$FN]:'';
 						$ret.=$div;
 						for ($i = 0; $i < count ($conf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items']); ++$i) {
-							$ckecked='';
+							$checked='';
 							if ($this->metafeeditlib->is_extent($val)) {
 								$checked=($i==$val)?'checked="checked"':'';
 							}
@@ -3737,9 +3759,9 @@ function getFormJs($formName,&$conf) {
 						}
 						$ret.='</div>';
 						break;
-					case 'check':
+					case 'check': 
 						//modif CMD on récup la val courante pour l'afficher en tant que selectionné
-						
+				
 						$val=is_array($conf['piVars']['advancedSearch'][$conf['pluginId']])?$conf['piVars']['advancedSearch'][$conf['pluginId']][$FN]:'';
 						$sel1=($val==1)?' selected="selected" ':'';
 						$sel2=($this->metafeeditlib->is_extent($val) && $val==0)?' selected="selected" ':'';
@@ -3749,7 +3771,7 @@ function getFormJs($formName,&$conf) {
 						break;
 				
 					case 'select':
-						// For select fields we either draw  ajax seletion widget or we relace with getselectoptions ...
+						// For select fields we either draw  ajax selection widget or we relace with getselectoptions ...
 						if ($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['foreign_table'] && $conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']==1 && ($conf['list.']['advancedSearchAjaxSelector'] || $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector.'][$FN])) {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'widgets'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/widgets.js"></script>';
 							$ajaxWidgets = t3lib_div::makeInstance('tx_metafeedit_widgets');
@@ -3758,11 +3780,13 @@ function getFormJs($formName,&$conf) {
 							$ret.=$div.$ajaxWidgets->comboList('','','','handleData','setData','',15,$conf,$FN).'</div>';
 						} else {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
-							$name = ' name="'.($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
-							$ret.=$div.'<select '.($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']?'size="'.$conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'].'" ':'').$name.$this->caller->pi_classParam('form-asfield').'>';
+							//$selectSize=is_array($conf['typoscript.'][$pluginId.'.']['advancedSearch.'][$FN]['forceConfig.'])?$conf['typoscript.'][$pluginId.'.']['forceConfig.'][$FN]['forceSize']:$conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
+							$selectSize=$conf['list.']['advancedSearchConfig.']['columns.'][$FN.'.']['config.']['size']?$conf['list.']['advancedSearchConfig.']['columns.'][$FN.'.']['config.']['size']:$conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
+							$name = ' name="'.($selectSize>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
+							$ret.=$div.'<select '.($selectSize?'size="'.$selectSize.'" ':'').$name.$this->caller->pi_classParam('form-asfield').'>';
 							$SO='###AS_FIELD_'.$FN.'###';
 							$ret.=$SO.'</select>';
-							if ($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']>1) {
+							if ($selectSize>1) {
 								$ret.='<input type="hidden" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_val"'.$value.' />';
 								$ret.='<script type="text/javascript">
 										/*<![CDATA[*/

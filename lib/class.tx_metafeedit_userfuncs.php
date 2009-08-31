@@ -48,7 +48,7 @@ class tx_metafeedit_userfuncs {
 	* @example : 
 	*/
 	function user_moneyFormat($val,$params) {
-		$v=strval($val);
+		$v=intval($val);
 		if ($params['cents']) {
 			$v=strval(round($val/100,2));
 		}
@@ -57,8 +57,8 @@ class tx_metafeedit_userfuncs {
 			$int=substr($v,0,$p);
 			$dec=substr($v,$p+1);
 		} else {
-			$dec=$v;
-			$int="0";
+			$dec="0";
+			$int=$v;
 		}
 		$dec=str_pad($dec,2,'0');
 		return $int.".".$dec."&nbsp;$params[currency]";

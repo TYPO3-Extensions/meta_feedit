@@ -43,9 +43,12 @@ class tx_metafeedit_widgets {
 	function init($prefixId,$metafeeditLib) {
 		$this->prefixId=$prefixId;
 		$this->metafeeditLib=$metafeeditLib;
-	}	
+	}
+	
 	function comboList($prefix='',$id='',$val='',$onChange='',$onSelect='',$label='',$pagesize=10,&$conf,$FN) {
-		$advancedSearch=$conf['inputvar.']['advancedSearch'];		
+		$advancedSearch=$conf['inputvar.']['advancedSearch'];	
+		$prefix=$prefix?$prefix:'combolist-';
+	    $id=$id?$id:$conf['pluginId'].$FN;
 		//print_r($advancedSearch);
 		// modif by CMD
 		if(strpos($FN, '.') !== false) {
@@ -93,24 +96,24 @@ class tx_metafeedit_widgets {
 		$onKeyUp =  '"combolistkeyup('.$pagesize.',\''.$id.'\',\''.$prefix.'\',\''.$callBacks.'\',event.keyCode,\''.$foreignTable.'\',\''.$labelField.'\',\'uid\',\''.addSlashes($whereClause).'\',\''.addSlashes($orderBy).'\',1,\''.$fields.'\');" ';
 		$onArrowClick = ' onclick="arrowclick(\''.$prefix.$id.'\','.$pagesize.',\''.$id.'\',\''.$prefix.'\',\''.$callBacks.'\',0,\''.$foreignTable.'\',\''.$labelField.'\',\'uid\',\''.addSlashes($whereClause).'\',\''.addSlashes($orderBy).'\',\''.$fields.'\');" ';
 		// A remplacer par du JSON...
-		$html="<div id='cl_$prefix$id' class='meta_cl'>
-		    <div class='cl_label'>$label</div>
-		        <div id='cl_inp_$prefix$id' class='meta_cli'>
+		$html="<div id=\"cl_$prefix$id\" class=\"meta_cl\">
+		    <div class=\"cl_label\">$label</div>
+		        <div id=\"cl_inp_$prefix$id\" class=\"meta_cli\">
 		            <table>
 		                <tr>
 		                    <td>
-		                        <input type='input' id='cl_i$prefix$id' name='".$this->prefixId."[data]' value='$tval' onkeyup=$onKeyUp $onFocus $onBlur $onMouseOver $onMouseOut class='wdgt_input' autocomplete='off'/>
-		                        <input type='hidden' id='cl_k$prefix$id' name='".$this->prefixId."[kdata]' value='$val'/>
-		                        <input type='hidden' id='cl_n$prefix$id' name='".$name."' value='$val'/>
+		                        <input type=\"input\" id=\"cl_i$prefix$id\" name=\"".$this->prefixId."[data]\" value=\"$tval\" onkeyup=$onKeyUp $onFocus $onBlur $onMouseOver $onMouseOut class=\"wdgt_input\" autocomplete=\"off\"/>
+		                        <input type=\"hidden\" id=\"cl_k$prefix$id\" name=\"".$this->prefixId."[kdata]\"value=\"$val\"/>
+		                        <input type=\"hidden\" id=\"cl_n$prefix$id\" name=\"$name\" value=\"$val\"/>
 		                    </td>
 		                    <td>		  
-		                        <span id='cl_arrow_$prefix$id' class='wdgt_arr' $onArrowClick $onMouseOut>&nbsp;</span>
-		                        <span id='cl_logo_$prefix$id' class='wdgt_logo'>&nbsp;</span>
+		                        <span id=\"cl_arrow_$prefix$id\" class=\"wdgt_arr\" $onArrowClick $onMouseOut>&nbsp;</span>
+		                        <span id=\"cl_logo_$prefix$id\" class=\"wdgt_logo\"><i>&nbsp;</i></span>
 		                    </td>
 		                 </tr>
 		              </table>
 		        </div>
-		        <div id='cl_res_$prefix$id' name='cl_res_$prefix$id' class='meta_clr' $onMouseOver $onMouseOut style='display:none;'></div>
+		        <div id=\"cl_res_$prefix$id\" name=\"cl_res_$prefix$id\" class=\"meta_clr\" $onMouseOver $onMouseOut style=\"display:none;\"></div>
 		    </div>"; 
 		return $html;
 	}

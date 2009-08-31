@@ -187,13 +187,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$DEBUG='';
 		//$conf['recInMarkersHSC']=$this->recInMarkersHSC;
  		//$this->conf = &$conf;
-		/*if (t3lib_div::_GP('xajax'))  {
-  		   	$xajax=t3lib_div::makeInstance('tx_metafeedit_ajax');
-  		   	$xajax->init($conf);
-  		   	return;
-      	}*/
 
-      	if ( $conf['list.']['advancedSearchAjaxSelector'] || is_array($conf['list.']['advancedSearchAjaxSelector.'])) {
+      	if ( $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector'] || is_array($conf['list.']['advancedSearchAjaxSelector.'])) {
 		    $ajax = t3lib_div::makeInstance('tx_metafeedit_ajax');
 		    $ajax->init($this,$conf);
 	    }
@@ -254,7 +249,13 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// Getting the preview var
 		$this->preview = $this->conf['inputvar.']['preview'];
 		// Preview mode is activate also if edit mode is disabled but edit preview mode active
-		if (!$this->preview) $this->preview=$this->conf['disableEdit']&&$this->conf['edit.']['preview'] && $this->conf['inputvar.']['cmd']=='edit';
+
+		//echo $this->conf['disableEdit']."&&".$this->conf['edit.']['preview']." && ".$this->conf['inputvar.']['cmd'];
+		//echo "<br>".$conf['disableEdit']."&&".$conf['edit.']['preview']." && ".$conf['inputvar.']['cmd'];
+		
+		if (!$this->preview) $this->preview=$this->conf['disableEdit']&&$this->conf['edit.']['preview'] && ($this->conf['inputvar.']['cmd']=='edit'|| $this->conf['inputvar.']['cmd']=='create');
+		
+		//echo "p ".$this->preview;
 		// backURL is a given URL to return to when login is performed
 		// this should be a seperate function ...
 	
@@ -273,10 +274,10 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		//$this->recUid = t3lib_div::_GP('rU');
 		if ($this->conf['inputvar.']['rU']) $this->recUid = $this->conf['inputvar.']['rU'];
 
-    // Fe User Fields
+		// Fe User Fields
       
-    $this->fUField = $this->conf['fUField']?$this->conf['fUField']:t3lib_div::_GP('fUField['.$this->conf['pluginId'].']');
-    $this->fUKeyField = $this->conf['fUKeyField']?$this->conf['fUKeyField']:t3lib_div::_GP('fUKeyField['.$this->conf['pluginId'].']');
+		$this->fUField = $this->conf['fUField']?$this->conf['fUField']:t3lib_div::_GP('fUField['.$this->conf['pluginId'].']');
+		$this->fUKeyField = $this->conf['fUKeyField']?$this->conf['fUKeyField']:t3lib_div::_GP('fUKeyField['.$this->conf['pluginId'].']');
 		//$this->fUField = $this->conf['fUField'][$this->conf['pluginId']]?$this->conf['fUField'][$this->conf['pluginId']]:t3lib_div::_GP('fUField['.$this->conf['pluginId'].']');
 		//$this->fUKeyField = $this->conf['fUKeyField'][$this->conf['pluginId']]?$this->conf['fUKeyField'][$this->conf['pluginId']]:t3lib_div::_GP('fUKeyField['.$this->conf['pluginId'].']');
 		$this->fU = $this->conf['fU']?$this->conf['fU']:t3lib_div::_GP('fU['.$this->conf['pluginId'].']');
@@ -417,7 +418,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$FEUSER=$GLOBALS['TSFE']->fe_user->user;
 		if (!is_array($FEUSER)) $FEUSER=array();
 		$this->markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $FEUSER, '', TRUE, 'FEUSER_FIELD_', $this->conf['general.']['xhtml']);
-
 		// Setting cmdKey which is either 'edit' or 'create'
 		switch($this->conf['inputvar.']['cmd'])	{
 			case 'edit':
@@ -1488,8 +1488,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				$this->markerArray['###REC_UID###'] = $theUid;
 				$origArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$theUid);		// Fetches the original record to check permissions
 				if ($conf['edit'] && ($GLOBALS['TSFE']->loginUser || !$conf['requireLogin'] || $this->aCAuth($origArr)))	{	// Must be logged in in order to edit  (OR be validated by email) or requireLogin is unchecked
-					$newFieldList = implode(',',array_intersect(explode(',',$conf['fieldList']),t3lib_div::trimExplode(',',$conf['edit.']['show_fields'],1)));
-					//$newFieldList = implode(',',array_intersect(explode(',',$conf['fieldList']),t3lib_div::trimExplode(',',$conf['edit.']['fields'],1)));
+					$newFieldList = implode(',',array_intersect(explode(',',$conf['fieldList']),t3lib_div::trimExplode(',',$conf['edit.']['fields'],1)));
 
 
 					if ($this->aCAuth($origArr) || $this->metafeeditlib->DBmayFEUserEdit($this->theTable,$origArr,$GLOBALS['TSFE']->fe_user->user,$conf['allowedGroups'],$conf['fe_userEditSelf'],$conf))	{
@@ -2783,7 +2782,7 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 				$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_AUTH###');
 			}
 		} else {
-			$content.='Edit-option , Preview-option or List-option is not set in TypoScript';
+			$content.='Display Edit Screen : Edit-option , Preview-option or List-option is not set in TypoScript';
 		}
 		return $content;
 	}

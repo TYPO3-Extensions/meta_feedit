@@ -59,30 +59,10 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 	
 	function main($content='',$conf=''){
 		$DEBUG='';
-		global $PAGES_TYPES;
-		
-		if (!defined ('PATH_typo3conf')) die ('Could not access this script directly!');
-	   
-	    /*if (t3lib_div::_GP('ajx')) {
-    	//krumo($_POST);
-    	//krumo($_GET);
-    	// Initialize FE user object:
-			$feUserObj = tslib_eidtools::initFeUser();
-			$GLOBALS["TSFE"]->fe_user=$feUserObj;
-			//krumo($GLOBALS["TSFE"]);
-			// Connect to database:
-			tslib_eidtools::connectDB();
-			$ajax = t3lib_div::makeInstance('tx_metafeedit_ajax');
-			$ajax->init($this,$conf);
-		}*/
-		
-		//xdebug_start_profiling(t3lib_extMgm::extPath('meta_feedit').'profile.out');
-		//xdebug_start_profiling();
-		//xdebug_start_trace(t3lib_extMgm::extPath('meta_feedit').'tracefile.trc');
-		
+		//global $PAGES_TYPES;		
+		if (!defined ('PATH_typo3conf')) die ('Could not access this script directly!');	  
 		// Meta feedit library init
 		$this->metafeeditlib=t3lib_div::makeInstance('tx_metafeedit_lib');
-		//if (!t3lib_div::_GP('ajx')) 
 		$GLOBALS['TSFE']->includeTCA();
 		$this->pi_setPiVarDefaults();
 		$this->pi_initPIflexForm(); // Init FlexForm configuration for plugin
@@ -226,8 +206,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['general.']['listMode']=$lconf['defaultListMode'];
 		$mfconf['general.']['fieldSize']=8;
 		$mfconf['general.']['xhtml']=$lconf['xhtml'];
-		$mfconf['general.']['labels.']=$this->metafeeditlib->getMetaFeeditVar2($mfconf,'labels.');
-		
+		$mfconf['general.']['labels.']=$this->metafeeditlib->getMetaFeeditVar2($mfconf,'labels.');		
 		$mfconf['ajax.']['ajaxOn']=$lconf['ajaxOn'];
 		$mfconf['ajax.']['jqueryCompatMode']=$lconf['jqueryCompatMode'];
 
@@ -309,15 +288,14 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['lastLinkWrap']=$this->metafeeditlib->is_extent($conf['lastLinkWrap'])?$conf['lastLinkWrap']:$lconf['lastLinkWrap'];
 		$mfconf['list.']['searchBox']=$lconf['searchBox'];
 		$mfconf['list.']['align.']=$conf['list.']['align.'];
-		$mfconf['list.']['searchBox.']=$conf['searchBox.'];
-		
+		$mfconf['list.']['searchBox.']=$conf['searchBox.'];	
 		// advancedSearch
 		$mfconf['list.']['advancedSearchFields']=$this->correctFieldSets($lconf['advancedSearchFields']);
 		$mfconf['list.']['advancedSearch']=$lconf['advancedSearch'];
 		$mfconf['list.']['advancedSearch.']=$conf['advancedSearch.'];
+		$mfconf['list.']['advancedSearchConfig.']=$conf['advancedSearchConfig.'];
 		$mfconf['list.']['advancedSearchAjaxSelector']=$lconf['advancedSearchAjaxSelector'];
-		$mfconf['list.']['advancedSearchAjaxSelector.']=$conf[$lconf['pluginId'].'.']['list.']['advancedSearchAjaxSelector.'];
-		
+		$mfconf['list.']['advancedSearchAjaxSelector.']=$conf[$lconf['pluginId'].'.']['list.']['advancedSearchAjaxSelector.'];		
 		$mfconf['list.']['alphabeticalSearch']=$lconf['alphabeticalSearch'];
 		$mfconf['list.']['alphabeticalSearch.']=$conf['alphabeticalSearch.'];
 		$mfconf['list.']['calendarSearch']=$lconf['calendarSearch'];
@@ -768,7 +746,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['inputvar.']['rU']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'rU');
 		$mfconf['inputvar.']['rU.']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'rU.');
 		$mfconf['inputvar.']['cmd']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'cmd');
-		$mfconf['inputvar.']['backURL']=htmlspecialchars_decode($this->metafeeditlib->getMetaFeeditVar($mfconf,'backURL'));
+		$mfconf['inputvar.']['backURL']=htmlspecialchars_decode((string)$this->metafeeditlib->getMetaFeeditVar($mfconf,'backURL'));
 		$mfconf['inputvar.']['preview']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'preview');
 		$mfconf['inputvar.']['blog']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'blog');
 		$mfconf['inputvar.']['doNotSave']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'doNotSave');
@@ -788,16 +766,17 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 
   	if ($resetsearch) {
           unset ( $mfconf['inputvar.']['advancedSearch']);
-          unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['advancedSearch']);
           unset ( $mfconf['inputvar.']['sword']);
-          unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sword']);
           unset ( $mfconf['inputvar.']['sortLetter']);
-          unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sortLetter']);
           unset ( $_GET['tx_metafeedit']['reset']);
+          unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sword']);
+          unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sortLetter']);
+          unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['advancedSearch']);
   	}
   	if ($resetorderby) {
           unset ( $mfconf['inputvar.']['sort']);
           unset ( $metafeeditvars[$pluginId]['sort']);
+		  if (is_array($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId])) unset ($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sort']);
           unset ( $_GET['tx_metafeedit']['resetorderby']);
   	}
 		// aC
@@ -946,10 +925,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		foreach ($fLA as $fN) {
 			$param=explode(';',$fN);
 			if ($param[0]=='--div--') {
-				//luc 15/02/2007 : str_replace
 				$fLA2[]="--div--;".($tLA[$o]?str_replace ("'","`",$tLA[$o]):"Tab $o");
-				//$fLA2[]="--div--;".($tLA[$o]?$tLA[$o]:"Tab $o");
-
 				$o++;
 			} else {
 				$fLA2[]=$fN;
@@ -989,12 +965,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		return $fL2;
 	}
 }
-
-// if called by AJAX !
-/*if (t3lib_div::_GP('ajx')) {
-	$test = t3lib_div::makeInstance('tx_metafeedit_pi1');
-	$test->main();
-}*/
 
 if (defined("TYPO3_MODE") && $TYPO3_CONF_VARS[TYPO3_MODE]["XCLASS"]["ext/meta_feedit/pi1/class.tx_metafeedit_pi1.php"]){
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]["XCLASS"]["ext/meta_feedit/pi1/class.tx_metafeedit_pi1.php"]);
