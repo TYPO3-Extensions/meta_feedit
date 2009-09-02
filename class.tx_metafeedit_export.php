@@ -327,7 +327,7 @@ class tx_metafeedit_export {
 							if (isset($col->img->attributes()->y)) $imgy=(float)$col->img->attributes()->y; //x override
 							$pdf->Image($img,$imgx,$imgy,$imgw,$imgh);
 							//$pdf->Image($img,$pdf->GetX()+0.5,$pdf->GetY()+0.5);
-							$pdf->Rect($imgx, $imgy, ($imgh/$h)*$w, $imgh );
+							$pdf->Rect($imgx, $imgy, ($imgh/$h)*$w+0.1, $imgh );
 							$pdf->SetX($imgx+(($imgh/$h)*$w));
 						}
 					}
@@ -370,14 +370,14 @@ class tx_metafeedit_export {
 					if (isset($col->spec->attributes()->fs))$fs=$col->spec->attributes()->fs;
 					if (isset($col->spec->attributes()->f)) $pdf->SetFont($col->spec->attributes()->f,'',$fs);
 					if (isset($col->spec->attributes()->x) || isset($col->spec->attributes()->y)) {
-						$pdf->SetXY($col->spec->attributes()->x,$col->spec->attributes()->y);
+						$pdf->SetXY((float)$col->spec->attributes()->x,(float)$col->spec->attributes()->y);
 						if (isset($col->spec->attributes()->b)  || isset($col->spec->attributes()->bc) ) {
 							 $pdf->Cell($w,$h,utf8_decode($val),$b,0,$p,1);
 						} else {
 							$pdf->Write($height,utf8_decode($val));
 						}
-						$newX=$col->spec->attributes()->x+(isset($col->spec->attributes()->w)?$col->spec->attributes()->w:$pdf->GetStringWidth($val));
-						$pdf->SetXY(floor($newX),$col->spec->attributes()->y);
+						$newX=(float)$col->spec->attributes()->x+(isset($col->spec->attributes()->w)?(float)$col->spec->attributes()->w:$pdf->GetStringWidth($val));
+						$pdf->SetXY((float)floor($newX),(float)$col->spec->attributes()->y);
 						//$pdf->Text($col->spec->attributes()->x,$col->spec->attributes()->y,utf8_decode($val));
 					} else {
 						$pdf->Cell($w,$h,utf8_decode($val),$b,0,$p,1);

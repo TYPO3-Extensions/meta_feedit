@@ -1602,11 +1602,11 @@ class tx_metafeedit extends  tslib_pibase {
     * @return	string		$ret : html code
 	 */
 
-	function getEditSumFields($prefix,&$conf,&$count, $textmode=false, $type='')
+	function getEditSumFields($prefix,&$conf,&$count, $textmode=false, $type='',$actFlag=FALSE)
 	{
 		$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
-		$firstemptycell='###FIRSTEMPTYCELL###';
+		$firstemptycell=$actFlag?'':'###FIRSTEMPTYCELL###';
 		$count=0;
 		$ret=$type=='PDF'?'<gb>1</gb>':'';
 		foreach($fieldArray as $FN) {
@@ -1635,10 +1635,8 @@ class tx_metafeedit extends  tslib_pibase {
 					$count++;
 					if (!$textmode)			// Not text mode only
 						$ret.='<td '.($conf['list.']['align.'][$_FN]?'align="'.$conf['list.']['align.'][$_FN].'"':'').'>'.'###'.$prefix.'_FIELD_'.$_FN.'###</td>';
-						//$ret.='<td '.($conf['list.']['align.'][$_FN]?'align="'.$conf['list.']['align.'][$FN].'"':'').'>'.$Lib.'###SUM_FIELD_'.$_FN.'###</td>';
 					else  {
 						if ($type) 						// Fichier PDF
-							//$ret.='<td><data>'.$Lib.'###'.$prefix.'_FIELD_'.$FN.'###</data><size>'.$size.'</size></td>';
 							$ret.='<td><data>###'.$prefix.'_FIELD_'.$_FN.'###</data><size>'.$size.'</size></td>';
 						else 
 							$ret.=$Lib.'###'.$prefix.'_FIELD_'.$_FN.'###;';
@@ -1894,11 +1892,10 @@ class tx_metafeedit extends  tslib_pibase {
     	$GROUPBYFOOTERFIELDS=$this->getGroupByFooterFields($conf);
     	$tmp.=$GROUPBYFOOTERFIELDS.'<!-- ###ALLITEMS### end -->';
     
-    	// Total processing 
+ 		$actFlag=(!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions']));
+   	// Total processing 
     	if ($conf['list.']['sumFields']) {
-    		$sum='<!--###SUM_FIELDS### begin---><tr>'.$this->getEditSumFields('SUM',$conf, $count,false, 'html').'</tr>';
-    
-    		//$tmp.='<tr>'.$this->getSumFields($conf, false, 'html').'</tr>'; //TODO Handle undisplayed sumfields ...
+    		$sum='<!--###SUM_FIELDS### begin---><tr>'.($actFlag?'<td>###FIRSTEMPTYCELL###</td>':'').$this->getEditSumFields('SUM',$conf, $count,false, 'html',$actFlag).'</tr>';   
     		$sum.='<!--###SUM_FIELDS### end--->';
     		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###','Total (###SUM_FIELD_metafeeditnbelts###)');
     		$tmp.=$sum;
@@ -1985,11 +1982,11 @@ class tx_metafeedit extends  tslib_pibase {
 									}
 								} else if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
 //									$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
-                foreach ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'] as $index => $value) {
-									if ($val == $conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$index][1]) {
-									$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$index][0],$conf) ;
-									
-								}	}
+                					foreach ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'] as $index => $value) {
+										if ($val == $conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$index][1]) {
+											$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$index][0],$conf) ;
+										}	
+									}
 								} //rsg
 								break;
 							case 'radio' :
@@ -3631,15 +3628,15 @@ function getFormJs($formName,&$conf) {
 	 */
 	function searchBox(&$conf) {
 		$ret='<div'.$this->caller->pi_classParam('searchbox').'>';
-		$ret.='<form name="'.$conf['table'].'_ftform" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'" style="margin: 0pt;">';
+		//$ret.='<form name="'.$conf['table'].'_ftform" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'" style="margin: 0pt;">';
 		$ret.='<table>
 				<tbody><tr>
 					<td><input id="tx_metafeedit.sword.'.$conf['pluginId'].'" name="tx_metafeedit[sword]['.$conf['pluginId'].']" value="###FTSEARCHBOXVAL###" class="tx-metafeedit-searchbox-sword" type="text" /></td>
 					<td><button value="Search" class="'.$this->caller->pi_getClassName('form-submit').' '.$this->caller->pi_getClassName('searchbox-button').'" type="submit">'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</button><input name="no_cache" value="1" type="hidden" /><input name="tx_metafeedit[pointer]['.$conf['pluginId'].']" value="" type="hidden" /></td>
 				</tr>
 
-			</tbody></table>
-			</form>';
+			</tbody></table>';
+		//	</form>';
 		$ret.='</div>';
 		return $ret;
 	}

@@ -1232,7 +1232,7 @@ class tx_metafeedit_sqlengine {
 			if ($this->feadminlib->internal['orderBy'])    {
 	  			$sql['orderBy'] = $sql['orderBy']?$sql['orderBy'].','.$table.'.'.$this->feadminlib->internal['orderBy'].($this->feadminlib->internal['descFlag']?' DESC':' ASC') : ' ORDER BY '.$table.'.'.$this->feadminlib->internal['orderBy'].($this->feadminlib->internal['descFlag']?' DESC':' ASC');
 			}
-    }
+		}
 
 		//MODIF CBY if ($conf['list.']['orderByFields'] && !$this->piVars['sort']){
 		if ($conf['list.']['orderByFields'] && !$conf['inputvar.']['sort']){

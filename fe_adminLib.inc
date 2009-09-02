@@ -782,14 +782,14 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		}
 		*/
 		/*hack for rte pleasewait error, very ugly but RTE is too hard linked with typo3 core to prevent this !*/
-		if (is_array($this->conf['RTE'])) foreach($conf['RTE'] as $key=>$RTE) {
+		/*if (is_array($this->conf['RTE'])) foreach($conf['RTE'] as $key=>$RTE) {
 	        if ($RTE['cmdmode']!=$this->conf['cmdmode']) {
 				$content = $this->cObj->substituteMarker($content,'###RTE_'.$key.'###',$conf['RTEItem'][$key]);
 				$content.='<div style="display:none;" id="pleasewait'.$key.'"/>';
 				$content.='<div style="display:none;" id="editorWrap'.$key.'"/>';
 				$content.='<textarea style="display:none;" id="RTEarea'.$key.'"/>';
 			}
-		}
+		}*/
 
 		// Delete temp files:
 		
@@ -2690,7 +2690,7 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 					{
 						$FTCA=$GLOBALS['TCA'][$FTable]['columns'];
 						//krumo ($FTCA);
-						foreach($FTCA as $key=>$val) {
+						if (is_array($FCTA))  foreach($FTCA as $key=>$val) {
 							if (in_array($FTCA,array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 							$this->markerArray['###FIELD_'.$FTRel.'.'.$key.'###']='';
 							$this->markerArray['###FIELD_EVAL_'.$FTRel.'.'.$key.'###']='';
