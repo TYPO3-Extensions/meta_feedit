@@ -2952,7 +2952,7 @@ class tx_metafeedit_lib {
 	}
 
 	function getEditActions(&$conf,&$caller) {
-		$tmp='<div'.$caller->pi_classParam('form-row').'><table class="tx-metafeedit-edit-actions" style="width:100%"><tr><td>###ACTION-SAVE###</td>';
+		$tmp='<div'.$caller->pi_classParam('form-row').'><table class="tx-metafeedit-edit-actions" style="width:100%"><tr><td>###ACTION-SAVE###</form></td>';
     	//if ($conf['list.']['recordactions'] && !$conf['ajax.']['ajaxOn']) {
         
        
