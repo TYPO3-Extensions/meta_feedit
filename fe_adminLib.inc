@@ -66,7 +66,6 @@
  * 1194:     function displayGridScreen($TABLES,$DBSELECT)
  * 1194:     function displayCalendarScreen($TABLES,$DBSELECT)
  * 1282:     function displayEditScreen()
-			foreach($this->conf['email.'] as $key_mode=>$val) {
  * 1377:     function procesSetFixed()
  *
  *              SECTION: Template processing functions
@@ -185,15 +184,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 	function user_init($content,&$conf)	{
 		$DEBUG='';
-		//$conf['recInMarkersHSC']=$this->recInMarkersHSC;
- 		//$this->conf = &$conf;
 
       	if ( $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector'] || is_array($conf['list.']['advancedSearchAjaxSelector.'])) {
 		    $ajax = t3lib_div::makeInstance('tx_metafeedit_ajax');
 		    $ajax->init($this,$conf);
-	    }
-
-      	
+	    } 	
         $this->cObj=$GLOBALS['TSFE']->cObj;
         $this->conf = &$conf;
 		if (is_object($conf['caller'])) {
@@ -203,17 +198,15 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		    $this->metafeeditlib=t3lib_div::makeInstance('tx_metafeedit_lib');
         }
         $this->metafeeditlib->feadminlib=&$this;
-        
-		$this->metafeedit=t3lib_div::makeInstance('tx_metafeedit');
-		//new export class - CMD (do we need to load this here ?)...
+		$this->metafeedit=t3lib_div::makeInstance('tx_metafeedit'); //CBY  WHY ????
+		//new export class  (do we need to load this here ?)...Only in export mode ...
 		$this->metafeeditexport=t3lib_div::makeInstance('tx_metafeedit_export');
 		$this->metafeeditexport->init($this);
 
 		// We should handle here all GET//POST//PIVARS ... à mettre dans le pi1
+
 		$this->pi_setPiVarDefaults();
 		$this->conf['piVars']=$this->piVars;		
-	 	//$this->conf['metafeeditlib']=&$this->metafeeditlib;
-		//$this->conf['feAdminLib']=&$this; // 300 K
         if ($this->conf['general.']['listMode']==2) {
             $this->metafeeditgrid=t3lib_div::makeInstance('tx_metafeedit_grid');
             $this->metafeeditgrid->init($this->metafeeditlib,$this);
@@ -225,54 +218,30 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 		// template file is fetched.
 		$this->templateCode = $this->conf['templateContent']; //? $this->conf['templateContent']: $this->cObj->fileResource($this->conf['templateFile']);
+		// Checking template file
+		if (!$this->templateCode)	{
+			$content = 'No template file found: '.$this->conf['templateFile'];
+			return $content;
+		}
+
 		// get table
 		$this->theTable = $this->conf['table'];
 
 		// Getting the cmd var
-
 		$this->cmd = (string)$this->conf['inputvar.']['cmd'];
-		
-		// we check here editUnique Creation Mode (must optimize this);
-
-        if ($conf['editUnique']) {
-			$mmTable='';
-                        $DBSELECT=$this->metafeeditlib->DBmayFEUserEditSelectMM($this->theTable,$GLOBALS['TSFE']->fe_user->user, $this->conf['allowedGroups'],$this->conf['fe_userEditSelf'],$mmTable,$this->conf).$GLOBALS['TSFE']->sys_page->deleteClause($this->theTable);
-                        $thePid = intval($this->conf['pid']) ? intval($this->conf['pid']) : $GLOBALS['TSFE']->id;
-									if ($thePid) {
-                        $lockPid = $this->conf['edit.']['menuLockPid'] ? ' AND pid='.intval($thePid) : '';
-                        $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $this->theTable.($mmTable?','.$mmTable:'') , '1 '.$lockPid.$DBSELECT);
-                        $resu=$GLOBALS['TYPO3_DB']->sql_num_rows($res);
-                        if ($resu===0) $this->conf['inputvar.']['cmd']='create';
-						 				}
-        }
 
 		// Getting the preview var
 		$this->preview = $this->conf['inputvar.']['preview'];
-		// Preview mode is activate also if edit mode is disabled but edit preview mode active
-
-		//echo $this->conf['disableEdit']."&&".$this->conf['edit.']['preview']." && ".$this->conf['inputvar.']['cmd'];
-		//echo "<br>".$conf['disableEdit']."&&".$conf['edit.']['preview']." && ".$conf['inputvar.']['cmd'];
 		
-		if (!$this->preview) $this->preview=$this->conf['disableEdit']&&$this->conf['edit.']['preview'] && ($this->conf['inputvar.']['cmd']=='edit'|| $this->conf['inputvar.']['cmd']=='create');
-		
-		//echo "p ".$this->preview;
+		// Preview mode is forced also if edit mode is disabled but edit preview mode active		
+		if (!$this->preview) $this->preview=$this->conf['disableEdit']&&$this->conf[$this->conf['inputvar.']['cmd'].'.']['preview'] && ($this->conf['inputvar.']['cmd']=='edit'|| $this->conf['inputvar.']['cmd']=='create');
 		// backURL is a given URL to return to when login is performed
 		// this should be a seperate function ...
 	
 		$this->backURL = $this->conf['inputvar.']['backURL'];
-		if (!$this->backURL && !$this->piVars['referer'][$this->conf['pluginId']]) {
-			$this->backURL=$_SERVER['HTTP_REFERER'];
-			$this->piVars['referer'][$this->conf['pluginId']]=$_SERVER['HTTP_REFERER'];
-		} elseif (!$this->backURL) {
-	  	$this->backURL=$this->piVars['referer'][$this->conf['pluginId']];
-	  }		
-		if (!strpos($this->backURL,'?')) $this->backURL.='?';
-		str_replace("&BACK[".$this->conf['pluginId']."]=1","",$this->backURL);
-	  $this->backURL.="&BACK[".$this->conf['pluginId']."]=1";
-		
+
 		// Uid to edit:		
-		//$this->recUid = t3lib_div::_GP('rU');
-		if ($this->conf['inputvar.']['rU']) $this->recUid = $this->conf['inputvar.']['rU'];
+		if ($this->conf['inputvar.']['rU'] && $conf['inputvar.']['cmd']!='list') $this->recUid = $this->conf['inputvar.']['rU'];
 
 		// Fe User Fields
       
@@ -289,7 +258,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->conf['originKeyField'] = $this->conf['originKeyField']?$this->conf['originKeyField']:t3lib_div::_GP('oUKeyField');
 
 		// *****************
-		// Ajout CMD - gestion de l'order
+		// order by handling , is this usefull ?
 		// *******************
 		if ($this->conf['inputvar.']['orderDir']==1 && !$this->preview && !$conf['inputvar.']['doNotSave'])	{	// Delete record if delete command is sent + the preview flag is NOT set.
             if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc order start:']=$this->metafeeditlib->displaytime()." Seconds";
@@ -313,11 +282,20 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// Setting the hardcoded lists of fields allowed for editing and creation.
 
 		$this->metafeeditlib->getFieldList($this->conf);
+		if (!$this->theTable || !$this->conf['fieldList'])	{
+			$content = 'Wrong table: '.$this->theTable.', Fields : '.$this->conf['fieldList'];
+			return $content;		// Not listed or editable table!
+		}
+
 		$fArr=t3lib_div::trimexplode(',',$this->conf['fieldList']);
 		foreach($fArr as $fN) {
+			if (in_array(substr($fN,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 			$this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'###']='';
 			//MODIF CBY
 			$this->markerArray['###FIELD_EVAL_'.$fN.'###']='';
+			$this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$fN).'###']='';
+			//MODIF CBY
+			$this->markerArray['###FIELD_EVAL_'.str_replace('.','_',$fN).'###']='';
 
  			if ( $GLOBALS['TCA'][$this->theTable]['columns'][$fN]['config']['type']=='group') {
 				if ($GLOBALS['TCA'][$this->theTable]['columns'][$fN]['config']['internal_type']=='file') $this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'_file###']='';
@@ -327,6 +305,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		//Si blog
 		$fbArr=t3lib_div::trimexplode(',',$this->conf['blogFieldList']);
 		foreach($fbArr as $fN) {
+			if (in_array(substr($fN,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 			$this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'###']='';
 
 			//$this->markerArray['###FIELD_EVAL_'.$fN.'###']='';
@@ -337,7 +316,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			}
 		}
 		
-		// </CBY>
 		// globally substituted markers, fonts and colors.
 		$splitMark = md5(microtime());
 		list($this->markerArray['###GW1B###'],$this->markerArray['###GW1E###']) = explode($splitMark,$this->cObj->stdWrap($splitMark,$this->conf['wrap1.']));
@@ -348,54 +326,19 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 		// Initialize markerArray, setting FORM_URL and HIDDENFIELDS
 
-		//<CBY
 		$formid=$GLOBALS['TSFE']->id;
-		//modif CMD
 		$formType=$GLOBALS['TSFE']->type;
 
 		if ($this->conf['createPid']) { $formid=$this->conf['createPid']; }
 		if ($this->conf['editPid'] && $this->conf['inputvar.']['cmd']=='edit') { $formid=$this->conf['editPid']; }
 
-		
-
-
 		// we handle Global parameters for links from other page
 		$this->markerArray['###GLOBALPARAMS###']='';
-		
-		// === Put into Session
-		
-		//$A=t3lib_div::_GP($this->theTable);
-		//if  ($A['lV'] && $A['lField']) {
-		//  $this->markerArray['###GLOBALPARAMS###'].='&'.$this->theTable.'[lV]='.$A['lV'].'&'.$this->theTable.'[lField]='.$A['lField'];
-		//}
-		//$this->markerArray['###GLOBALPARAMS###'].=$this->piVars['advancedSearch'][$this->conf['pluginId']]?$this->metafeeditlib->keepVars('&tx_metafeedit[advancedSearch]['.$this->conf['pluginId'].']',$this->piVars['advancedSearch'][$this->conf['pluginId']]):'';
-		//$this->markerArray['###GLOBALPARAMS###'].=$this->piVars['sword'][$this->conf['pluginId']]?'&tx_metafeedit[sword]['.$this->conf['pluginId'].']='.$this->piVars['sword'][$this->conf['pluginId']]:'';
-		//$this->markerArray['###GLOBALPARAMS###'].=$this->piVars['sort'][$this->conf['pluginId']]?'&tx_metafeedit[sort]['.$this->conf['pluginId'].']='.$this->piVars['sort'][$this->conf['pluginId']]:'';
-		//$this->markerArray['###GLOBALPARAMS###'].=$this->piVars['sortLetter'][$this->conf['pluginId']]?'&tx_metafeedit[sortLetter]['.$this->conf['pluginId'].']='.$this->piVars['sortLetter'][$this->conf['pluginId']]:'';
-		//$this->markerArray['###GLOBALPARAMS###'].=$this->piVars['pointer'][$this->conf['pluginId']]?'&tx_metafeedit[pointer]['.$this->conf['pluginId'].']='.$this->piVars['pointer'][$this->conf['pluginId']]:'';
-		
-		//=====
-		
-		//if ($this->piVars['reset']) unset($this->piVars['advancedSearch']);
-		/*$this->markerArray['###GLOBALPARAMS###'].=$this->conf['originUid']?'&oU='.$this->conf['originUid']:'';
-		$this->markerArray['###GLOBALPARAMS###'].=$this->conf['originTable']?'&oUTable='.$this->conf['originTable']:'';
-		$this->markerArray['###GLOBALPARAMS###'].=$this->conf['originUidsField']?'&oUField='.$this->conf['originUidsField']:'';
-		$this->markerArray['###GLOBALPARAMS###'].=$this->conf['originKeyField']?'&oUKeyField='.$this->conf['originKeyField']:'';
-		*/
-		//$this->markerArray['###GLOBALPARAMS###'].=$this->fUField?'&fUField='.$this->fUField:'';
-		//$this->markerArray['###GLOBALPARAMS###'].=$this->fUKeyField?'&fUKeyField='.$this->fUKeyField:'';
-		//$this->markerArray['###GLOBALPARAMS###'].=$this->fU?'&fU='.$this->fU:'';
 		$this->markerArray['###GLOBALPARAMS###'].=$this->piVars['referer'][$this->conf['pluginId']]?'&tx_metafeedit[referer]['.$this->conf['pluginId'].']='.rawurlencode($this->piVars['referer'][$this->conf['pluginId']]):'';
-
-		/*
-		$this->markerArray['###GLOBALPARAMS###'].=$this->fUField?'&fUField['.$this->conf['pluginId'].']='.$this->fUField:'';
-		$this->markerArray['###GLOBALPARAMS###'].=$this->fUKeyField?'&fUKeyField['.$this->conf['pluginId'].']='.$this->fUKeyField:'';
-		$this->markerArray['###GLOBALPARAMS###'].=$this->fU?'&fU['.$this->conf['pluginId'].']='.$this->fU:'';
-		*/
 	    $this->conf['GLOBALPARAMS']=$this->markerArray['###GLOBALPARAMS###'];						
 		$prma=array();
 		if ($this->nc) $prma['no_cache']=1;
-		//modif CMD pour gérer le type de la page
+		//We handle page type here 
 		if ($formType != 0) $formid .=','.$formType;
 		$pl=$this->pi_getPageLink($formid,'',$prma);//,,$this->nc.$this->conf['addParams']);	
 		if (!strpos($pl,'?')) $pl.='?';
@@ -405,7 +348,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->markerArray['###FORM_URL_ENC###'] = rawurlencode($this->markerArray['###FORM_URL###']);
 		$this->markerArray['###FORM_URL_HSC###'] = htmlspecialchars($pl.$this->markerArray['###GLOBALPARAMS###']);
 		$this->markerArray['###NEW_URL###']=$this->metafeeditlib->hsc($this->conf,$this->pi_getPageLink($formid,'',array( 'no_cache'=>1, 'cmd['.$this->conf['pluginId'].']'=>'create', 'rU['.$this->conf['pluginId'].']' => '', 'backURL['.$this->conf['pluginId'].']'=> $pl)));
-		//$this->markerArray['###NEW_URL###']=$this->metafeeditlib->hsc($this->conf,$this->pi_getPageLink($formid,'',array( 'no_cache'=>1, 'cmd['.$this->conf['pluginId'].']'=>'create', 'backURL['.$this->conf['pluginId'].']'=> $pl)));
 		$this->markerArray['###BACK_URL###'] = $this->metafeeditlib->hsc($this->conf,$this->backURL.$this->markerArray['###GLOBALPARAMS###']);
 		$this->markerArray['###BACK_URL_ENC###'] = rawurlencode($this->markerArray['###BACK_URL###']);
 		$this->markerArray['###BACK_URL_HSC###'] = htmlspecialchars($this->backURL.$this->markerArray['###GLOBALPARAMS###']);
@@ -414,12 +356,17 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->markerArray['###AUTH_CODE###'] = $this->authCode;
 		$this->markerArray['###THIS_ID###'] = $GLOBALS['TSFE']->id;
 		$this->markerArray['###THIS_URL###'] = htmlspecialchars(t3lib_div::getIndpEnv('TYPO3_REQUEST_DIR'));
-
+		
 		$FEUSER=$GLOBALS['TSFE']->fe_user->user;
 		if (!is_array($FEUSER)) $FEUSER=array();
 		$this->markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $FEUSER, '', TRUE, 'FEUSER_FIELD_', $this->conf['general.']['xhtml']);
+		
 		// Setting cmdKey which is either 'edit' or 'create'
 		switch($this->conf['inputvar.']['cmd'])	{
+			case 'list':
+				$this->conf['cmdKey']='list';
+				$this->conf['cmdmode']='list';
+				break;			
 			case 'edit':
 				$this->conf['cmdKey']='edit';
 				$this->conf['cmdmode']='edit';
@@ -429,28 +376,29 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				$this->conf['cmdmode']='edit';
 			break;
 		}
+		
 		$pluginId=$conf['pluginId'];
 		$this->markerArray['###HIDDENFIELDS###'] =
-			($this->conf['inputvar.']['cmd']?'<input type="hidden" name="cmd['.$pluginId.']" value="'.htmlspecialchars($this->conf['inputvar.']['cmd']).'" />':'').
 			($this->authCode?'<input type="hidden" name="aC['.$pluginId.']" value="'.htmlspecialchars($this->authCode).'" />':'').
-			($this->backURL?'<input type="hidden" name="backURL['.$pluginId.']" value="'.htmlspecialchars($this->backURL).'" />':'').
 			($conf['blogData']?'<input type="hidden" name="cameFromBlog['.$pluginId.']" value="1" />':'');
+
 		// Setting requiredArr to the fields in 'required' intersected field the total field list in order to remove invalid fields.
 		$this->requiredArr = array_intersect(
 			t3lib_div::trimExplode(',',$this->conf[$this->conf['cmdKey'].'.']['required'],1),
 			t3lib_div::trimExplode(',',$this->conf[$this->conf['cmdKey'].'.']['fields'],1)
 		);
 		// Setting incoming data. Non-stripped
-
+		
 		$fe=$conf['inputvar.']['fedata'];
-		$this->dataArr = $fe[$this->theTable];	// Incoming data.
-
+		//print_r($fe[$this->theTable]);
+		//if ($conf['inputvar.']['cmd']='edit' || ($conf['inputvar.']['cmd']='create' && $this->preview)) $this->dataArr=$fe[$this->theTable];	// Incoming data.
+		if ($conf['inputvar.']['cmd']!='list' || $conf['general.']['listMode']==2) $this->dataArr=$fe[$this->theTable];	// Incoming data.
 		$this->conf['dataArr']=&$this->dataArr;
 		// Setting blog incoming data. Non-stripped
 		$this->markerArray['###EVAL_BLOG_ERROR###'] = '';
-		if ($this->conf['blogData'] && is_array($fe['tx_metafeedit_comments'])) {
+		if ($this->conf['blogData'] && is_array($fe['tx_metafeedit_comments']) && $conf['inputvar.']['cmd']!='list') {
 			$this->dataArr = $fe['tx_metafeedit_comments'];	
-			$this->dataArr['linked_row'] =$this->theTable.'_'.$conf['inputvar.']['rU'];
+			$this->dataArr['linked_row'] =$this->theTable.'_'.$this->recUid;
 			// checking CAPTCHA
 			if ($this->conf['blog.']['captcha'] && is_object($this->metafeeditlib->freeCap) && !$this->metafeeditlib->freeCap->checkWord($this->piVars['captcha_response'])) {
 				$this->markerArray['###EVAL_BLOG_ERROR###'] = $this->metafeeditlib->getLL('blog_captcha_error',$this->conf);
@@ -458,44 +406,38 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				$this->failureMsg['blog_captcha']=$this->markerArray['###EVAL_BLOG_ERROR###'];
 		   }
 		}
+
 		// Incoming data.
-		if (!$this->recUid) $this->recUid=$this->dataArr[$this->conf['uidField']];
-		//if (!$this->recUid) $this->recUid=$this->dataArr['uid'];
+		if (!$this->recUid) $this->recUid=$this->dataArr[$this->conf['uidField']]?$this->dataArr[$this->conf['uidField']]:NULL;
 		$this->conf['recUid']=$this->recUid;
 		$this->markerArray['###REC_UID###'] = $this->recUid;
-
-		// Checking template file and table value
-
-		if (!$this->templateCode)	{
-			$content = 'No template file found: '.$this->conf['templateFile'];
-			return $content;
-		}
-
-		if (!$this->theTable || !$this->conf['fieldList'])	{
-			$content = 'Wrong table: '.$this->theTable.', Fields : '.$this->conf['fieldList'];
-			return $content;		// Not listed or editable table!
-		}
         if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Init done:']=$this->metafeeditlib->displaytime()." Seconds";
-
+		
 		// *****************
 		// If data is submitted, we take care of it here.
 		// *******************
 		if ($this->conf['inputvar.']['cmd']=='delete' && !$this->preview && !$conf['inputvar.']['doNotSave'])	{	// Delete record if delete command is sent + the preview flag is NOT set.
-      if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc delete start:']=$this->metafeeditlib->displaytime()." Seconds";
+			if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc delete start:']=$this->metafeeditlib->displaytime()." Seconds";
 			$this->deleteRecord();
-      if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc delete end:']=$this->metafeeditlib->displaytime()." Seconds";
+			if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc delete end:']=$this->metafeeditlib->displaytime()." Seconds";
+			$this->conf['inputvar.']['cmd']='list';
+			$this->conf['cmdKey']='list';
+			$this->conf['cmdmode']='list';
+			$this->dataArr=array();
+			$this->recUid=NULL;
 		}
-
 		// If incoming data is seen...
-		if (is_array($this->dataArr))	{
+		if (is_array($this->dataArr) && count($this->dataArr)>0)	{
 			if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc incoming data start:']=$this->metafeeditlib->displaytime()." Seconds";
+			// We have data to save
+			// Evaluation of data for grid mode:
 
-			// Evaluation of data:
 			if (is_array($this->dataArr['grid'])) {
 				// We are in datagrid mode ...
 				// A VALIDER CBY
 				$this->conf['cmdmode']='grid';
 				$saveData=$this->dataArr;
+				$saveCurrentData=$this->currentArr;
 				$rowData=$this->dataArr['grid'];				
 				$nbcols=$this->dataArr['nbcols'];
 				$sqlModeArr=$this->dataArr['grid-sqlmode'];
@@ -554,26 +496,22 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		  		}
 			}
 			$this->dataArr=$saveData;
-
+			$this->currentArr=$saveCurrentData;
 		  } else {
-		  		//krumo($this->dataArr);
-
 		        // We are in normal List or edit mode
 				$this->parseValues();
 				$this->overrideValues();
 				$this->evalValues();
 				if ($this->conf['evalFunc'])	{
-
 					$this->dataArr = $this->userProcess('evalFunc',$this->dataArr);
 				}
-				// if not preview and no failures, then set data...
 
-				if (!$this->failure && (!$this->preview || $this->conf['blogData']) && !$conf['inputvar.']['doNotSave'])	{	// doNotSave is a global var (eg a 'Cancel' submit button) that prevents the data from being processed
+				// if not preview and no failures, then set data...
+				if (!$this->failure && $this->conf['inputvar.']['BACK']!=1  && (!$this->preview || $this->conf['blogData']) && !$conf['inputvar.']['doNotSave'])	{	// doNotSave is a global var (eg a 'Cancel' submit button) that prevents the data from being processed
 					$this->save($this->conf);
 					if ($this->conf['evalFunc'])	{
 						$this->currentArr = $this->userProcess('evalFunc',$this->currentArr);
 					}
-
 				} else {
 					if ($this->conf['debug'])		debug($this->failure);
 				}
@@ -590,32 +528,28 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			// override value arr to transmit to fe_adminLib
 			$fNA=$this->metafeeditlib->getOverrideFields($this->conf['inputvar.']['cmd'],$this->conf);
 			$this->cObj->start($this->dataArr,$this->theTable);
-			//print_r($this->cObj);
 			foreach($fNA as $fN) {
 				$val=$this->metafeeditlib->getOverrideValue($fN,$this->conf['inputvar.']['cmd'],$this->conf,$this->cObj);
 				$dataArr[$fN]=$val;
 				$this->dataArr[$fN]=$val;
-			}			
+			}	
+			$nbf=count($this->dataArr);
+
+			
 			$this->currentArr=$dataArr;
 			// ugly hack to handle checkboxes properly
 			$this->dataArr['tx_metafeedit_dont_ctrl_checkboxes']=1;
-
 			if (is_array($this->dataArr) && count($this->dataArr)>1) {
 				$this->parseValues(1);
-				$this->evalValues();
-
+				//$this->evalValues(); Is this good ?
 			}
 			if ($this->conf['evalFunc'])	{
 					$this->dataArr = $this->userProcess('evalFunc',$this->dataArr);
 			}
             if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc No incoming data end:']=$this->metafeeditlib->displaytime()." Seconds";
-
 		}
 		if ($this->failure && !$this->conf['blogData'])	{$this->preview=0;}	// No preview flag if a evaluation failure has occured
-		//if ($this->failure)	{$this->preview=0;}	// No preview flag if a evaluation failure has occured
 		$this->previewLabel = ($this->preview || $this->conf['blogData'])? '_PREVIEW' : '';	// Setting preview label prefix.
-
-
 		// *********************
 		// DISPLAY FORMS:
 		// ***********************
@@ -623,82 +557,92 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$this->dataArr=array_merge($this->dataArr,$this->currentArr);
 			// Clear page cache
 			$this->clearCacheIfSet();
-
-				// Displaying the page here that says, the record has been saved. You're able to include the saved values by markers.
+			// Displaying the page here that says, the record has been saved. You're able to include the saved values by markers.
+			//echo $this->conf['inputvar.']['cmd'];
 			switch($this->conf['inputvar.']['cmd'])	{
 				case 'delete':
 					$key='DELETE';
-				break;
+					break;
+				case 'list':
+				case 'create':
 				case 'edit':
 					$key='EDIT';
+					break;
 				break;
 				default:
 					$key='CREATE';
 				break;
 			}
 
-			if (($this->conf[$this->conf['inputvar.']['cmd'].'.']['statusScreen'] && ($this->conf['inputvar.']['cmd']=='edit' || $this->conf['inputvar.']['cmd']=='create')) ||  ($this->conf['inputvar.']['cmd']!='edit' && $this->conf['inputvar.']['cmd']!='create')) {
-            if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Status screen start:']=$this->metafeeditlib->displaytime()." Seconds";
-			$this->conf['cmdmode']='status';
+			// We handle status screen
+			if (($this->conf[$this->conf['inputvar.']['cmd'].'.']['statusScreen'] && ($this->conf['inputvar.']['cmd']=='edit' || $this->conf['inputvar.']['cmd']=='create')) ||  (!($this->conf['inputvar.']['cmd']=='list' && $this->conf['general.']['listMode']==2) && ($this->conf['inputvar.']['cmd']!='edit' && $this->conf['inputvar.']['cmd']!='create'))) {
+				//echo "STATUS";
+				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Status screen start:']=$this->metafeeditlib->displaytime()." Seconds";
+				$this->conf['cmdmode']='status';
+				// Output message
+				// this should be message in Edit Screen;
 
-			// Output message
-			// this should be message in Edit Screen;
-
-			$templateCode = $this->cObj->getSubpart($this->templateCode, '###TEMPLATE_'.$key.'_SAVED###');
-			$this->metafeeditlib->setCObjects($this->conf,$this->markerArray,$templateCode,$this->currentArr);
-			// ???
-			$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $this->currentArr, '', TRUE, 'FIELD_', $this->conf['general.']['xhtml']);
-			$content = $this->cObj->substituteMarkerArray($templateCode, $markerArray);
-            if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Status screen end:']=$this->metafeeditlib->displaytime()." Seconds";
+				$templateCode = $this->cObj->getSubpart($this->templateCode, '###TEMPLATE_'.$key.'_SAVED###');
+				$this->metafeeditlib->setCObjects($this->conf,$this->markerArray,$templateCode,$this->currentArr);
+				// ???
+				$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $this->currentArr, '', TRUE, 'FIELD_', $this->conf['general.']['xhtml']);
+				$content = $this->cObj->substituteMarkerArray($templateCode, $markerArray);
+				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Status screen end:']=$this->metafeeditlib->displaytime()." Seconds";
 			} else {
-				// no status screen we want too stay on the edit form if in create mode we must switch to edit template
+				//echo "NO STATUS";
+				// no status screen we want too stay on the edit form if in create mode we must switch to edit template, if in list or grid we stay in same mode ...
 				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc No status screen start:']=$this->metafeeditlib->displaytime()." Seconds";
-
-				if ($this->conf['inputvar.']['cmd']!='edit') {
+				if ($this->conf['inputvar.']['cmd']!='list') {
 					$this->conf['inputvar.']['cmd']='edit';
-					$this->metafeeditlib->getFieldList($this->conf);	
+					$this->metafeeditlib->getFieldList($this->conf);
 				}
+				if (!$this->preview) $this->preview=$this->conf['disableEdit']&&$this->conf[$this->conf['inputvar.']['cmd'].'.']['preview'] && ($this->conf['inputvar.']['cmd']=='edit'|| $this->conf['inputvar.']['cmd']=='create');
+				$this->previewLabel = ($this->preview || $this->conf['blogData'])? '_PREVIEW' : '';
 				// thanks to Karl-Ernst Kiel [kekiel@kekiel.de]
-				$this->markerArray['###EVAL_ERROR###'] = $this->metafeeditlib->getLL('edit_saved_message',$this->conf);
-       	        $content = $this->displayEditScreen();
-            if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc No istatus screen end:']=$this->metafeeditlib->displaytime()." Seconds";
+				$this->markerArray['###EVAL_ERROR###'] = $this->metafeeditlib->makeErrorMarker($this->conf,$this->metafeeditlib->getLL('edit_saved_message',$this->conf));
+
+				$content = $this->displayEditScreen();
+				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc No status screen end:']=$this->metafeeditlib->displaytime()." Seconds";
 			}
-
 			// Notification Mails
-
 			// mail admin
 			// mail feuser
 			// mail datamail
-
 			// SetFixed Mails (moderation)...
 			// mail admin
 			// mail feuser
-			// mail datamail ?
-			
+			// mail datamail ?		
 			// we reset email array if data is empty.
 
 			foreach($this->conf['email.'] as $key_mode=>$val) {
 				if ($this->conf['email.'][$key_mode]===0 || $this->conf['email.'][$key_mode]=='0') unset($this->conf['email.'][$key_mode]);
 			}
 
-			
+		
 			if ($this->conf['email.']['sendAdminMail'] || $this->conf['email.']['sendAdminMail'] || $this->conf['email.']['sendFEUserMail'] || $this->conf['email.']['sendDataMail'] || $this->conf['email.']['sendDataInfoMail'] || $this->conf['email.']['sendFEUserInfoMail'] || $this->conf['email.']['sendAdminInfoMail']) {
-			if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Notification mail start:']=$this->metafeeditlib->displaytime()." Seconds";
-				
-			$this->compileMail(
-				$key.'_SAVED',
-				array($this->currentArr),
-				$this->getFeuserMail($this->currentArr,$this->conf),
-				$this->conf['setfixed.']
-			);
-	
-			if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Notification mail end:']=$this->metafeeditlib->displaytime()." Seconds";
+				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Notification mail start:']=$this->metafeeditlib->displaytime()." Seconds";
+					
+				$this->compileMail(
+					$key.'_SAVED',
+					array($this->currentArr),
+					$this->getFeuserMail($this->currentArr,$this->conf),
+					$this->conf['setfixed.']
+				);
+			
+				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Notification mail end:']=$this->metafeeditlib->displaytime()." Seconds";
 			}
+			switch($this->conf['inputvar.']['cmd'])	{
+				case 'delete':
+				case 'create':
+					$this->conf['inputvar.']['cmd']='edit';
+					break;
+				default:
+					$this->conf['inputvar.']['cmd']='list';
+			}
+
 		} elseif ($this->error) {	
-
 			// If there was an error, we return the template-subpart with the error message
-			$this->markerArray['###EVAL_ERROR###'] = $this->metafeeditlib->getLL('error_occured',$this->conf);
-
+			$this->markerArray['###EVAL_ERROR###'] = $this->metafeeditlib->makeErrorMarker($this->conf,$this->metafeeditlib->getLL('error_occured',$this->conf));
 			$templateCode = $this->cObj->getSubpart($this->templateCode, $this->error);
 			$this->metafeeditlib->setCObjects($this->conf,$this->markerArray,$templateCode);
 			$content = $this->cObj->substituteMarkerArray($templateCode, $this->markerArray);
@@ -707,7 +651,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			if (!$this->conf['inputvar.']['cmd'])	{
 				$this->conf['inputvar.']['cmd']=$this->conf['defaultCmd'];
 			}
-			if ($this->conf['debug'])		debug('Display form: '.$this->conf['inputvar.']['cmd'],1);
+			if ($this->conf['debug']) debug('Display form: '.$this->conf['inputvar.']['cmd'],1);
             if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc process start:']=$this->metafeeditlib->displaytime()." Seconds";
 		    switch($this->conf['inputvar.']['cmd'])	{
 			    case 'setfixed':
@@ -722,6 +666,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			        $this->conf['cmdmode']='delete';
 				    $content = $this->displayDeleteScreen();
 			        break;
+			    case 'list': //TODO to be improved move displayListScreen here.
 			    case 'edit':
 				    if ($this->conf['debug']) echo t3lib_div::view_array(array('displayEditScreen'=>'on'));
 			        $this->conf['cmdmode']='edit';
@@ -731,7 +676,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			        $this->conf['cmdmode']='create';
 				    $content = $this->displayCreateScreen($this->conf);
 			        break;
-		     }
+		    }
             if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc process end:']=$this->metafeeditlib->displaytime()." Seconds";
             if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Conf process end size']=strlen(serialize($this->conf))." Bytes"; 
             if ($this->conf['performanceaudit']) $this->perfArray['Conf TCAN size ']=strlen(serialize($this->conf['TCAN']))." Bytes"; 
@@ -744,53 +689,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			}
 	    }
 	    
-	    // Draw RTEs :	        
-		/*
-		if (count($conf['RTE'])) {
-				$pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
-				$this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];
-				$this->RTEObj = t3lib_div::makeInstance('tx_rtehtmlarea_pi2');//&t3lib_BEfunc::RTEgetObj();
-				$this->thePidValue = $GLOBALS['TSFE']->id;
-				$this->RTEtypeVal='text';
-		}
-		
-		if (is_array($this->conf['RTE'])) foreach($conf['RTE'] as $key=>$RTE) {
-	        if ($RTE['cmdmode']==$this->conf['cmdmode']) {
-				
-                $this->RTEcounter=$key;
-                $this->formName =$conf['RTE'][$key]['formName'];
-				$this->strEntryField = $conf['RTE'][$key]['field'];
-				$this->specConf =$conf['RTE'][$key]['spec'];  
-				$this->PA =$conf['RTE'][$key]['PA'];				
-				$RTEItem = $this->RTEObj->drawRTE($this,$conf['RTE'][$key]['table'],$conf['RTE'][$key]['field'],$row=array(), $this->PA, $this->specConf, $this->thisConfig, $this->RTEtypeVal, '', $this->thePidValue);
-				$content = $this->cObj->substituteMarker($content,'###RTE_'.$key.'###',$RTEItem);
-			}
-		}
-		
-		if (!$GLOBALS['TSFE']->config['config']['removeDefaultJS']) {
-	   		$content = $this->additionalJS_initial.$content;
-	    	if ($this->additionalJS_pre) $content.='<script type="text/javascript">'. implode('', $this->additionalJS_pre).'</script>';
-	    	if ($this->additionalJS_post) $content.='<script type="text/javascript">'. implode('', $this->additionalJS_post).'</script>';
-	    	*/
-		//if ($this->additionalJS_submit) $content.='<script type="text/javascript">/*<![CDATA[*/'. implode('', $this->additionalJS_submit).'/*]]>*/</script>';
-	  	/*
-		} else {
-	   		$content= $this->additionalJS_initial.$content;
-	    	if ($this->additionalJS_pre) $content.=TSpagegen::inline2TempFile( implode('', $this->additionalJS_pre),'js');
-	    	if ($this->additionalJS_post) $content.=TSpagegen::inline2TempFile( implode('', $this->additionalJS_post),'js');
-	    	//if ($this->additionalJS_submit) $content.=TSpagegen::inline2TempFile( implode('', $this->additionalJS_submit),'js');
-		}
-		*/
-		/*hack for rte pleasewait error, very ugly but RTE is too hard linked with typo3 core to prevent this !*/
-		/*if (is_array($this->conf['RTE'])) foreach($conf['RTE'] as $key=>$RTE) {
-	        if ($RTE['cmdmode']!=$this->conf['cmdmode']) {
-				$content = $this->cObj->substituteMarker($content,'###RTE_'.$key.'###',$conf['RTEItem'][$key]);
-				$content.='<div style="display:none;" id="pleasewait'.$key.'"/>';
-				$content.='<div style="display:none;" id="editorWrap'.$key.'"/>';
-				$content.='<textarea style="display:none;" id="RTEarea'.$key.'"/>';
-			}
-		}*/
-
 		// Delete temp files:
 		
 		foreach($this->unlinkTempFiles as $tempFileName)	{
@@ -816,7 +714,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	    if ($conf['debug.']['conf']) $this->metafeeditlib->debug('Conf :',$this->conf,$DEBUG);
 	    if ($conf['debug.']['template']) $this->metafeeditlib->debug('Templates :',$this->conf['templateContent'],$DEBUG);
 		if ($conf['debug.']['tsfe']) $this->metafeeditlib->debug('TSFE :',$GLOBALS['TSFE'],$DEBUG);
-
+		
+		// We update Session vars in case of change of cmd mode
+		$this->metafeeditlib->updateSessionVars(&$this->conf);
         return ($conf['performanceaudit']?t3lib_div::view_array($this->perfArray):'').$content.$conf['debug.']['debugString'].$DEBUG;
 	}
 
@@ -875,9 +775,10 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				reset($parseValues);
 			  while(list($theField,$theValue)=each($parseValues))	{
 				$this->markerArray['###EVAL_ERROR_FIELD_'.$theField.'###']='';
+				$this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$theField).'###']='';
 				$listOfCommands = t3lib_div::trimExplode(',',$theValue,1);
 				while(list(,$cmd)=each($listOfCommands))	{
-					$cmdParts = split('\[|\]',$cmd);	// Point is to enable parameters after each command enclosed in brackets [..]. These will be in position 1 in the array.
+					$cmdParts = preg_split('/\[|\]/',$cmd);	// Point is to enable parameters after each command enclosed in brackets [..]. These will be in position 1 in the array.
 					$theCmd=trim($cmdParts[0]);
 					switch($theCmd)	{
 						case 'int':
@@ -891,16 +792,16 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 							$this->dataArr[$theField] = str_replace(' ', '', $this->dataArr[$theField]);
 						break;
 						case 'alpha':
-							$this->dataArr[$theField] = ereg_replace('[^a-zA-Z]','',$this->dataArr[$theField]);
+							$this->dataArr[$theField] = preg_replace('/[^a-zA-Z]/','',$this->dataArr[$theField]);
 						break;
 						case 'num':
-							$this->dataArr[$theField] = ereg_replace('[^0-9]','',$this->dataArr[$theField]);
+							$this->dataArr[$theField] = preg_replace('/[^0-9]/','',$this->dataArr[$theField]);
 						break;
 						case 'alphanum':
-							$this->dataArr[$theField] = ereg_replace('[^a-zA-Z0-9]','',$this->dataArr[$theField]);
+							$this->dataArr[$theField] = preg_replace('/[^a-zA-Z0-9]/','',$this->dataArr[$theField]);
 						break;
 						case 'alphanum_x':
-							$this->dataArr[$theField] = ereg_replace('[^a-zA-Z0-9_-]','',$this->dataArr[$theField]);
+							$this->dataArr[$theField] = preg_replace('/[^a-zA-Z0-9_-]/','',$this->dataArr[$theField]);
 						break;
 						case 'trim':
 							$this->dataArr[$theField] = trim($this->dataArr[$theField]);
@@ -950,8 +851,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 							$hashArray=array();
 							while(list(,$fN)=each($otherFields))	{
 								$vv = $this->dataArr[$fN];
-								$vv = ereg_replace('[[:space:]]','',$vv);
-								$vv = ereg_replace('[^[:alnum:]]','',$vv);
+								$vv = preg_replace('/[[:space:]]/','',$vv);
+								$vv = preg_replace('/[^[:alnum:]]/','',$vv);
 								$vv = strtolower($vv);
 								$hashArray[]=$vv;
 							}
@@ -1128,7 +1029,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		}
 		if ($this->failure) {
 			$this->markerArray['###EVAL_ERROR_FIELD_'.$theField.'###'] = is_array($this->failureMsg[$theField]) ? implode('<br />',$this->failureMsg[$theField]) : '';
-			$this->markerArray['###EVAL_ERROR###'] = $this->metafeeditlib->getLL('error_occured',$this->conf);
+			$this->markerArray['###EVAL_ERROR###'] = $this->metafeeditlib->makeErrorMarker($this->conf,$this->metafeeditlib->getLL('error_occured',$this->conf));
 		}	
 	}
 
@@ -1139,38 +1040,38 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 * @see init()
 	 */
 
-	function overrideValues()	{
-		
+	function overrideValues()	{	
+
 		// Addition of overriding values		
 		// TODO add check and warnings on non existent fields ...
-		
 		if (is_array($this->conf[$this->conf['cmdKey'].'.']['overrideValues.']))	{
 			reset($this->conf[$this->conf['cmdKey'].'.']['overrideValues.']);
 			while(list($theField,$theValue)=each($this->conf[$this->conf['cmdKey'].'.']['overrideValues.']))	{
 			
 				$FValue=$this->dataArr[$theField];
-			
 			    //here we handle special values ... 	
-				$fieldArr=explode('.',$theValue);
-				$data=$FValue;
-				$c=count($fieldArr);
-				if ($c > 1) {
-					$data=$this->cObj->getData($fieldArr[0],0);
-					$i=1;
-					while ($i<=$c) {
-						if (is_object($data)) {
-							$data=get_object_vars($data);
-						}
-						if (is_array($data)) {
-							$key=$fieldArr[$i];
-							$data=$data[$fieldArr[$i]];
-						}
-					 	$i++;
-					}
-		
-				} elseif (strpos($theValue,":")) {
+				if (strpos($theValue,":")) {
 					$data=tx_metafeedit_lib::getData($theValue,0,$this->cObj);
 					if (!$data) $data=$this->dataArr[$theField];
+				} elseif  (strpos($theValue,".")) {	
+					$fieldArr=explode('.',$theValue);
+					$data=$FValue;
+					$c=count($fieldArr);
+					if ($c > 1) {
+						$data=$this->cObj->getData($fieldArr[0],0);
+						$i=1;
+						while ($i<=$c) {
+							if (is_object($data)) {
+								$data=get_object_vars($data);
+							}
+							if (is_array($data)) {
+								$key=$fieldArr[$i];
+								$data=$data[$fieldArr[$i]];
+							}
+							$i++;
+						}
+					}
+			
 				} else {
 					$data=$theValue;
 				}
@@ -1260,11 +1161,12 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			while(list($theField,$theValue)=each($evalValues))	{
 				$listOfCommands = t3lib_div::trimExplode(',',$theValue,1);
 				while(list(,$cmd)=each($listOfCommands))	{
-					$cmdParts = split('\[|\]',$cmd);	// Point is to enable parameters after each command enclosed in brackets [..]. These will be in position 1 in the array.
+					$cmdParts = preg_split('/\[|\]/',$cmd);	// Point is to enable parameters after each command enclosed in brackets [..]. These will be in position 1 in the array.
 					$theCmd = trim($cmdParts[0]);
 					switch($theCmd)	{
 						case 'uniqueGlobal':
-								if ($DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField($masterTable,$theField,$this->dataArr[$theField],'','','','1'))	{
+								$whereef= $GLOBALS['TSFE']->sys_page->enableFields($masterTable);
+								if ($DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField($masterTable,$theField,$this->dataArr[$theField],$whereef,'','','1'))	{
 								if (!$recExist || $DBrows[0][$this->conf['uidField']]!=$this->dataArr[$this->conf['uidField']])	{	// Only issue an error if the record is not existing (if new...) and if the record with the false value selected was not our self.
 									//$tempArr[]=$theField;
 									$this->failureMsg[$theField][] = $this->getFailure($theField, $theCmd, $this->metafeeditlib->getLL('error_value_existed',$this->conf));
@@ -1278,8 +1180,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 								if ($i>0 && trim($cmdP)) $Where.= " and ".$cmdParts[$i]."='".$this->dataArr[$cmdParts[$i]]."'";
 								$i++;
 							}
-
-							if ($DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField($masterTable,$theField,$this->dataArr[$theField], 'AND pid IN ('.$recordTestPid.')'.$Where,'','','1'))	{
+							$whereef= $GLOBALS['TSFE']->sys_page->enableFields($masterTable);
+							if ($DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField($masterTable,$theField,$this->dataArr[$theField], 'AND pid IN ('.$recordTestPid.')'.$Where.$whereef,'','','1'))	{
 								if (!$recExist || $DBrows[0][$this->conf['uidField']]!=$this->dataArr[$this->conf['uidField']])	{	// Only issue an error if the record is not existing (if new...) and if the record with the false value selected was not our self.
 									//$tempArr[]=$theField;
 									$this->failureMsg[$theField][] = $this->getFailure($theField, $theCmd, $this->metafeeditlib->getLL('error_mvalue_existed',$this->conf));
@@ -1288,8 +1190,12 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						break;
 						case 'uniqueLocal':
 						case 'uniqueInPid':
-							if ($DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField($masterTable,$theField,$this->dataArr[$theField], 'AND pid IN ('.$recordTestPid.')','','','1'))	{
-								if (!$recExist || $DBrows[0][$this->conf['uidField']]!=$this->dataArr[$this->conf['uidField']])	{	// Only issue an error if the record is not existing (if new...) and if the record with the false value selected was not our self.
+							//echo '<br>uniqueLocal';print_r($this->dataArr).$this->conf['recUid'];
+							//'<br>uniqueLocal'.print_r($this->currentArr);
+							$whereef= $GLOBALS['TSFE']->sys_page->enableFields($masterTable);
+							if ($DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField($masterTable,$theField,$this->dataArr[$theField], 'AND pid IN ('.$recordTestPid.')'.$whereef,'','','1'))	{
+
+							if (!$recExist || $DBrows[0][$this->conf['uidField']]!=$this->dataArr[$this->conf['uidField']])	{	// Only issue an error if the record is not existing (if new...) and if the record with the false value selected was not our self.
 									//$tempArr[]=$theField;
 									$this->failureMsg[$theField][] = $this->getFailure($theField, $theCmd, $this->metafeeditlib->getLL('error_value_existed',$this->conf));
 								}
@@ -1319,7 +1225,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 									$tempArr[]=$theField;
 									$this->failureMsg[$theField][] = $this->getFailure($theField, $theCmd, $this->metafeeditlib->getLL('error_value_required',$this->conf));
 								}
-								//print_r($this->dataArr);
 							}
 						break;
 						case 'atLeast':
@@ -1387,12 +1292,12 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if (count($this->failureMsg) >0) {
 			$this->failure=1;
 			if (count($tempArr)) $this->failure=implode(',',$tempArr);
-			$this->markerArray['###EVAL_ERROR###'] = $this->metafeeditlib->getLL('error_occured',$this->conf);
+			$this->markerArray['###EVAL_ERROR###'] = $this->metafeeditlib->makeErrorMarker($this->conf,$this->metafeeditlib->getLL('error_occured',$this->conf));
 		} else { 
 			$this->failure=0;
 			if (count($tempArr)) {
 			$this->failure=implode(',',$tempArr);
-			$this->markerArray['###EVAL_ERROR###'] =  $this->getFailure('_FORM', '_REQUIRED', $this->metafeeditlib->getLL('error_required',$this->conf)); //$this->metafeeditlib->getLL('error_required',$this->conf);
+			$this->markerArray['###EVAL_ERROR###'] =  $this->metafeeditlib->makeErrorMarker($this->conf,$this->getFailure('_FORM', '_REQUIRED', $this->metafeeditlib->getLL('error_required',$this->conf))); //$this->metafeeditlib->getLL('error_required',$this->conf);
 			}
 		}
 		
@@ -1434,6 +1339,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($confVal)	{
 			$funcConf = $confArr;
 			$funcConf['parentObj']=&$this;
+			//$this->logErrors('beforeCallUserFunction : '.serialize($confVal));
 			$passVar = $GLOBALS['TSFE']->cObj->callUserFunction($confVal, $funcConf, $passVar);
 		}
 		return $passVar;
@@ -1469,8 +1375,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			} 
 			
 		}
-		//print_r($this->dataArr);
-		
 		switch($conf['inputvar.']['cmd'])	{
 			case 'edit':
 				if ($conf['blogData']) {
@@ -1514,6 +1418,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			break;
 			default:
 				if ($conf['create'])	{
+
 						
 					$newFieldList = implode(',',array_intersect(explode(',',$conf['fieldList']),t3lib_div::trimExplode(',',$conf['create.']['fields'],1)));
 					$this->cObj->DBgetInsert($this->theTable, $this->thePid, $this->dataArr, $newFieldList, TRUE);
@@ -1521,6 +1426,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					if ($conf['debug.']['sql']) 
 							$conf['debug.']['debugString'].="<br/>INSERT SQL <br/>".$this->cObj->DBgetInsert($this->theTable, $this->thePid, $this->dataArr, $newFieldList, FALSE);
 					$newId = $GLOBALS['TYPO3_DB']->sql_insert_id();
+					$this->dataArr[$conf['uidField']]=$newId;
+					$this->currentArr[$conf['uidField']]=$newId;
 					$this->recUid=$newId;
 					$conf['recUid']=$this->recUid;
 					$this->markerArray['###REC_UID###'] = $this->recUid;
@@ -1550,7 +1457,13 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					}
 
 					$this->currentArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$newId);
-					$this->userProcess_alt($conf['create.']['userFunc_afterSave'],$conf['create.']['userFunc_afterSave.'],array('rec'=>$this->currentArr));
+					//die(dot);
+					//$this->logErrors('before user process uid:='.$this->dataArr[$conf['uidField']]);
+					$this->dataArr[$conf['uidField']]=$newId;
+					$this->currentArr[$conf['uidField']]=$newId;
+					$rec=array('rec'=>$this->currentArr);
+					$this->userProcess_alt($conf['create.']['userFunc_afterSave'],$conf['create.']['userFunc_afterSave.'],$rec);
+					//$this->logErrors('after user process uid:='.$this->dataArr[$conf['uidField']]);
 					$this->currentArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$newId);
 					$this->saved=1;
 				}
@@ -1828,27 +1741,30 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 */
 	function displayDeleteScreen()	{
 		$pluginId=$conf['pluginId'];
+		$content="feal : displayDeleteScreen unset content";
 		if ($this->conf['delete'])	{	// If deleting is enabled
 			$origArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,  $this->recUid);
-						
 			if (($GLOBALS['TSFE']->loginUser &&  $this->conf['requireLogin']) || ($this->aCAuth($origArr) && $this->conf['requireLogin']) || !$this->conf['requireLogin'])	{	// Must be logged in OR be authenticated by the aC code in order to delete
 					// If the recUid selects a record.... (no check here)
 					
 				if (is_array($origArr))	{
-				
+
 					if ($this->aCAuth($origArr) || $this->metafeeditlib->DBmayFEUserEdit($this->theTable,$origArr, $GLOBALS['TSFE']->fe_user->user,$this->conf['allowedGroups'],$this->conf['fe_userEditSelf'],$this->conf))	{	// Display the form, if access granted.
 						$this->markerArray['###HIDDENFIELDS###'].= '<input type="hidden" name="rU['.$pluginId.']" value="'.$this->recUid.'" />';
 						$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_DELETE_PREVIEW###', $origArr);
 					} else {	// Else display error, that you could not edit that particular record...
 						$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_NO_PERMISSIONS###');
 					}
+				} else {
+					$content='Object already deleted';
 				}
 			} else {	// Finally this is if there is no login user. This must tell that you must login. Perhaps link to a page with create-user or login information.
 				$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_AUTH###');
 			}
 		} else {
-			$content.='Delete-option is not set in TypoScript';
+			$content='Delete-option is not set in TypoScript';
 		}
+		$content=$content?$content:'No template for delete screen';
 		return $content;
 	}
 
@@ -1869,14 +1785,27 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $this->dataArr, '', TRUE, 'FIELD_', FALSE);
 			// Modif CBY to clear unset fields
 			$fArr=t3lib_div::trimexplode(',',$this->conf['fieldList']);
-    	foreach($fArr as $fN) {
-    		if (!$this->dataArr[$fN]) $markerArray['###FIELD_'.$fN.'###']='';
+			foreach($fArr as $fN) {
+				if (in_array(substr($fN,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
+				if (!$this->dataArr[$fN]) $markerArray['###FIELD_'.$fN.'###']='';
+			}
+			$action=array();
+			//<button type="submit" name="doNotSave['.$pluginId.']" value="donotsave" '.$this->caller->pi_classParam('preview-donotsave').'>'.$this->metafeeditlib->getLL("create_preview_donotsave_label",$conf).'</button>
+			//<button type="submit" name="submit['.$pluginId.']" value="preview"'.$this->caller->pi_classParam('preview-submit').'>'.$this->metafeeditlib->getLL("create_preview_submit_label",$conf).'</button>
+			//<table style="width:100%"><tr><td align="left"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div></td><td align="right"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-edit').'"></div></td></tr></table>
+			$action['DONOTSAVE']=$this->conf['disableCreate']?'':'<div class="'.$this->pi_getClassName('preview-donotsave').'" ><button type="submit" name="doNotSave['.$pluginId.']" value="donotsave" '.$this->pi_classParam('form-submit').'>'.$this->metafeeditlib->getLL("create_preview_donotsave_label",$this->conf).'</button></div>';
+			$action['PREVIEWSAVE']=$this->conf['disableCreate']?'':'<div class="'.$this->pi_getClassName('action-SAVE').'" ><button type="submit" name="submit['.$pluginId.']" value="save" '.$this->pi_classParam('form-submit').'>'.$this->metafeeditlib->getLL("create_preview_submit_label",$this->conf).'</button></div>';
+			$action['SAVE']=$this->conf['disableCreate']?'':'<div class="'.$this->pi_getClassName('action-SAVE').'" ><button type="submit" name="submit['.$pluginId.']" value="'.($this->conf['create.']['preview']?'preview':'save').'" '.$this->pi_classParam('form-submit').'>'.($this->conf['create.']['preview']?$this->metafeeditlib->getLL("create_submit_label",$this->conf):$this->metafeeditlib->getLL("create_preview_submit_label",$this->conf)).'</button></div>';
+			$action['BACK']=$conf['ajax.']['ajaxOn']?'':'<div class="'.$this->pi_getClassName('link').' '.$this->pi_getClassName('link-create-login').'"><div class="'.$this->pi_getClassName('link').' '.$this->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div></div>';
+			foreach($action as $key=>$act) {
+				$markerArray['###ACTION-'.$key.'###']=$this->conf['no_action']?'':$this->cObj->substituteMarkerArray($act,$markerArray);
 			}
 			//$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $this->dataArr, '', TRUE, 'FIELD_', $conf['general.']['xhtml']);
 			if ($conf['create.']['preview'] && !$this->previewLabel)	{$markerArray['###HIDDENFIELDS###'].= '<input type="hidden" name="preview['.$pluginId.']" value="1" />';}
 			$content = $this->cObj->substituteMarkerArray($templateCode, $markerArray);
-			// $content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($this->dataArr), $this->theTable.'_form', 'FE['.$this->theTable.']', $conf['fieldList'].$this->additionalUpdateFields);
-			$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($currentArr), $this->theTable.'_form',  'FE['.$this->theTable.']', $this->conf['edit.']['show_fields'].$this->additionalUpdateFields);
+		    //$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($this->dataArr), $this->theTable.'_form', 'FE['.$this->theTable.']', $conf['fieldList'].$this->additionalUpdateFields);
+			//$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($currentArr), $this->theTable.'_form',  'FE['.$this->theTable.']', $this->conf['edit.']['show_fields'].$this->additionalUpdateFields);
+			$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($this->dataArr), $this->theTable.'_form',  'FE['.$this->theTable.']', $this->conf['edit.']['show_fields'].$this->additionalUpdateFields);
 		} else { die('PLUGIN META FEEDIT : Create mode not allowed !');}
 		return $content;
 	}
@@ -1945,11 +1874,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		
 		//$this->markerArray['###BACK_URL###'] = "";
         // return navigation ... should this be not handled in template ... hmm ...
-		if (!$conf['no_action']) {
+		/*if (!$conf['no_action']) {
 			$this->backURL=$this->metafeeditlib->makeBackURLTypoLink($conf,$this->backURL);
 			if (!strpos($this->backURL,'?')) $this->backURL.='?';
 			$this->markerArray['###BACK_URL###'] = $this->backURL;
-		}
+		}*/
 		
 		// TOBE replaced by specific pagebrowser 
 	    if ($conf['list.']['pageSize']) $this->internal['results_at_a_time'] = $conf['list.']['pageSize']; // Number of results to show in a listing.
@@ -2012,10 +1941,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 		// CALENDAR_SETUP
 		if ($conf['list.']['calendarSearch']){			
-					  $cal=t3lib_div::makeInstance('tx_metafeedit_calendar');
-					  $cal->init($this->metafeeditlib);
-					  $cal->cObj=$this->cObj;
-					  $this->markerArray['###CALENDAR_SEARCH###']=$cal->main('', $conf,$sql);
+			$cal=t3lib_div::makeInstance('tx_metafeedit_calendar');
+			$cal->init($conf,$sql,$this->metafeeditlib,$this->cObj);
+			$this->markerArray['###CALENDAR_SEARCH###']=$cal->main('', $conf,$sql);
 		}
 		
 		// Group by calculations
@@ -2103,7 +2031,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT));
 	    if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList rows',$GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT)),$DEBUG);
-		//echo $GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT));
 
  		$tpl=$this->prepareListTemplates($conf,&$this->markerArray,$exporttype);
 
@@ -2354,7 +2281,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	$content=$this->cObj->substituteMarker($content,'###ACTIONS-LIST-BOTTOM###',$this->metafeeditlib->getListBottomActions($conf,$this));
 
     // AS Search replace
-		//new_url is set with the current url and with cmd = create , rU = , ...
+	//new_url is set with the current url and with cmd = create , rU = , ...
     if ($conf['list.']['advancedSearch']) {
         $fields=$conf['list.']['advancedSearchFields']?$conf['list.']['advancedSearchFields']:($conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field);
         $fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
@@ -2376,7 +2303,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
     }
   
     // AS Search end
-	if (!$num) $this->markerArray['###EVAL_ERROR###']=$this->cObj->substituteMarkerArray($this->metafeeditlib->getPlainTemplate($conf,$this->markerArray,'###TEMPLATE_EDITMENU_NOITEMS###'),$this->markerArray);
+	if (!$num) $this->markerArray['###EVAL_ERROR###']=$this->metafeeditlib->makeErrorMarker($conf,$this->cObj->substituteMarkerArray($this->metafeeditlib->getPlainTemplate($conf,$this->markerArray,'###TEMPLATE_EDITMENU_NOITEMS###'),$this->markerArray));
 	// Call to user  marker function
 	if ($conf['list.']['userFunc_afterMark']) $this->userProcess_alt($conf['list.']['userFunc_afterMark'],$conf['list.']['userFunc_afterMark.'],array($conf['list.']['whereString']));
 	//t3lib_div::callUserFunction($conf['metafeedit.']['userFunc_afterInitConf'],$conf,$this);
@@ -2426,15 +2353,18 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				if ($conf['list.']['sqlcalcfields.'][$fieldName]) {
 					$calcField=$conf['list.']['sqlcalcfields.'][$fieldName]; // TO BE IMPROVED
 					if ($calcField) {
-						if (eregi("min\(|max\(|count\(|sum\(|avg\(",$calcField)) {
+						if (preg_match("/min\(|max\(|count\(|sum\(|avg\(/i",$calcField)) {
 							// we test for group by functions
-							$sumSQLFields.=$sumSQLFields?",$calcField as sum_$fieldName":"$calcField as sum_$fieldName";
+							$sumSQLFields.=$sumSQLFields?",$calcField as 'sum_$fieldName'":"$calcField as 'sum_$fieldName'";
 						} else {
-							$sumSQLFields.=$sumSQLFields?",sum($calcField) as sum_$fieldName":"sum($calcField) as sum_$fieldName";
+							$sumSQLFields.=$sumSQLFields?",sum($calcField) as 'sum_$fieldName'":"sum($calcField) as 'sum_$fieldName'";
 						}
 					}
 				} else {
-					$sumSQLFields.=$sumSQLFields?",sum($table.$fieldName) as sum_$fieldName":"sum($table.$fieldName) as sum_$fieldName";
+				
+					$fieldAlias=$this->metafeeditlib->makeFieldAlias($table,$fieldName,$conf);
+
+					$sumSQLFields.=$sumSQLFields?",sum($fieldAlias) as 'sum_$fieldName'":"sum($fieldAlias) as 'sum_$fieldName'";
 				}
 			}
 			
@@ -2453,11 +2383,13 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			foreach ($sumFields as $fieldName){
 				// we handle a stdWrap on the Data..
 				$std=$conf[$conf['cmdmode'].'.']['stdWrap.']?$conf[$conf['cmdmode'].'.']['stdWrap.']:$conf['stdWrap.'];
-		
-				if ($std[$fieldName.'.'] || $std[$table.'.'][$fieldName.'.']) {
-					if ($std[$fieldName.'.']) $stdConf = $std[$fieldName.'.'];
-					if ($std[$table.'.'][$fieldName.'.']) $stdConf = $std[$table.'.'][$fieldName.'.'];
-						//$dataArr['EVAL_'.$_fN] = 
+				$fa=t3lib_div::trimexplode('.',$fieldName);
+				$sfn=array_pop($fa);
+				//TODO handle whole relation ...
+				if ($std[$sfn.'.'] || $std[$table.'.'][$sfn.'.'] ) {
+					if ($std[$sfn.'.']) $stdConf = $std[$sfn.'.'];
+					if ($std[$table.'.'][$sfn.'.']) $stdConf = $std[$table.'.'][$sfn.'.'];
+					//$dataArr['EVAL_'.$_fN] = 
 					$value['sum_'.$fieldName]=$this->cObj->stdWrap($value['sum_'.$fieldName], $stdConf);
 				}
 		
@@ -2509,9 +2441,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						 $FTCA=$conf['TCAN'][$FTable]['columns'];
 						 if (!is_array($FTCA)) die( "PLUGIN META FEEDIT : Rel $FTRel - $FTable has no columns !");
 						 foreach($FTCA as $key=>$val) {												
+							 if (in_array(substr($FTCA,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 							 $markerArray['###FIELD_'.$FTRel.'.'.$key.'###']='';
 							 $markerArray['###FIELD_EVAL_'.$FTRel.'.'.$key.'###']='';
 							 $markerArray['###EVAL_ERROR_FIELD_'.$FTRel.'.'.$key.'###']='';
+							 $markerArray['###EVAL_ERROR_FIELD_'.$FTRel.'_'.$key.'###']='';
 						}
 					}
 				}
@@ -2520,98 +2454,98 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		}
 	}
 
-/**
- * groupByHeader : generates Group By Header if necessary
- *
- * @return	string		HTML content
- * @see init()
- */
- 
-function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByField,&$lc,&$gc,&$i,&$pagejump,&$sql,$end=false,&$DEBUG) {
-	// group by  field handling
-	$GBmarkerArray=array();
+	/**
+	 * groupByHeader : generates Group By Header if necessary
+	 *
+	 * @return	string		HTML content
+	 * @see init()
+	 */
+	 
+	function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByField,&$lc,&$gc,&$i,&$pagejump,&$sql,$end=false,&$DEBUG) {
+		// group by  field handling
+		$GBmarkerArray=array();
 
-  $groupByFields="";
-  $gbflag=0;
-  $newGroupBy=array();
-  if ($conf['list.']['groupByFieldBreaks']) {
-  	$fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
-    foreach($fNA as $fN) {
-    	$fN2=t3lib_div::trimexplode(':',$fN);
-      $fN=$fN2[0];
-      //if ($conf['list.']['hiddenGroupByField.'][$fN]) continue;
+		$groupByFields="";
+		$gbflag=0;
+		$newGroupBy=array();
+		if ($conf['list.']['groupByFieldBreaks']) {
+			$fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
+			foreach($fNA as $fN) {
+				$fN2=t3lib_div::trimexplode(':',$fN);
+				$fN=$fN2[0];
+				//if ($conf['list.']['hiddenGroupByField.'][$fN]) continue;
 
-      $GBmarkerArray['###GROUPBY_'.$fN.'###']="";
-      if (($groupBy[$fN]!=$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN] || $end)  && !$conf['list.']['hiddenGroupByField.'][$fN]) {
-				// Group by field change !
-				$GBmarkerArray['###FOOTERSUM_'.$fN.'_FIELD_metafeeditnbelts###']='';
-        if ($evalGroupBy[$fN]) {
-        	$GBmarkerArray['###GROUPBYFOOTER_'.$fN.'###']=$evalGroupBy[$fN]; 
-					$this->metafeeditlib->getGroupByFooterSums($conf,'FOOTERSUM',$GBmarkerArray,$fN,$sql,$groupBy,$end,$DEBUG);
-        } else {
-           $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFOOTERFIELD_'.$fN.'###','');
-        }     	
-      	$std=$menuRow[$fN];
+				$GBmarkerArray['###GROUPBY_'.$fN.'###']="";
+				if (($groupBy[$fN]!=$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN] || $end)  && !$conf['list.']['hiddenGroupByField.'][$fN]) {
+					// Group by field change !
+					$GBmarkerArray['###FOOTERSUM_'.$fN.'_FIELD_metafeeditnbelts###']='';
+					if ($evalGroupBy[$fN]) {
+						$GBmarkerArray['###GROUPBYFOOTER_'.$fN.'###']=$evalGroupBy[$fN]; 
+						$this->metafeeditlib->getGroupByFooterSums($conf,'FOOTERSUM',$GBmarkerArray,$fN,$sql,$groupBy,$end,$DEBUG);
+					} else {
+					   $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFOOTERFIELD_'.$fN.'###','');
+					}     	
+					$std=$menuRow[$fN];
 
-        // Default we get value from std group by field ...
-        if ($GrpByField[$fN]) {
-          $std=$menuRow[$GrpByField[$fN]];
-          if ($menuRow['EVAL_'.str_replace('.','_',$GrpByField[$fN])]) $std=$menuRow['EVAL_'.str_replace('.','_',$GrpByField[$fN])];
-        }
-        
-				// stdWrap on group by.		
-				$_fN=str_replace('.','_',$fN);
-        if ($conf['list.']['groupByFields.']['stdWrap.'][$_fN.'.']) {
-         $this->cObj->start($menuRow,$this->theTable);
-         $std=$this->cObj->stdWrap($std,$conf['list.']['groupByFields.']['stdWrap.'][$_fN.'.']);
-        }
-        
-				// ??? 	
-				
-        if ($GrpByField[$fN]) {
-                $newGroupBy[$fN]=$menuRow[$GrpByField[$fN]];
-        } else {
-                $newGroupBy[$fN]=$menuRow[$fN];
-          			if ($menuRow['EVAL_'.$_fN]) $std=$menuRow['EVAL_'.$_fN];
-        }
-        
-        
-				// we set group by flag
-        $gbflag=1;
-        $GBmarkerArray['###GROUPBY_'.$fN.'###']=$std;
-				$evalGroupBy[$fN]=$std;
+					// Default we get value from std group by field ...
+					if ($GrpByField[$fN]) {
+					  $std=$menuRow[$GrpByField[$fN]];
+					  if ($menuRow['EVAL_'.str_replace('.','_',$GrpByField[$fN])]) $std=$menuRow['EVAL_'.str_replace('.','_',$GrpByField[$fN])];
+					}
+			
+					// stdWrap on group by.		
+					$_fN=str_replace('.','_',$fN);
+					if ($conf['list.']['groupByFields.']['stdWrap.'][$_fN.'.']) {
+					 $this->cObj->start($menuRow,$this->theTable);
+					 $std=$this->cObj->stdWrap($std,$conf['list.']['groupByFields.']['stdWrap.'][$_fN.'.']);
+					}
+			
+					// ??? 	
+					
+			if ($GrpByField[$fN]) {
+				$newGroupBy[$fN]=$menuRow[$GrpByField[$fN]];
+			} else {
+				$newGroupBy[$fN]=$menuRow[$fN];
+				if ($menuRow['EVAL_'.$_fN]) $std=$menuRow['EVAL_'.$_fN];
+			}
+			
+			
+					// we set group by flag
+			$gbflag=1;
+			$GBmarkerArray['###GROUPBY_'.$fN.'###']=$std;
+			$evalGroupBy[$fN]=$std;
 
-      } else {
-      		// we clear unused group bys 
-         $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFIELD_'.$fN.'###','');
-         $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFOOTERFIELD_'.$fN.'###','');
-      }
-      // We clear next group by if end of list is reached
-      if ($end) $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFIELD_'.$fN.'###','');
+		  } else {
+				// we clear unused group bys 
+			 $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFIELD_'.$fN.'###','');
+			 $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFOOTERFIELD_'.$fN.'###','');
+		  }
+		  // We clear next group by if end of list is reached
+		  if ($end) $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFIELD_'.$fN.'###','');
 
-    }
-    foreach($newGroupBy as $fN=>$val) {
-    	$groupBy[$fN]=$val;
-    }
-    
-  }
-  if ($gbflag) {
-    $groupByFields=$this->cObj->substituteMarkerArray($GBCode, $GBmarkerArray);
-    $gc++;
-    // Jump page on group by
-    if ($gc>1 && $conf['list.']['jumpPageOnGroupBy']) {
-       $pagejump=1;
-    }
-    if ($conf['list.']['groupBySize']) {
-    	$lc=$lc+$conf['list.']['groupBySize'];
-    }
-    if ($conf['list.']['no_detail']) $lc++; //MMM
+		}
+		foreach($newGroupBy as $fN=>$val) {
+			$groupBy[$fN]=$val;
+		}
+		
+	  }
+		if ($gbflag) {
+			$groupByFields=$this->cObj->substituteMarkerArray($GBCode, $GBmarkerArray);
+			$gc++;
+			// Jump page on group by
+			if ($gc>1 && $conf['list.']['jumpPageOnGroupBy']) {
+			   $pagejump=1;
+			}
+			if ($conf['list.']['groupBySize']) {
+				$lc=$lc+$conf['list.']['groupBySize'];
+			}
+			if ($conf['list.']['no_detail']) $lc++; //MMM
 
-    if ($gc>1 && $dispDir=='Right') $lc++;
-  	$i=0; // pour fin de ligne
+			if ($gc>1 && $dispDir=='Right') $lc++;
+			$i=0; // pour fin de ligne
+		}
+		return $groupByFields;
 	}
-	return $groupByFields;
-}
 
     /**
     * Creates the edit-screen for records
@@ -2619,8 +2553,8 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
     * @return	string		HTML content
     * @see init()
     */
-    function displayEditScreen()	{
-        
+	
+    function displayEditScreen()	{       
     	// We handle here Edit mode or Preview Mode
     	// Edit Mode : User can edit fields
     	// Preview Mode : user can only see fields	
@@ -2634,17 +2568,17 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
      	//$this->markerArray['###BACK_URL###'] = "";
      	
 		//We handle backurl...
-        if ($this->conf['edit.']['backPagePid'] && !$this->conf['no_action']) {
+        /*if ($this->conf['edit.']['backPagePid'] && !$this->conf['no_action']) {
             $this->backURL=$this->pi_getPageLink($this->conf['edit.']['backPagePid']);
             if (!strpos($this->backURL,'?')) $this->backURL.='?';
             $this->markerArray['###BACK_URL###'] = $this->backURL;
-        }
-	    if ($this->conf['edit'] || $this->preview || $this->conf['list'] )	{	// If editing is enabled
-    		
+        }*/
+		// If editing is enabled
+	    if ($this->conf['edit'] || $this->preview || $this->conf['list'] )	{	
 			// hack for lists in second plugin ... to be checked.., Will not work if we want to edit in second plugin ...
     		if ($this->conf['debug']) echo t3lib_div::view_array(array('Edit or preview'=>'on'));
     		$uid=$this->dataArr[$this->conf['uidField']]?$this->dataArr[$this->conf['uidField']]:$this->recUid;
-    		if ($this->conf['list.']['rUJoinField']=='uid' && $uid){
+ 			if ($this->conf['list.']['rUJoinField']=='uid' && $uid){
     			if ($this->conf['debug']) echo t3lib_div::view_array(array('UIDFIELD'=>$this->conf['uidField'].' : '.$this->recUid));
     			if ($this->conf['debug']) echo t3lib_div::view_array(array('dataArr'=>$this->dataArr[$this->conf['uidField']]));
     			$origArr = $this->metafeeditlib->getRawRecord($this->theTable,$uid,$this->conf);
@@ -2653,7 +2587,7 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
     		if ($this->conf['debug']) echo t3lib_div::view_array(array('editMode'=>'on'));
 
     		// here we handle foreign tables not the best way , we should work on join tables especially if we handle lists...
-    		//
+    		
     		if ($this->conf['foreignTables'] && is_array($origArr)) {
 				
 				//MM not implemented
@@ -2678,7 +2612,6 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 								}
 							}
 						}
-						// modif by CMD
 						else
 						{
 							// originally there only these 2 lines in this condition (if ($FTUid) )
@@ -2691,10 +2624,11 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 						$FTCA=$GLOBALS['TCA'][$FTable]['columns'];
 						//krumo ($FTCA);
 						if (is_array($FCTA))  foreach($FTCA as $key=>$val) {
-							if (in_array($FTCA,array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
+							if (in_array(substr($FTCA,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 							$this->markerArray['###FIELD_'.$FTRel.'.'.$key.'###']='';
 							$this->markerArray['###FIELD_EVAL_'.$FTRel.'.'.$key.'###']='';
 							$this->markerArray['###EVAL_ERROR_FIELD_'.$FTRel.'.'.$key.'###']='';
+							$this->markerArray['###EVAL_ERROR_FIELD_'.$FTRel.'_'.$key.'###']='';
 						} 
 					}
 					
@@ -2723,62 +2657,63 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 			// <CBY>
 			$this->markerArray['###REC_UID###']=$this->recUid;
 			//if ($GLOBALS['TSFE']->loginUser || $this->aCAuth($origArr))	{	// Must be logged in OR be authenticated by the aC code in order to edit
-			if (($GLOBALS['TSFE']->loginUser &&  $this->conf['requireLogin']) || ( $this->aCAuth($origArr)&& $this->conf['requireLogin'])||!$this->conf['requireLogin'])	{	// Must be logged in OR be authenticated by the aC code in order to edit
+			if (($GLOBALS['TSFE']->loginUser &&  $this->conf['requireLogin']) || ( $this->aCAuth($origArr)&& $this->conf['requireLogin'])||!$this->conf['requireLogin'])	{	
+				// Must be logged in OR be authenticated by the aC code in order to edit
 
-		  	// If the recUid selects a record.... (no check here)
-			if ($this->conf['debug']) echo t3lib_div::view_array(array('EDIT'=>"No login"));
+				// If the recUid selects a record.... (no check here)
+				if ($this->conf['debug']) echo t3lib_div::view_array(array('EDIT'=>"No login"));
 			
-			if (is_array($origArr) && !($this->conf['inputvar.']['BACK'] && $this->conf['inputvar.']['cameFromBlog']))	{
-				if ($this->conf['blogData']) $this->preview=1; 
-				// we check if edit or preview mode is allowed ...
-				if (!$this->conf['edit'] && !$this->preview )	{	// If editing is enabled
-					$content.='Edit-option or Preview-option is not set in TypoScript';
-					return $content;
-				}
-				
-				if ($this->conf['disableEdit'] && !$this->preview )	{	// If editing is enabled
-					$content.='Edit-option disabled and Preview-option is not set in TypoScript';
-					return $content;
-				}
-
-				if ($this->aCAuth($origArr) || $this->metafeeditlib->DBmayFEUserEdit($this->theTable,$origArr, $GLOBALS['TSFE']->fe_user->user,$this->conf['allowedGroups'],$this->conf['fe_userEditSelf'],$this->conf))	{	// Display the form, if access granted.
-				if ($this->conf['debug']) echo t3lib_div::view_array(array('EDIT'=>"User may edit"));
-					if ($this->conf['evalFunc'])	{
-						$origArr = $this->userProcess('evalFunc',$origArr);
+				// We come from ??
+				if (is_array($origArr) && !($this->conf['inputvar.']['BACK'] && $this->conf['inputvar.']['cameFromBlog']))	{
+					if ($this->conf['blogData']) $this->preview=1; 
+					// we check if edit or preview mode is allowed ...
+					if (!$this->conf['edit'] && !$this->preview )	{	// If editing is enabled
+						$content.='meta_feedit : feadminlib.inc, Edit-option is not set and Preview-option is not set in TypoScript';
+						return $content;
 					}
-					$this->markerArray = $this->setfixed($this->markerArray, $this->conf['setfixed.'], $origArr);
-					$content=$this->displayEditForm($origArr,$this->conf,$exporttype);
-				} else {
-	                // Else display error, that you could not edit that particular record...	
-				    $content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_NO_PERMISSIONS###');
-				}
-			} else { 
-				// If the recUid did not select a record, we display a menu of records. (eg. if no recUid)
-				// we check if list mode is allowed ...
-				if (!$this->conf['list'])	{	// If editing is enabled
-			     $content.='List-option is not set in TypoScript';
-					 return $content;
-				}
-				//$content=($this->conf['general.']['listMode']==2)?$this->metafeeditgrid->displayGridScreen($TABLES,$DBSELECT,$this->conf):$this->displayListScreen($TABLES,$DBSELECT,$this->conf);
-				switch($this->conf['general.']['listMode']) {
-					case 2 :
-						$content=$this->metafeeditgrid->displayGridScreen($TABLES,$DBSELECT,$this->conf);
-						break;
-					case 1 :
-						//$content=$this->metafecalendar->displayCalendarScreen($TABLES,$DBSELECT,$this->conf);
-						$cal=t3lib_div::makeInstance('tx_metafeedit_calendar');
-					  $cal->initObj($this->metafeeditlib,$this->cObj);
-						$content=$cal->displayCalendarScreen($TABLES,$DBSELECT,$this->conf);
-						break;
-					default :
-						$content=$this->displayListScreen($TABLES,$DBSELECT,$this->conf);
-				}
-				}; 
+					
+					if ($this->conf['disableEdit'] && !$this->preview )	{	// If editing is enabled
+						$content.='meta_feedit : feadminlib.inc, Edit-option disabled and Preview-option is not set in TypoScript';
+						return $content;
+					}
 
-				
-				
-				
-			} else {	// Finally this is if there is no login user. This must tell that you must login. Perhaps link to a page with create-user or login information.
+					if ($this->aCAuth($origArr) || $this->metafeeditlib->DBmayFEUserEdit($this->theTable,$origArr, $GLOBALS['TSFE']->fe_user->user,$this->conf['allowedGroups'],$this->conf['fe_userEditSelf'],$this->conf))	{	
+						// Display the form, if access granted.
+						if ($this->conf['debug']) echo t3lib_div::view_array(array('EDIT'=>"User may edit"));
+						if 	($this->conf['evalFunc'])	{
+							$origArr = $this->userProcess('evalFunc',$origArr);
+						}
+						$this->markerArray = $this->setfixed($this->markerArray, $this->conf['setfixed.'], $origArr);
+						$content=$this->displayEditForm($origArr,$this->conf,$exporttype);
+					} else {
+						// Else display error, that you could not edit that particular record...	
+						$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_NO_PERMISSIONS###');
+					}
+				} else { 
+
+					// If the recUid did not select a record, we display a menu of records. (eg. if no recUid)
+					// we check if list mode is allowed ...
+					if (!$this->conf['list'])	{	// If editing is enabled
+							$content.='List-option is not set in TypoScript';
+						 return $content;
+					}
+					//$content=($this->conf['general.']['listMode']==2)?$this->metafeeditgrid->displayGridScreen($TABLES,$DBSELECT,$this->conf):$this->displayListScreen($TABLES,$DBSELECT,$this->conf);
+					switch($this->conf['general.']['listMode']) {
+						case 2 :
+							$content=$this->metafeeditgrid->displayGridScreen($TABLES,$DBSELECT,$this->conf);
+							break;
+						case 1 :
+								//$content=$this->metafecalendar->displayCalendarScreen($TABLES,$DBSELECT,$this->conf);
+							$cal=t3lib_div::makeInstance('tx_metafeedit_calendar');
+						  $cal->initObj($this->metafeeditlib,$this->cObj);
+							$content=$cal->displayCalendarScreen($TABLES,$DBSELECT,$this->conf);
+							break;
+						default :
+							$content=$this->displayListScreen($TABLES,$DBSELECT,$this->conf);
+					}
+				}
+			} else {	
+				// Finally this is if there is no login user. This must tell that you must login. Perhaps link to a page with create-user or login information.
 				$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_AUTH###');
 			}
 		} else {
@@ -2805,14 +2740,16 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 		$back_lnk = $this->conf['typoscript.'][$pluginId.'.']['edit.']['nobackbutton']?false:($this->conf['typoscript.']['default.']['edit.']['nobackbutton']?false:true);
 
 		foreach($arr as $key) {
+			if (in_array(substr($key,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
+
 			if (!$this->markerArray['###EVAL_ERROR_FIELD_'.$key.'###']) $this->markerArray['###EVAL_ERROR_FIELD_'.$key.'###']='';
+			if (!$this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$key).'###']) $this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$key).'###']='';
 			if ( $GLOBALS['TCA'][$this->theTable]['columns'][$key]['config']['type']=='group' &&  $GLOBALS['TCA'][$this->theTable]['columns'][$key]['config']['internal_type']=='file')	{
 				if (!$this->markerArray['###EVAL_ERROR_FIELD_'.$key.'_file###']) $this->markerArray['###EVAL_ERROR_FIELD_'.$key.'_file###']='';
 			// we handle here field_file copy in field.
 			//if ($this->dataArr[$key.'_file'] and !in_array($this->dataArr[$key.'_file'],explode(',',$currentArr[$key]))) $currentArr[$key]=$currentArr[$key]?$currentArr[$key].','.$this->dataArr[$key.'_file']:$this->dataArr[$key.'_file'];
 			}
 		}
-
 		if ($this->conf['debug'])	debug('displayEditForm(): '.'###TEMPLATE_EDIT'.$this->previewLabel.'###',1);
 		$templateCode = $this->cObj->getSubpart($this->templateCode, '###TEMPLATE_EDIT'.$this->previewLabel.($exporttype?'_'.$exporttype:'').'###');
 		$failure = t3lib_div::_GP('noWarnings')?'':$this->failure;
@@ -2824,7 +2761,6 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 		//$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $currentArr, '', TRUE, 'FIELD_', $this->conf['general.']['xhtml']);
 		$markerArray['###HIDDENFIELDS###'].= '<input type="hidden" name="FE['.$this->theTable.']['.$this->conf['uidField'].']" value="'.$currentArr[$this->conf['uidField']].'" />'.($conf['blogData']?'<input type="hidden" name="cameFromBlog['.$pluginId.']" value="1" />':'');
 		if ($this->conf['edit.']['preview'] && !$this->previewLabel)	{$markerArray['###HIDDENFIELDS###'].= '<input type="hidden" name="preview['.$pluginId.']" value="1" />';}
-		
 		// Here we handle actions
 		
 		$actions =array('SAVE','DELETE','BACK', 'NEW','PDF');
@@ -2845,26 +2781,29 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 				$actionId=strtoupper($actionId);
 				$actions[]=$actionId;
 				$js='this.form.action=\''.$actionUrl.'\'; this.form.submit();';
-				$action[$actionId]='<div class="'.$this->pi_getClassName('action-'.$actionId).'"><form name="'.$actionLib.'" method="post" action=""><input type="submit" name="'.$actionLib.'['.$pluginId.']" value="'.$actionLib.'" onclick="'.$js.'" '.$this->pi_classParam('form-submit').' /></form></div>';
+				$action[$actionId]='<div class="'.$this->pi_getClassName('action-'.$actionId).'"><form name="'.$actionLib.'" method="post" action=""><button type="submit" name="'.$actionLib.'['.$pluginId.']" value="'.$actionLib.'" onclick="'.$js.'" '.$this->pi_classParam('form-submit').'>'.$actionLib.'</button></form></div>';
 			}
 		}
 		
 
 		if($this->conf['delete']) {			
-				$backURL=rawurlencode($this->metafeeditlib->makeFormTypoLink($this->conf,"&rU[$pluginId]=".$this->recUid));
-
+			//$backURL=rawurlencode($this->metafeeditlib->makeFormTypoLink($this->conf,"&rU[$pluginId]=".$this->recUid));
 			if($this->conf['delete.']['preview'] && !$this->conf['disableDelete'] && !$this->conf['disableEditDelete']) {
-				$deleteURL=$this->metafeeditlib->makeFormTypoLink($this->conf,"&cmd[$pluginId]=delete&preview[$pluginId]=1&rU[$pluginId]=".$this->recUid."&backURL[$pluginId]=".$backURL);
+				//$deleteURL=$this->metafeeditlib->makeFormTypoLink($this->conf,"&cmd[$pluginId]=delete&preview[$pluginId]=1&rU[$pluginId]=".$this->recUid."&backURL[$pluginId]=".$backURL);
+				$deleteURL=$this->metafeeditlib->makeFormTypoLink($this->conf,"&cmd[$pluginId]=delete&preview[$pluginId]=1&rU[$pluginId]=".$this->recUid);
 				$js='this.form.action=\''.$deleteURL.'\'; this.form.submit();';
-				$action['DELETE']='<div><form name="'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'" method="post" action=""><input type="submit" class="'.$this->pi_getClassName('action').' '.$this->pi_getClassName('action-DELETE').'" name="'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'['.$pluginId.']" value="'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'" onclick="'.$js.'" /></form></div>';
+				//<form name="'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'" method="post" action="">
+				$action['DELETE']='<div><button type="submit" class="'.$this->pi_getClassName('action').' '.$this->pi_getClassName('action-DELETE').'" name="'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'['.$pluginId.']" value="delete" onclick="'.$js.'">'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'</button></div>'; //</form>
 			} else if (!$this->conf['disableDelete']  && !$this->conf['disableEditDelete']) {
-				$deleteURL=$this->metafeeditlib->makeFormTypoLink($this->conf,"&cmd[$pluginId]=delete&rU[$pluginId]=".$this->recUid."&backURL[$pluginId]=".$backURL);
+				//$deleteURL=$this->metafeeditlib->makeFormTypoLink($this->conf,"&cmd[$pluginId]=delete&rU[$pluginId]=".$this->recUid."&backURL[$pluginId]=".$backURL);
+				$deleteURL=$this->metafeeditlib->makeFormTypoLink($this->conf,"&cmd[$pluginId]=delete&rU[$pluginId]=".$this->recUid);
 				$js='this.form.action=\''.$deleteURL.'\'; this.form.submit();';
-				$action['DELETE']='<div><form name="'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'" method="post" action=""><input type="submit" class="'.$this->pi_getClassName('action').' '.$this->pi_getClassName('action-DELETE').'" name="'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'['.$pluginId.']" value="'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'" onclick="'.$js.'" /></form></div>';
+				//<form name="'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'" method="post" action="">
+				$action['DELETE']='<div><button type="submit" class="'.$this->pi_getClassName('action').' '.$this->pi_getClassName('action-DELETE').'" name="'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'['.$pluginId.']" value="" onclick="'.$js.'">'.$this->metafeeditlib->getLL("edit_delete_label",$this->conf).'</button></div>'; //</form>
 			}
 		}
 	
-		$action['SAVE']=($this->conf['disableEdit']|| $this->conf['blogData'])?'':'<div class="'.$this->pi_getClassName('action-SAVE').'" ><button type="submit" name="submit['.$pluginId.']" value="save" '.$this->pi_classParam('form-submit').'>'.($this->conf['edit.']['preview']?$this->metafeeditlib->getLL("edit_submit_label",$this->conf):$this->metafeeditlib->getLL("edit_preview_submit_label",$this->conf)).'</button></div>';
+		$action['SAVE']=($this->conf['disableEdit']|| $this->conf['blogData'])?'':'<div class="'.$this->pi_getClassName('action-SAVE').'" ><button type="submit" name="submit['.$pluginId.']" value="'.($this->conf['edit.']['preview']?'preview':'save').'" '.$this->pi_classParam('form-submit').'>'.($this->conf['edit.']['preview']?$this->metafeeditlib->getLL("edit_submit_label",$this->conf):$this->metafeeditlib->getLL("edit_preview_submit_label",$this->conf)).'</button></div>';
 		// We handle Export Actions Here
 		$action['PDF']=$conf['edit.']['pdf']?$this->metafeeditexport->CreatePDFButtonDetail($conf,$conf['caller'],false,$this->recUid):'';
 		//modif OSR 2006-12-09 Add "add new" button in edit screen. onclick on the button , document reload with the create url 
@@ -2872,18 +2811,15 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 		//new_url is set with the current url and with cmd = create , rU = , 
 		
 		$js='this.form.action=\'###NEW_URL###\'; this.form.submit();';
-		$action['NEW']=($this->conf['disableCreate']||$this->conf['create.']['hide'])?'':'<div><form name="'.$this->metafeeditlib->getLL("back_label",$this->conf).'" method="post" action=""><input type="button" class="'.$this->pi_getClassName('action').' '.$this->pi_getClassName('action-NEW').'" name="'.$this->metafeeditlib->getLL("new_label",$this->conf).'['.$pluginId.']" value="'.$this->metafeeditlib->getLL("new_label",$this->conf).'" onclick="'. $js .'" /></form></div>'; 
-		//$action['BACK']='<div class="'.$this->pi_getClassName('link').' '.$this->pi_getClassName('link-back').'"><a href="###BACK_URL###">'.$this->metafeeditlib->getLL("back_label",$this->conf).'</a></div>';
+		//<form name="'.$this->metafeeditlib->getLL("back_label",$this->conf).'" method="post" action="">
+		$action['NEW']=($this->conf['disableCreate']||$this->conf['create.']['hide'])?'':'<div><button type="submit" class="'.$this->pi_getClassName('action').' '.$this->pi_getClassName('action-NEW').'" name="'.$this->metafeeditlib->getLL("new_label",$this->conf).'['.$pluginId.']" value="new" onclick="'. $js .'" />'.$this->metafeeditlib->getLL("new_label",$this->conf).'</button></div>'; //</form>
 		$js='this.form.action=\'###BACK_URL###\'; this.form.submit();';
-		//modif by CMD - on cache le lien de retour
-		//$action['BACK']='<div><form name="'.$this->metafeeditlib->getLL("back_label",$this->conf).'" method="post" action=""><input type="submit" class="'.$this->pi_getClassName('action').' '.$this->pi_getClassName('action-BACK').'" name="'.$this->metafeeditlib->getLL("back_label",$this->conf).'['.$pluginId.']" value="'.$this->metafeeditlib->getLL("back_label",$this->conf).'" onclick="'. $js .'" /></form></div>'; 
-		$action['BACK']=($back_lnk)?'<div><form name="'.$this->metafeeditlib->getLL("back_label",$this->conf).'" method="post" action=""><input type="submit" class="'.$this->pi_getClassName('action').' '.$this->pi_getClassName('action-BACK').'" name="'.$this->metafeeditlib->getLL("back_label",$this->conf).'['.$pluginId.']" value="'.$this->metafeeditlib->getLL("back_label",$this->conf).'" onclick="'. $js .'" /></form></div>':'';
-		//a href="###BACK_URL###">'.$this->metafeeditlib->getLL("back_label",$this->conf).'</a></div>';
+		//<form name="'.$this->metafeeditlib->getLL("back_label",$this->conf).'" method="post" action="">
+		$action['BACK']=($back_lnk)?'<div><button type="submit" class="'.$this->pi_getClassName('action').' '.$this->pi_getClassName('action-BACK').'" name="'.$this->metafeeditlib->getLL("back_label",$this->conf).'['.$pluginId.']" value="back" onclick="'. $js .'" />'.$this->metafeeditlib->getLL("back_label",$this->conf).'</button></div>':'';//</form>
 
 		foreach($actions as $act) {
 			$markerArray['###ACTION-'.$act.'###']=$this->conf['no_action']?'':$this->cObj->substituteMarkerArray($action[$act],$markerArray);
 		}
-
 		// End of actions
  		$content = $this->cObj->substituteSubpart($templateCode,'###TEMPLATE_BLOG###',$this->metafeeditlib->getBlogComments($templateCode,$this->theTable,$this->recUid,$this->conf));
 		if ($this->conf['blogData']) $content = $this->cObj->substituteSubpart($content,'###PREVIEWACTIONS###',$action['BACK']); ;
@@ -2892,14 +2828,13 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 		// Blog Comment Display :
 		// We handle empty fields here ..
  		if ($this->conf['preview.']['noemptyfields'] && $this->preview) {
-                        foreach($arr as $key) {
-                                if (!$currentArr[$key]) {
-
-                                        $cnt = '';
-                                        $content=$this->cObj->substituteSubpart($content, '###editITEM-'.$key.'###',$cnt);
-                                }
-                        }
-                }
+			foreach($arr as $key) {
+				if (!$currentArr[$key]) {
+					$cnt = '';
+					$content=$this->cObj->substituteSubpart($content, '###editITEM-'.$key.'###',$cnt);
+				}
+			}
+		}
 
 		if ($this->conf['edit.']['field_stdWrap.']) {
                         $this->cObj->start($currentArr,$this->theTable);
@@ -3040,7 +2975,7 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 			while(list($theField,$theValue)=each($this->conf[$this->conf['cmdKey'].'.']['evalValues.']))	{
 				$listOfCommands = t3lib_div::trimExplode(',',$theValue,1);
 				while(list(,$cmd)=each($listOfCommands))	{
-					$cmdParts = split('\[|\]',$cmd);	// Point is to enable parameters after each command enclosed in brackets [..]. These will be in position 1 in the array.
+					$cmdParts = preg_split('/\[|\]/',$cmd);	// Point is to enable parameters after each command enclosed in brackets [..]. These will be in position 1 in the array.
 					$theCmd = trim($cmdParts[0]);
 					switch($theCmd)	{
 						case 'twice':
@@ -3520,7 +3455,16 @@ function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByFie
 	function getFailure($theField, $theCmd, $label)	{
 		return isset($this->conf['evalErrors.'][$theField.'.'][$theCmd]) ? $this->conf['evalErrors.'][$theField.'.'][$theCmd] : $label;
 	}
-
+	function logErrors($msg) {
+		//die(logErrors);
+		$msg=date('j/m/y h:i:s').' : '.$msg . "\n";
+		$errfilename = "mfeediterror.log";
+		$f = fopen($errfilename, "a");
+		if($f) {
+			fwrite($f, $msg);
+			fclose($f);	
+		}
+	}
 }
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/meta_feedit/fe_adminLib.inc'])	{

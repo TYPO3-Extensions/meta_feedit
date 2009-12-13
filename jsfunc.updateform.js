@@ -70,6 +70,8 @@ function updateForm(formname,fieldname,value)	{
 				}
 			break;
 			default:
+			   fObj.value = value;
+			break;
 		}
 	}
 	else

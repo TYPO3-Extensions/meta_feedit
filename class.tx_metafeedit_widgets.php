@@ -44,13 +44,51 @@ class tx_metafeedit_widgets {
 		$this->prefixId=$prefixId;
 		$this->metafeeditLib=$metafeeditLib;
 	}
-	
+	function htmlfriendly($var){
+		$chars = array(
+        128 => '&#8364;',
+        130 => '&#8218;',
+        131 => '&#402;',
+        132 => '&#8222;',
+        133 => '&#8230;',
+        134 => '&#8224;',
+        135 => '&#8225;',
+        136 => '&#710;',
+        137 => '&#8240;',
+        138 => '&#352;',
+        139 => '&#8249;',
+        140 => '&#338;',
+        142 => '&#381;',
+        145 => '&#8216;',
+        146 => '&#8217;',
+        147 => '&#8220;',
+        148 => '&#8221;',
+        149 => '&#8226;',
+        150 => '&#8211;',
+        151 => '&#8212;',
+        152 => '&#732;',
+        153 => '&#8482;',
+        154 => '&#353;',
+        155 => '&#8250;',
+        156 => '&#339;',
+        158 => '&#382;',
+        159 => '&#376;');
+		$var = str_replace(array_map('chr', array_keys($chars)), $chars, htmlentities(stripslashes($var),ENT_QUOTES));
+
+		return $var;
+
+	}
+	function htmlfriendly2($var){
+		$chars = array(
+ 		10 => '',
+		39 => '\u0027');
+		return str_replace(array_map('chr', array_keys($chars)), $chars,$var);
+	}
+
 	function comboList($prefix='',$id='',$val='',$onChange='',$onSelect='',$label='',$pagesize=10,&$conf,$FN) {
 		$advancedSearch=$conf['inputvar.']['advancedSearch'];	
 		$prefix=$prefix?$prefix:'combolist-';
 	    $id=$id?$id:$conf['pluginId'].$FN;
-		//print_r($advancedSearch);
-		// modif by CMD
 		if(strpos($FN, '.') !== false) {
 			$curTable = $this->metafeeditLib->getForeignTableFromField($FN, $conf,'',array());
 			$table=$curTable['relTable'];
@@ -59,7 +97,6 @@ class tx_metafeedit_widgets {
 			$table=$conf['table'];
 			$FieldN=$FN;
 		}
-		// end modif by CMD
 		$val=$advancedSearch[$FN];
 		$name=$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']';
 		$callBacks=$onChange.','.$onSelect;
@@ -67,11 +104,8 @@ class tx_metafeedit_widgets {
 		$onMouseOut =' onmouseout="combolistmouseout(\''.$prefix.$id.'\');"';
 		$onFocus=' onmouseover="combolistmouseover(\''.$prefix.$id.'\');"';
 		$onBlur =' onmouseout="combolistmouseout(\''.$prefix.$id.'\');"';
-		//$table=$conf['table'];
-		//$whereClause= $this->metafeeditLib->getWhereClause(0,$table,$FN,array(),$conf);
 		$whereClause= $this->metafeeditLib->getWhereClause(0,$table,$FieldN,array(),$conf);
-    //$foreignTable = $conf['TCAN'][$table]['columns'][$FN]["config"]["allowed"]?$conf['TCAN'][$table]['columns'][$FN]["config"]["allowed"]:$conf['TCAN'][$table]['columns'][$FN]["config"]["foreign_table"];
-    $foreignTable = $conf['TCAN'][$table]['columns'][$FieldN]["config"]["allowed"]?$conf['TCAN'][$table]['columns'][$FieldN]["config"]["allowed"]:$conf['TCAN'][$table]['columns'][$FieldN]["config"]["foreign_table"];
+		$foreignTable = $conf['TCAN'][$table]['columns'][$FieldN]["config"]["allowed"]?$conf['TCAN'][$table]['columns'][$FieldN]["config"]["allowed"]:$conf['TCAN'][$table]['columns'][$FieldN]["config"]["foreign_table"];
 		$fields=$conf['list.']['advancedSearchAjaxSelector.'][$FN.'.']['dataFields']?$conf['list.']['advancedSearchAjaxSelector.'][$FN.'.']['dataFields']:''; //TODO
 		$keyField=''; //TODO
 		$labelField=$conf['list.']['advancedSearchAjaxSelector.'][$FN.'.']['labelField']?$conf['list.']['advancedSearchAjaxSelector.'][$FN.'.']['labelField']:$conf['TCAN'][$foreignTable]['ctrl']['label'];
@@ -107,7 +141,7 @@ class tx_metafeedit_widgets {
 		                        <input type=\"hidden\" id=\"cl_n$prefix$id\" name=\"$name\" value=\"$val\"/>
 		                    </td>
 		                    <td>		  
-		                        <span id=\"cl_arrow_$prefix$id\" class=\"wdgt_arr\" $onArrowClick $onMouseOut>&nbsp;</span>
+		                        <span id=\"cl_arrow_$prefix$id\" class=\"wdgt_arr\" $onArrowClick $onMouseOut><i>&nbsp;</i></span>
 		                        <span id=\"cl_logo_$prefix$id\" class=\"wdgt_logo\"><i>&nbsp;</i></span>
 		                    </td>
 		                 </tr>
@@ -144,57 +178,61 @@ class tx_metafeedit_widgets {
 		$callBacksArr=t3lib_div::trimexplode(',',$callbacks);
 		
 		// We get the rows here
-		$json='{';
-		
+		//$json='{';
+		$json=array();
 		if ($callBacksArr[0] && $mode!=3) {
 			$comboData=call_user_func_array(array($handler,$callBacksArr[0]),array($search,$page,$pagesize,$table,$labelField,$numField,$fields,$whereField));
 			if (is_array($comboData))		{
 				$nbpages=ceil($comboData['nbrows']/$pagesize);
 				$c=count($callBacksArr);
-				$json.='"cbs":[';
+				$json['cbs']=array();
 				foreach($callBacksArr as $cb) {
 					$c--;
-					$json.='{"id":"'.$cb.'"}'.($c?',':'');
+					$json['cbs'][]=array('id'=>$cb);
 				}
-				$json.=']';
-				$json.=',"prefix":"'.$prefix.'"';
-				$json.=',"idwidget":"'.$idwidget.'"';
-				$json.=',"pagesize":'.($pagesize?$pagesize:0);
-				$json.=',"nbpages":'.($nbpages?$nbpages:0);
-				$json.=',"page":'.($page?$page:0);
-
-				$json.=',"ls":[';
+				$json['prefix']=$prefix;
+				$json['idwidget']=$idwidget;
+				$json['pagesize']=($pagesize?$pagesize:0);
+				$json['nbpages']=($nbpages?$nbpages:0);
+				$json['page']=($page?$page:0);
+				$json['ls']=array();
 				if (is_array($comboData['labels'])){
 					$c=count($comboData['labels']);
 					foreach($comboData['labels'] as $label) {
 						$c--;
-						$json.='{"l":"'.$label.'"}'.($c?',':'');
+						$json['ls'][]=array('l'=>$label);
 					}
 				}
-				$json.=']';
-				$json.=',"rs":[';
+				$json['rs']=array();
 				
 				//contenu des données
 				if (is_array($comboData['rows'])) {
 					$c=count($comboData['rows']);
 					foreach($comboData['rows'] as $i) {
-						$json.='{';
 						$row=$i['row'];
 						$cf = count($row);
-						$json.='"id":"'.$i['id'].'","d":"'.addslashes($i['data']).'"'.($cf?',':'');
-
+						$rs=array();
+						$rs['id']=$i['id'];
+						$rs['d']=$this->htmlfriendly2($i['data']);
+						//$rs['d']=str_replace("\n",'',$this->htmlfriendly2($i['data']));
+						
+						//$rs['d']=addslashes($this->htmlfriendly($i['data']));
+						
 						foreach($row as $key=>$field) {
 							$cf--;
-							$json.='"i'.$key.'":"'.addslashes($field).'"'.($cf?',':'');
+							//$rs['i'.$key]=str_replace('&','&amp;',$this->htmlfriendly2($field));
+							$rs['i'.$key]=$this->htmlfriendly2($field);
+							//$json.='"i'.$key.'":"'.addslashes($field).'"'.($cf?',':'');
+						
 						}
+						$json['rs'][]=$rs;
 						
 						$c--;
-						$json.='}'.($c?',':'');
 					}	
 				}
-				$json.=']';
 			}
-			$json.='}';
+			//$json=json_encode($json);
+			$json=json_encode($json);
 		}
 		
 		// We call the setData ...We have hit enter ...
@@ -208,13 +246,13 @@ class tx_metafeedit_widgets {
 			$objResponse->addAssign('cl_i'.$idcombo, 'value', $tdata);
 			$objResponse->addAssign('cl_k'.$idcombo, 'value', $id);
 			$objResponse->addAssign('cl_n'.$idcombo, 'value', $id);
-			$objResponse->addAssign('cl_logo_'.$idcombo, 'className', '');
+			$objResponse->addAssign('cl_logo_'.$idcombo, 'className', 'wdgt_logo');
 			$objResponse->addScript("document.getElementById('cl_res_$idcombo').style.display='none';");
 		} else {
 			$fireback =  "combolistfireback('$idcombo', $pagesize,'$idwidget','$prefix','$callbacks',$eventdata,'$table','$labelField','$numField','$whereField','$orderBy','$fields');";
 			$objResponse->addScript('combolistdraw(\''.$json.'\');');
 			$objResponse->addScript($fireback);
-			$objResponse->addScript("document.getElementById('cl_logo_$idcombo').className='';");
+			$objResponse->addScript("document.getElementById('cl_logo_$idcombo').className='wdgt_logo';");
 		}
 	}
 }

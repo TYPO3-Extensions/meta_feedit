@@ -21,7 +21,7 @@ meta_feedit_ajax.10 {
    template.file = typo3conf/ext/meta_feedit/res/indexajax.html
 	 workOnSubpart = DOCUMENT_BODY
 	 subparts {
-    DOCUMENT_CONTENU < styles.content.get
+    DOCUMENT_CONTENT < styles.content.get
 	 }
 }
 

@@ -149,11 +149,12 @@ class tx_metafeedit_lib {
 					$ret[] = $theField;
 				}
 			}
+			//TODO  handle user function on overrides ?
 			return $ret;
 		}
 
 		/**
-		* [Describe function...]
+		* getOverrideValue
 		*
 		* @param [type]  $fN: ...
 		* @param [type]  $cmd: ...
@@ -166,8 +167,12 @@ class tx_metafeedit_lib {
 			$data = "";
 			if (is_array($conf[$cmd.'.']['overrideValues.'])) {
 				$theValue = $conf[$cmd.'.']['overrideValues.'][$fN];
-				$data = $theValue;				
-				if (strpos($theValue, '.') > 0) {
+				$data = $theValue;	
+				if (strpos($theValue, ':') > 0) {
+					$data = $this->getData($theValue, 0, $cObj);
+					return $data;
+				}
+				elseif (strpos($theValue, '.') > 0) {
 					//here we handle special values ...
 					$fieldArr = explode('.', $theValue);
 					$data = "";
@@ -294,48 +299,81 @@ class tx_metafeedit_lib {
 	 * @param	[type]		$arr: ...
 	 * @return	[type]		...
 	 */
-   function keepVars($path,$arr) {
-   	if (is_array($arr)) {
-   		$res='';
-   		foreach($arr as $key=>$val) {
-   			$res.=$this->keepVars($path."[$key]",$val);
-   		}
-   		return $res;
-   	} else {
-
-   		return $this->is_extent($arr)?$path."=".htmlspecialchars($arr):'';
-  	}
-   }
-// LIENS
-
-		function makeBackURLTypoLink(&$conf,$params) {
-			if ($conf['backPagePid'] ) {
-				//$this->backURL=$caller->pi_linkTP_keepPIvars_url(array(),0,0,$this->conf['backPagePid']);
-				//$prma=$param;
-				$tlconf['parameter']=$conf['backPagePid'];
-				if ($conf['no_cache'] || $conf['cacheMode']==0) $tlconf['no_cache']=1;
-				$tlconf['useCacheHash']=1;
-				//$tlconf['additionalParams']=$params;
-				//$pl=$this->pi_getPageLink($formid,'',$prma);//,,$this->nc.$this->conf['addParams']);
-				$pl=$this->cObj->typoLink_URL($tlconf);
-			} else {
-				if ($params) {
-					$pl=$params;
-				} else {
-					$pl="javascript:history.back();";
-				}
+	function keepVars($path,$arr) {
+		if (is_array($arr)) {
+			$res='';
+			foreach($arr as $key=>$val) {
+				$res.=$this->keepVars($path."[$key]",$val);
 			}
-			return $pl;
+			return $res;
+		} else {
+
+			return $this->is_extent($arr)?$path."=".htmlspecialchars($arr):'';
 		}
+	}
+
+	// LINKS
+	/**
+	* makeBackURLTypoLink : makes Back button URL Link. 
+	* If in List Mode we go back to BackPID if specified, to passed Link
+	* If in Edit, Preview or Create mode we should go ack to list mode first if configuration allows it, otherwise to referer
+	* If in Edit Preview or Create preview, back should bring us to the Edit or Create Screen if possible, to referer otherwise
+	* If in Save confirmation or Create confirmation or Delete Confirmation, back should bring us to the calling Edit or List Screen if possible, to referer otherwise
+	* @param	array		$conf: configuration array
+	* @param	string		$referer: default link
+	* @return	string		backURL link
+	*/
+	function makeBackURLTypoLink(&$conf,$referer) {
+	    //echo "<br>makeBackURLTypoLink forced : $conf[forcedCmd], default: $conf[defaultCmd], input:".$conf['inputvar.']['cmd'].', mode:'.$conf['cmdmode'].', key:'.$conf['cmdley'];
+		switch ($conf['inputvar.']['cmd']) {
+			case 'create' :			
+				//if($conf['create'] && !$conf['disableCreate'] && !$conf['create.']['hide']) {
+				//$backurl=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$conf['GLOBALPARAMS']);
+			case 'delete' :			
+				//if($conf['create'] && !$conf['disableCreate'] && !$conf['create.']['hide']) {
+				//$backurl=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$conf['GLOBALPARAMS']);
+			case 'edit' :
+				/*if (!$conf['disableDelete'] && !$conf['disableEditDelete'] && !$conf['delete.']['hide']) {
+					$backurl=$this->makeFormTypoLink($conf,"&rU[$pluginId]=".$conf['recUid']);
+				}
+				if (($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit'] ) {
+					$backurl=$this->makeFormTypoLink($conf,"");
+				};
+				if ($conf['blog.']['showComments'] ) {
+				//$backurl=$this->makeFormTypoLink($conf,"");
+				}
+				if ($conf['TCAN'][$conf['table']]['ctrl']['sortby'] && !$conf['disableEdit']) {
+				//$backurl=$this->makeFormTypoLink($conf,"&rU[$pluginId]=".$conf['recUid']);
+				}*/
+				$backLink=$this->makeFormTypoLink($conf,'&BACK['.$conf[pluginId].']=1&cmd['.$conf[pluginId].']=list',false);
+				break;
+			case 'list':
+			default :
+				if ($conf['backPagePid'] ) {
+					$tlconf['parameter']=$conf['backPagePid'];
+					if ($conf['no_cache'] || $conf['cacheMode']==0) $tlconf['no_cache']=1;
+					$tlconf['useCacheHash']=1;
+					$backLink=$this->cObj->typoLink_URL($tlconf);
+				} else {
+					if ($referer) {
+						$backLink=$referer;
+					} else {
+						$backLink="javascript:history.back();";
+					}
+				}
+		}
+		//echo "<br>makeBackURLTypoLink : $backLink";
+		return $backLink;
+	}
 
 	/**
-	 * [Describe function...]
+	 * makeFormTypoLink
 	 *
 	 * @param	[type]		$$conf: ...
 	 * @param	[type]		$params: ...
 	 * @return	[type]		...
 	 */
-		function makeFormTypoLink(&$conf,$params) {
+		function makeFormTypoLink(&$conf,$params,$hsc=true) {
 			$formid=$GLOBALS['TSFE']->id;
 			if ($conf['createPid']) {$formid=$conf['createPid']; }
 			if ($conf['editPid'] && $conf['inputvar.']['cmd']=='edit') { $formid=$conf['editPid']; }
@@ -346,13 +384,16 @@ class tx_metafeedit_lib {
 			$tlconf['additionalParams']=$params;
 			$pl=$this->cObj->typoLink_URL($tlconf);
 			if (!strpos($pl,'?')) $pl.='?';
-			$pl=$this->hsc($conf,$pl);
+			$pl=$hsc?$this->hsc($conf,$pl):$pl;
 			return $pl;
 		}
 
+		function makeErrorMarker(&$conf,$errorMsg) {
+			return '<div'.$conf['caller']->pi_classParam('error-cnt').'>'.$errorMsg.'</div>';
+		}
 
 		Function enleveaccents($chaine) {
-			$string = strtr($chaine, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");
+			$string = strtr($chaine, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
 			return $string;
 		}
 
@@ -622,39 +663,40 @@ class tx_metafeedit_lib {
 	/* Group By Field Break Footer ...
 	*/
 	function getGroupByFooterSums(&$conf,$prefix,&$GBMarkerArray,$fN,&$sql,&$row,$end,&$DEBUG) {
-			$sumFields = '';
-			$sumSQLFields = '';
-			$somme = 0;
-			$sumFields = explode(',', $conf['list.']['sumFields']);
-			if ($conf['list.']['sumFields']) {
-				foreach($sumFields as $fieldName) {
-					if ($conf['list.']['sqlcalcfields.'][$fieldName]) {
-						$calcField=$conf['list.']['sqlcalcfields.'][$fieldName]; // TO BE IMPROVED
-						if ($calcField) {				
-							if (eregi("min\(|max\(|count\(|sum\(|avg\(",$calcField)) {
-								// we test for group by functions
-								$sumSQLFields.=$sumSQLFields?",$calcField as sum_$fieldName":"$calcField as sum_$fieldName";
-							} else {
-								$sumSQLFields.=$sumSQLFields?",sum($calcField) as sum_$fieldName":"sum($calcField) as sum_$fieldName";
-							}
+		$sumFields = '';
+		$sumSQLFields = '';
+		$somme = 0;
+		$sumFields = explode(',', $conf['list.']['sumFields']);
+		if ($conf['list.']['sumFields']) {
+			foreach($sumFields as $fieldName) {
+				if ($conf['list.']['sqlcalcfields.'][$fieldName]) {
+					$calcField=$conf['list.']['sqlcalcfields.'][$fieldName]; // TO BE IMPROVED
+					if ($calcField) {				
+						if (preg_match("/min\(|max\(|count\(|sum\(|avg\(/i",$calcField)) {
+							// we test for group by functions
+							$sumSQLFields.=$sumSQLFields?",$calcField as sum_$fieldName":"$calcField as sum_$fieldName";
+						} else {
+							$sumSQLFields.=$sumSQLFields?",sum($calcField) as 'sum_$fieldName'":"sum($calcField) as 'sum_$fieldName'";
 						}
-					}	
-					else
-					{
-						// CMD - we must handle here sum of relation table (actualy fieldName is like : foreignField.field in place of foreignTable_foreignField.field)
-							$sumSQLFields.=$sumSQLFields?",sum($fieldName) as sum_$fieldName":"sum($fieldName) as sum_$fieldName";
-	
-					}				
-				}
+					}
+				}	
+				else
+				{
+					// CMD - we must handle here sum of relation table (actualy fieldName is like : foreignField.field in place of foreignTable_foreignField.field)
+					$fieldAlias=$this->makeFieldAlias($table,$fieldName,$conf);
+					$sumSQLFields.=$sumSQLFields?",sum($fieldAlias) as 'sum_$fieldName'":"sum($fieldAlias) as 'sum_$fieldName'";
+
+				}				
 			}
-			$sumSQLFields.=$sumSQLFields?', count(*) as metafeeditnbelts':' count(*) as metafeeditnbelts';
-			if ($sql['groupBy']) $sumSQLFields.=','.$conf['table'].'.*';
-			$WHERE=$sql['where'];
-		 	$fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
-		 	$i=0;
-		 	//$GBA=t3lib_div::trimexplode(',',$sql['gbFields']);
-			$GROUPBY=$sql['groupBy'];
-			$endgb=0;
+		}
+		$sumSQLFields.=$sumSQLFields?', count(*) as metafeeditnbelts':' count(*) as metafeeditnbelts';
+		if ($sql['groupBy']) $sumSQLFields.=','.$conf['table'].'.*';
+		$WHERE=$sql['where'];
+		$fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
+		$i=0;
+		//$GBA=t3lib_div::trimexplode(',',$sql['gbFields']);
+		$GROUPBY=$sql['groupBy'];
+		$endgb=0;
 	    foreach($fNA as $fNe) {
 	    	
 		    $fN2=t3lib_div::trimexplode(':',$fNe);
@@ -669,7 +711,7 @@ class tx_metafeedit_lib {
 							*/
 							if (!$endgb) {
 					    	$GROUPBY=$GROUPBY?$GROUPBY.','.$fN2[0]:$fN2[0];
-					    	$HAVING=$HAVING?$HAVING." and $fN2[0]=".$row[$fNi]:" HAVING $fN2[0]=".$row[$fNi];
+					    	$HAVING=$HAVING?$HAVING." and $fN2[0]='".$row[$fNi]."'":" HAVING $fN2[0]='".$row[$fNi]."'";
 					    }
 					} else {
 				    if (strpos($fNi,'.')===false && $row[$fNi]) {
@@ -695,33 +737,31 @@ class tx_metafeedit_lib {
 			}
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($sumSQLFields, $sql['fromTables'], '1 '.$WHERE.$GROUPBY.$HAVING);		
 	  	if ($conf['debug.']['sql']) $this->debug('Group by footer',$GLOBALS['TYPO3_DB']->SELECTquery($sumSQLFields, $sql['fromTables'], '1 '.$WHERE.$GROUPBY.$HAVING),$DEBUG);
-			$value=array();
-	        while($valueelt = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-    	    	foreach($valueelt as $key=>$val) {
-    	    		$value[$key]+=$val;
-    	    		if ($key=='metafeeditnbelts') break;
-    	    	}
-	        }
-			foreach ($sumFields as $fieldName){
-				// we handle a stdWrap on the Data..
-				$std=$conf[$conf['cmdmode'].'.']['stdWrap.']?$conf[$conf['cmdmode'].'.']['stdWrap.']:$conf['stdWrap.'];
-		
-				if ($std[$fieldName.'.'] || $std[$table.'.'][$fieldName.'.']) {
-					if ($std[$fieldName.'.']) $stdConf = $std[$fieldName.'.'];
-					if ($std[$table.'.'][$fieldName.'.']) $stdConf = $std[$table.'.'][$fieldName.'.'];
-						//$dataArr['EVAL_'.$_fN] = 
-					$value['sum_'.$fieldName]=$this->cObj->stdWrap($value['sum_'.$fieldName], $stdConf);
-				}
-		
-			 $GBMarkerArray["###".$prefix."_".$fN."_FIELD_$fieldName###"]= $value['sum_'.$fieldName];
-			 //$i++;
+		$value=array();
+		while($valueelt = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			foreach($valueelt as $key=>$val) {
+				$value[$key]+=$val;
+				if ($key=='metafeeditnbelts') break;
 			}
+		}
 			
-			 $GBMarkerArray["###".$prefix."_".$fN."_FIELD_metafeeditnbelts###"]= $value['metafeeditnbelts'];
+		foreach ($sumFields as $fieldName){
+			// we handle a stdWrap on the Data..
+			$fns=t3lib_div::trimexplode('.',$fieldName);
+			$fnn=array_pop($fns);
+			$std=$conf[$conf['cmdmode'].'.']['stdWrap.']?$conf[$conf['cmdmode'].'.']['stdWrap.']:$conf['stdWrap.'];
+			if ($std[$fnn.'.'] || $std[$table.'.'][$fnn.'.']) {
+				if ($std[$fnn.'.']) $stdConf = $std[$fnn.'.'];
+				if ($std[$table.'.'][$fnn.'.']) $stdConf = $std[$table.'.'][$fnn.'.'];
+				$value['sum_'.$fieldName]=$this->cObj->stdWrap($value['sum_'.$fieldName], $stdConf);
+			}
+	
+			$GBMarkerArray["###".$prefix."_".$fN."_FIELD_$fieldName###"]= $value['sum_'.$fieldName];
+		 //$i++;
+		}
 			
-			//$sumcontent=$this->cObj->stdWrap(trim($this->cObj->substituteMarkerArray($itemSumCode, $this->markerArray)),$conf['list.']['sumWrap.']);
-			//$content=$this->cObj->substituteSubpart($content,'###SUM_FIELDS###',$sumcontent);
-		//}
+		$GBMarkerArray["###".$prefix."_".$fN."_FIELD_metafeeditnbelts###"]= $value['metafeeditnbelts'];
+			
 		return true;
 	}
 
@@ -1328,9 +1368,12 @@ class tx_metafeedit_lib {
 	* @return	array		processed data array
 	*/
 	
-	function user_processDataArray($content, &$inconf,$intable='') {
+	function user_processDataArray($content, &$inconf,$intable='',$forceInConf=FALSE) {
+		
 		$fe_adminLib = &$inconf['parentObj'];
-		$conf = $fe_adminLib->conf;
+		//echo "forceInConf $forceInConf";
+		$conf = $forceInConf?$inconf:$fe_adminLib->conf;
+		
 		$dataArr = $content;
 		$table = $intable?$intable:$fe_adminLib->theTable;
 		// if stdWraps are defined we iniatialize the data array for dataWrap ...
@@ -1338,7 +1381,8 @@ class tx_metafeedit_lib {
 			$this->cObj->start(count($dataArr)?$dataArr:array(), $table);
 		}
 		foreach((array)$dataArr as $fN => $value) {
-		    //special fields not to handle 
+		    if (in_array(substr($fN,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
+			//special fields not to handle 
 		    if ($fN=='tx_metafeedit_dont_ctrl_checkboxes') continue;
 			//ugly hack by CMD
 		    if ($fN=='sorting') continue;
@@ -1365,6 +1409,10 @@ class tx_metafeedit_lib {
     				}
     				if (in_array('date',$evals) && !empty($dataArr[$fN])) {
     				    $values = strftime(($conf['dateformat']?$conf['dateformat']:($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y')),$dataArr[$fN]);
+
+    				}
+					if (in_array('time',$evals) && !empty($dataArr[$fN])) {
+    				    $values = strftime('%H:%M',$dataArr[$fN]);
 
     				}
     				else if(in_array('datetime',$evals) && !empty($dataArr[$fN])) {
@@ -1465,8 +1513,11 @@ class tx_metafeedit_lib {
     							} else {
     								// here must use cObject IMAGE
     								$imgA=array();
-									$imgA['file.']['maxW'] = 100;
-									$imgA['file.']['maxH'] = 100;
+									//$imgA['file.']['maxW'] = 100;
+									$imgA['file.']['maxH'] = 50;
+									//$imgA['file.']['width'] = 100;
+									$imgA['file.']['height'] = '50c';
+
     
 									if ($conf[$conf['cmdmode'].'.']['imgConf.'][$fN.'.'] || $conf['imgConf.'][$fN.'.'])	$imgA=$conf[$conf['cmdmode'].'.']['imgConf.'][$fN.'.']?$conf[$conf['cmdmode'].'.']['imgConf.'][$fN.'.']:$conf['imgConf.'][$fN.'.'];
 										if (!$imgA['file'] ) $imgA['file'] = $imgT;
@@ -1562,14 +1613,13 @@ class tx_metafeedit_lib {
 							$this->cObj->start($resRow, $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']);
 							$resLabel = $resRow[$label];
 							$resLabel_alt = $resRow[$label_alt];
-							/*
 							if ($statictable) {
 								$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
 								$resLabel = $this->getLL('language_'.$code, $conf);
 								if (!$resLabel ) {
 									$resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset);
 								}
-							}*/
+							}
 							$resLabel = $this->cObj->stdWrap($resLabel, $conf['evalWrap.'][$fN.'.']);
 							$resLabel_alt = $this->cObj->stdWrap($resLabel_alt, $conf['evalWrap.'][$fN.'.']);
 							$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
@@ -1695,8 +1745,11 @@ class tx_metafeedit_lib {
 			$overrideuids=tx_metafeedit_lib::getOverrideValue($fN,$fe_adminLib->cmd,$fe_adminLib->conf,$fe_adminLib->cObj);
 			if ($overrideuids) $dataArr[$fN]=$overrideuids;
 			}*/
-
 			foreach((array)$dataArr as $fN => $value) {
+				if (in_array(substr($fN,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) {
+					unset($dataArr[$fN]);
+					continue;
+				}
 				switch((string)$conf['TCAN'][$table]['columns'][$fN]['config']['type']) {
 					case 'group':
 					// we need to update the additional field $fN.'_file'.
@@ -1735,7 +1788,7 @@ class tx_metafeedit_lib {
 					// Example: if default value is now+30 we transform it into a timestamp representing the day 30 days from today
 					$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$table]['columns'][$fN]['config']['eval']);
 					
-					if ((in_array('date',$evals) || in_array('datetime',$evals)) && substr($fe_adminLib->conf[$fe_adminLib->conf['cmdKey']."."]["defaultValues."][$fN], 0, 3) == 'now'/* && empty($dataArr[$fN])*/) {
+					if ((in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) && substr($fe_adminLib->conf[$fe_adminLib->conf['cmdKey']."."]["defaultValues."][$fN], 0, 3) == 'now'/* && empty($dataArr[$fN])*/) {
 					$dataArr[$fN] = time() + 24 * 60 * 60 * intval(substr($fe_adminLib->conf[$fe_adminLib->conf['cmdKey']."."]["defaultValues."][$fN], 3));
 				}
 				break;
@@ -1868,16 +1921,20 @@ class tx_metafeedit_lib {
 	// Handling INCOMING VARIABLES !!!
 	// All variables must be indexed on pluginID !!! to avoid problems when 2 plugins are put in same page.
 	// Variable priorites are :
-	// Typoscript
-	// POST
-	// GET
+	// pluginid Typoscript
+	// default typoscript
+	// piVars
+	// POST //dangerous ...
+	// GET  // dangerous ...
+	// session (only if $keepvar true).
+	
 	function getMetaFeeditVar(&$conf,$varname,$keepvar=false) {
 		$pluginId=$conf['pluginId'];
 		$piVars=$conf['piVars'];
 		$typoscript=$conf['typoscript.'];
-  
+		//$res=array();
 		if ($keepvar) {
-		  // we look into session vars
+			// we look into session vars
 			$vars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
 			$vars=$vars[$GLOBALS['TSFE']->id];
 			if (is_array($vars[$pluginId])) $res[$pluginId]=$vars[$pluginId][$varname];
@@ -2092,7 +2149,8 @@ class tx_metafeedit_lib {
 			$pluginId=$conf['pluginId'];
 			$fe_adminLib->templateCode = $fe_adminLib->conf['templateContentOptions'];
 			$fe_adminLib->templateCode = $this->replaceOptions($fe_adminLib->templateCode, $fe_adminLib->conf, 'edit', $fe_adminLib->conf['table'], $content['rec'][$conf['uidField']]);
-			$fe_adminLib->markerArray['###HIDDENFIELDS###'] = '<input type="hidden" name="cmd['.$pluginId.']" value="'.htmlspecialchars('edit').'" />'. ($fe_adminLib->authCode?'<input type="hidden" name="aC['.$pluginId.']" value="'.htmlspecialchars($fe_adminLib->authCode).'" />':''). ($fe_adminLib->backURL?'<input type="hidden" name="backURL['.$pluginId.']" value="'.htmlspecialchars($fe_adminLib->backURL).'" />':'').($fe_adminLib->conf['blogData']?'<input type="hidden" name="cameFromBlog['.$pluginId.']" value="1" />':'');
+			$fe_adminLib->markerArray['###HIDDENFIELDS###'] = '<input type="hidden" name="cmd['.$pluginId.']" value="'.htmlspecialchars('edit').'" />'. ($fe_adminLib->authCode?'<input type="hidden" name="aC['.$pluginId.']" value="'.htmlspecialchars($fe_adminLib->authCode).'" />':'').($fe_adminLib->conf['blogData']?'<input type="hidden" name="cameFromBlog['.$pluginId.']" value="1" />':'');
+			//$fe_adminLib->markerArray['###HIDDENFIELDS###'] = '<input type="hidden" name="cmd['.$pluginId.']" value="'.htmlspecialchars('edit').'" />'. ($fe_adminLib->authCode?'<input type="hidden" name="aC['.$pluginId.']" value="'.htmlspecialchars($fe_adminLib->authCode).'" />':''). ($fe_adminLib->backURL?'<input type="hidden" name="backURL['.$pluginId.']" value="'.htmlspecialchars($fe_adminLib->backURL).'" />':'').($fe_adminLib->conf['blogData']?'<input type="hidden" name="cameFromBlog['.$pluginId.']" value="1" />':'');
 		}
 
 		// We handle T3 tree copy here :
@@ -2151,7 +2209,9 @@ class tx_metafeedit_lib {
 		// appeller fonction utilisateur si elle est présente ...
 		$var_temp_array = array($fe_adminLib, $treeArray);
 		if ($fe_adminLib->conf['userFunc_afterSave']) t3lib_div::callUserFunction($fe_adminLib->conf['userFunc_afterSave'], $var_temp_array, $fe_adminLib);
-
+		// TODO CBY MERGE updated DATAARR with DATARR
+		//$fe_adminLib->logErrors('User AfterSave : End');
+		return $dataArr;
 	}
 	
     /**
@@ -2195,7 +2255,7 @@ class tx_metafeedit_lib {
 				for ($i = 0; $i < count($ext); $i++) {
 					$ext[$i] = str_replace(".", "\.", $ext[$i]);
 					$ext[$i] = str_replace("+", "\+", $ext[$i]);
-					if (eregi($ext[$i].'$', $fn)) return $player;
+					if (preg_match('/'.$ext[$i].'$/i', $fn)) return $player;
 				}
 			}
 		}
@@ -2216,7 +2276,7 @@ class tx_metafeedit_lib {
 				for ($i = 0; $i < count($ext); $i++) {
 					$ext[$i] = str_replace(".", "\.", $ext[$i]);
 					$ext[$i] = str_replace("+", "\+", $ext[$i]);
-					if (eregi($ext[$i].'$', $fn))
+					if (preg_match('/'.$ext[$i].'$/i', $fn))
 						return $type;
 				}
 			}
@@ -2531,13 +2591,11 @@ class tx_metafeedit_lib {
 								$resLabel_alt.=$resLabel_alt ?" ".($resRow["EVAL_".$tslabel]?$resRow["EVAL_".$tslabel]:$resRow[$tslabel]):($resRow["EVAL_".$tslabel]?$resRow["EVAL_".$tslabel]:$resRow[$tslabel]);
 						}
 					}
-					/*
 					if ($statictable) {
 						$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
 						$resLabel = $this->getLL('language_'.$code,$conf);
 						if( !$resLabel ) { $resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset); } // CBY  what is this static Info charset ???
-					}
-					*/					
+					}					
 					$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
 					$tempLabel = $tempLabel ? $tempLabel : $resLabel_alt;
 					$resRow['tx_metafeedit_resLabel']=$tempLabel;
@@ -2547,6 +2605,7 @@ class tx_metafeedit_lib {
 			mysql_free_result($res);
 
 			if ($conf['general.']['list.']['userFunc_alterSortTabs']) {
+				//TODO  test t3lib_div::callUserFunction($conf['general.']['list.']['userFunc_alterSortTabs'], $sortTab, $conf);
 			  	$_params = array ('sortTab' => &$sortTab, 'sortAux' => &$sortAux, 'table' => $table, 'fN' => $fN , 'forceEmptyOption'=> $forceEmptyOption ,'forceVal' => $forceVal ); 
         		t3lib_div::callUserFunction($conf['general.']['list.']['userFunc_alterSortTabs'],  $_params , $conf);
 			}
@@ -2610,7 +2669,38 @@ class tx_metafeedit_lib {
 		return $whereClause;
 	}
 
-
+	/**
+	* Removes all trailing dots recursively from TS settings array
+	* TODO Explain why we remove the dots.
+	*
+	* @param array $setup The settings array
+	* @return void
+	*/
+	public function postProcessSettings(array $settings) {
+		$processedSettings = array();
+		// TODO Check if the t3lib_div::removeDotsFromTS() fits for this purpose (using rtrim() for removing trailing dots)
+		foreach ($settings as $key => $value) {
+			if (substr($key, -1) === '.') {
+				$keyWithoutDot = substr($key, 0, -1);
+				$processedSettings[$keyWithoutDot] = self::postProcessSettings($value);
+				if (array_key_exists($keyWithoutDot, $settings)) {
+					$processedSettings[$keyWithoutDot]['_typoScriptNodeValue'] = $settings[$keyWithoutDot];
+					unset($settings[$keyWithoutDot]);
+				}
+			} else {
+				$keyWithDot = $key . '.';
+				if (array_key_exists($keyWithDot, $settings)) {
+					$processedSettings[$key] = self::postProcessSettings($settings[$keyWithDot]);
+					$processedSettings[$key]['_typoScriptNodeValue'] = $value;
+					unset($settings[$keyWithDot]);
+				} else {
+					$processedSettings[$key] = $value;
+				}
+			}
+		}
+		return $processedSettings;
+	}
+	
     /**
     * Language override functions ...
     * getLLFromLabel : Gets Language label for key...
@@ -2626,7 +2716,7 @@ class tx_metafeedit_lib {
 		$label2=end($labela);
 
 		// user override of language labels
-		if ($conf['LOCAL_LANG'][$conf['LLkey']][$label2]) {
+		if (isset($conf['LOCAL_LANG'][$conf['LLkey']][$label2])) {
 			return $conf['LOCAL_LANG'][$conf['LLkey']][$label2];
 		}
 		$ret=$GLOBALS['TSFE']->sL($label)?$GLOBALS['TSFE']->sL($label):"$label";
@@ -2649,9 +2739,9 @@ class tx_metafeedit_lib {
     */
     
     function getLL($key,&$conf)	{
-      if($conf['debug.']['langArray']) return "?*$key*?"; // if we are debugging language array we show keys of all fields envlodes in "?".
+      if($conf['debug.']['langArray']) return "?*$key*?"; // if we are debugging language array we show keys of all fields enveloped in "?".
       $label=$GLOBALS['TSFE']->getLLL($key,$conf['LOCAL_LANG']);
-      return $label ? $label : "$key";
+      return isset($label) ? $label : "$key";
     }
 
     /**
@@ -2677,15 +2767,46 @@ class tx_metafeedit_lib {
         return $val;
     }
 
+	//update session vars :
+	
+	function updateSessionVars(&$conf) {
+		$metafeeditvars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
+		$metafeeditvars[$GLOBALS['TSFE']->id][$conf['pluginId']]=array_merge($metafeeditvars[$GLOBALS['TSFE']->id][$conf['pluginId']],$conf['inputvar.']);		
+		//if (!is_array($metafeeditvars[$GLOBALS['TSFE']->id][$conf['pluginId']])) $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]=$conf['inputvar.'];
+		$GLOBALS["TSFE"]->fe_user->setKey('ses','metafeeditvars',$metafeeditvars);
+		$GLOBALS["TSFE"]->fe_user->storeSessionData();
+	}
+	
+	
     //ACTIONS-LIST-LIB
+	/**
+	 * getListItemActionsLib, can only be called from fe_adminLib
+	 *
+	 * @param	[type]		$$conf: ...
+	 * @param	[type]		$caller: ...
+	 * @return	[type]		...
+	 */
 	function getListItemActionsLib(&$conf) {
 		$ret='';
+		$obs=t3lib_div::trimexplode(':',$conf['inputvar.']['sort']);
+		// we only show reset order by link if order bys have been set
 		if (!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions'])) {
-			$ret='<th class="mfdt-actions">'.$this->getLL('actions',$conf). ($conf['list.']['sortFields'] ? '<a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[resetorderby]['.$conf['pluginId'].']=1">'. $this->getLL('order_by_reset',$conf) .'</a>' : '').'</th>';  // rsg
+			$ret='<th class="mfdt-actions">'.$this->getLL('actions',$conf). ($conf['list.']['sortFields']&&$obs[0] ? '<div class="tx-metafeedit-link tx-metafeedit-link-resetob"><a class="mtf-rstob" href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[resetorderby]['.$conf['pluginId'].']=1">'. $this->getLL('order_by_reset',$conf) .'</a></div>' : '').'</th>';  // rsg
 		}
 		return $ret;
 	}
-
+	/**
+	 * getASResetAction
+	 *
+	 * @param	[type]		$$conf: ...
+	 * @param	[type]		$caller: ...
+	 * @return	[type]		...
+	 */
+	function getListASResetAction(&$conf,&$caller) {
+		//$ret='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('advancedSearch-action').' '.$caller->pi_getClassName('as_reset').'"><a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[reset]['.$conf['pluginId'].']=1">'.$this->metafeeditlib->getLL("advanced_search_reset",$conf).'</a></div>';
+		$ret='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('advancedSearch-action').' '.$caller->pi_getClassName('as_reset').'"><button name="'.$this->prefixId.'[reset]['.$conf['pluginId'].']" type="submit" value="1">'.$this->getLL("advanced_search_reset",$conf).'</button></div>';
+		return $ret;
+	}
 	/**
 	 * getListItemActions
 	 *
@@ -2702,14 +2823,14 @@ class tx_metafeedit_lib {
 		if (!$conf['no_action']) {
 			// DELETE ACTION
 			if (!$conf['disableDelete'] && !$conf['disableEditDelete'] && !$conf['delete.']['hide']) {
-					$backurl=$this->makeFormTypoLink($conf,"&rU[$pluginId]=".$conf['recUid']);
-				  $url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=delete&preview[$pluginId]=1&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
-
-					$act=' <div  class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-delete').' '.$caller->pi_getClassName('link-delete-list').'"><a class="jqMFDelModal" href="'.$url.'">'.$this->getLL("edit_delete_label",$conf).'</a></div>';
-					$markerArray['###ACTION_DELETE###']=$act;
-					$ret.=$act;
-					$editLinkId="link-edit";
-		  }
+				//$backurl=$this->makeFormTypoLink($conf,"&rU[$pluginId]=".$conf['recUid']);
+				//$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=delete&preview[$pluginId]=1&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+				$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=delete&preview[$pluginId]=1&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']);
+				$act=' <div  class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-delete').' '.$caller->pi_getClassName('link-delete-list').'"><a class="jqMFDelModal" href="'.$url.'">'.$this->getLL("edit_delete_label",$conf).'</a></div>';
+				$markerArray['###ACTION_DELETE###']=$act;
+				$ret.=$act;
+				$editLinkId="link-edit";
+			}
 
 			if ($conf['edit.']['preview'] && $conf['disableEdit']) {
 				$preview="&preview[$pluginId]=1";
@@ -2718,18 +2839,21 @@ class tx_metafeedit_lib {
 
 			// EDIT ACTION
  			if (($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit'] ) {
-					$backurl=$this->makeFormTypoLink($conf,"");
-				  $url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$preview."&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
- 				  $act='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName($editLinkId).'"><a class="jqMFModal" href="'.$url.'" title="'.$this->getLL($editLinkId,$conf).'">'.$this->getLL($editLinkId,$conf).'</a></div>';
-					$markerArray['###ACTION_EDIT###']=$act;
-					$ret.=$act;
+				//$backurl=$this->makeFormTypoLink($conf,"");
+				//$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$preview."&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+ 				$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$preview."&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']);
+				$act='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName($editLinkId).'"><a class="jqMFModal" href="'.$url.'" title="'.$this->getLL($editLinkId,$conf).'">'.$this->getLL($editLinkId,$conf).'</a></div>';
+				$markerArray['###ACTION_EDIT###']=$act;
+				$ret.=$act;
 			}
 
 			// MANUAL ORDER ACTION
 			if ($conf['TCAN'][$conf['table']]['ctrl']['sortby'] && !$conf['disableEdit']) {
-				$backurl=$this->makeFormTypoLink($conf,"&rU[$pluginId]=".$conf['recUid']);
-				$url_up=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit&orderDir[$pluginId]=up&orderU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
-				$url_down=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit&orderDir[$pluginId]=down&orderU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+				//$backurl=$this->makeFormTypoLink($conf,"&rU[$pluginId]=".$conf['recUid']);
+				//$url_up=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit&orderDir[$pluginId]=up&orderU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+				//$url_down=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit&orderDir[$pluginId]=down&orderU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+				$url_up=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit&orderDir[$pluginId]=up&orderU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']); //."&backURL[$pluginId]=".rawurlencode($backurl));
+				$url_down=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit&orderDir[$pluginId]=down&orderU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']);//."&backURL[$pluginId]=".rawurlencode($backurl));
 				$act=' <div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-order-up').'"><a href="'.$url_up.'">'.$this->getLL("edit_order_up_label",$conf).'</a></div>';
 				$act.=' <div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-order-down').'"><a href="'.$url_down.'">'.$this->getLL("edit_order_down_label",$conf).'</a></div>';
 				$markerArray['###ACTION_SORTING###']=$act;
@@ -2744,8 +2868,13 @@ class tx_metafeedit_lib {
 					$cmdarr=t3lib_div::trimexplode('|',$action);
 					$actionLib=$cmdarr[0];
 					$actionUrl=$cmdarr[1];
+					$extraParams='';
+					if (isset($cmdarr[2])) {
+						$extraParams=$cmdarr[2];
+					}
+
 					$astdconf=$conf[$conf['cmdmode'].'.']['actionStdWrap.'][$cmdarr[0].'.'];
-					$act='<a href="'.$actionUrl.'">'.$this->getLL($actionLib,$conf).'</a>';
+					$act='<a href="'.$actionUrl.'" '.$extraParams.'>'.$this->getLL($actionLib,$conf).'</a>';
 					if (is_array($astdconf)) $act=$this->cObj->stdWrap($this->getLL($actionLib,$conf), $astdconf);
 					//$act='<br/><div  class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-'.$actionLib).' '.$caller->pi_getClassName('link-'.$actionLib.'-list').'"><a href="'.$actionUrl.'">'.$this->getLL($actionLib,$conf).$actionLib.'</a></div>';
 					$act='<div  class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-'.$actionLib).' '.$caller->pi_getClassName('link-'.$actionLib.'-list').'">'.$act.'</div>';
@@ -2764,7 +2893,7 @@ class tx_metafeedit_lib {
 	}
 
 	/**
-	 * [Describe function...]
+	 * getGridItemActions
 	 *
 	 * @param	[type]		$$conf: ...
 	 * @param	[type]		$caller: ...
@@ -2779,14 +2908,15 @@ class tx_metafeedit_lib {
 		if (!$conf['no_action']) {
 			// DELETE ACTION
 			if (!$conf['disableDelete'] && !$conf['disableEditDelete']) {
-					$backurl=$this->makeFormTypoLink($conf,"&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']);
-				  $url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=delete&preview[$pluginId]=1&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+				//$backurl=$this->makeFormTypoLink($conf,"&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']);
+				//$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=delete&preview[$pluginId]=1&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+				$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=delete&preview[$pluginId]=1&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']);
 
-					$act=' <div  class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-delete').' '.$caller->pi_getClassName('link-delete-list').'"><a href="'.$url.'">'.$this->getLL("edit_delete_label",$conf).'</a></div>';
-					$markerArray['###ACTION_DELETE###']=$act;
-					$ret.=$act;
-					$editLinkId="link-edit";
-		  }
+				$act=' <div  class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-delete').' '.$caller->pi_getClassName('link-delete-list').'"><a href="'.$url.'">'.$this->getLL("edit_delete_label",$conf).'</a></div>';
+				$markerArray['###ACTION_DELETE###']=$act;
+				$ret.=$act;
+				$editLinkId="link-edit";
+			}
 
 			if ($conf['edit.']['preview'] && $conf['disableEdit']) {
 				$preview="&preview[$pluginId]=1";
@@ -2795,11 +2925,12 @@ class tx_metafeedit_lib {
 
 			// EDIT ACTION
  			if (($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit'] ) {
-				$backurl=$this->makeFormTypoLink($conf,$conf['GLOBALPARAMS']);
-				  $url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$preview."&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
- 				  $act='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName($editLinkId).'"><a href="'.$url.'">'.$this->getLL($editLinkId,$conf).'</a></div>';
-					$markerArray['###ACTION_EDIT###']=$act;
-					$ret.=$act;
+				//$backurl=$this->makeFormTypoLink($conf,$conf['GLOBALPARAMS']);
+				//$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$preview."&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+				$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$preview."&rU[$pluginId]=".$conf['recUid'].$conf['GLOBALPARAMS']); //."&backURL[$pluginId]=".rawurlencode($backurl));
+ 				$act='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName($editLinkId).'"><a href="'.$url.'">'.$this->getLL($editLinkId,$conf).'</a></div>';
+				$markerArray['###ACTION_EDIT###']=$act;
+				$ret.=$act;
 			}
 
 			// USER ACTIONS
@@ -2835,16 +2966,17 @@ class tx_metafeedit_lib {
 	 */
 	function getBlogActions(&$conf,&$caller,$rU ) {
 		$pluginId=$conf['pluginId'];
-			// Blog ACTION
-			$act='';
- 			if ($conf['blog.']['showComments'] ) {
-					$backurl=$this->makeFormTypoLink($conf,"");
-				  //$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit&preview[$pluginId]=1&rU[$pluginId]=".$rU.$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
-				  $url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit&blog[$pluginId]=1&rU[$pluginId]=".$rU.$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
- 				  $act='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('blog').'"><a href="'.$url.'">'.$this->blogCommentCount($conf['table'],$rU).'&nbsp;'.$this->getLL('blogcomments',$conf).'</a></div>';
-				}
-			return $act;
-  }
+		// Blog ACTION
+		$act='';
+		if ($conf['blog.']['showComments'] ) {
+			//$backurl=$this->makeFormTypoLink($conf,"");
+			//$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit&preview[$pluginId]=1&rU[$pluginId]=".$rU.$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+			//$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit&blog[$pluginId]=1&rU[$pluginId]=".$rU.$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+			$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit&blog[$pluginId]=1&rU[$pluginId]=".$rU.$conf['GLOBALPARAMS']);
+			$act='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('blog').'"><a href="'.$url.'">'.$this->blogCommentCount($conf['table'],$rU).'&nbsp;'.$this->getLL('blogcomments',$conf).'</a></div>';
+		}
+		return $act;
+	}
 
 	/**
 	 * [Describe function...]
@@ -2879,9 +3011,9 @@ class tx_metafeedit_lib {
 		$pluginId=$conf['pluginId'];
 		$ret='';
 		$url='###BACK_URL_HSC###';
-		if ($conf['backPagePid'] ) {
+		/*if ($conf['backPagePid'] ) {
 			$url=$this->makeBackURLTypoLink($conf,'');
-		}
+		}*/
 		$ret.='<div class="'.$caller->pi_getClassName('actions').'"><div class="'.$caller->pi_getClassName('navigation-actions').'">';
 		//modif by cmd - gestion global du lien de retour
 		$back_lnk=$conf['typoscript.'][$pluginId.'.']['list.']['nobackbutton']?false:($conf['typoscript.']['default.']['list.']['nobackbutton']?false:true);
@@ -2899,8 +3031,9 @@ class tx_metafeedit_lib {
 			// New Button
 			
 			if($conf['create'] && !$conf['disableCreate'] && !$conf['create.']['hide']) {
-				$backurl=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$conf['GLOBALPARAMS']);
-				$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=create".$conf['GLOBALPARAMS'].($conf['ajax.']['ajaxOn']?'':"&backURL[$pluginId]=".rawurlencode($backurl)));
+				//$backurl=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$conf['GLOBALPARAMS']);
+				//$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=create".$conf['GLOBALPARAMS'].($conf['ajax.']['ajaxOn']?'':"&backURL[$pluginId]=".rawurlencode($backurl)));
+				$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=create".$conf['GLOBALPARAMS']);
 				$ret.='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-create').'"><a href="'.$url.'" class="jqMFModal" title="'.$this->getLL("edit_menu_createnew_label",$conf).'">'.$this->getLL("edit_menu_createnew_label",$conf).'</a></div>';
 			}
 		}
@@ -2929,9 +3062,9 @@ class tx_metafeedit_lib {
 		$pluginId=$conf['pluginId'];
 		$ret='';
 		$url='###BACK_URL_HSC###';
-		if ($conf['backPagePid'] ) {
+		/*if ($conf['backPagePid'] ) {
 			$url=$this->makeBackURLTypoLink($conf,'');
-		}
+		}*/
 		$ret.='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-back').'"><a title="'.$this->getLL("back_label",$conf).'" href="'.$url.'">'.$this->getLL("back_label",$conf).'</a></div></td><td align="right">';
 
 		if(!$conf['no_action']) {
@@ -2941,18 +3074,19 @@ class tx_metafeedit_lib {
 			$ret.=$conf['grid.']['gridExportCSV']?$caller->metafeeditexport->CreateCSVButton($conf,$caller,false,0):'';
 			$ret.=$conf['grid.']['gridExportExcel']?$caller->metafeeditexport->CreateExcelButton($conf,$caller,false,0):'';									
 			if($conf['create'] && !$conf['disableCreate'] && !$conf['create.']['hide']) {
-				$backurl=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$conf['GLOBALPARAMS']);
-				$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=create".$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+				//$backurl=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$conf['GLOBALPARAMS']);
+				//$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=create".$conf['GLOBALPARAMS']."&backURL[$pluginId]=".rawurlencode($backurl));
+				$url=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=create".$conf['GLOBALPARAMS']);
 				$ret.='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-create').'"><a href="'.$url.'">'.$this->getLL("edit_menu_createnew_label",$conf).'</a></div>';
 			}
 		}
-		$ret.=$conf['disableEdit']?'':'<div class="'.$caller->pi_getClassName('action-SAVE').'" ><form action="###FORM_URL###" method="POST"><input type="submit" name="submit" value="'.($conf['edit.']['preview']?$this->getLL("edit_submit_label",$conf):$this->getLL("edit_preview_submit_label",$conf)).'"'.$caller->pi_classParam('form-submit').' /></form></div>';
-
+		//($conf['edit.']['preview']?$this->getLL("edit_submit_label",$conf):$this->getLL("edit_preview_submit_label",$conf))
+		$ret.=$conf['disableEdit']?'':'<div class="'.$caller->pi_getClassName('action-SAVE').'" ><form action="###FORM_URL###" method="POST"><button type="submit" name="submit" value="edit"'.'"'.$caller->pi_classParam('form-submit').'>'.($conf['edit.']['preview']?$this->getLL("edit_submit_label",$conf):$this->getLL("edit_preview_submit_label",$conf)).'</button></form></div>';
 		return $ret;
 	}
 
 	function getEditActions(&$conf,&$caller) {
-		$tmp='<div'.$caller->pi_classParam('form-row').'><table class="tx-metafeedit-edit-actions" style="width:100%"><tr><td>###ACTION-SAVE###</form></td>';
+		$tmp='<div'.$caller->pi_classParam('form-row').'><table class="tx-metafeedit-edit-actions" style="width:100%"><tr><td>###ACTION-SAVE###</td>';
     	//if ($conf['list.']['recordactions'] && !$conf['ajax.']['ajaxOn']) {
         
        
@@ -2972,8 +3106,23 @@ class tx_metafeedit_lib {
     	$conf['actions.']['delete']='';
     	if($conf['delete'] && !$conf['ajax.']['ajaxOn'] && (($conf['delete.']['preview'] && !$conf['disableDelete'] && !$conf['disableEditDelete']) || (!$conf['disableDelete']  && !$conf['disableEditDelete']))) $conf['actions.']['delete']= '###ACTION-DELETE###';
 
-		if (!$conf['ajax.']['ajaxOn'])	$tmp.='<td align="left">###ACTION-BACK###</td><td>###ACTION-NEW###</td>';
+		if (!$conf['ajax.']['ajaxOn'])	$tmp.='<td align="left">###ACTION-BACK###</td>'; //TODO NEW action does not work in this context <td>###ACTION-NEW###</td>';
 		$tmp.='<td align="right"><div class="'.$caller->pi_getClassName('actions').' '.$caller->pi_getClassName('edit-actions').'">'.$conf['actions.']['useractions'].$conf['actions.']['delete'].'</div></td><td>###ACTION-PDF###</td>';
+		$tmp.='</tr></table></div>';
+		return $tmp;
+	}
+
+	function getCreateActions(&$conf,&$caller) {
+		$tmp='<div'.$caller->pi_classParam('form-row').'><table class="tx-metafeedit-edit-actions" style="width:100%"><tr><td>###ACTION-SAVE###</td>';
+     	$conf['actions.']['delete']='';
+ 		if (!$conf['ajax.']['ajaxOn'])	$tmp.='<td align="left">###ACTION-BACK###</td>';
+		$tmp.='</tr></table></div>';
+		return $tmp;
+	}
+	function getCreatePreviewActions(&$conf,&$caller) {
+		$tmp='<div'.$caller->pi_classParam('form-row').'><table class="tx-metafeedit-edit-actions" style="width:100%"><tr><td>###ACTION-DONOTSAVE###</td><td>###ACTION-PREVIEWSAVE###</td>';
+     	$conf['actions.']['delete']='';
+ 		if (!$conf['ajax.']['ajaxOn'])	$tmp.='<td align="left">###ACTION-BACK###</td>';
 		$tmp.='</tr></table></div>';
 		return $tmp;
 	}
@@ -3316,7 +3465,8 @@ class tx_metafeedit_lib {
         	$p=strpos($FN,'.');
 	    }
 		
-	    $fieldAlias=$relTable.'_'.$field;				
+	    $fieldAlias=$relTable.'_'.$field;	
+		//echo 	$fieldAlias;	
 		return $fieldAlias;
 
     }
@@ -3333,7 +3483,7 @@ class tx_metafeedit_lib {
     	if ($conf['list.']['show_fields']) {
           $FTA=t3lib_div::trimexplode(',',$conf['list.']['show_fields']);
         	foreach($FTA as $FTi) {
-        		if (in_array($FTi,array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
+        		if (in_array(substr($FTi,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
         	    // check if field is a user calc field, if so it will be handled later ...
         	    if (@array_key_exists($FTi,$conf['list.']['sqlcalcfields.'])) continue;
         	    // check if field is a relation to a foreign table (it has a '.' in it's name).
@@ -4202,6 +4352,76 @@ class tx_metafeedit_lib {
 		if (is_array($sql['joinTables'])) $sql['joinTables']=array_unique($sql['joinTables']);
 		if (is_array($sql['gbFields'])) $sql['gbFields']=array_unique($sql['gbFields']);
 		if (is_array($sql['fieldArray'])) $sql['fieldArray']=array_unique($sql['fieldArray']);
+	}
+		
+	/**
+	 * This function generates the header of the list view
+	 *
+	 * @alter title
+	 * @alter recherche
+	 * @need caller
+	 */
+	 
+	function getHeader(&$title, &$recherche, &$conf,$data=array()) {
+		if($conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre']) $title = $conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre'];
+		If (!isset($title)) $title = $GLOBALS['TSFE']->page['title'];
+		$markerArray=array();
+
+		
+		/*
+		$uid=$conf['inputvar.']['rU']?$conf['inputvar.']['rU']:$dataArr[$conf['uidField']];
+	    if($typeField && $uid) { // get the type from the database else use default value
+	      $rec = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$uid);
+	      $type = intval($rec[$typeField]);
+	    }
+		*/
+		$table=$conf['table'];
+		$lV=$conf['inputvar.']['lV'];
+		$lField=$conf['inputvar.']['lField'];
+		//echo "$lV - $lField - $table";
+		if  ($lV && $lField) {	
+			$FT=$conf['TCAN'][$table]['columns'][$lField]['config']['foreign_table'];
+			//echo $FT;
+			if ($FT) {
+				/*$mmTable=$this->conf['TCAN'][$table]['columns'][$lField]['config']['MM'];
+				if ($mmTable) {								
+					$ParentWhere.=" AND ".$mmTable.'.uid_local=\''.$lV.'\'';
+					//TODO
+					//$sql['fromTables'].=','.$mmTable;
+					//$sql['joinTables'][]=$mmTable;
+					echo $mmTable;
+				} 
+				else { // old "," seperated list field
+					//$ParentWhere.=' AND FIND_IN_SET('.$table.'.'.$lField.','.$lV.')>0 ';
+					$data = $GLOBALS['TSFE']->sys_page->getRawRecord($FT,$lV);
+					echo "ddd";print_r($data);
+				}*/
+				$data = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$lV);
+			
+				$data=$this->user_processDataArray($data, $conf,$table,TRUE);
+			} else  {
+				
+			}
+				
+		} 
+		
+		$data['SYSDATE']=date('j/m/y');
+		$markerArray=$this->cObj->fillInMarkerArray($markerArray, $data, '', TRUE, 'FIELD_', $conf['general.']['xhtml']);
+		$title=$this->cObj->substituteMarkerArray($title,$markerArray);
+		
+		if ($this->confTS[$this->pluginId.'.']['list.']['soustitre']) $recherche = $this->confTS[$this->pluginId.'.']['list.']['soustitre'];
+
+		$cont = $this->conf['inputvar.']['advancedSearch'];
+		if (is_array($this->conf['inputvar.']['advancedSearch'])) {		
+			foreach ($this->conf['inputvar.']['advancedSearch'] as $key => $val) {
+				if($val) {
+					$recherche .= ($recherche?', ':'').$caller->metafeeditlib->getLLFromLabel($this->conf['TCAN'][$this->conf['table']]['columns'][$key]['label'], $this->conf).':';
+					$recherche .= $this->conf['inputvar.']['advancedSearch'][$key]['val']?$this->conf['inputvar.']['advancedSearch'][$key]['val']:$this->conf['inputvar.']['advancedSearch'][$key];
+				}
+			}
+		}
+		return $title;
+
 	}
 }
 

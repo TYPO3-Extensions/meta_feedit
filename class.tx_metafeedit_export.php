@@ -27,6 +27,7 @@
 * @author      Christophe BALISKY <cbalisky@metaphore.fr>
 */
 //define('FPDF_FONTPATH',t3lib_extMgm::extPath('meta_feedit').'res/fonts/');
+define('EURO',chr(128));
 
 if (t3lib_extMgm::isLoaded('fpdf')) require_once(t3lib_extMgm::extPath('fpdf').'class.tx_fpdf.php');
 
@@ -39,10 +40,12 @@ class tx_metafeedit_pdf extends FPDF {
 	var $rightmargin;
 	var $bottommargin;
 	var $nofooter=false;
+	var $caller;
+	var $conf;
 	
 	function Header()
 	{
-		// Logo - présent sur toutes les pages du pdf
+		// Logo - present sur toutes les pages du pdf
 		//$logo = PATH_site.($xml->tr->td->img->dir).'logo.png';
 		//$this->Image($logo,1,1,17,8);
 	}
@@ -54,16 +57,16 @@ class tx_metafeedit_pdf extends FPDF {
 			$this->setFillColor(200,200,200);
 			$this->SetY(0-$this->bottommargin+3); //TODO		
 			$date=date('d/m/Y');
-			$this->Cell(0,$this->footercellsize, "", 0,0,'C',1);
+			$this->Cell(0,$this->footercellsize, $this->confTS[$this->pluginId.'.']['list.']['footer'], 0,0,'C',1);
 			$this->SetX($this->leftmargin);
 			$this->Cell(0,$this->footercellsize, $date, 0,0,'L');
 			$this->SetX($this->leftmargin);
 			$this->Cell(0,$this->footercellsize,'Page '.$this->PageNo().'/{nb}',0,0,'C');
-			$this->SetX($this->leftmargin);
+			$this->SetX($this->leftmargin);			
 			$user = '';
 			$user = $GLOBALS['TSFE']->fe_user->user[username];
 			//$res = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($GLOBALS['TYPO3_DB']->exec_SELECTquery('ent_nom', 'tx_metabookingdb_entite_juridique', 'uid='.$GLOBALS['TSFE']->fe_user->user[tx_metabookingdbextfeusers_tx_metabookingdb_entite_juridique_uid]));
-			$this->Cell(0,$this->footercellsize, 'User: '.$user,0,0,'R');
+			$this->Cell(0,$this->footercellsize, utf8_decode($this->caller->caller->metafeeditlib->getLL('printedby', $this->caller->conf)).$user,0,0,'R');
 		}
 	}
 }
@@ -73,18 +76,21 @@ class tx_metafeedit_export {
 	var $conf;								// $conf array from metafeedit_lib
 	var $pluginId;							// ID du plugin
 	var $confTS;							// TS du plugin
-
+	var $cObj;
+	var $caller;
 	/**
 	 * Initialisation function called by fe_adminlib.inc allow this class to acces $conf array
 	 *
 	 * @return	nothing
 	 */
 	function init(&$caller) {
+		$this->caller=$caller;
 		$this->conf = $caller->conf;
 		$this->pluginId = $caller->conf['pluginId'];
 		//$this->confTS = $caller->conf['typoscript.']['metafeedit.']['typoscript.'];
 		//why go in metafeedit.typoscript
 		$this->confTS = $caller->conf['typoscript.'];
+		$this->cObj=$caller->cObj;
 	}
 
 	/**
@@ -146,13 +152,13 @@ class tx_metafeedit_export {
 	// We handle here CSV file generation ...
 	function getCSV(&$content,&$caller) {
 		// We handle the header here 
-		$this->getHeader($title, $recherche, $caller);		
+		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);		
 		header("Content-Type: application/csv; charEncoding=utf-8");
 		//header("Content-Encoding:utf-8");
 		//header("Content-Length: ".strlen($content);
 		
 		header('Content-disposition: filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.csv"');
-		echo utf8_decode(str_replace('&euro;','€',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
+		echo utf8_decode(str_replace('&euro;','Eur',str_replace('&nbsp;',' ',strip_tags($caller->metafeeditlib->T3StripComments($content)))));
 		die;
 	}
 
@@ -173,7 +179,7 @@ class tx_metafeedit_export {
 		$count = 0;
 		$taille = 0;
 		$taillemax = 0;
-		$fields = explode(',', $this->conf['list.']['show_fields']); //list des champ affiché afin de récup la dimension des colonnes defini en TS
+		$fields = explode(',', $this->conf['list.']['show_fields']); //liste des champ affiches afin de recuperer la dimension des colonnes defini en TS
 		$sizeArr = array(); //tableau de la taille des cellules
 		$pos=array(); // Array of positions (left,right,center)
 		$x=0; //compteur des colonnes
@@ -210,6 +216,7 @@ class tx_metafeedit_export {
 		}
 		$unit='mm';
 		$pdf = new tx_metafeedit_pdf($orientation, $unit, $format);
+		$pdf->caller=&$this;
 		$pdf->AddFont('3OF9','','3OF9.php');
 		$pdf->nofooter=$nofooter;
 		// TODO Handle typoscript here ...
@@ -233,7 +240,7 @@ class tx_metafeedit_export {
 
 		// We handle the header here 
 		//
-		$this->getHeader($title, $recherche, $caller);
+		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
 
 		//if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 
@@ -263,7 +270,7 @@ class tx_metafeedit_export {
 		$r=0;
 		// We print rows...
 		foreach($xml->tr as $row) {
-			if (isset($row->spec->attributes()->ap)) $pdf->addPage();
+			if ($row->spec->attributes()->ap) $pdf->addPage();
 			// we change color 
 			$x=0; //compteur des colonnes
 			if ($alt>1) {							// changement de couleur 1 ligne sur 2
@@ -282,15 +289,15 @@ class tx_metafeedit_export {
 				
 			// We print row cells ...
 			foreach($row->td as $col) {
-				$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule // avant on récupérer la taille de la meme manière qu'en haut cependant bug : une valeur se transformer en une autre du coup tenais plus sur la page
+				$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule 
 				$size=40;
-				$val = $col->data;
+				$val = strip_tags($col->data);
 
-				$result = ereg("(^[0-9]+([\.0-9]*))$" , $val);
+				$result = preg("/(^[0-9]+([\.0-9]*))$/" , $val);
 
-				// Affichage du signe € sur l'export PDF //CBY nothing to do here !!
+				// Affichage du signe Euro sur l'export PDF //CBY nothing to do here !!
 
-				if ($this->conf['list.']['euros'] && $result) $val .= ' €';
+				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
 				
 				if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
 					$vala=t3lib_div::trimexplode(',',$val);
@@ -367,7 +374,14 @@ class tx_metafeedit_export {
 							$fca=t3lib_div::trimexplode(',',$col->spec->attributes()->fc);
 							$pdf->setDrawColor($fca[0],$fca[1],$fca[2]);
 					}
-					if (isset($col->spec->attributes()->fs))$fs=$col->spec->attributes()->fs;
+					if (isset($col->spec->attributes()->tc)) {
+							$tca=t3lib_div::trimexplode(',',$col->spec->attributes()->tc);
+							$pdf->setTextColor($tca[0],$tca[1],$tca[2]);
+					}
+					if (isset($col->spec->attributes()->fs)) {
+						$fs=$col->spec->attributes()->fs;
+						$pdf->SetFontSize($fs);
+					}
 					if (isset($col->spec->attributes()->f)) $pdf->SetFont($col->spec->attributes()->f,'',$fs);
 					if (isset($col->spec->attributes()->x) || isset($col->spec->attributes()->y)) {
 						$pdf->SetXY((float)$col->spec->attributes()->x,(float)$col->spec->attributes()->y);
@@ -405,7 +419,7 @@ class tx_metafeedit_export {
 		};
 		$count = 0;
 		$taille = 0;
-		$fields = explode(',', $this->conf['list.']['show_fields']); //list des champ affiché afin de récup la dimension des colonnes defini en TS
+		$fields = explode(',', $this->conf['list.']['show_fields']); //liste des champs affiches afin de recuperer la dimension des colonnes defini en TS
 		$sizeArr = array(); //tableau de la taille des cellules
 		$pos=array(); // Array of positions (left,right,center)
 		$x=0; //compteur des colonnes
@@ -426,7 +440,8 @@ class tx_metafeedit_export {
 		$format=A4;
 		$unit='mm';
 		$pdf = new tx_metafeedit_pdf($orientation, $unit, $format);
-		
+		$pdf->caller=&$this;
+
 		// TODO Handle typoscript here ...
 		
 		$pdf->bottommargin=9;
@@ -444,7 +459,7 @@ class tx_metafeedit_export {
 
 		// We handle the header here 
 		//
-		$this->getHeader($title, $recherche, $caller);
+		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
 
 		if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 
@@ -484,12 +499,12 @@ class tx_metafeedit_export {
 			}				
 
 			foreach($row->td as $col) {
-				$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule // avant on récupérer la taille de la meme manière qu'en haut cependant bug : une valeur se transformer en une autre du coup tenais plus sur la page			
-				$val = $col->data;
-				$result = ereg("(^[0-9]+([\.0-9]*))$" , $val);
+				$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule			
+				$val = str_replace('â‚¬','Eur',strip_tags($col->data));
+				$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
 
-				// Currency handling € CBY should not be here !!!
-				if ($this->conf['list.']['euros'] && $result) $val .= ' €';
+				// Currency handling Euro CBY should not be here !!!
+				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
 
 				if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
 					$vala=t3lib_div::trimexplode(',',$val);
@@ -509,7 +524,7 @@ class tx_metafeedit_export {
 							$pdf->setX($pdf->getX()+((($height-1)/$h)*$w));
 						}
 					}
-					$pdf->setX($size+$pdf->leftmargin);									// + la marge définie plus haut pour la page => ligne 2308
+					$pdf->setX($size+$pdf->leftmargin);									// + la marge definie plus haut pour la page => ligne 2308
 				} else {
 					switch($pos[$x]) {
 						case 'left' :
@@ -569,9 +584,9 @@ class tx_metafeedit_export {
 		$pdf->setMargins(5,5,8);
 		$pdf->AddPage();
 
-		// title of the page - Il est définit ici et non dans le header pour qu'il ne soit pas présent sur chaque page mais seulement la 1ère
+		// title of the page - Il est definit ici et non dans le header pour qu'il ne soit pas present sur chaque page mais seulement la 1ere
 		$title =''; 
-		$this->getHeader($title, $recherche, $caller);
+		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
 
 		if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 
@@ -615,7 +630,7 @@ class tx_metafeedit_export {
 		foreach($xml->tr as $row) {
 			foreach($row->td as $elem) {
 				if ($elem->data != '') {
-					$val .= $elem->data;
+					$val .= strip_tags($elem->data);
 					$val .= "\n";
 				} else {
 					$cpt++;
@@ -632,13 +647,13 @@ class tx_metafeedit_export {
 
 			$pdf->MultiCell($size*8,($sizeh? $sizeh : 7),utf8_decode($val),1,'L',1);
 
-			if ($cptcols == $nbcol)			// Si on arrive au nombre de colonnes indiqué dans le flexform, on passe à une nouvelle ligne d'éléments
+			if ($cptcols == $nbcol)			// Si on arrive au nombre de colonnes indiquee dans le flexform, on passe a une nouvelle ligne d'elements
 			{
 				$pdf->Ln();					// Nouvelle ligne
-				$cptcols = 0;				// Compteur de colonnes remis à 0
-				$posy=$pdf->getY();			// On récupère la position en Y actuelle pour savoir ou placer les prochaines colonnes
-				$nbx=-1;					// le nombre d'éléments et remis à 0 (-1 en réalité car il est incrémenté juste après)
-				$marginl=1;					// La marge de gauche est réinitialisée
+				$cptcols = 0;				// Compteur de colonnes remis a 0
+				$posy=$pdf->getY();			// On recupere la position en Y actuelle pour savoir ou placer les prochaines colonnes
+				$nbx=-1;					// le nombre d'elements et remis a 0 (-1 en realite car il est incremente juste apres)
+				$marginl=1;					// La marge de gauche est reinitialisee
 				$marginh=0;
 			}
 	
@@ -682,7 +697,7 @@ class tx_metafeedit_export {
 		};
 		$count = 0;
 		$taille = 0;
-		$fields = explode(',', $this->conf['list.']['show_fields']); //list des champ affiché afin de récup la dimension des colonnes defini en TS
+		$fields = explode(',', $this->conf['list.']['show_fields']);
 		$sizeArr = array(); //tableau de la taille des cellules
 		$pos=array(); // Array of positions (left,right,center)
 		$x=0; //compteur des colonnes
@@ -707,7 +722,8 @@ class tx_metafeedit_export {
 
 		// We handle the header here 
 		//
-		$this->getHeader($title, $recherche, $caller);
+		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
+		if (strlen($title)>31) $title=substr($title,0,31);
 		$user = '';
 		$user = $GLOBALS['TSFE']->fe_user->user[username];
 
@@ -780,7 +796,7 @@ class tx_metafeedit_export {
 				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
 				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
 				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFont()->setBold(true);
-				$val = $col->data;
+				$val = strip_tags($col->data);
 				$objPHPExcel->getActiveSheet()->getCell($c.$r)->setValueExplicit("".$val, PHPExcel_Cell_DataType::TYPE_STRING);
 				$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
 
@@ -799,12 +815,12 @@ class tx_metafeedit_export {
 				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
 
 
-				$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule // avant on récupérer la taille de la meme manière qu'en haut cependant bug : une valeur se transformer en une autre du coup tenais plus sur la page			
-				$val = $col->data;
-				$result = ereg("(^[0-9]+([\.0-9]*))$" , $val);
+				$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule  une valeur se transformer en une autre du coup tenais plus sur la page			
+				$val = strip_tags($col->data);
+				$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
 
-				// Affichage du signe € sur l'export PDF CBY : a virer !!!
-				if ($this->conf['list.']['euros'] && $result) $val .= ' €';
+				// Affichage du signe Euro sur l'export PDF CBY : a virer !!!
+				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
 
 				if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
 					$vala=t3lib_div::trimexplode(',',$val);
@@ -835,7 +851,7 @@ class tx_metafeedit_export {
 						}
 					}
 					$maxoffset=$offset>$maxoffset?$offset:$maxoffset;
-					//$pdf->setX($size+$pdf->leftmargin);									// + la marge définie plus haut pour la page => ligne 2308
+					//$pdf->setX($size+$pdf->leftmargin);									// + la marge definie plus haut pour la page => ligne 2308
 				} else {
 					switch($pos[$x]) {
 						case 'left' :
@@ -881,7 +897,8 @@ class tx_metafeedit_export {
 				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
 				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
 				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFont()->setBold(true);
-				$val = $col->data;
+				
+				$val = strip_tags($col->data);
 				$objPHPExcel->getActiveSheet()->getCell($c.$r)->setValueExplicit("".$val, PHPExcel_Cell_DataType::TYPE_STRING);
 				$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
 				$x++;
@@ -915,30 +932,7 @@ class tx_metafeedit_export {
 		$objWriter2007->save('php://output'); 
 		die;
 	}
-	/**
-	 * This function generates the header of the first page of the pdf file
-	 *
-	 * @alter title
-	 * @alter recherche
-	 * @need caller
-	 */
-	 
-	function getHeader(&$title, &$recherche, &$caller) {
-		if($this->confTS[$this->pluginId.'.']['list.']['titre']) $title = $this->confTS[$this->pluginId.'.']['list.']['titre'];
-		else $title = $GLOBALS['TSFE']->page['title'];
 
-		if ($this->confTS[$this->pluginId.'.']['list.']['soustitre']) $recherche = $this->confTS[$this->pluginId.'.']['list.']['soustitre'];
-
-		$cont = $this->conf['inputvar.']['advancedSearch'];
-		if (is_array($this->conf['inputvar.']['advancedSearch'])) {		
-			foreach ($this->conf['inputvar.']['advancedSearch'] as $key => $val) {
-				if($val) {
-					$recherche .= ($recherche?', ':'').$caller->metafeeditlib->getLLFromLabel($this->conf['TCAN'][$this->conf['table']]['columns'][$key]['label'], $this->conf).':';
-					$recherche .= $this->conf['inputvar.']['advancedSearch'][$key]['val']?$this->conf['inputvar.']['advancedSearch'][$key]['val']:$this->conf['inputvar.']['advancedSearch'][$key];
-				}
-			}
-		}
-	}
 	
 	/**
 	 * This function get the police size of the pdf file

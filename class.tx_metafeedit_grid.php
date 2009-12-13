@@ -64,7 +64,6 @@ class tx_metafeedit_grid {
 		$this->markerArray['###GLOBALPARAMS###'].=$this->piVars['referer'][$this->conf['pluginId']]?'&tx_metafeedit[referer]['.$this->conf['pluginId'].']='.rawurlencode($this->piVars['referer'][$this->conf['pluginId']]):'';
 		$this->conf['GLOBALPARAMS']=$this->markerArray['###GLOBALPARAMS###'];
 	    */
-		
 		//$this->metafeeditlib=t3lib_div::makeInstance('tx_metafeedit_lib');
 		$conf['cmdmode']='grid';
 		$this->conf=&$conf;
@@ -138,8 +137,7 @@ class tx_metafeedit_grid {
 		$jRowField=$this->metafeeditlib->getFieldJoin($conf,$sql,$conf['table'],$rowField);
 		$jColField=$this->metafeeditlib->getFieldJoin($conf,$sql,$conf['table'],$colField);		
 		if ($conf['debug.']['sql']) 
-			$DEBUG.="<br/>GRID SQL ARRAY <br/>".t3lib_div::view_array($sql);   
-		
+			$DEBUG.="<br/>GRID SQL ARRAY <br/>".t3lib_div::view_array($sql);   	
 		
 		// Clean up ..
 		
@@ -180,6 +178,10 @@ class tx_metafeedit_grid {
     		$ReqFields=$ReqFields.','.$sql['addFields'];
 		//single tables !
 	    $sql['fromTables']=implode(',',array_unique(explode(',',$sql['fromTables'])));
+		
+		//echo $GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where']);;
+		//die(sql);
+		
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where']);
 		if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayGrid row count ',$GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where']),$DEBUG);
 		while($item = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))	{
@@ -189,6 +191,9 @@ class tx_metafeedit_grid {
 			}
 			$cella[$item[$jRowField]][$item[$jColField]][$secondaryColFields]=0;
 		}
+		
+		//print_r($cella);
+		//die(cell);
 		//MODIF CBY
 			
 			// Grid Row Data loop
@@ -535,7 +540,7 @@ class tx_metafeedit_grid {
 				
 					foreach($row->td as $col) {
 						$val = $col->data;
-						$result = ereg("(^[0-9]+([\.0-9]*))$" , $val);
+						$result = preg("/(^[0-9]+([\.0-9]*))$/" , $val);
 						
 						if ($conf['grid.']['gridEuros'] && $result) {  
 						$value = $val.' €';

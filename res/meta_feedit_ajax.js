@@ -18,7 +18,7 @@ function cbywebcamUpdateImage(id,fileName,thumb) {
 jQuery().ready(function() {
 	initEdtBtns();
 	initDelBtns();
-	jQuery('div.tx-metafeedit-link a').prepend('<i>&nbsp;</i>');
+	jQuery('a').prepend('<i>&nbsp;</i>');
 	jQuery('button').prepend('<i>&nbsp;</i>');
 	//jQuery('#modalWindow').jqm({modal: true,trigger: '.tx-metafeedit-list_field_image a',target: '#jqmContent',onHide: closeModDel,onShow: openInFrame}).jqDrag('.jqDrag').jqResize('.jqResize');
 	jQuery('input.tx-metafeedit-form-submit').bind('click',function() {
@@ -51,9 +51,9 @@ var initCal = function() {
 		id=jQuery(this).attr('id');
 		var tab=id.split('$');
 		var flashvars='table='+tab[0]+'&imageField='+tab[1]+'&uid='+tab[2];
-	  var	flashid=tab[0]+'_'+tab[1]+'_'+tab[2];
+	    var	flashid=tab[0]+'_'+tab[1]+'_'+tab[2];
 		var flash='none';
-		jQuery(this).after('<button id="img_'+flashid+'" href="#"><img  src="/typo3conf/ext/cby_webcam/res/webcam.png" /></button><div id="flash_'+flashid+'" class="jqmWindow"><div id="jqmTitle" class="jqmTitle jqDrag"><button class="jqmClose">X</button><span id="jqmTitleText" class="jqmTitleText">Webcam</span></div><div class="jqmContent"></div></div>');
+		jQuery(this).after('<button id="img_'+flashid+'" href="#" class="cbywcm"><i>&nbsp;</i>Webcam</button><div id="flash_'+flashid+'" class="jqmWindow"><div id="jqmTitle" class="jqmTitle jqDrag"><button class="jqmClose"><i>&nbsp;</i>X</button><span id="jqmTitleText" class="jqmTitleText">Webcam</span></div><div class="jqmContent"></div></div>');
 		jQuery('#img_'+flashid).bind('click', {id:flashid,fv:flashvars}, function(e){
 			
 			if (AC_FL_RunContent == 0 || DetectFlashVer == 0) {
@@ -61,7 +61,6 @@ var initCal = function() {
 			} else {
 				var hasRightVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
 				if(hasRightVersion) {
-     			
      			flash=AC_FL_RunContent(
 					'codebase', 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0',
 					'width', '360',
@@ -204,10 +203,11 @@ var closeModal = function(hash)
 
             if (hash.refreshAfterClose == true)
             {
-                window.location.href = document.location.href;
+                window.location.href = document.location.href+((document.location.href.lastIndexOf('cmd=list') > -1)?'':((document.location.href.lastIndexOf('?') > -1)?'&cmd=list':'?&cmd=list'));
+				//alert(window.location.href);
             }
             initEdtBtns();
-		 				initDelBtns();
+		 	initDelBtns();
 
         });
     };

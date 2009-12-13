@@ -67,7 +67,7 @@ class tx_metafeedit_sqlengine {
 				if ($conf['list.']['sqlcalcfields.'][$fieldName]) {
 					$calcField=$conf['list.']['sqlcalcfields.'][$fieldName]; // TO BE IMPROVED
 					if ($calcField) {				
-						if (eregi("min\(|max\(|count\(|sum\(|avg\(",$calcField)) {
+						if (preg_match("/min\(|max\(|count\(|sum\(|avg\(/i",$calcField)) {
 							// we test for group by functions
 							$sumSQLFields.=$sumSQLFields?",$calcField as sum_$fieldName":"$calcField as sum_$fieldName";
 						} else {
@@ -729,7 +729,7 @@ class tx_metafeedit_sqlengine {
     * @return	[type]		...
     */
 
-	function getListSQL($TABLES,$DBSELECT,&$conf,&$markerArray,&$DEBUG)	
+	function getListSQL($TABLES,$DBSELECT,&$conf,&$markerArray,&$DEBUG)	{
 		$sql=array();
 		die($TABLES);
 		$sql['fromTables']=$TABLES;

@@ -300,10 +300,10 @@ class tx_metafeedit_flexfill {
 	function getFields(&$params,$table,$rel) {
 		global $TCA;
 		$prefix=$rel?$rel.'.':'';
-		//$this->loadTCA($table);
+		t3lib_div::loadTCA($table);
 		if (is_array($TCA[$table]['columns']))  {
 			foreach($TCA[$table]['columns'] as $key => $config)     {
-				$label = t3lib_div::fixed_lgd(ereg_replace(':$','',$GLOBALS['LANG']->sL($config['label'])),30).' ('.$prefix.$key.')';
+				$label = t3lib_div::fixed_lgd(preg_replace('/:$/','',$GLOBALS['LANG']->sL($config['label'])),30).' ('.$prefix.$key.')';
 				$params['items'][]=Array($label, $prefix.$key);
 			}
 		}
@@ -333,9 +333,9 @@ class tx_metafeedit_flexfill {
 
 		if (is_array($TCA[$table]['columns']))  {
 			foreach($TCA[$table]['columns'] as $key => $config)     {
-				$label = t3lib_div::fixed_lgd(ereg_replace(':$','',$GLOBALS['LANG']->sL($config['label'])),30).' ASC ('.$prefix.$key.')';
+				$label = t3lib_div::fixed_lgd(preg_replace('/:$/','',$GLOBALS['LANG']->sL($config['label'])),30).' ASC ('.$prefix.$key.')';
 				$params['items'][]=Array($label, $prefix.$key.':asc' );
-				$label = t3lib_div::fixed_lgd(ereg_replace(':$','',$GLOBALS['LANG']->sL($config['label'])),30).' DESC ('.$prefix.$key.')';
+				$label = t3lib_div::fixed_lgd(preg_replace('/:$/','',$GLOBALS['LANG']->sL($config['label'])),30).' DESC ('.$prefix.$key.')';
 				$params['items'][]=Array($label, $prefix.$key.':desc' );
 			}
 		}
@@ -364,11 +364,11 @@ class tx_metafeedit_flexfill {
 
 		global $TCA;
 		$ta=array();
-		//$this->loadTCA($table);
+		t3lib_div::loadTCA($table);
         if (is_array($TCA[$table]['columns']))  {
             foreach($TCA[$table]['columns'] as $key => $config)     {
 				if ($config['config']['foreign_table']) {
-                    $label = t3lib_div::fixed_lgd(ereg_replace(':$','',$GLOBALS['LANG']->sL($config['label'])),30).' ('.($prefix?$prefix.'.':'').$key.')';
+                    $label = t3lib_div::fixed_lgd(preg_replace('/:$/','',$GLOBALS['LANG']->sL($config['label'])),30).' ('.($prefix?$prefix.'.':'').$key.')';
                     $params['items'][]=Array($label, ($prefix?$prefix.'.':'').$key);
                     //echo ($prefix?$prefix.'.':'').$key."-$label<br>";
 				}

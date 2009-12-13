@@ -1,5 +1,4 @@
 * List mode
-  Searche by alphabetecal order on label field
   Search by category
 
 * Edit & Create Mode
@@ -8,12 +7,13 @@
   afterSave function in BE
 * General
   Error messages in localLang
-  
-* getdata allow use of user functions ??
-
+ 
 * default preview mode should be acvtive if ajax mode activated
 
 * advanced search selector :
 - allow to select values among values of table.
 - allow filters to react to other filters values.
 
+* bug on creation evalFields
+
+*bug on datagrid save...we lose grid ...

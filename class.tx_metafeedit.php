@@ -11,7 +11,7 @@
 *  it under the terms of the GNU General Public License as published by
 *  the Free Software Foundation; either version 2 of the License, or
 *  (at your option) any later version.
-*f
+*
 *  The GNU General Public License can be found at
 *  http://www.gnu.org/copyleft/gpl.html.
 *
@@ -154,6 +154,9 @@ class tx_metafeedit extends  tslib_pibase {
     		'<input type="hidden" id="mfdt_orderBy" name="'.$this->prefixId.'[orderBy]" value="" />'.
 				'</form>';
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf size ']=strlen(serialize($conf))." Bytes"; 
+		    /**** ADDS THE REQUIRED JAVASCRIPTS ****/    
+
+    	$content .= $this->getJSAfter();
 		return ($conf['performanceaudit']?t3lib_div::view_array($this->caller->perfArray):'').$form.$content;
   	}    
 
@@ -192,9 +195,6 @@ class tx_metafeedit extends  tslib_pibase {
         $this->cObj=$GLOBALS['TSFE']->cObj;
         $this->templateObj = t3lib_div::makeInstance('mediumDoc');
         $this->table = $conf['table'];
-
-        //$conf['cmd'] = (string)t3lib_div::_GP('cmd') ? (string)t3lib_div::_GP('cmd') : $conf['defaultCmd'];
-        //$conf['cmd'] = (string)$conf['forcedCmd'] ? $conf['forcedCmd'] : $conf['cmd'];
         
         // we check here editUnique Creation Mode
                 
@@ -205,11 +205,13 @@ class tx_metafeedit extends  tslib_pibase {
             $lockPid = $conf['edit.']['menuLockPid'] ? ' AND pid='.intval($thePid) : '';
             $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $this->table.($mmTable?','.$mmTable:'') , '1 '.$lockPid.$DBSELECT);
             $resu=$GLOBALS['TYPO3_DB']->sql_num_rows($res);
-            // CBY I must improve this condition !!
+            //TODO CBY I must improve this condition !!
         	if ($resu===0 &&  $this->cmd!='setfixed') $conf['inputvar.']['cmd']='create';
         }
         
-        if (!$conf['inputvar.']['cmd']) $conf['inputvar.']['cmd']='edit';
+        if (!$conf['inputvar.']['cmd']) die ("META_FEEDIT ERROR: NO COMMAND SPECIFIED FOR THE SCRIPT");
+
+		//$conf['inputvar.']['cmd']='edit';
         //$conf['cmd']=$this->cmd;
         //	debug("WARNING:: NO COMMAND SPECIFIED FOR THE SCRIPT","NO COMMAND");
         
@@ -311,8 +313,12 @@ class tx_metafeedit extends  tslib_pibase {
 		}
 		
 	    // Set private TCA var
-		//$this->TCA = &$GLOBALS['TCA'][$this->table];
-		//$this->TCAN = &$GLOBALS['TCA']; // can I remove this ?
+		
+		if (is_array($conf['general.']['tsOverride.'])) {
+			$settings=$this->metafeeditlib->postProcessSettings($conf['general.']['tsOverride.']);
+			$conf['TCAN'] = t3lib_div::array_merge_recursive_overrule($conf['TCAN'], $settings);
+		}
+		
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after TCA size 0 ']=strlen(serialize($conf))." Bytes"; 
 	    //$conf['TCAN']=&$GLOBALS['TCA']; // 400 K ...
 
@@ -352,7 +358,6 @@ class tx_metafeedit extends  tslib_pibase {
             foreach($conf['_LOCAL_LANG.'] as $key=>$valarr) {
 				$nkey=substr($key,0,strpos($key,'.')); 
             	foreach($valarr as $skey=>$sval) {
-					//modif cmd - on ne regénère pas - met chaque info dans une clef précise - on garde au minimum table.champ, le reste est ajoute ensuite
 					if (is_array($sval)) {
             	        $svala=$sval;
             	        foreach($svala as $skey2=>$sval) {
@@ -374,7 +379,7 @@ class tx_metafeedit extends  tslib_pibase {
         $conf['LLkey']=$this->LLkey;       
         $conf['LOCAL_LANG']['default']=&$this->LOCAL_LANG['default'];
         $conf['LOCAL_LANG'][$conf['LLkey']]=&$this->LOCAL_LANG[$conf['LLkey']];
-        unset($conf['_LOCAL_LANG.']);
+		unset($conf['_LOCAL_LANG.']);
  		/**** Init language object (used for translation of labels) ****/
 		$GLOBALS['TSFE']->initLLvars();
     }
@@ -406,12 +411,12 @@ class tx_metafeedit extends  tslib_pibase {
 						$farr[]=$parts[0].';'.$parts[1];
 					}
     			} else {
-							if ($fN) {
-    	  	  	$conf[$cmd.'.']['fields'] = $conf[$cmd.'.']['fields'] ? $conf[$cmd.'.']['fields'].','.$fN : $fN;
-								$farr[]=$fN;
-							}
-						}
+					if ($fN) {
+						$conf[$cmd.'.']['fields'] = $conf[$cmd.'.']['fields'] ? $conf[$cmd.'.']['fields'].','.$fN : $fN;
+						$farr[]=$fN;
 					}
+				}
+			}
 
     		// CBY :: here we handle the new evalValues mecanism if empty we take the default config.eval value
 		  	// here whe should merge the eval arrays ....
@@ -428,7 +433,7 @@ class tx_metafeedit extends  tslib_pibase {
     		                $conf['TCAN'][$table]['columns'][$fN.'_file'] = $conf['TCAN'][$table]['columns'][$fN]; // the new upload field should have the same upload folder as the original field
     		                $conf['TCAN'][$table]['columns'][$fN.'_file']['imagealiasfield']=$fN;
     		                //$conf['TCAN'][$table]['columns'][$fN.'_file']['config']['uploadfolder'] = $conf['TCAN'][$table]['columns'][$fN]['config']['uploadfolder']; // the new upload field should have the same upload folder as the original field
-    		                $conf['parseValues.'][$fN.'_file'] = 'files['.ereg_replace(',',';',$conf['TCAN'][$table]['columns'][$fN]['config']['allowed']).']['.$conf['TCAN'][$table]['columns'][$fN]['config']['max_size'].']'; // adds the parse options for the new field, so it will be parsed as a file.
+    		                $conf['parseValues.'][$fN.'_file'] = 'files['.preg_replace('/,/',';',$conf['TCAN'][$table]['columns'][$fN]['config']['allowed']).']['.$conf['TCAN'][$table]['columns'][$fN]['config']['max_size'].']'; // adds the parse options for the new field, so it will be parsed as a file.
     		        }
     		}
 		}
@@ -454,7 +459,8 @@ class tx_metafeedit extends  tslib_pibase {
         /**** CHECK IF LOGIN IS REQUIRED ****/
         //CBY: if($conf['requireLogin'] && !$GLOBALS['TSFE']->loginUser) return $this->metafeeditlib->getLL("login_required_message",$conf);
         /**** FE ADMIN LIB ****/
-        $conf["templateContent"]= $this->getDefaultTemplate($conf); // gets the default template
+       //$conf['parentObj']=&$this;
+       $conf["templateContent"]= $this->getDefaultTemplate($conf); // gets the default template
 
         // generate default template in browser if required to.
         if ($conf['generateTemplate']){
@@ -509,61 +515,68 @@ class tx_metafeedit extends  tslib_pibase {
     function getDefaultTemplate(&$conf)	{
         $callerMethods = get_class_methods(get_class($this->caller));
         $template = array_search('getrequiredtemplate',$callerMethods) || array_search('getRequiredTemplate',$callerMethods)?
-          $this->caller->getRequiredTemplate($conf) : $this->getRequiredTemplate($conf);
+		$this->caller->getRequiredTemplate($conf) : $this->getRequiredTemplate($conf);
         $template .= array_search('getemailtemplate',$callerMethods) || array_search('getEmailTemplate',$callerMethods)?$this->caller->getEmailTemplate($conf) : $this->getEmailTemplate($conf);
         $nbCols = $this->piVars['nbCols'];
         
-        if ($conf['generateTemplate']){
-          $template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
-          $template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
-          if ($conf['list.']['csv']) $template .= array_search('getCSVTemplate',$callerMethods) || array_search('getCSVTemplate',$callerMethods)?  $this->caller->getCSVTemplate($conf) : $this->getCSVTemplate($conf);
-          if ($conf['list.']['xls']) $template .= array_search('getExcelTemplate',$callerMethods) || array_search('getExcelTemplate',$callerMethods)?  $this->caller->getExcelTemplate($conf) : $this->getExcelTemplate($conf);
-          if ($conf['list.']['pdf']) $template .= array_search('getPDFTemplate',$callerMethods) || array_search('getPDFTemplate',$callerMethods)?  $this->caller->getPDFTemplate($conf) : $this->getPDFTemplate($conf);
-          if ($conf['list.']['pdf'] || $conf['edit.']['pdf']) $template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);
-          if ($conf['list.']['pdf']) $template .= array_search('getPDFTABTemplate',$callerMethods) || array_search('getPDFTABTemplate',$callerMethods)?  $this->caller->getPDFTABTemplate($conf) : $this->getPDFTABTemplate($conf);
-          if ($conf['grid.']['pdf']) $template .= array_search('getGridPDFTemplate',$callerMethods) || array_search('getGridPDFTemplate',$callerMethods)?  $this->caller->getGridPDFTemplate($conf) : $this->getGridPDFTemplate($conf);
-          if ($conf['grid.']['csv']) $template .= array_search('getGridCSVTemplate',$callerMethods) || array_search('getGridCSVTemplate',$callerMethods)?  $this->caller->getGridCSVTemplate($conf) : $this->getGridCSVTemplate($conf);
-          if ($conf['grid.']['xls']) $template .= array_search('getGridExcelTemplate',$callerMethods) || array_search('getGridExcelTemplate',$callerMethods)?  $this->caller->getGridExcelTemplate($conf) : $this->getGridExcelTemplate($conf);
-          
-          $template .= array_search('getcreatetemplate',$callerMethods) || array_search('getCreateTemplate',$callerMethods)?  $this->caller->getCreateTemplate($conf) : $this->getCreateTemplate($conf);
-          $template .= array_search('getdeletetemplate',$callerMethods) || array_search('getDeleteTemplate',$callerMethods)?
-        $this->caller->getDeleteTemplate($conf) : $this->getDeleteTemplate($conf);
-          $template .= array_search('getsetfixedtemplate',$callerMethods) || array_search('getSetfixedTemplate',$callerMethods)?  $this->caller->getSetfixedTemplate($conf) : $this->getSetfixedTemplate($conf);
-        } else {
-        switch((string) $conf['inputvar.']['cmd']) {
-        case 'edit':
-          $template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
-          $template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
-	        if ($conf['piVars']['exporttype']) {
-	          if ($conf['list.']['csv']) $template .= array_search('getCSVTemplate',$callerMethods) || array_search('getCSVTemplate',$callerMethods)?  $this->caller->getCSVTemplate($conf) : $this->getCSVTemplate($conf);
-	          if ($conf['list.']['excel']) $template .= array_search('getExcelTemplate',$callerMethods) || array_search('getExcelTemplate',$callerMethods)?  $this->caller->getExcelTemplate($conf) : $this->getExcelTemplate($conf);
-	          if ($conf['list.']['pdf']) $template .= array_search('getPDFTemplate',$callerMethods) || array_search('getPDFTemplate',$callerMethods)?  $this->caller->getPDFTemplate($conf) : $this->getPDFTemplate($conf);
-	          if ($conf['list.']['pdf'] || $conf['edit.']['pdf']) $template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);
-	          if ($conf['list.']['pdf']) $template .= array_search('getPDFTABTemplate',$callerMethods) || array_search('getPDFTABTemplate',$callerMethods)?  $this->caller->getPDFTABTemplate($conf) : $this->getPDFTABTemplate($conf);
-
-	          if ($conf['grid.']['pdf']) $template .= array_search('getGridPDFTemplate',$callerMethods) || array_search('getGridPDFTemplate',$callerMethods)?  $this->caller->getGridPDFTemplate($conf) : $this->getGridPDFTemplate($conf);
-	          if ($conf['grid.']['csv']) $template .= array_search('getGridCSVTemplate',$callerMethods) || array_search('getGridCSVTemplate',$callerMethods)?  $this->caller->getGridCSVTemplate($conf) : $this->getGridCSVTemplate($conf);
-	          if ($conf['grid.']['xls']) $template .= array_search('getGridExcelTemplate',$callerMethods) || array_search('getGridExcelTemplate',$callerMethods)?  $this->caller->getGridExcelTemplate($conf) : $this->getGridExcelTemplate($conf);
-	        }  
-        		$template .= array_search('getmediaplayertemplate',$callerMethods) || array_search('getMediaPlayerTemplate',$callerMethods)?  $this->caller->getMediaPlayerTemplate($conf): $this->getMediaPlayerTemplate($conf);
-          break;
-        case 'create':
-          $template .= array_search('getcreatetemplate',$callerMethods) || array_search('getCreateTemplate',$callerMethods)?
-        $this->caller->getCreateTemplate($conf) : $this->getCreateTemplate($conf);
-          $template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
-          break;
-        case 'delete':
-          $template .= array_search('getdeletetemplate',$callerMethods) || array_search('getDeleteTemplate',$callerMethods)?
-        $this->caller->getDeleteTemplate($conf) : $this->getDeleteTemplate($conf);
-          break;
-        case 'setfixed':
-          $template .= array_search('getsetfixedtemplate',$callerMethods) || array_search('getSetfixedTemplate',$callerMethods)?
-        $this->caller->getSetfixedTemplate($conf) : $this->getSetfixedTemplate($conf);
-          break;
-        default:
-          debug('meta_feedit->getDefaultTemplate():: No template found for cmd='.$conf['inputvar.']['cmd'],'No Template');
-          $template = '';
-        }
+		if ($conf['generateTemplate']){ // We generate all templates
+			$template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
+			$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
+			if ($conf['list.']['csv']) $template .= array_search('getCSVTemplate',$callerMethods) || array_search('getCSVTemplate',$callerMethods)?  $this->caller->getCSVTemplate($conf) : $this->getCSVTemplate($conf);
+			if ($conf['list.']['xls']) $template .= array_search('getExcelTemplate',$callerMethods) || array_search('getExcelTemplate',$callerMethods)?  $this->caller->getExcelTemplate($conf) : $this->getExcelTemplate($conf);
+			if ($conf['list.']['pdf']) $template .= array_search('getPDFTemplate',$callerMethods) || array_search('getPDFTemplate',$callerMethods)?  $this->caller->getPDFTemplate($conf) : $this->getPDFTemplate($conf);
+			if ($conf['list.']['pdf'] || $conf['edit.']['pdf']) $template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);
+			if ($conf['list.']['pdf']) $template .= array_search('getPDFTABTemplate',$callerMethods) || array_search('getPDFTABTemplate',$callerMethods)?  $this->caller->getPDFTABTemplate($conf) : $this->getPDFTABTemplate($conf);
+			if ($conf['grid.']['pdf']) $template .= array_search('getGridPDFTemplate',$callerMethods) || array_search('getGridPDFTemplate',$callerMethods)?  $this->caller->getGridPDFTemplate($conf) : $this->getGridPDFTemplate($conf);
+			if ($conf['grid.']['csv']) $template .= array_search('getGridCSVTemplate',$callerMethods) || array_search('getGridCSVTemplate',$callerMethods)?  $this->caller->getGridCSVTemplate($conf) : $this->getGridCSVTemplate($conf);
+			if ($conf['grid.']['xls']) $template .= array_search('getGridExcelTemplate',$callerMethods) || array_search('getGridExcelTemplate',$callerMethods)?  $this->caller->getGridExcelTemplate($conf) : $this->getGridExcelTemplate($conf);
+			$template .= array_search('getcreatetemplate',$callerMethods) || array_search('getCreateTemplate',$callerMethods)?  $this->caller->getCreateTemplate($conf) : $this->getCreateTemplate($conf);
+			$template .= array_search('getdeletetemplate',$callerMethods) || array_search('getDeleteTemplate',$callerMethods)?
+			$this->caller->getDeleteTemplate($conf) : $this->getDeleteTemplate($conf);
+			$template .= array_search('getsetfixedtemplate',$callerMethods) || array_search('getSetfixedTemplate',$callerMethods)?  $this->caller->getSetfixedTemplate($conf) : $this->getSetfixedTemplate($conf);
+		} else {
+			switch((string) $conf['inputvar.']['cmd']) {
+				case 'edit':
+					$template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
+					if ($conf['list.']['pdf'] || $conf['edit.']['pdf']) {
+						$template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);	          
+						//$template .= array_search('getGridPDFTemplate',$callerMethods) || array_search('getGridPDFTemplate',$callerMethods)?  $this->caller->getGridPDFTemplate($conf) : $this->getGridPDFTemplate($conf);
+					}
+					//$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
+					$template .= array_search('getmediaplayertemplate',$callerMethods) || array_search('getMediaPlayerTemplate',$callerMethods)?  $this->caller->getMediaPlayerTemplate($conf): $this->getMediaPlayerTemplate($conf);
+				case 'list':
+					$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
+					if ($conf['piVars']['exporttype']) {
+						if ($conf['list.']['csv']) $template .= array_search('getCSVTemplate',$callerMethods) || array_search('getCSVTemplate',$callerMethods)?  $this->caller->getCSVTemplate($conf) : $this->getCSVTemplate($conf);
+						if ($conf['list.']['excel']) $template .= array_search('getExcelTemplate',$callerMethods) || array_search('getExcelTemplate',$callerMethods)?  $this->caller->getExcelTemplate($conf) : $this->getExcelTemplate($conf);
+						if ($conf['list.']['pdf']) $template .= array_search('getPDFTemplate',$callerMethods) || array_search('getPDFTemplate',$callerMethods)?  $this->caller->getPDFTemplate($conf) : $this->getPDFTemplate($conf);
+						if ($conf['list.']['pdf']) $template .= array_search('getPDFTABTemplate',$callerMethods) || array_search('getPDFTABTemplate',$callerMethods)?  $this->caller->getPDFTABTemplate($conf) : $this->getPDFTABTemplate($conf);
+						//if ($conf['grid.']['csv']) $template .= array_search('getGridCSVTemplate',$callerMethods) || array_search('getGridCSVTemplate',$callerMethods)?  $this->caller->getGridCSVTemplate($conf) : $this->getGridCSVTemplate($conf);
+						//if ($conf['grid.']['xls']) $template .= array_search('getGridExcelTemplate',$callerMethods) || array_search('getGridExcelTemplate',$callerMethods)?  $this->caller->getGridExcelTemplate($conf) : $this->getGridExcelTemplate($conf);
+					}  
+					break;
+				case 'create':
+					$template .= array_search('getcreatetemplate',$callerMethods) || array_search('getCreateTemplate',$callerMethods)?
+					$this->caller->getCreateTemplate($conf) : $this->getCreateTemplate($conf);
+					$template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
+					/*if ($conf['list.']['pdf'] || $conf['edit.']['pdf']) {
+						$template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);	          
+					}
+					$template .= array_search('getmediaplayertemplate',$callerMethods) || array_search('getMediaPlayerTemplate',$callerMethods)?  $this->caller->getMediaPlayerTemplate($conf): $this->getMediaPlayerTemplate($conf);
+					*/
+					break;
+				case 'delete':
+					$template .= $this->getDeleteTemplate($conf);
+					$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
+					break;
+				case 'setfixed':
+					$template .= array_search('getsetfixedtemplate',$callerMethods) || array_search('getSetfixedTemplate',$callerMethods)?
+					$this->caller->getSetfixedTemplate($conf) : $this->getSetfixedTemplate($conf);
+					break;
+				default:
+					debug('meta_feedit->getDefaultTemplate():: No template found for cmd='.$conf['inputvar.']['cmd'],'No Template');
+					$template = '';
+			}
         }
         return $template;
     }
@@ -645,6 +658,12 @@ class tx_metafeedit extends  tslib_pibase {
 			 	  $res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',array());
 			 	  $table=$res['relTable'];
 				  $fNiD=$res['fNiD'];
+					$masterTable=$cmd=='blog'?'tx_metafeedit_comments':$conf['table'];
+					$evclasses='';
+					$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']);
+					foreach($evals as $ev) {
+						$evclasses.=' '.$this->caller->pi_getClassName('form-data-'.$ev);
+					}
 			      $label = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$table]['columns'][$fNiD]['label'],$conf);
 				  $out_array[$out_sheet][]='<div  class="'.$this->caller->pi_getClassName($fsc?'fsc':'form-row').' '.$this->caller->pi_getClassName(($fsc?'fsc-':'form-row-').$fN).'">
                     <div class="'.$this->caller->pi_getClassName($fsc?'fsl':'form-label').' '.$this->caller->pi_getClassName(($fsc?'fsl-':'form-label-').$fN).'">
@@ -652,8 +671,7 @@ class tx_metafeedit extends  tslib_pibase {
                     '.$label. '
                     '.$helpIcon.'
                     </div>
-                    <div'.$this->caller->pi_classParam($fsc?'fsf':'form-field').'>'.$fieldCode.'</div>
-                    '.$msg.'</div>';
+                    <div class="'.$this->caller->pi_getClassName($fsc?'fsf':'form-field').$evclasses.'">'.$fieldCode.'</div>'.$msg.'</div>';
 				}
             }
         }
@@ -885,7 +903,7 @@ class tx_metafeedit extends  tslib_pibase {
       // special cases requiring presentation transformation
 	  $evals=t3lib_div::trimexplode(',',$conf['TCAN'][$table]['columns'][$fNiD]['config']["eval"]);
 	  
-      if(in_array('date',$evals) || in_array('datetime',$evals)) $values = '###FIELD_EVAL_'.$fN.'###';
+      if(in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) $values = '###FIELD_EVAL_'.$fN.'###';
       if (in_array('wwwURL',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
       if (in_array('email',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
 
@@ -900,6 +918,8 @@ class tx_metafeedit extends  tslib_pibase {
 				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'),$feData[$masterTable][$fN]);
       } else if(in_array('datetime',$evals) && !empty($feData[$masterTable][$fN])) {
 				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'),$feData[$masterTable][$fN]);
+      } else if(in_array('time',$evals) && !empty($feData[$masterTable][$fN])) {
+				$values = strftime('%H:%M',$feData[$masterTable][$fN]);
       }
 
       if($displayTwice) {
@@ -981,7 +1001,9 @@ class tx_metafeedit extends  tslib_pibase {
 	    if(!empty($item)) {
 	      list($label,$val) = $item;
 	      if(in_array($val,$vals)) {
-		$values .= $values ? ', ' . $label : $label;
+			//TODO test Change
+	      	$tmpLL=$this->metafeeditlib->getLLFromLabel($label,$conf);	      
+			$values .= $values ? ', ' . $tmpLL : $tmpLL;
 	      }
 	    }
 	  }
@@ -1039,10 +1061,16 @@ class tx_metafeedit extends  tslib_pibase {
         $gridMark=$bgrid?'###GRIDCELL###':'';
         $gridMarkAlt=$bgrid?'###GRIDCELLALT###':'';
         $fieldName = 'FE['.$masterTable.']'.$gridMark.'['.$fN.']';
-        $idFieldName = 'FE.'.$masterTable.'.'.$gridMark.'.'.$fN.'.';
-        $class='class="'.$this->caller->pi_getClassName('form-data').' '.$this->caller->pi_getClassName('form-data-'.$fN).'" ';
+		$idFieldName = 'FE.'.$masterTable.'.'.$gridMark.'.'.$fN.'.';
+				
+		$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']);
+		foreach($evals as $ev) {
+			$evclasses.=' '.$this->caller->pi_getClassName('form-data-'.$ev);
+		}
+
+
+        $class='class="'.$this->caller->pi_getClassName('form-data').' '.$this->caller->pi_getClassName('form-data-'.$fN).$evclasses.'" ';
         $defaultParams = ' name="'.$fieldName.'"'.$class;
-        //$EVAL_ERROR_FIELD= ($cmd=='edit')?'<div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'###</div>':'';
         $EVAL_ERROR_FIELD=$bgrid?'':'<div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'###</div>';
         $onchange = 'onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';
         $defaultParams_feVal = ' name="'.$fieldName.'_feVal" '.$onchange.$class;
@@ -1375,15 +1403,15 @@ class tx_metafeedit extends  tslib_pibase {
 
 	        if ($params[0]!='--div--'  && $params[0]!='--fse--' && $params[0]!='--fsb--') {
         		$masterTable = $conf['table'];
-						$size = $this->getSize($conf, $FN, $masterTable);
-	          $ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',array());     
+				$size = $this->getSize($conf, $FN, $masterTable);
+				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',array());     
 	        	$Lib=$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf);
 	        	$href=$this->metafeeditlib->hsc($conf,$this->pi_linkTP_keepPIvars_url(array('sort' => $FN.':###SORT_DIR_'.$FN.'###'),1));
 	        	if(!$textmode) {
 	        			if ($this->piVars['exporttype']==EXCEL)
 	        			    $ret.='<th><data>'.$Lib.'</data><size>'.$size.'</size></th>';
 	        			else
-	        			    $ret.=$conf['list.']['sortFields']?'<th><a class="###SORT_CLASS_'.$FN.'###" href="'.$href.'"><i>&nbsp;</i>'.$Lib.'</a></th>':'<th>'.$Lib.'</th>';
+	        			    $ret.=$conf['list.']['sortFields']?'<th><a class="###SORT_CLASS_'.$FN.'###" href="'.$href.'">'.$Lib.'</a></th>':'<th>'.$Lib.'</th>';
 	        	} else if ($type) {
 							//$img=0;
 							//if( $conf['TCAN'][$masterTable]['columns'][$FN]['config']['type']== 'group' &&  $conf['TCAN'][$masterTable]['columns'][$FN]['config']['internal_type']=='file') $img=1;
@@ -1616,10 +1644,10 @@ class tx_metafeedit extends  tslib_pibase {
 				$masterTable = $conf['table'];
 				$sumarray=t3lib_div::trimexplode(',',$conf['list.']['sumFields']);
 				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',array());               
- 				$Lib='Total '.$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf).':';
+ 				$Lib=$this->metafeeditlib->getLLFromLabel('total',$conf).' '.$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf).':';
 				$size = $this->getSize($conf, $_FN, $masterTable);
 				
-				if (!(in_array($_FN,$sumarray))) {			// If field is not a sum field ...
+				if (!in_array($_FN,$sumarray) && !in_array($FN,$sumarray)) {			// If field is not a sum field ...
 					if ($textmode){
 						if ($type)					// Empty cell for PDF
 						$ret .= '<td><data>'.($firstemptycell?$firstemptycell:'').'</data><size>'.$size.'</size></td>';
@@ -1633,13 +1661,14 @@ class tx_metafeedit extends  tslib_pibase {
 					
 				} else {   						// Field is a sum field
 					$count++;
+					$mfn=in_array($FN,$sumarray)?$FN:$_FN;
 					if (!$textmode)			// Not text mode only
-						$ret.='<td '.($conf['list.']['align.'][$_FN]?'align="'.$conf['list.']['align.'][$_FN].'"':'').'>'.'###'.$prefix.'_FIELD_'.$_FN.'###</td>';
+						$ret.='<td '.($conf['list.']['align.'][$mfn]?'align="'.$conf['list.']['align.'][$mfn].'"':'').'>'.'###'.$prefix.'_FIELD_'.$mfn.'###</td>';
 					else  {
 						if ($type) 						// Fichier PDF
-							$ret.='<td><data>###'.$prefix.'_FIELD_'.$_FN.'###</data><size>'.$size.'</size></td>';
+							$ret.='<td><data>###'.$prefix.'_FIELD_'.$mfn.'###</data><size>'.$size.'</size></td>';
 						else 
-							$ret.=$Lib.'###'.$prefix.'_FIELD_'.$_FN.'###;';
+							$ret.=$Lib.'###'.$prefix.'_FIELD_'.$mfn.'###;';
 					}
 				}
 			}
@@ -1661,19 +1690,19 @@ class tx_metafeedit extends  tslib_pibase {
 	$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
 	foreach($fieldArray as $FN) {
  		$params=t3lib_div::trimExplode(';',$FN);
-    if ($params[0]!='--div--') {
-			$Lib='Total '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][trim($FN)]['label'],$conf).':';
+		if ($params[0]!='--div--') {
+			$Lib=$this->metafeeditlib->getLLFromLabel('total',$conf).' '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][trim($FN)]['label'],$conf).':';
 			if(!$textmode) {
 				$ret.='<td>'.$Lib.'###SUM_FIELD_'.$FN.'###</td>';
 			} else if ($type) {
-						$masterTable = $conf['table'];
-						$size = $this->getSize($conf, $FN, $masterTable);
-						$ret.='<td><data>'.$Lib.'###SUM_FIELD_'.$FN.'###</data><size>'.$size.'</size></td>';	
-					} else {
-						  $ret.=$Lib.'###SUM_FIELD_'.$FN.'###;';	
-					}
+				$masterTable = $conf['table'];
+				$size = $this->getSize($conf, $FN, $masterTable);
+				$ret.='<td><data>'.$Lib.'###SUM_FIELD_'.$FN.'###</data><size>'.$size.'</size></td>';	
+			} else {
+				  $ret.=$Lib.'###SUM_FIELD_'.$FN.'###;';	
 			}
 		}
+	}
 	return $ret;
   }
 	/**
@@ -1826,7 +1855,8 @@ class tx_metafeedit extends  tslib_pibase {
 				$classFn = str_replace('.', '_', $fN);
 				// Total processing 
 				$size = $this->getSize($conf, $fN, $conf['table']);
-				$div=($textmode?'':'<div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.'Total : ###GROUPBYFOOTER_'.$fN.'###(###FOOTERSUM_'.$fN.'_FIELD_metafeeditnbelts###)'.($textmode?'':'</div>');
+
+				$div=($textmode?'':'<div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.$this->metafeeditlib->getLLFromLabel('total',$conf).' ###GROUPBYFOOTER_'.$fN.'###'.($conf['list.']['groupByCount']?'(###FOOTERSUM_'.$fN.'_FIELD_metafeeditnbelts###)':'').($textmode?'':'</div>');
 				if ($conf['list.']['sumFields']) {
 					$sum='<!--###FOOTERSUM_FIELDS### begin -->'.$this->getEditSumFields('FOOTERSUM_'.$fN,$conf,$count, $textmode, $exporttype);
 					//$tmp.='<tr>'.$this->getSumFields($conf, false, 'html').'</tr>'; //TODO Handle undisplayed sumfields ...
@@ -1871,8 +1901,8 @@ class tx_metafeedit extends  tslib_pibase {
     	// TOP ACTIONS TAG	
     	$tmp.= '<table  class="tx-metafeedit-top-actions" style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-TOP###</td></tr></table>';
     	
-       	$tmp.='<div'.$this->caller->pi_classParam('editmenu').'>'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_header",$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_description",$conf).'</div>').' 
-    	<div'.$this->caller->pi_classParam('error').'><!-- -->###EVAL_ERROR###</div>
+       	$tmp.='<div'.$this->caller->pi_classParam('editmenu').'>'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-editmenu').'">'.$this->metafeeditlib->getHeader($this->metafeeditlib->getLL("edit_menu_header",$conf),$rech,$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_description",$conf).'</div>').' 
+    	<div'.$this->caller->pi_classParam('error').'>###EVAL_ERROR###</div>
     	<div'.$this->caller->pi_classParam('editmenu-list').'>'.$this->getSearchBox(&$conf);
     
     	$tmp.='<table '.$this->caller->pi_classParam('editmenu-list-table').' style="width: 100%;">'.($conf['list.']['nbCols']?'':'<tr'.$this->caller->pi_classParam('editmenu-list-table-header').'>###ACTIONS-LIST-LIB###'.$this->getListFields($conf).'</tr>').'<!-- ###ALLITEMS### begin -->';
@@ -1893,11 +1923,11 @@ class tx_metafeedit extends  tslib_pibase {
     	$tmp.=$GROUPBYFOOTERFIELDS.'<!-- ###ALLITEMS### end -->';
     
  		$actFlag=(!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions']));
-   	// Total processing 
+		// Total processing 
     	if ($conf['list.']['sumFields']) {
     		$sum='<!--###SUM_FIELDS### begin---><tr>'.($actFlag?'<td>###FIRSTEMPTYCELL###</td>':'').$this->getEditSumFields('SUM',$conf, $count,false, 'html',$actFlag).'</tr>';   
     		$sum.='<!--###SUM_FIELDS### end--->';
-    		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###','Total (###SUM_FIELD_metafeeditnbelts###)');
+    		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$this->metafeeditlib->getLLFromLabel('total',$conf).($conf['list.']['totalCount']?' (###SUM_FIELD_metafeeditnbelts###)':''));
     		$tmp.=$sum;
     	}
     	// MEDIAPLAYER TAGS
@@ -1906,7 +1936,7 @@ class tx_metafeedit extends  tslib_pibase {
     	$tmp.= '</div></div><table class="tx-metafeedit-bottom-actions" style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-BOTTOM###</td></tr></table>';
 		if ($conf['ajax.']['ajaxOn']) $tmp.= '<div id="modalWindow" class="jqmWindow">
         <div id="jqmTitle" class="jqmTitle jqDrag">
-            <button class="jqmClose">
+            <button class="jqmClose mfdClose">
                X
             </button>
             <span id="jqmTitleText" class="jqmTitleText">Title of modal window</span>
@@ -1916,7 +1946,7 @@ class tx_metafeedit extends  tslib_pibase {
         <img src="typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
     </div>'.'<div id="modalDelWindow" class="jqmWindow">
         <div id="jqmDelTitle" class="jqmTitle jqDrag">
-            <button class="jqmClose">
+            <button class="jqmClose mfdClose">
                X
             </button>
             <span id="jqmDelTitleText" class="jqmTitleText" >Title of modal window</span>
@@ -1927,7 +1957,7 @@ class tx_metafeedit extends  tslib_pibase {
     </div>'.
     '<div id="modalImgWindow" class="jqmWindow">
         <div id="jqmImgTitle" class="jqmTitle jqDrag">
-        	<button class="jqmClose">X</button>
+        	<button class="jqmClose mfdClose">X</button>
            <span id="jqmImgTitleText" class="jqmTitleText" >Title of image window</span>
         </div>
         <div id="jqmImgContent" class="jqmContent"></div>
@@ -1942,13 +1972,13 @@ class tx_metafeedit extends  tslib_pibase {
 	   	// TODO  We get Search Filter here (MUST BE REPLACED by tag !!!!!)....
     	// TODO Put all this in function getSearchFilter ..
         //-- Should be put in fe_adminLib
-		$fulltext=$conf['inputvar.']['sword']?$this->metafeeditlib->getLL("fulltext_search",$conf).' "'.$conf['inputvar.']['sword'].'"':'';
+		$fulltext=$conf['inputvar.']['sword']?$this->metafeeditlib->getLL("fulltext_search",$conf).' = "'.$conf['inputvar.']['sword'].'"':'';
 		$obs=t3lib_div::trimexplode(':',$conf['inputvar.']['sort']);
 		$orderby=$obs[0]?$this->metafeeditlib->getLL("order_by",$conf).' '.$this->metafeeditlib->getLL($obs[0],$conf).' '.($obs[1]?$this->metafeeditlib->getLL("ascending",$conf):$this->metafeeditlib->getLL("descending",$conf)):'';
 		$filterArray=array();
     	$recherche='';
  		if ($fulltext) $filterArray[]=$fulltext;
-		if ($conf['inputvar.']['sortLetter'])  $filterArray[]=$this->metafeeditlib->getLL("filtre_lettre",$conf).' "'.$conf['inputvar.']['sortLetter'].'"';
+		if ($conf['inputvar.']['sortLetter'])  $filterArray[]=$this->metafeeditlib->getLL("filtre_lettre",$conf).' = "'.$conf['inputvar.']['sortLetter'].'"';
 		if (is_array($conf['inputvar.']['advancedSearch'])) {
     		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
     			if($this->metafeeditlib->is_extent($val)) {
@@ -1981,13 +2011,8 @@ class tx_metafeedit extends  tslib_pibase {
 										$val=implode(', ',$vs);
 									}
 								} else if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
-//									$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
-                					foreach ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'] as $index => $value) {
-										if ($val == $conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$index][1]) {
-											$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$index][0],$conf) ;
-										}	
-									}
-								} //rsg
+									$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
+								}
 								break;
 							case 'radio' :
 								$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
@@ -2001,12 +2026,13 @@ class tx_metafeedit extends  tslib_pibase {
 							default:
 								$val=$val.'('.$type.')';
 						}
-						$recherche .= $this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'], $conf).'='.$val;
+						$recherche .= $this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'], $conf).' = '.$val;
 					}
  					if ($recherche) $filterArray[]=$recherche;
 				}
     		}
     	}
+		$filtercnt=count($filterArray);
 		if ($orderby) $filterArray[]=$orderby;
 
 		// Should all be replaceD by marker and evaluation should be done in metafeedit_lib called from feadminlib.inc
@@ -2020,7 +2046,8 @@ class tx_metafeedit extends  tslib_pibase {
     	$filter .= '</div>';
    		*/
 		$searchFlag=((boolean)$conf['list.']['searchBox'] || (boolean)$conf['list.']['alphabeticalSearch'] || (bool)$conf['list.']['advancedSearch'] || (bool)$conf['list.']['calendarSearch']);
-		$ret=($searchFlag?'<fieldset class="tx-metafeedit-fs-searchbox"><legend>'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</legend><span class="tx-metafeedit-sb-filter">'.implode(', ',$filterArray).'</span>'.$this->cObj->stdWrap($this->advancedSearch($conf,$filter),$conf['list.']['advancedSearch.']).'</fieldset>':'');
+		$ret=($searchFlag?'<fieldset class="tx-metafeedit-fs-searchbox"><legend>'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</legend><span class="tx-metafeedit-sb-filter">'.implode(', ',$filterArray).'</span>'.$this->cObj->stdWrap($this->advancedSearch($conf,$filter,$filtercnt),$conf['list.']['advancedSearch.']).'</fieldset>':'');
+		//die($ret);
 		return $ret;
 	}
 	
@@ -2053,7 +2080,7 @@ function getGridTemplate(&$conf) {
 	$tmp='<!-- ###TEMPLATE_GRID### begin -->';
 	$tmp.='<div'.$this->caller->pi_classParam('form-wrap').'>';
 	$tmp.='<form name="'.$conf['table'].'_form" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'" onsubmit="'.implode(';', $this->additionalJS_submit).'">';
-	$tmp.=($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-grid').'">'.$this->metafeeditlib->getLL("grid_header",$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-grid').'">'.$this->metafeeditlib->getLL("edit_grid_description",$conf).'</div>').'
+	$tmp.=($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-grid').'">'.$this->metafeeditlib->getHeader($this->metafeeditlib->getLL("grid_header",$conf),$rech,$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-grid').'">'.$this->metafeeditlib->getLL("edit_grid_description",$conf).'</div>').'
 	<div'.$this->caller->pi_classParam('error').'><!-- -->###EVAL_ERROR###</div>
 	<div'.$this->caller->pi_classParam('grid').'>';
 	
@@ -2071,7 +2098,7 @@ function getGridTemplate(&$conf) {
 }
 
 /**
- * [Describe function...]
+ * getCalendarTemplate
  *
  * @param	[type]		$$conf: ...
  * @return	[type]		...
@@ -2110,47 +2137,46 @@ function getCalendarTemplate(&$conf) {
     function getEditTemplate(&$conf) {
         if(!$conf['disableEdit']) $this->HTMLFormEdit = $this->makeHTMLForm('edit',$conf);
         if($conf['edit.']['preview'] || $conf['blogData']) $this->HTMLPreviewEdit = $this->makeHTMLPreview('edit',$conf);        
-        $tmpl= $this->getEditScreenTemplate($conf);
+		$tmpl= $this->getEditScreenTemplate($conf);
         $tmpl.= $this->getEditPreviewTemplate($conf);
         $tmpl.= $this->getEditSavedTemplate($conf);
         return $tmpl;
     }
 
 	/**
-	 * getEditScreenTemplate :
-	 *
-	 * @param	[type]		$$conf: ...
-	 * @return	[type]		...
-	 */
-  function getEditScreenTemplate(&$conf) {
-  if ($conf['edit.']['screenTpl']) return '<!-- ###TEMPLATE_EDIT### begin -->'.$conf['edit.']['screenTpl'].'<!-- ###TEMPLATE_EDIT### end-->';
-    $tmp= '<!-- ###TEMPLATE_EDIT### begin -->'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-edit').'">'.$this->metafeeditlib->getLL("edit_header_prefix",$conf).' "###FIELD_'.strtolower($this->id_field).'###"</h1>').'
-	'.($conf['text_in_top_of_form']?'<div'.$this->caller->pi_classParam('form-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_form'],$conf['text_in_top_of_form.']).'</div>':'').'
-	<div'.$this->caller->pi_classParam('error').'><!-- -->###EVAL_ERROR###</div>
-	<div'.$this->caller->pi_classParam('form-wrap').'>
-	<form id="'.$conf['pluginId'].'_form" name="'.$conf['pluginId'].'_form" method="POST" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'">
-	<input type="hidden" name="no_cache" value="1">
-	<input type="hidden" id="tx_metafeedit_exporttype" name="tx_metafeedit[exporttype]" value="">
-	<input type="hidden" id="PDF'.$conf['pluginId'].'_et" name="tx_metafeedit[exporttype]" value="PDF"/>
-	<input type="hidden" id="PDF'.$conf['pluginId'].'_cmd" name="cmd['.$conf['pluginId'].']" value="edit"/>
-	<input type="hidden" id="PDF'.$conf['pluginId'].'_rU" name="rU['.$conf['pluginId'].']" value="0"/>
-	</form>
-	<form name="'.$this->table.'_form" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'" onsubmit="'.implode(';', $this->additionalJS_submit).'">
-	'.$this->HTMLFormEdit.'###HIDDENFIELDS###';
-	$tmp.=$this->metafeeditlib->getEditActions($conf,$this);
-	$tmp.='</form></div>';
-	// Why was this deactivated ?
-	if ($conf['blog.']['showComments']) $tmp.=$this->getBlogTemplate($conf);
-	$tmp.='<!-- ###TEMPLATE_EDIT### end-->';
-  return $tmp;
-}
+	* getEditScreenTemplate :
+	*
+	* @param	[type]		$$conf: ...
+	* @return	[type]		...
+	*/
+	function getEditScreenTemplate(&$conf) {
+		if ($conf['edit.']['screenTpl']) return '<!-- ###TEMPLATE_EDIT### begin -->'.$conf['edit.']['screenTpl'].'<!-- ###TEMPLATE_EDIT### end-->';
+			$tmp= '<!-- ###TEMPLATE_EDIT### begin -->'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-edit').'">'.$this->metafeeditlib->getLL("edit_header_prefix",$conf).' "###FIELD_'.strtolower($this->id_field).'###"</h1>').'
+			'.($conf['text_in_top_of_form']?'<div'.$this->caller->pi_classParam('form-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_form'],$conf['text_in_top_of_form.']).'</div>':'').'
+			<div'.$this->caller->pi_classParam('error').'><!-- -->###EVAL_ERROR###</div>
+			<div'.$this->caller->pi_classParam('form-wrap').'>
+			<form id="'.$conf['pluginId'].'_form" name="'.$conf['pluginId'].'_form" method="POST" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'">
+			<input type="hidden" name="no_cache" value="1">
+			<input type="hidden" id="tx_metafeedit_exporttype" name="tx_metafeedit[exporttype]" value="">
+			<input type="hidden" id="PDF'.$conf['pluginId'].'_et" name="tx_metafeedit[exporttype]" value="PDF"/>
+			<input type="hidden" id="PDF'.$conf['pluginId'].'_cmd" name="cmd['.$conf['pluginId'].']" value="edit"/>
+			<input type="hidden" id="PDF'.$conf['pluginId'].'_rU" name="rU['.$conf['pluginId'].']" value="0"/>
+			</form>
+			<form name="'.$this->table.'_form" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'" onsubmit="'.implode(';', $this->additionalJS_submit).'">
+			'.$this->HTMLFormEdit.'###HIDDENFIELDS###';
+			$tmp.=$this->metafeeditlib->getEditActions($conf,$this);
+			$tmp.='</form></div>';
+		if ($conf['blog.']['showComments']) $tmp.=$this->getBlogTemplate($conf);
+		$tmp.='<!-- ###TEMPLATE_EDIT### end-->';
+		return $tmp;
+	}
 
 	/**
-	 * [Describe function...]
-	 *
-	 * @param	[type]		$$conf: ...
-	 * @return	[type]		...
-	 */
+	* getEditPreviewTemplate
+	*
+	* @param	[type]		$$conf: ...
+	* @return	[type]		...
+	*/
   function getEditPreviewTemplate(&$conf) {
   $pluginId=$conf['pluginId'];
   if ($conf['edit.']['previewTpl']) return '<!-- ###TEMPLATE_EDIT_PREVIEW### begin -->'.$conf['edit.']['previewTpl'].'<!-- ###TEMPLATE_EDIT_PREVIEW### end-->';
@@ -2165,8 +2191,8 @@ function getCalendarTemplate(&$conf) {
 		###HIDDENFIELDS###
 		<!-- ###PREVIEWACTIONS### begin -->
 			'.(!$conf['disableEdit']?'
-		<input type="submit" name="doNotSave['.$pluginId.']" value="'.$this->metafeeditlib->getLL("edit_preview_donotsave_label",$conf).'"'.$this->caller->pi_classParam('preview-donotsave').' />
-		<input type="submit" name="submit['.$pluginId.']" value="'.$this->metafeeditlib->getLL("edit_preview_submit_label",$conf).'"'.$this->caller->pi_classParam('preview-submit').' />
+		<button type="submit" name="doNotSave['.$pluginId.']" value="donotsave"'.$this->caller->pi_classParam('preview-donotsave').'>'.$this->metafeeditlib->getLL("edit_preview_donotsave_label",$conf).'</button>
+		<button type="submit" name="submit['.$pluginId.']" value="save"'.$this->caller->pi_classParam('preview-submit').'>'.$this->metafeeditlib->getLL("edit_preview_submit_label",$conf).'</button>
 		':'
 		<table style="width:100%"><tr><td align="left">'.($conf['no_action']?'':($conf['ajax.']['ajaxOn']?'':'<div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div>').'</td><td align="right"><div class="'.$this->caller->pi_getClassName('actions').' '.$this->caller->pi_getClassName('preview-actions').'">'.$conf['actions.']['useractions'].'</div>').'</td></tr></table>
 	').'<!-- ###PREVIEWACTIONS### end -->
@@ -2221,7 +2247,7 @@ function getCalendarTemplate(&$conf) {
 		</div>
 		<!--###CAPTCHA_INSERT###-->':'').'<div'.$this->caller->pi_classParam('blog-row').'><input type="hidden" name="cmd['.$pluginId.']" value="edit" /><input type="hidden" name="blog['.$pluginId.']" value="1" />
 		<input type="hidden" name="rU['.$pluginId.']" value="###FIELD_uid###" />
-		<input type="submit" name="submit['.$pluginId.']" value="'.$this->metafeeditlib->getLL("blog_submit_label",$conf).'"'.$this->caller->pi_classParam('blog-submit').' />
+		<button type="submit" name="submit['.$pluginId.']" value="save"'.$this->caller->pi_classParam('blog-submit').'>'.$this->metafeeditlib->getLL("blog_submit_label",$conf).'</button>
 		</div></fieldset></form></fieldset></div>';
 	$t2.=$conf['no_action']?'':'<table style="width:100%"><tr><td align="left"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div></td><td align="right"><div class="'.$this->caller->pi_getClassName('actions').' '.$this->caller->pi_getClassName('preview-actions').'">'.$conf['actions.']['useractions'].'</div>';
 	$t2.='</td></tr></table></div>';
@@ -2251,7 +2277,7 @@ function getCalendarTemplate(&$conf) {
   function getCreateScreenLoginTemplate(&$conf) {
   	$pluginId=$conf['pluginId'];
     if ($conf['create.']['screenLoginTpl']) return '<!-- ###TEMPLATE_CREATE_LOGIN### -->'.$conf['create.']['screenLoginTpl'].'<!-- ###TEMPLATE_CREATE_LOGIN### end-->';
-	return '<!-- ###TEMPLATE_CREATE_LOGIN### -->
+	$tmp= '<!-- ###TEMPLATE_CREATE_LOGIN### -->
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-create-login').'">'.$this->metafeeditlib->getLL("create_header_prefix",$conf).' '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]["ctrl"]["title"],$conf).'</h1>').'
 '.($conf['text_in_top_of_form']?'<div'.$this->caller->pi_classParam('form-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_form'],$conf['text_in_top_of_form.']).'</div>':'').'
 <div'.$this->caller->pi_classParam('form-wrap').'>
@@ -2259,14 +2285,15 @@ function getCalendarTemplate(&$conf) {
 <div'.$this->caller->pi_classParam('error').'><!-- -->###EVAL_ERROR###</div>
 '.$this->HTMLFormCreate.'
 <div'.$this->caller->pi_classParam('form-row').'>
-   ###HIDDENFIELDS###
-   <input type="submit" name="submit['.$pluginId.']" value="'.($conf['create.']['preview']?$this->metafeeditlib->getLL("create_submit_label",$conf):$this->metafeeditlib->getLL("create_preview_submit_label",$conf)).'"'.$this->caller->pi_classParam('form-submit').' />
-</div>
+   ###HIDDENFIELDS###';
+	$tmp.=$this->metafeeditlib->getCreateActions($conf,$this);
+	//$tmp.='<button type="submit" name="submit['.$pluginId.']" value="'.($conf['create.']['preview']?'preview':'save').'"'.$this->caller->pi_classParam('form-submit').'>'.($conf['create.']['preview']?$this->metafeeditlib->getLL("create_submit_label",$conf):$this->metafeeditlib->getLL("create_preview_submit_label",$conf)).'</button>
+	$tmp.='</div>
 </form>
-
-</div>
-'.($conf['ajax.']['ajaxOn']?'':'<div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-create-login').'"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div></div>').'
-<!-- ###TEMPLATE_CREATE_LOGIN### end-->';
+</div>';
+	//$tmp.='.($conf['ajax.']['ajaxOn']?'':'<div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-create-login').'"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div></div>').'
+	$tmp.='<!-- ###TEMPLATE_CREATE_LOGIN### end-->';
+	return $tmp;
 }
 
 	/**
@@ -2278,21 +2305,17 @@ function getCalendarTemplate(&$conf) {
   function getCreatePreviewLoginTemplate(&$conf) {
   	$pluginId=$conf['pluginId'];
     if ($conf['create.']['previewLoginTpl']) return '<!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### begin-->'.$conf['create.']['previewLoginTpl'].'<!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### end-->';
-	return '<!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### begin-->
+	$tmp= '<!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### begin-->
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-create-login-preview').'">'.$this->metafeeditlib->getLL("create_header_prefix",$conf).' '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]["ctrl"]["title"],$conf).'</h1>').'
 '.($conf['text_in_top_of_preview']?'<div'.$this->caller->pi_classParam('preview-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_preview'],$conf['text_in_top_of_preview.']).'</div>':'').'
 <div'.$this->caller->pi_classParam('preview-wrap').'>
 <form name="'.$this->table.'_form" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'">
 '.$this->HTMLPreviewCreate.'
 <div'.$this->caller->pi_classParam('preview-row').'>
-    ###HIDDENFIELDS###
-    <input type="submit" name="doNotSave['.$pluginId.']" value="'.$this->metafeeditlib->getLL("create_preview_donotsave_label",$conf).'"'.$this->caller->pi_classParam('preview-donotsave').' />
-    <input type="submit" name="submit['.$pluginId.']" value="'.$this->metafeeditlib->getLL("create_preview_submit_label",$conf).'"'.$this->caller->pi_classParam('preview-submit').' />
-	<table style="width:100%"><tr><td align="left"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div></td><td align="right"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-edit').'"></div></td></tr></table>
-</div>
-</form>
-</div>
-<!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### end-->';
+    ###HIDDENFIELDS###';
+	$tmp.=$this->metafeeditlib->getCreatePreviewActions($conf,$this);
+	$tmp.='</div></form></div><!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### end-->';
+	return $tmp;
 }
 
 	/**
@@ -2304,21 +2327,22 @@ function getCalendarTemplate(&$conf) {
   function getCreateScreenTemplate(&$conf) {
   	$pluginId=$conf['pluginId'];
     if ($conf['create.']['screenTpl']) return '<!-- ###TEMPLATE_CREATE### begin -->'.$conf['create.']['screenTpl'].'<!-- ###TEMPLATE_CREATE### end-->';
-	return '<!-- ###TEMPLATE_CREATE### begin -->
+	$tmp='<!-- ###TEMPLATE_CREATE### begin -->
 	'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-create').'">'.$this->metafeeditlib->getLL("create_header_prefix",$conf).' '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]["ctrl"]["title"],$conf).'</h1>').'
 	'.($conf['text_in_top_of_form']?'<div'.$this->caller->pi_classParam('form-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_form'],$conf['text_in_top_of_form.']).'</div>':'').'
 	<div'.$this->caller->pi_classParam('form-wrap').'>
 	<form name="'.$this->table.'_form" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'" onsubmit="'.implode(';', $this->additionalJS_submit).'">
 	'.$this->HTMLFormCreate.'
 	<div'.$this->caller->pi_classParam('form-row').'>
-	###HIDDENFIELDS###
-	<input type="submit" name="submit['.$pluginId.']" value="'.($conf['create.']['preview']?$this->metafeeditlib->getLL("create_submit_label",$conf):$this->metafeeditlib->getLL("create_preview_submit_label",$conf)).'"'.$this->caller->pi_classParam('form-submit').' />
-	'.($conf['ajax.']['ajaxOn']?'':'<table style="width:100%"><tr><td align="left"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div></td><td align="right"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-edit').'"></div></td></tr></table>').'
-	</div>
+	###HIDDENFIELDS###';
+	$tmp.=$this->metafeeditlib->getCreateActions($conf,$this);
+	//$tmp.='<button type="submit" name="submit['.$pluginId.']" value="'.($conf['create.']['preview']?'preview':'save').'"'.$this->caller->pi_classParam('form-submit').'>'.($conf['create.']['preview']?$this->metafeeditlib->getLL("create_submit_label",$conf):$this->metafeeditlib->getLL("create_preview_submit_label",$conf)).'</button>'.($conf['ajax.']['ajaxOn']?'':'<table style="width:100%"><tr><td align="left"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-back').'"><a title="'.$this->metafeeditlib->getLL("back_label",$conf).'" href="###BACK_URL_HSC###">'.$this->metafeeditlib->getLL("back_label",$conf).'</a></div></td><td align="right"><div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-edit').'"></div></td></tr></table>').'
+	$tmp.='</div>
 	</form>
 	</div>
 	</div>
 	<!-- ###TEMPLATE_CREATE### end-->';
+	return $tmp;
 }
 
 	/**
@@ -2338,8 +2362,8 @@ function getCalendarTemplate(&$conf) {
 	'.$this->HTMLPreviewCreate.'
 	<div'.$this->caller->pi_classParam('preview-row').'>
 		###HIDDENFIELDS###
-		<input type="submit" name="doNotSave['.$pluginId.']" value="'.$this->metafeeditlib->getLL("create_preview_donotsave_label",$conf).'"'.$this->caller->pi_classParam('preview-donotsave').' />
-		<input type="submit" name="submit['.$pluginId.']" value="'.$this->metafeeditlib->getLL("create_preview_submit_label",$conf).'"'.$this->caller->pi_classParam('preview-submit').' />
+		<button type="submit" name="doNotSave['.$pluginId.']" value="donotsave"'.$this->caller->pi_classParam('preview-donotsave').'>'.$this->metafeeditlib->getLL("create_preview_donotsave_label",$conf).'</button>
+		<button type="submit" name="submit['.$pluginId.']" value="save"'.$this->caller->pi_classParam('preview-submit').'>'.$this->metafeeditlib->getLL("create_preview_submit_label",$conf).'</button>
 	</div>
 	</form>
 	</div>
@@ -2384,10 +2408,11 @@ function getCalendarTemplate(&$conf) {
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-delete-preview').'">'.$this->metafeeditlib->getLL("delete_preview_header",$conf).'</h1>').'
 <div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-delete-preview').'">'.$this->metafeeditlib->getLL("delete_preview_message",$conf).'</div>
 <div class="'.$this->caller->pi_getClassName('link-preview').' '.$this->caller->pi_getClassName('link-delete-preview').'">
-<div  class="jqmClose '.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-delete-ok').'"><a href="###FORM_URL###&amp;cmd['.$pluginId.']=delete&amp;rU['.$pluginId.']=###REC_UID###&amp;backURL['.$pluginId.']=###BACK_URL_ENC###">'.$this->metafeeditlib->getLL("delete_preview_delete_label",$conf).'</a></div>
-<div  class="jqmClose '.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-delete-ko').'"><a href="###BACK_URL_HSC###&amp;backURL['.$pluginId.']=###BACK_URL_ENC###" >'.$this->metafeeditlib->getLL("delete_preview_dont_delete_label",$conf).'</a></div>
+<div  class="'.($conf['ajax.']['ajaxOn']?'jqmClose ':'').$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-delete-ok').'"><a href="###FORM_URL###&amp;cmd['.$pluginId.']=delete&amp;rU['.$pluginId.']=###REC_UID###">'.$this->metafeeditlib->getLL("delete_preview_delete_label",$conf).'</a></div>
+<div  class="'.($conf['ajax.']['ajaxOn']?'jqmClose ':'').$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-delete-ko').'"><a href="###BACK_URL_HSC###&amp;backURL['.$pluginId.']=###BACK_URL_ENC###" >'.$this->metafeeditlib->getLL("delete_preview_dont_delete_label",$conf).'</a></div>
 </div>
 <!-- ###TEMPLATE_DELETE_PREVIEW### end-->';
+//&amp;backURL['.$pluginId.']=###BACK_URL_ENC###
 }
 
 	/**
@@ -2823,7 +2848,7 @@ function getPDFTemplate(&$conf)
 		$tmp.=$GROUPBYFIELDS;
 		$tmp.='<!-- ###ITEM-COL### begin -->';
 		$sum=$this->getEditSumFields('SUM',$conf,$count,true,'html');
-		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###','Total (###SUM_FIELD_metafeeditnbelts###)');
+		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$this->metafeeditlib->getLLFromLabel('total',$conf).($conf['list.']['totalCount']?' (###SUM_FIELD_metafeeditnbelts###)':''));
 		$tmp.='<!-- ###ITEM### begin --><!-- ###ITEM-EL### begin --><tr>'.$this->getListDataFields($conf,true,'html').$sum.'</tr><!-- ###ITEM-EL### end --><!-- ###ITEM### end -->';		
 		$tmp.='<!-- ###ITEM-COL### end -->';
 	}
@@ -2835,7 +2860,7 @@ function getPDFTemplate(&$conf)
 	if ($conf['list.']['sumFields'])
 	{
 		$sum=$this->getEditSumFields('SUM',$conf,$count,true,'PDF');
-		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###','Total (###SUM_FIELD_metafeeditnbelts###)');
+		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$this->metafeeditlib->getLLFromLabel('total',$conf).($conf['list.']['totalCount']?' (###SUM_FIELD_metafeeditnbelts###)':''));
 
 		$tmp.='<!--###SUM_FIELDS### begin---><tr>'.$sum.'</tr>';
 		$tmp.='<!--###SUM_FIELDS### end--->';
@@ -2958,7 +2983,7 @@ function getCSVTemplate(&$conf)
 	if ($conf['list.']['sumFields'])
 	{
 		$sum=$this->getEditSumFields('SUM',$conf, $count,true);
-		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###','Total (###SUM_FIELD_metafeeditnbelts###)');
+		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$this->metafeeditlib->getLLFromLabel('total',$conf).($conf['list.']['totalCount']?' (###SUM_FIELD_metafeeditnbelts###)':''));
 		
 		$tmp.='<!--###SUM_FIELDS### begin--->'.$sum.chr(10);
 		$tmp.='<!--###SUM_FIELDS### end--->';
@@ -3011,7 +3036,7 @@ function getExcelTemplate(&$conf)
 	if ($conf['list.']['sumFields'])
 	{
 		$sum=$this->getEditSumFields('SUM',$conf,$count);
-		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###','Total (###SUM_FIELD_metafeeditnbelts###)');
+		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$this->metafeeditlib->getLLFromLabel('total',$conf).($conf['list.']['totalCount']?' (###SUM_FIELD_metafeeditnbelts###)':''));
 		$tmp.='<!--###SUM_FIELDS### begin---><tr>'.$sum.'</tr>';
 		//$tmp.='<tr>'.$this->getSumFields($conf).'</tr><!--###SUM_FIELDS### end--->';
 		$tmp.='<!--###SUM_FIELDS### end--->';
@@ -3158,7 +3183,7 @@ function getFormJs($formName,&$conf) {
 		evalFunc.respectTimeZones ='.($GLOBALS['TYPO3_CONF_VARS']['SYS']['respectTimeZones']?'1':'0').';
 		evalFunc.USmode ='.($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?'1':'0').';
 		if(!(document.'.$formName.' && document.'.$formName.'[theField] && document.'.$formName.'[feValField])) return;
-		theValue = document.'.$formName.'[theField].value;
+		var theValue = document.'.$formName.'[theField].value;
 		document.'.$formName.'[feValField].value = evalFunc.outputObjValue(theFObj, theValue);
 	}
 
@@ -3528,9 +3553,9 @@ function getFormJs($formName,&$conf) {
    		$result .= $this->additionalJS_initial;
     	if ($this->additionalJS_pre) $result.'<script type="text/javascript">'. implode('', $this->additionalJS_pre).'</script>';
   	} else {
-  	 	$result.=TSpagegen::inline2TempFile($script,'js');
+  	 	$result.='<script type="text/javascript" src="'.TSpagegen::inline2TempFile($script,'js').'"></script>';
    		$result.= $this->additionalJS_initial;
-    	if ($this->additionalJS_pre) $result.=TSpagegen::inline2TempFile( implode('', $this->additionalJS_pre),'js');
+    	if ($this->additionalJS_pre) $result.='<script type="text/javascript" src="'.TSpagegen::inline2TempFile( implode('', $this->additionalJS_pre),'js').'"></script>';
   	}
     if($conf['divide2tabs'])
 		$result .= $this->templateObj->getDynTabMenuJScode();
@@ -3546,7 +3571,7 @@ function getFormJs($formName,&$conf) {
   	if (!$GLOBALS['TSFE']->config['config']['removeDefaultJS']) {
    		return '<script type="text/javascript">'.implode(chr(10), $this->additionalJS_post).'</script>'.chr(10).'<script type="text/javascript">'.implode(chr(10), $this->additionalJS_end).'</script>';
 		} else {
- 			return TSpagegen::inline2TempFile(implode(chr(10), $this->additionalJS_post), 'js').chr(10).TSpagegen::inline2TempFile(implode(chr(10), $this->additionalJS_end), 'js');
+ 			return '<script type="text/javascript" src="'.TSpagegen::inline2TempFile(implode(chr(10), $this->additionalJS_post), 'js').'"></script>'.chr(10).'<script type="text/javascript" src="'.TSpagegen::inline2TempFile(implode(chr(10), $this->additionalJS_end), 'js').'"></script>';
 	  }			
   }
 
@@ -3615,7 +3640,7 @@ function getFormJs($formName,&$conf) {
 		$ret='<div'.$this->caller->pi_classParam('alphabeticalSearch').'>';
 		for ($i="A"; $i != "AA"; $i++) $ret.='<div'.$this->caller->pi_classParam('lettersearch').'><a '.(($conf['inputvar.']['sortLetter']==$i)?'class="mfdt-set"':'').' href="###FORM_URL###&amp;'.$this->prefixId.'['.sortLetter.']['.$conf['pluginId'].']='.$i.'">'.$i.'</a></div>'; 
 
-		$ret.='<div'.$this->caller->pi_classParam('lettersearch').'><a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'['.reset.']['.$conf['pluginId'].']=1">'.$this->metafeeditlib->getLL("alphabetical_search_all",$conf).'</a></div>'; 
+		if ($conf['inputvar.']['sortLetter']) $ret.='<div'.$this->caller->pi_classParam('lettersearch').'><a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'['.reset.']['.$conf['pluginId'].']=1">'.$this->metafeeditlib->getLL("alphabetical_search_all",$conf).'</a></div>'; 
 		$ret.='</div>';
 		return $ret;
 	}
@@ -3657,11 +3682,17 @@ function getFormJs($formName,&$conf) {
   *
   * @param	array :		config array....
   * @param	string $filter :	filter content....
+  * @param	int $filtercnt :	Number of filters set....
   * @return	string : 	html of advanced search area.
   */
 	 
-	function advancedSearch(&$conf,$filter) {
+	function advancedSearch(&$conf,$filter,$filtercnt) {
 		$table = $conf['table'];
+		$TConf=$conf;
+		if (is_array($conf['list.']['advancedSearchConfig.'])) {
+			$settings=$this->metafeeditlib->postProcessSettings($conf['list.']['advancedSearchConfig.']);
+			$TConf['TCAN'] = t3lib_div::array_merge_recursive_overrule($TConf['TCAN'], $settings);
+		}
 		$cnt='<div'.$this->caller->pi_classParam('advancedSearch').'><form name="'.$this->table.'_asform" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'">';
 		$fields=$conf['list.']['advancedSearchFields']?$conf['list.']['advancedSearchFields']:($conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field);
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
@@ -3675,17 +3706,17 @@ function getFormJs($formName,&$conf) {
 		}
 		$first=true;
 		if ($conf['list.']['searchBox']) {
-			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($conf['inputvar.']['sword']?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_searchbox_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'"><i>&nbsp;</i>'.$this->metafeeditlib->getLL('fulltext_search',$conf).'</a></li>';
+			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($conf['inputvar.']['sword']?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_searchbox_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'">'.$this->metafeeditlib->getLL('fulltext_search',$conf).'</a></li>';
 			$ret.='<div id="'.$this->caller->pi_getClassName('as').'_searchbox_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-searchbox').'">'.$this->cObj->stdWrap($this->searchBox($conf),$conf['list.']['searchBox.']).'</div>';					
 		    $first=false;
 		}
 		if ($conf['list.']['alphabeticalSearch']) {
-			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($conf['inputvar.']['sortLetter']?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_alphabeticalsearch_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'"><i>&nbsp;</i>'.$this->metafeeditlib->getLL('alphabetical_search',$conf).'</a></li>';
+			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($conf['inputvar.']['sortLetter']?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_alphabeticalsearch_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'">'.$this->metafeeditlib->getLL('alphabetical_search',$conf).'</a></li>';
 			$ret.='<div id="'.$this->caller->pi_getClassName('as').'_alphabeticalsearch_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-alphabeticalsearch').'">'.$this->cObj->stdWrap($this->alphabeticalSearch($conf),$conf['list.']['alphabeticalSearch.']).'</div>';					
 		    $first=false;
 		}
 		if ($conf['list.']['calendarSearch']) {
-			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li><a id="'.$this->caller->pi_getClassName('as').'_calendarsearch_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'"><i>&nbsp;</i>'.$this->metafeeditlib->getLL('calendar_search',$conf).'</a></li>';
+			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li><a id="'.$this->caller->pi_getClassName('as').'_calendarsearch_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'">'.$this->metafeeditlib->getLL('calendar_search',$conf).'</a></li>';
 			$ret.='<div id="'.$this->caller->pi_getClassName('as').'_calendarsearch_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-alphabeticalsearch').'">'.$this->cObj->stdWrap($this->calendarSearch(),$conf['list.']['calendarSearch.']).'</div>';					
 		    $first=false;
 		}
@@ -3713,10 +3744,10 @@ function getFormJs($formName,&$conf) {
 					}
 					//modif CMD - prise en compte des tables etrangère dans l'AS
 					$curTable = $this->metafeeditlib->getForeignTableFromField($FN, $conf,'',array());
-					$type = $conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
-					$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['eval']);
+					$type =$TConf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
+					$evals=t3lib_div::trimexplode(',',$TConf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['eval']);
 					
-					if(in_array('date',$evals) || in_array('datetime',$evals)) $type=date;
+					if(in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) $type=date;
 					//TODO : metre cette modification de type de donnée en surcharge de TCA
 					//$GLOBALS['TCA'][$this->table]['columns'][$GLOBALS['TCA'][$this->table]['ctrl']['crdate']]['config']['eval']='datetime';
 					//$GLOBALS['TCA'][$this->table]['columns'][$GLOBALS['TCA'][$this->table]['ctrl']['crdate']]['config']['type']='input';
@@ -3726,7 +3757,7 @@ function getFormJs($formName,&$conf) {
 					$type=($curTable['fNiD']=='crdate' && (string)$type=='')?'date':$type;
 					$Lib='<div class="'.$this->caller->pi_getClassName('asl').'">'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</div>';
 					$isset=is_array($conf['inputvar.']['advancedSearch'][$FN])?($this->metafeeditlib->is_extent($conf['inputvar.']['advancedSearch'][$FN]['op']) && ($this->metafeeditlib->is_extent($conf['inputvar.']['advancedSearch'][$FN]['val'])||$this->metafeeditlib->is_extent($conf['inputvar.']['advancedSearch'][$FN]['valsup']))):$this->metafeeditlib->is_extent($conf['inputvar.']['advancedSearch'][$FN]);
-					if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($isset?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'"><i>&nbsp;</i>'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</a></li>';
+					if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($isset?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'">'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</a></li>';
 					$div='<div id="'.$this->caller->pi_getClassName('as').'_'.str_replace('.','_',$FN).'_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type).' '.$this->caller->pi_getClassName('advancedSearch-'.$curTable['table'].'-'.$type.'-'.$curTable['fNiD']).'">'.$Lib;
 					$first=false;
 					$value=' value="###ASFIELD_'.$FN.'_VAL###"';
@@ -3752,12 +3783,12 @@ function getFormJs($formName,&$conf) {
 						//modif CMD on récup la val courante pour l'afficher en tant que selectionné
 						$val = is_array($conf['piVars']['advancedSearch'])?$conf['piVars']['advancedSearch'][$conf['pluginId']][$FN]:'';
 						$ret.=$div;
-						for ($i = 0; $i < count ($conf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items']); ++$i) {
+						for ($i = 0; $i < count ($TConf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items']); ++$i) {
 							$checked='';
 							if ($this->metafeeditlib->is_extent($val)) {
 								$checked=($i==$val)?'checked="checked"':'';
 							}
-							$ret.='<input type="radio"'.$this->caller->pi_classParam('radio').'id="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']'.'-'.$i.'" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']" value="'.$i.'" '.$checked.' /><label for="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']'.'-'.$i.'">'.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items'][$i][0],$conf).'</label>';
+							$ret.='<input type="radio"'.$this->caller->pi_classParam('radio').'id="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']'.'-'.$i.'" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']" value="'.$i.'" '.$checked.' /><label for="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']'.'-'.$i.'">'.$this->metafeeditlib->getLLFromLabel($TConf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items'][$i][0],$conf).'</label>';
 						}
 						$ret.='</div>';
 						break;
@@ -3774,16 +3805,16 @@ function getFormJs($formName,&$conf) {
 				
 					case 'select':
 						// For select fields we either draw  ajax selection widget or we relace with getselectoptions ...
-						if ($conf['TCAN'][$conf['table']]['columns'][$FN]['config']['foreign_table'] && $conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']==1 && ($conf['list.']['advancedSearchAjaxSelector'] || $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector.'][$FN])) {
+						if ($TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['foreign_table'] && $TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']==1 && ($conf['list.']['advancedSearchAjaxSelector'] || $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector.'][$FN])) {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'widgets'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/widgets.js"></script>';
 							$ajaxWidgets = t3lib_div::makeInstance('tx_metafeedit_widgets');
 							$ajaxWidgets->init($this->prefixId,$this->metafeeditlib);
 							//$ret.=$ajaxWidgets->comboList($this->metafeeditlib->getLLFromLabel($label,$conf),'','','handleData','setData',$this->metafeeditlib->getLLFromLabel($label,$conf),15,$conf,$FN);
-							$ret.=$div.$ajaxWidgets->comboList('','','','handleData','setData','',15,$conf,$FN).'</div>';
+							$ret.=$div.$ajaxWidgets->comboList('','','','handleData','setData','',15,$TConf,$FN).'</div>';
 						} else {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
-							//$selectSize=is_array($conf['typoscript.'][$pluginId.'.']['advancedSearch.'][$FN]['forceConfig.'])?$conf['typoscript.'][$pluginId.'.']['forceConfig.'][$FN]['forceSize']:$conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
-							$selectSize=$conf['list.']['advancedSearchConfig.']['columns.'][$FN.'.']['config.']['size']?$conf['list.']['advancedSearchConfig.']['columns.'][$FN.'.']['config.']['size']:$conf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
+							//$selectSize=is_array($conf['typoscript.'][$pluginId.'.']['advancedSearch.'][$FN]['forceConfig.'])?$conf['typoscript.'][$pluginId.'.']['forceConfig.'][$FN]['forceSize']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
+							$selectSize=$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']?$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
 							$name = ' name="'.($selectSize>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
 							$ret.=$div.'<select '.($selectSize?'size="'.$selectSize.'" ':'').$name.$this->caller->pi_classParam('form-asfield').'>';
 							$SO='###AS_FIELD_'.$FN.'###';
@@ -3812,7 +3843,8 @@ function getFormJs($formName,&$conf) {
 		$ret=$cnt.($conf['ajax.']['ajaxOn'] ? '<ul class="astabnav">'.implode("",$searchTabs)."</ul>" : '').$ret;
 		$ret.='<div '.$this->caller->pi_classParam('advancedSearch-actions').'><div '.$this->caller->pi_classParam('advancedSearch-action').'>';
 		$ret.='<div '.$this->caller->pi_classParam('advancedSearch-action').'><button type="submit" name="submit" value="'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'" class="'.$this->caller->pi_getClassName('form-submit').' '.$this->caller->pi_getClassName('searchbox-button').'">'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</button></div>';
-		$ret.='<div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('advancedSearch-action').' '.$this->caller->pi_getClassName('as_reset').'"><a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[reset]['.$conf['pluginId'].']=1">'.$this->metafeeditlib->getLL("advanced_search_reset",$conf).'</a></div>';
+		// we only show reset button if conditions are set 
+		if ($filtercnt) $ret.=$this->metafeeditlib->getListASResetAction($conf,$this->caller);
 		$ret.= '</div></div></form></div>';
 		return $ret;
 	}

@@ -106,7 +106,10 @@ class tx_metafeedit_calendar extends tslib_pibase {
 	 * @param	[type]		$sql: ...
 	 * @return	void
 	 */
-	function init(&$conf,&$sql) {
+	function init(&$conf,&$sql,&$metafeeditlib,&$cObj) {
+		$this->metafeeditlib=&$metafeeditlib;
+		print_r($cObj);
+		$this->cObj=$GLOBALS['TSFE']->cObj;
 		$this->conf=$conf;
 		if (!$conf['list.']['beginDateField']) die ("Plugin Meta Feedit, Calendar Mode and no begin date set !");
 		$this->pi_setPiVarDefaults();
@@ -114,13 +117,8 @@ class tx_metafeedit_calendar extends tslib_pibase {
 
 		// pidList is the pid/list of pids from where to fetch the faq items.
 		$cePidList = $this->cObj->data['pages']; //ce = Content Element
-		$pidList   = $cePidList ?
-			$cePidList :
-			trim($this->cObj->stdWrap(
-				$this->conf['pid_list'], $this->conf['pid_list.']
-			));
-
-			$this->enableFields=$sql['DBSELECT'].$sql['lockPidWhere'];
+		$pidList=$cePidList?$cePidList:trim($this->cObj->stdWrap($this->conf['pid_list'], $this->conf['pid_list.']));
+		$this->enableFields=$sql['DBSELECT'].$sql['lockPidWhere'];
 //if ($_GET['test']=='test') { echo chr(10).chr(13)."<br> --> ".$this->enableFields;}
 
 		 unset($this->conf['pid_list']);
@@ -179,11 +177,11 @@ class tx_metafeedit_calendar extends tslib_pibase {
 			// Get the next and previous month and year with at least one post
 			$prevTime = $unixMonth;
 
-if ($_GET['test']=='test') {echo "<br/>--->".$conf['list.']['beginDateField'].' < \''.$prevTime.'\''.$this->enableFields;}
+			if ($_GET['test']=='test') {echo "<br/>--->".$conf['list.']['beginDateField'].' < \''.$prevTime.'\''.$this->enableFields;}
 			$prev = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 				$conf['list.']['beginDateField'],
 				$conf['table'],
-				$conf['list.']['beginDateField'].' < \''.$prevTime.'\''.$this->enableFields. ' AND ' .$conf['list.']['whereString'],
+				$conf['list.']['beginDateField'].' < \''.$prevTime.'\''.$this->enableFields. $conf['list.']['whereString'],
 				'',
 				$conf['list.']['beginDateField'].' DESC',
 				1
@@ -198,20 +196,20 @@ if ($_GET['test']=='test') {echo "<br/>--->".$conf['list.']['beginDateField'].' 
 			$next = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 				$conf['list.']['beginDateField'],
 				$conf['table'],
-				$conf['list.']['beginDateField'].' > \''.$nextTime.'\''.$this->enableFields. ' AND ' .$conf['list.']['whereString'],
+				$conf['list.']['beginDateField'].' > \''.$nextTime.'\''.$this->enableFields.$conf['list.']['whereString'],
 				'',
 				$conf['list.']['beginDateField'].' ASC',
 				1
 			);
-if ($_GET['test']=='test') {
-echo "<br> Next : ";
-print_r($next);
-}
+			if ($_GET['test']=='test') {
+			echo "<br> Next : ";
+			print_r($next);
+			}
 			if(!empty($next)) {
 				$next = $next[0][$conf['list.']['beginDateField']];
-if ($_GET['test']=='test') {
-echo "<br> Next n'est pas vide ";
-}	
+				if ($_GET['test']=='test') {
+					echo "<br> Next n'est pas vide ";
+				}	
 			}
 			else
 			{
@@ -373,7 +371,7 @@ echo "<br> Next est vide. ";
 		$result = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'title, '.$conf['list.']['beginDateField'],
 			$conf['table'],
-			$conf['list.']['beginDateField'].' > '.$monthBeginn.' AND '.$conf['list.']['beginDateField'].' < '.$monthEnd.$this->enableFields. ' AND ' .$conf['list.']['whereString'],
+			$conf['list.']['beginDateField'].' > '.$monthBeginn.' AND '.$conf['list.']['beginDateField'].' < '.$monthEnd.$this->enableFields.$conf['list.']['whereString'],
 			$conf['list.']['beginDateField'].' ASC'
 		);
 
