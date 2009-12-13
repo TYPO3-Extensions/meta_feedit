@@ -3553,9 +3553,9 @@ function getFormJs($formName,&$conf) {
    		$result .= $this->additionalJS_initial;
     	if ($this->additionalJS_pre) $result.'<script type="text/javascript">'. implode('', $this->additionalJS_pre).'</script>';
   	} else {
-  	 	$result.='<script type="text/javascript" src="'.TSpagegen::inline2TempFile($script,'js').'"></script>';
+  	 	$result.=$this->metafeeditlib->inline2TempFile($script,'js');//'<script type="text/javascript" src="'.TSpagegen::inline2TempFile($script,'js').'"></script>';
    		$result.= $this->additionalJS_initial;
-    	if ($this->additionalJS_pre) $result.='<script type="text/javascript" src="'.TSpagegen::inline2TempFile( implode('', $this->additionalJS_pre),'js').'"></script>';
+    	if ($this->additionalJS_pre) $result.=$this->metafeeditlib->inline2TempFile(implode('', $this->additionalJS_pre),'js');    //'<script type="text/javascript" src="'.TSpagegen::inline2TempFile( implode('', $this->additionalJS_pre),'js').'"></script>';
   	}
     if($conf['divide2tabs'])
 		$result .= $this->templateObj->getDynTabMenuJScode();
@@ -3563,7 +3563,7 @@ function getFormJs($formName,&$conf) {
 	}
 
 	/**
-	 * [Describe function...]
+	 * getJSAfter
 	 *
 	 * @return	[type]		...
 	 */
@@ -3571,7 +3571,7 @@ function getFormJs($formName,&$conf) {
   	if (!$GLOBALS['TSFE']->config['config']['removeDefaultJS']) {
    		return '<script type="text/javascript">'.implode(chr(10), $this->additionalJS_post).'</script>'.chr(10).'<script type="text/javascript">'.implode(chr(10), $this->additionalJS_end).'</script>';
 		} else {
- 			return '<script type="text/javascript" src="'.TSpagegen::inline2TempFile(implode(chr(10), $this->additionalJS_post), 'js').'"></script>'.chr(10).'<script type="text/javascript" src="'.TSpagegen::inline2TempFile(implode(chr(10), $this->additionalJS_end), 'js').'"></script>';
+ 			return $this->metafeeditlib->inline2TempFile(implode(chr(10), $this->additionalJS_post), 'js').chr(10).$this->metafeeditlib->inline2TempFile(implode(chr(10), $this->additionalJS_end), 'js');//'<script type="text/javascript" src="'.TSpagegen::inline2TempFile(implode(chr(10), $this->additionalJS_post), 'js').'"></script>'.chr(10).'<script type="text/javascript" src="'.TSpagegen::inline2TempFile(implode(chr(10), $this->additionalJS_end), 'js').'"></script>';
 	  }			
   }
 

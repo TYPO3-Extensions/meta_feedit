@@ -81,7 +81,7 @@ class tx_metafeedit_lib {
     /**
     * getJSAfter
     *
-    * @param	[type]		$$feadminlib: ...
+    * @param	[type]		$feadminlib: ...
     * @param	[type]		$conf: ...
     * @return	[type]		...
     */
@@ -92,7 +92,22 @@ class tx_metafeedit_lib {
         '<script type="text/javascript">'.implode(chr(10), $conf['caller_additionalJS_end']).'</script>';
         return $JS.(is_array($conf['additionalJS_post'])?'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_post']).'</script>'.chr(10):'').(is_array($conf['additionalJS_end'])?'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_end']).'</script>':'');
     }
-
+    /**
+    * inline2TempFile : compatibility version since version 4.3 of typo3 has changed 
+    * in new version only gives uri of temp file
+	* in old version gave script tag.
+    * @param	string		$script: js our css code
+    * @param	string		$ext: 'js' or 'cs'
+    * @return	string		...
+    */
+	function inline2TempFile($script,$ext) {
+		$ret=TSpagegen::inline2TempFile($script,$ext);
+		//TODO better test 
+		if (!strpos($ret,'</script>')) $ret='<script type="text/javascript" src="'.$ret.'"></script>';
+		//'<script type="text/javascript" src="'.TSpagegen::inline2TempFile($script,'js').'"></script>';	
+		return $ret;
+	}
+	
     function T3StripComments($document){
 		$search = array('@<script[^>]*?>.*?</script>@si',  // Strip out javascript
                '@<style[^>]*?>.*?</style>@siU',    // Strip style tags properly
