@@ -270,7 +270,7 @@ class tx_metafeedit_export {
 		$r=0;
 		// We print rows...
 		foreach($xml->tr as $row) {
-			if ($row->spec->attributes()->ap) $pdf->addPage();
+			if (@$row->spec->attributes()->ap) $pdf->addPage();
 			// we change color 
 			$x=0; //compteur des colonnes
 			if ($alt>1) {							// changement de couleur 1 ligne sur 2
@@ -281,9 +281,11 @@ class tx_metafeedit_export {
 			$nbcols=count($row->td);
 			$csize=0;
 			if ($row->gb) {
-				$pdf->SetFont('Arial', 'B', $fs);
+				$pdf->SetLineWidth(0.3);
+				$pdf->SetFont('Arial', 'B', 9);
 			} else {
-				$pdf->SetFont('Arial', '', $fs);
+				$pdf->SetLineWidth(0.2);
+				$pdf->SetFont('Arial', '', 9);
 			}
 
 				
@@ -293,7 +295,7 @@ class tx_metafeedit_export {
 				$size=40;
 				$val = strip_tags($col->data);
 
-				$result = preg("/(^[0-9]+([\.0-9]*))$/" , $val);
+				$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
 
 				// Affichage du signe Euro sur l'export PDF //CBY nothing to do here !!
 
@@ -493,8 +495,10 @@ class tx_metafeedit_export {
 			$nbcols=count($row->td);
 			$csize=0;
 			if ($row->gb) {
+				$pdf->SetLineWidth(0.3);
 				$pdf->SetFont('Arial', 'B', 9);
 			} else {
+				$pdf->SetLineWidth(0.2);
 				$pdf->SetFont('Arial', '', 9);
 			}				
 
@@ -687,7 +691,7 @@ class tx_metafeedit_export {
 		require_once(t3lib_extMgm::extPath('meta_feedit').'/lib/PHPExcel/IOFactory.php'); 
 		/** PHPExcel_Cell_AdvancedValueBinder */
 		require_once(t3lib_extMgm::extPath('meta_feedit').'/lib/PHPExcel/Cell/AdvancedValueBinder.php');
-
+		//echo $content;die(t);
 		// Prepare content
 		try {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));

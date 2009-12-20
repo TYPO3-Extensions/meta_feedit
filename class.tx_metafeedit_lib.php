@@ -2,7 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2006 Christophe BALISKY (cbalisky@metaphore.fr)
+*  (c) 2006 Christophe Balisky <christophe@balisky.org>
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -25,7 +25,7 @@
 * This is a API for crating and editing records in the frontend.
 * The API is built on top of fe_adminLib.
 *
-* @author      Christophe BALISKY <cbalisky@metaphore.fr>
+* @author     Christophe Balisky <christophe@balisky.org>
 */
 
 // Necessary includes
@@ -339,7 +339,6 @@ class tx_metafeedit_lib {
 	* @return	string		backURL link
 	*/
 	function makeBackURLTypoLink(&$conf,$referer) {
-	    //echo "<br>makeBackURLTypoLink forced : $conf[forcedCmd], default: $conf[defaultCmd], input:".$conf['inputvar.']['cmd'].', mode:'.$conf['cmdmode'].', key:'.$conf['cmdley'];
 		switch ($conf['inputvar.']['cmd']) {
 			case 'create' :			
 				//if($conf['create'] && !$conf['disableCreate'] && !$conf['create.']['hide']) {
@@ -377,7 +376,6 @@ class tx_metafeedit_lib {
 					}
 				}
 		}
-		//echo "<br>makeBackURLTypoLink : $backLink";
 		return $backLink;
 	}
 
@@ -750,8 +748,10 @@ class tx_metafeedit_lib {
 			if (is_array($conf['list.']['sqlcalcfields.'])) foreach ($conf['list.']['sqlcalcfields.'] as $fn=>$calcField) {
 					$sumSQLFields.=$sumSQLFields?",$calcField as $fn":"$calcField as $fn";
 			}
+
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($sumSQLFields, $sql['fromTables'], '1 '.$WHERE.$GROUPBY.$HAVING);		
-	  	if ($conf['debug.']['sql']) $this->debug('Group by footer',$GLOBALS['TYPO3_DB']->SELECTquery($sumSQLFields, $sql['fromTables'], '1 '.$WHERE.$GROUPBY.$HAVING),$DEBUG);
+
+			if ($conf['debug.']['sql']) $this->debug('Group by footer',$GLOBALS['TYPO3_DB']->SELECTquery($sumSQLFields, $sql['fromTables'], '1 '.$WHERE.$GROUPBY.$HAVING),$DEBUG);
 		$value=array();
 		while($valueelt = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 			foreach($valueelt as $key=>$val) {
@@ -1386,7 +1386,6 @@ class tx_metafeedit_lib {
 	function user_processDataArray($content, &$inconf,$intable='',$forceInConf=FALSE) {
 		
 		$fe_adminLib = &$inconf['parentObj'];
-		//echo "forceInConf $forceInConf";
 		$conf = $forceInConf?$inconf:$fe_adminLib->conf;
 		
 		$dataArr = $content;
@@ -1688,7 +1687,7 @@ class tx_metafeedit_lib {
 			
 			default:
 				if ($conf['list.']['sqlcalcfields.'][$fN]) {
-					$dataArr['EVAL_'.$fN]=$dataArr[$fN];
+					$dataArr['EVAL_'.$fN]=$this->transformSqlCalcField($fN,$dataArr[$fN],$conf);
 				} 
 				break;
 				
@@ -1850,9 +1849,6 @@ class tx_metafeedit_lib {
 			if (is_object($this->RTEObj) && $this->RTEObj->isAvailable()) {
 				$this->specConf = $this->getFieldSpecialConf($table, $fN,$conf,$dataArr);
 				if (count($this->specConf)) {
-					//echo "<br>=$source==".$conf['cmdmode']."====$fN==========before $mode ".$dataArr['_TRANSFORM_'.$fN].'/'.$dataArr[$fN];
-					//echo "<br>after $mode ..db".$dataArr['_TRANSFORM_'.$fN].'/'.$this->RTEObj->transformContent('db', $dataArr[$fN], $table, $fN, $dataArr, $this->specConf, $this->thisConfig, '', $this->thePidValue);;
-					//echo "<br>after $mode ..rte".$dataArr['_TRANSFORM_'.$fN].'/'.$this->RTEObj->transformContent('rte', $dataArr[$fN], $table, $fN, $dataArr, $this->specConf, $this->thisConfig, '', $this->thePidValue);;
 					$pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
 					$this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];//array();//
 					$this->thePidValue = $GLOBALS['TSFE']->id;
@@ -1947,7 +1943,6 @@ class tx_metafeedit_lib {
 		$pluginId=$conf['pluginId'];
 		$piVars=$conf['piVars'];
 		$typoscript=$conf['typoscript.'];
-		//$res=array();
 		if ($keepvar) {
 			// we look into session vars
 			$vars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
@@ -1962,7 +1957,9 @@ class tx_metafeedit_lib {
 	  
 		// We look into the piVars
 	  
-		if ($piVars[$varname]) $res=$piVars[$varname];
+		if ($piVars[$varname]) {
+			$res=$piVars[$varname];
+		}
 		// we check if typoscript override is present
 		if ($typoscript[$varname.'.']) $res=$typoscript[$varname.'.'];
 		 
@@ -2791,13 +2788,20 @@ class tx_metafeedit_lib {
 		$GLOBALS["TSFE"]->fe_user->setKey('ses','metafeeditvars',$metafeeditvars);
 		$GLOBALS["TSFE"]->fe_user->storeSessionData();
 	}
-	
-	
+	/**
+	 * hasActions, can only be called from fe_adminLib
+	 *
+	 * @param	array		$conf: ...
+	 * @return	boolean		...
+	 */	
+	function hasListActions($conf) {
+		return (!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions']));
+	}
     //ACTIONS-LIST-LIB
 	/**
 	 * getListItemActionsLib, can only be called from fe_adminLib
 	 *
-	 * @param	[type]		$$conf: ...
+	 * @param	array		$conf: ...
 	 * @param	[type]		$caller: ...
 	 * @return	[type]		...
 	 */
@@ -2805,7 +2809,7 @@ class tx_metafeedit_lib {
 		$ret='';
 		$obs=t3lib_div::trimexplode(':',$conf['inputvar.']['sort']);
 		// we only show reset order by link if order bys have been set
-		if (!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions'])) {
+		if ($this->hasListActions($conf)) {
 			$ret='<th class="mfdt-actions">'.$this->getLL('actions',$conf). ($conf['list.']['sortFields']&&$obs[0] ? '<div class="tx-metafeedit-link tx-metafeedit-link-resetob"><a class="mtf-rstob" href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[resetorderby]['.$conf['pluginId'].']=1">'. $this->getLL('order_by_reset',$conf) .'</a></div>' : '').'</th>';  // rsg
 		}
 		return $ret;
@@ -2972,7 +2976,7 @@ class tx_metafeedit_lib {
 	}
 
 	/**
-	 * [Describe function...]
+	 * getBlogActions
 	 *
 	 * @param	[type]		$$conf: ...
 	 * @param	[type]		$caller: ...
@@ -3141,7 +3145,19 @@ class tx_metafeedit_lib {
 		$tmp.='</tr></table></div>';
 		return $tmp;
 	}
-	
+	function pageSelector($nbpages,$conf)	{
+		$ret='<form method="POST"><input type="submit" value="'.$this->getLL('gotopage',$conf).'"><select name="'.$this->prefixId.'[pointer]">';
+		for($i=1;$i<=$nbpages;$i++) {
+			//echo $i;
+			//print_r($conf['piVars']);
+			$select=$conf['piVars']['pointer']==($i-1)?'selected="selected"':'';
+			//echo "<br> $i - $select -".$conf['piVars']['pointer'];
+			$ret.="<option $select value=\"".($i-1)."\">$i</option>";
+		}
+		$ret.='</select></form>';
+		
+		return $ret;
+	}
     /**
     * [Describe function...]
     *
@@ -3481,7 +3497,6 @@ class tx_metafeedit_lib {
 	    }
 		
 	    $fieldAlias=$relTable.'_'.$field;	
-		//echo 	$fieldAlias;	
 		return $fieldAlias;
 
     }
@@ -3899,7 +3914,57 @@ class tx_metafeedit_lib {
 		$sql['fullTextWhere']=$this->cObj->searchWhere($conf['inputvar.']['sword'],$this->feadminlib->internal['searchFieldList'],$table);
 		$sql['where'].=$sql['fullTextWhere'];
 	}
-
+	/**
+    * transformGroupByData : transforms data for groupByBreak Tests through ts configuration
+    *
+    * @param	string		$fN: field to apply transformation to.
+    * @param	mixed		$val: $value to transform
+    * @param	array		$conf: configuration array
+    * @return	mixed		transformed value
+    */
+	function transformGroupByData($fN,$val,$conf) {
+		switch ($conf['list.']['groupby.'][$fN.'.']['transform']) {
+		case 'date':
+			//$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$conf['table']]['columns'][$fN]['config']['eval']);			
+			//if ((in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) && substr($fe_adminLib->conf[$fe_adminLib->conf['cmdKey']."."]["defaultValues."][$fN], 0, 3) == 'now'/* && empty($dataArr[$fN])*/) {
+			$val=strftime($conf['dateformat']?$conf['dateformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'),$val);
+			break;
+		case 'datetime':
+			$val=strftime($conf['datetimeformat']?$conf['datetimeformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'),$val);
+			break;
+		case 'time':
+			$val=strftime(($conf['timeformat']?$conf['timeformat']:'%H:%M'),$val);
+			break;
+		default:
+		}
+		return $val;
+	}
+	
+	/**
+    * transformSqlCalcField : transforms data for groupByBreak Tests through ts configuration
+    *
+    * @param	string		$fN: field to apply transformation to.
+    * @param	mixed		$val: $value to transform
+    * @param	array		$conf: configuration array
+    * @return	mixed		transformed value
+    */
+	function transformSqlCalcField($fN,$val,$conf) {
+		switch ($conf['list.']['sqlcalcfieldstransforms.'][$fN]) {
+		case 'date':
+			//$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$conf['table']]['columns'][$fN]['config']['eval']);			
+			//if ((in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) && substr($fe_adminLib->conf[$fe_adminLib->conf['cmdKey']."."]["defaultValues."][$fN], 0, 3) == 'now'/* && empty($dataArr[$fN])*/) {
+			$val=strftime($conf['dateformat']?$conf['dateformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'),$val);
+			break;
+		case 'datetime':
+			$val=strftime($conf['datetimeformat']?$conf['datetimeformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'),$val);
+			break;
+		case 'time':
+			$val=strftime(($conf['timeformat']?$conf['timeformat']:'%H:%M'),$val);
+			break;
+		default:
+		}
+		return $val;
+	}
 	
 	/**
     * getGroupBy : generates group bys from flexform definition ...
@@ -3928,7 +3993,7 @@ class tx_metafeedit_lib {
 				if ($fN2[2]) {
 						// calculated field groupBy
 						//$SORT=$SORT?$SORT.','.$fN2[0]:$fN2[0];
-						$sql['breakOrderBy'][]=$fN2[0];
+						$sql['breakOrderBy'][]=$fN2[0].$dir;
 						//$GBFields.=','.$fN2[0];
 						$calcField=$conf['list.']['sqlcalcfields.'][$fN2[0]]; // TO BE IMPROVED
 						if ($calcField) {
@@ -3980,9 +4045,9 @@ class tx_metafeedit_lib {
                         //$sql['fieldAliases'][$fN2[0].'.'.$label]=$fN2[0].'.'.$label;
 						$GrpByField[$fN]=$aliasA['tableAlias'].'.'.strtoupper($label);
 						//$SORT=$SORT?$SORT.','.$GrpByField[$fN]:$GrpByField[$fN];
-						$sql['breakOrderBy'][]=$GrpByField[$fN];
+						$sql['breakOrderBy'][]=$GrpByField[$fN].$dir;
 			  	    } else {
-					 	$sql['breakOrderBy'][]=$gbtableAlias.'.'.$gbfN;
+					 	$sql['breakOrderBy'][]=$gbtableAlias.'.'.$gbfN.$dir;
 						$GBFields.=','.$gbtableAlias.'.'.$gbfN.' as \''.$fN2[0].'\'';
 						$sql['fieldArray'][]=$gbtableAlias.'.'.$gbfN.' as \''.$fN2[0].'\'';
                         //$sql['fieldAliases'][$fN2[0].'.'.$label]=$fN2[0].'.'.$label;
@@ -4117,11 +4182,9 @@ class tx_metafeedit_lib {
 			//$conf['debug.']['debugString'].="<br> internal 0 ### :".$this->feadminlib->internal['descFlag']." ob :".$this->feadminlib->internal['orderBy'];
 
 			if ($this->feadminlib->internal['orderBy'])    {
-			   // echo $this->makeFieldAlias($conf['table'],$this->feadminlib->internal['orderBy'],$conf);
 	  		    $sql['orderBy'][] = $this->makeFieldAlias($conf['table'],$this->feadminlib->internal['orderBy'],$conf).($this->feadminlib->internal['descFlag']?' DESC':' ASC');
 			}
         }
-
 		//MODIF CBY if ($conf['list.']['orderByFields'] && !$this->piVars['sort']){
 		if ($conf['list.']['orderByFields'] && !$conf['inputvar.']['sort']){
 			$orderByFields = explode(',', $conf['list.']['orderByFields']);
@@ -4129,11 +4192,13 @@ class tx_metafeedit_lib {
 				$fN2=t3lib_div::trimexplode(':',$fieldName);
 				$fieldName=$fN2[0];
 				$dir=" ".$fN2[1];
-				if ($fN2[2]) {
+				$fieldAlias = $this->makeFieldAlias($conf['table'],$fieldName,$conf);
+				/*if ($fN2[2]) {
         	        $sql['orderBy'][] = $fieldName.$dir;
 				} else {
-        	        $sql['orderBy'][] = $table.'.'.$fieldName.$dir;
-				}
+        	        $sql['orderBy'][] = strpos($fieldName,'.')?$table.'_'.$fieldName.$dir:$table.'.'.$fieldName.$dir;
+				}*/
+				 $sql['orderBy'][]= $fieldAlias.$dir;
 			}
 		}
 		if ($conf['list.']['orderByString']) {
@@ -4154,7 +4219,6 @@ class tx_metafeedit_lib {
 			    $sql['preOrderBy'][]=$ob;	
 			}
 		};
-		
 		//$sql['breakOrderBy']=$sql['preOrderBy'] && $sql['breakOrderBy']?','.$sql['breakOrderBy']:$sql['breakOrderBy'];
 		//$sql['orderBy']=($sql['preOrderBy'] || $sql['breakOrderBy']) && $sql['orderBy'] ?','.$sql['orderBy']:$sql['orderBy'];
 		if (is_array($sql['preOrderBy'])) $sql['preOrderBy']=array_unique($sql['preOrderBy']);
@@ -4163,9 +4227,6 @@ class tx_metafeedit_lib {
 		
  		$sql['orderBySql']=implode(',',array_unique(array_merge($sql['preOrderBy'],$sql['breakOrderBy'],$sql['orderBy'])));
  		if ($sql['orderBySql']) $sql['orderBySql']=' ORDER BY '.$sql['orderBySql'];
- 		//$sql['preOrderBy'].$sql['breakOrderBy'].$sql['orderBy']?" ORDER BY ".$sql['preOrderBy'].$sql['breakOrderBy'].$sql['orderBy']:'';
-		//hack by CMD - suite
-		//$sql['orderBy'] = ' ORDER BY '.$sql['orderBy'];
     }
     
     /**
@@ -4195,8 +4256,6 @@ class tx_metafeedit_lib {
 		$metafeeditvars[$GLOBALS['TSFE']->id][$conf['pluginId']]['advancedSearch']=$advancedSearch;
 		$GLOBALS["TSFE"]->fe_user->setKey('ses','metafeeditvars',$metafeeditvars);
 		$GLOBALS["TSFE"]->fe_user->storeSessionData();
-		//if (!is_array($advancedSearch)) $advancedSearch=$conf['piVars']['advancedSearch'];	
-		//modif CMD - récup du typoscript
 		$pluginId=$conf['pluginId'];
 		if ($conf['typoscript.'][$pluginId.'.']['advancedSearch.']) $advancedSearchDefault = $conf['typoscript.'][$pluginId.'.']['advancedSearch.'];
 
@@ -4393,10 +4452,8 @@ class tx_metafeedit_lib {
 		$table=$conf['table'];
 		$lV=$conf['inputvar.']['lV'];
 		$lField=$conf['inputvar.']['lField'];
-		//echo "$lV - $lField - $table";
 		if  ($lV && $lField) {	
 			$FT=$conf['TCAN'][$table]['columns'][$lField]['config']['foreign_table'];
-			//echo $FT;
 			if ($FT) {
 				/*$mmTable=$this->conf['TCAN'][$table]['columns'][$lField]['config']['MM'];
 				if ($mmTable) {								
@@ -4404,12 +4461,10 @@ class tx_metafeedit_lib {
 					//TODO
 					//$sql['fromTables'].=','.$mmTable;
 					//$sql['joinTables'][]=$mmTable;
-					echo $mmTable;
 				} 
 				else { // old "," seperated list field
 					//$ParentWhere.=' AND FIND_IN_SET('.$table.'.'.$lField.','.$lV.')>0 ';
 					$data = $GLOBALS['TSFE']->sys_page->getRawRecord($FT,$lV);
-					echo "ddd";print_r($data);
 				}*/
 				$data = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$lV);
 			

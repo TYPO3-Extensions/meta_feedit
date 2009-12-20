@@ -243,14 +243,14 @@ vertical-align:top;
 	display:block;
 	position:absolute;
 	left:0px;
-	background: url(/typo3conf/ext/meta_feedit/res/button_down.gif) no-repeat;
+	background: url(/typo3conf/ext/meta_feedit/res/button_up.gif) no-repeat;
 }
 .tx-metafeedit-editmenu-list-table-header th a.mfedt_sortdesc i{
 	width:20px;
 	display:block;
 	left:0px;
 	position:absolute;
-	background: url(/typo3conf/ext/meta_feedit/res/button_up.gif) no-repeat;
+	background: url(/typo3conf/ext/meta_feedit/res/button_down.gif) no-repeat;
 }
 .tx-metafeedit-advancedSearch ul.astabnav {
     font: bold 11px verdana, arial, sans-serif;
@@ -332,12 +332,57 @@ a.mfdt-set,a.mfdt-set:hover,a.mfdt-set:visited{color:red;}
 .tx-metafeedit-fs-searchbox{padding:2px}
 .activeLinkWrap a,.activeLinkWrap a:visited {color:red;font-size:10px}
 .activeLinkWrap a:hover {color:maroon;}
-.tx-metafeedit-editmenu-list div.browseBoxWrap {
+.tx-metafeedit-editmenu-list .mfepagenav {
 	background-color:#ccc;
 	border:1px solid #000;
 	margin:0px;
 	padding:0px;
-
+text-align:center;
+}
+.tx-metafeedit-editmenu-list div.browseBoxWrap {
+	background-color:#ccc;
+	margin:0px;
+	padding:0px;
+	border:0px;
+	float:left;
+}
+.tx-metafeedit-editmenu-list div.browseBoxWrap table td{
+	background-color:#ccc;
+	margin:0px;
+	padding:0px;
+	border:0px;
+}
+.tx-metafeedit-editmenu-list .nbpages {
+	background-color:#ccc;
+	margin:0px;
+	padding:0px;
+	color:#666;
+	font-family:Verdana,Arial,Helvetica,sans-serif;
+	font-size:10px;
+	font-weight:bold;
+	text-decoration:none;
+	text-align:center;
+}
+.tx-metafeedit-editmenu-list .nbpages form {
+display:inline;
+}
+.tx-metafeedit-editmenu-list .nbpages form input{
+height:1.5em;
+}
+.tx-metafeedit-editmenu-list .nbpages form select{
+font-size:1em;
+color:#666;
+}
+.tx-metafeedit-editmenu-list .nbrows {
+	background-color:#ccc;
+	margin:0px;
+	color:#666;
+	font-family:Verdana,Arial,Helvetica,sans-serif;
+	font-size:10px;
+	font-weight:bold;
+	text-decoration:none;
+	padding:0px;
+	float:right;
 }
 tr.tx-metafeedit-list-row-1:hover {background-color:#ddefff}
 tr.tx-metafeedit-list-row-2:hover {background-color:#ddefff}
@@ -351,6 +396,34 @@ tr.tx-metafeedit-list-row-2:hover {background-color:#ddefff}
 .tx-metafeedit-form-help-icon a {display:inline}
 .tx-metafeedit input:focus, textarea:focus{
 background: url() lightyellow;
+}
+.tx-metafeedit-groupBy-lvl-0 {
+background:#084B8A;
+color:#EEE;
+}
+tr.tx-metafeedit-header {
+border-top:2px solid #000;
+}
+.tx-metafeedit-groupBy{
+white-space:nowrap;
+}
+.tx-metafeedit-groupBy-lvl-1 {
+background:#0080FF;
+color:#fff;
+text-indent:1em;
+font-size:0.9em
+}
+.tx-metafeedit-groupBy-lvl-2 {
+background:#0080FF;
+color:#fff;
+text-indent:2em;
+font-size:0.8em
+}
+.tx-metafeedit-groupBy-lvl-3 {
+background:#0080FF;
+color:#fff;
+text-indent:3em;
+font-size:0.7em
 }
 )
 }

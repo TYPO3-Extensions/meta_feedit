@@ -390,8 +390,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// Setting incoming data. Non-stripped
 		
 		$fe=$conf['inputvar.']['fedata'];
-		//print_r($fe[$this->theTable]);
-		//if ($conf['inputvar.']['cmd']='edit' || ($conf['inputvar.']['cmd']='create' && $this->preview)) $this->dataArr=$fe[$this->theTable];	// Incoming data.
 		if ($conf['inputvar.']['cmd']!='list' || $conf['general.']['listMode']==2) $this->dataArr=$fe[$this->theTable];	// Incoming data.
 		$this->conf['dataArr']=&$this->dataArr;
 		// Setting blog incoming data. Non-stripped
@@ -558,7 +556,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			// Clear page cache
 			$this->clearCacheIfSet();
 			// Displaying the page here that says, the record has been saved. You're able to include the saved values by markers.
-			//echo $this->conf['inputvar.']['cmd'];
 			switch($this->conf['inputvar.']['cmd'])	{
 				case 'delete':
 					$key='DELETE';
@@ -576,7 +573,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 			// We handle status screen
 			if (($this->conf[$this->conf['inputvar.']['cmd'].'.']['statusScreen'] && ($this->conf['inputvar.']['cmd']=='edit' || $this->conf['inputvar.']['cmd']=='create')) ||  (!($this->conf['inputvar.']['cmd']=='list' && $this->conf['general.']['listMode']==2) && ($this->conf['inputvar.']['cmd']!='edit' && $this->conf['inputvar.']['cmd']!='create'))) {
-				//echo "STATUS";
 				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Status screen start:']=$this->metafeeditlib->displaytime()." Seconds";
 				$this->conf['cmdmode']='status';
 				// Output message
@@ -589,7 +585,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				$content = $this->cObj->substituteMarkerArray($templateCode, $markerArray);
 				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Status screen end:']=$this->metafeeditlib->displaytime()." Seconds";
 			} else {
-				//echo "NO STATUS";
 				// no status screen we want too stay on the edit form if in create mode we must switch to edit template, if in list or grid we stay in same mode ...
 				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc No status screen start:']=$this->metafeeditlib->displaytime()." Seconds";
 				if ($this->conf['inputvar.']['cmd']!='list') {
@@ -1190,13 +1185,10 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						break;
 						case 'uniqueLocal':
 						case 'uniqueInPid':
-							//echo '<br>uniqueLocal';print_r($this->dataArr).$this->conf['recUid'];
-							//'<br>uniqueLocal'.print_r($this->currentArr);
 							$whereef= $GLOBALS['TSFE']->sys_page->enableFields($masterTable);
 							if ($DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField($masterTable,$theField,$this->dataArr[$theField], 'AND pid IN ('.$recordTestPid.')'.$whereef,'','','1'))	{
 
 							if (!$recExist || $DBrows[0][$this->conf['uidField']]!=$this->dataArr[$this->conf['uidField']])	{	// Only issue an error if the record is not existing (if new...) and if the record with the false value selected was not our self.
-									//$tempArr[]=$theField;
 									$this->failureMsg[$theField][] = $this->getFailure($theField, $theCmd, $this->metafeeditlib->getLL('error_value_existed',$this->conf));
 								}
 							}
@@ -1895,7 +1887,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($conf['list.']['sortFields']){
     	foreach($Arr as $fieldName) {
 				$this->markerArray['###SORT_CLASS_'.$fieldName.'###']=($fieldName==$this->internal['orderBy'])?($this->internal['descFlag']?'mfedt_sortdesc':'mfedt_sortasc'):'NOSORT';
-				$this->markerArray['%23%23%23SORT_DIR_'.$fieldName.'%23%23%23']=($fieldName==$this->internal['orderBy'])?($this->internal['descFlag']?'0':'1'):'1';
+				$this->markerArray['%23%23%23SORT_DIR_'.$fieldName.'%23%23%23']=($fieldName==$this->internal['orderBy'])?($this->internal['descFlag']?'0':'1&'.$this->prefixId.'[resetorderby]['.$conf['pluginId'].']=1'):'1';
 			}
 		}
         //-- end sort calculations
@@ -1928,7 +1920,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']);
 	    if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList row count ',$GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']),$DEBUG);
 		$num=$GLOBALS['TYPO3_DB']->sql_num_rows($res);	// If there are menu-items ...
-
+		$this->markerArray['###METAFEEDITNBROWS###']='<span class="nbrows">'.$this->metafeeditlib->getLL("nbrows",$this->conf).$num.'</span>';
 		$NBSup=0; // Number of empty elements for page breaks and group by breaks;
 		$pageidx=0;
 		$pi=1; //page number we start at 1
@@ -1951,7 +1943,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($sql['groupBy']) {
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('mod(count(*),'.$nbe.') as moduloelts, count(*) as nbelts, ceiling(count(*)/'.$nbep.') as pages'.$sql['gbFields'].$sql['calcFieldsSql'].($sql['groupBy']?','.$conf['table'].'.*':''), $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql']);
 			//$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('mod(count(*),'.$nbe.') as moduloelts, count(*) as nbelts, ceiling(count(*)/'.$nbep.') as pages'.$sql['gbFields'].$sql['calcFieldsSql'].($sql['groupBy']?','.$conf['table'].'.*':''), $sql['fromTables'], '1 '.$sql['where'].$sql['orderBySql']);
-	  	if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList group by row count ',$GLOBALS['TYPO3_DB']->SELECTquery('mod(count(*),'.$nbe.') as moduloelts, count(*) as nbelts, ceiling(count(*)/'.$nbep.') as pages'.$sql['gbFields'].$sql['calcFieldsSql'].($sql['groupBy']?','.$conf['table'].'.*':''), $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql']),$DEBUG);
+			if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList group by row count ',$GLOBALS['TYPO3_DB']->SELECTquery('mod(count(*),'.$nbe.') as moduloelts, count(*) as nbelts, ceiling(count(*)/'.$nbep.') as pages'.$sql['gbFields'].$sql['calcFieldsSql'].($sql['groupBy']?','.$conf['table'].'.*':''), $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql']),$DEBUG);
 
 			$GBTA=array();
 			
@@ -2012,12 +2004,13 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($conf['list.']['pagination']) {
 			$this->internal['res_count']=$num+$NBSup;
 
-			//$pointer = $this->piVars['pointer'][$conf['pluginId']];
-			//$pointer = $this->piVars['pointer'];
 			$pointer = $conf['inputvar.']['pointer'];
         	$pointer = intval($pointer);
         	if ($pointer>(($num+$NBSup)/$conf['list.']['pageSize'])) $pointer=0;
-        	// HACK to set naavigation pointer for page browser;
+			$nbpages=ceil(($num+$NBSup)/$conf['list.']['pageSize']);
+			$this->markerArray['###METAFEEDITNBPAGES###']='<span class="nbpages">'.$this->metafeeditlib->pageSelector($nbpages,$conf).$this->metafeeditlib->getLL("nbpages",$this->conf).$nbpages.'</span>';
+
+			// HACK to set naavigation pointer for page browser;
         	$this->piVars['pointer']=$pointer;
         	$results_at_a_time = t3lib_div::intInRange($this->internal['results_at_a_time'],1,1000);
         	$LIMIT = ' LIMIT '.($pointer*$results_at_a_time - $pagedelta[$pointer+1]).','.$results_at_a_time;
@@ -2120,7 +2113,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			// group by  field handling 
 			$pagejump=0;
 
-			$groupByFields=$this->groupByHeader($conf,$tpl['GBFCode'].$tpl['GBCode'],$menuRow,$groupBy,$evalGroupBy,$GrpByField,$lc,$gc,$i,$pagejump,$sql,false,$DEBUG);
+			$groupByFields=$this->groupByHeader($conf,$tpl['GBFCode'].$tpl['GBCode'],$menuRow,$groupBy,$lastgroupBy,$evalGroupBy,$GrpByField,$lc,$gc,$i,$pagejump,$sql,false,$DEBUG);
 			If ($pagejump) break;
 
 			// New cols 
@@ -2188,12 +2181,12 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			} else {
 				// Display Right (rows first)
 				$row.=$item;
-        if ($lc>$g_mod) {
+				if ($lc>$g_mod) {
 					$row=$this->cObj->substituteSubpart($tpl['itemRowCode'], '###ITEM###', $row);
 					$rows.= $this->cObj->substituteMarkerArray($row, $markerArray);
 					$row='';
 
-        }
+				}
 				if ($nbrowscol) {
 						$g_mod=$lc;
 				}
@@ -2219,7 +2212,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	
 	// Add last group by totals :
 	
-	$groupByFields=$this->groupByHeader($conf,$tpl['GBFCode'].$tpl['GBCode'],$menuRow,$groupBy,$evalGroupBy,$GrpByField,$lc,$gc,$i,$pagejump,$sql,true,$DEBUG);
+	$groupByFields=$this->groupByHeader($conf,$tpl['GBFCode'].$tpl['GBCode'],$menuRow,$groupBy,$lastgroupBy,$evalGroupBy,$GrpByField,$lc,$gc,$i,$pagejump,$sql,true,$DEBUG);
 	$out.=$groupByFields;
 
 	$wraparray=array();
@@ -2461,7 +2454,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 * @see init()
 	 */
 	 
-	function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$evalGroupBy,$GrpByField,&$lc,&$gc,&$i,&$pagejump,&$sql,$end=false,&$DEBUG) {
+	function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$lastgroupBy,&$evalGroupBy,$GrpByField,&$lc,&$gc,&$i,&$pagejump,&$sql,$end=false,&$DEBUG) {
 		// group by  field handling
 		$GBmarkerArray=array();
 
@@ -2476,12 +2469,12 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				//if ($conf['list.']['hiddenGroupByField.'][$fN]) continue;
 
 				$GBmarkerArray['###GROUPBY_'.$fN.'###']="";
-				if (($groupBy[$fN]!=$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN] || $end)  && !$conf['list.']['hiddenGroupByField.'][$fN]) {
+				if (($groupBy[$fN]!=$this->metafeeditlib->transformGroupByData($fN,$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN],$conf) || $end)  && !$conf['list.']['hiddenGroupByField.'][$fN]) {
 					// Group by field change !
 					$GBmarkerArray['###FOOTERSUM_'.$fN.'_FIELD_metafeeditnbelts###']='';
 					if ($evalGroupBy[$fN]) {
 						$GBmarkerArray['###GROUPBYFOOTER_'.$fN.'###']=$evalGroupBy[$fN]; 
-						$this->metafeeditlib->getGroupByFooterSums($conf,'FOOTERSUM',$GBmarkerArray,$fN,$sql,$groupBy,$end,$DEBUG);
+						$this->metafeeditlib->getGroupByFooterSums($conf,'FOOTERSUM',$GBmarkerArray,$fN,$sql,$lastgroupBy,$end,$DEBUG);
 					} else {
 					   $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFOOTERFIELD_'.$fN.'###','');
 					}     	
@@ -2502,33 +2495,39 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			
 					// ??? 	
 					
-			if ($GrpByField[$fN]) {
-				$newGroupBy[$fN]=$menuRow[$GrpByField[$fN]];
-			} else {
-				$newGroupBy[$fN]=$menuRow[$fN];
-				if ($menuRow['EVAL_'.$_fN]) $std=$menuRow['EVAL_'.$_fN];
-			}
+					if ($GrpByField[$fN]) {
+						$newGroupBy[$fN]=$menuRow[$GrpByField[$fN]];
+					} else {
+						$newGroupBy[$fN]=$menuRow[$fN];
+						if ($menuRow['EVAL_'.$_fN]) $std=$menuRow['EVAL_'.$_fN];
+					}
 			
 			
 					// we set group by flag
-			$gbflag=1;
-			$GBmarkerArray['###GROUPBY_'.$fN.'###']=$std;
-			$evalGroupBy[$fN]=$std;
+					$gbflag=1;
+					$GBmarkerArray['###GROUPBY_'.$fN.'###']=$std;
+					$evalGroupBy[$fN]=$std;
+					// We have to reset all son groupbys so that the headers will be regenerated...
+					$resetgbf=FALSE;
+					foreach ($groupBy as $gbf=>$val) {
+						if ( $resetgbf) unset($groupBy[$gbf]);
+						if ($gbf==$fN) $resetgbf=TRUE;
+					}
+				} else {
+						// we clear unused group bys 
+					 $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFIELD_'.$fN.'###','');
+					 $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFOOTERFIELD_'.$fN.'###','');
+				}
+				// We clear next group by if end of list is reached
+				if ($end) $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFIELD_'.$fN.'###','');
 
-		  } else {
-				// we clear unused group bys 
-			 $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFIELD_'.$fN.'###','');
-			 $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFOOTERFIELD_'.$fN.'###','');
-		  }
-		  // We clear next group by if end of list is reached
-		  if ($end) $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFIELD_'.$fN.'###','');
-
+			}
+			foreach($newGroupBy as $fN=>$val) {
+				$groupBy[$fN]=$this->metafeeditlib->transformGroupByData($fN,$val,$conf);
+				$lastgroupBy[$fN]=$this->metafeeditlib->transformGroupByData($fN,$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN],$conf);
+			}
+				
 		}
-		foreach($newGroupBy as $fN=>$val) {
-			$groupBy[$fN]=$val;
-		}
-		
-	  }
 		if ($gbflag) {
 			$groupByFields=$this->cObj->substituteMarkerArray($GBCode, $GBmarkerArray);
 			$gc++;
@@ -2616,7 +2615,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						{
 							// originally there only these 2 lines in this condition (if ($FTUid) )
 							$FTorigArr = $GLOBALS['TSFE']->sys_page->getRawRecord($FTable, $FTUid);
-							foreach($FTorigArr as $key =>$val) $origArr[$FTRel.'.'.$key]=$val;
+							if (is_array($FTorigArr)) foreach($FTorigArr as $key =>$val) $origArr[$FTRel.'.'.$key]=$val;
 						}
 					}
 					else

@@ -2,7 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2003-2004 Kasper Skårhøj (kasper@typo3.com)
+*  (c) 2003-2004 Christophe Balisky <christophe@balisky.org>
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -24,7 +24,7 @@
 /**
  * Class/Function which manipulates the item-array for the FEusers listing
  *
- * @author	Kasper Skårhøj <kasper@typo3.com>
+ * @author	Christophe Balisky <christophe@balisky.org>
  */
 
 
@@ -315,22 +315,19 @@ class tx_metafeedit_flexfill {
 	}
 
 	/**
-	 * [Describe function...]
+	 * getFields_OB
 	 *
-	 * @param	[type]		$$params: ...
-	 * @param	[type]		$table: ...
-	 * @param	[type]		$rel: ...
-	 * @return	[type]		...
+	 * @param	array		$params: ...
+	 * @param	string		$table: tablename
+	 * @param	string		$rel: relation name
+	 * @param	array		$flexarr: flexform array data
+	 * @return	array		...
 	 */
 	function getFields_OB(&$params,$table,$rel,&$flexarr) {
 		global $TCA;
+		$rel=str_replace('.','_',$rel);
 		$prefix=$rel?$rel.'.':'';
-		//$this->loadTCA($table);
-		//$params['items'][]=Array( 'Unique ID : ASC',$prefix.'uid:asc');
-		//$params['items'][]=Array( 'Unique ID : DESC',$prefix.'uid:desc');
-		//$params['items'][]=Array('Page ID : ASC',$prefix.'pid:asc');
-		//$params['items'][]=Array('Page ID : DESC',$prefix.'pid:desc');
-
+		
 		if (is_array($TCA[$table]['columns']))  {
 			foreach($TCA[$table]['columns'] as $key => $config)     {
 				$label = t3lib_div::fixed_lgd(preg_replace('/:$/','',$GLOBALS['LANG']->sL($config['label'])),30).' ASC ('.$prefix.$key.')';
@@ -339,6 +336,14 @@ class tx_metafeedit_flexfill {
 				$params['items'][]=Array($label, $prefix.$key.':desc' );
 			}
 		}
+		if (@$TCA[$table]['ctrl']['tstamp']) $params['items'][]=Array($TCA[$table]['ctrl']['tstamp'].' ASC ('.$prefix.$TCA[$table]['ctrl']['tstamp'].')', $prefix.$TCA[$table]['ctrl']['tstamp'].':asc');
+		if (@$TCA[$table]['ctrl']['crdate']) $params['items'][]=Array($TCA[$table]['ctrl']['crdate'].' ASC ('.$prefix.$TCA[$table]['ctrl']['crdate'].')', $prefix.$TCA[$table]['ctrl']['crdate'].':asc');
+		if (@$TCA[$table]['ctrl']['cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['cruser_id'].' ASC ('.$prefix.$TCA[$table]['ctrl']['cruser_id'].')',$prefix.$TCA[$table]['ctrl']['cruser_id'].':asc');
+		if (@$TCA[$table]['ctrl']['fe_cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['fe_cruser_id'].' ASC ('.$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].')',$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].':asc');    
+		if (@$TCA[$table]['ctrl']['tstamp']) $params['items'][]=Array($TCA[$table]['ctrl']['tstamp'].' DESC ('.$prefix.$TCA[$table]['ctrl']['tstamp'].')', $prefix.$TCA[$table]['ctrl']['tstamp'].':desc');
+		if (@$TCA[$table]['ctrl']['crdate']) $params['items'][]=Array($TCA[$table]['ctrl']['crdate'].' DESC ('.$prefix.$TCA[$table]['ctrl']['crdate'].')', $prefix.$TCA[$table]['ctrl']['crdate'].':desc');
+		if (@$TCA[$table]['ctrl']['cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['cruser_id'].' DESC ('.$prefix.$TCA[$table]['ctrl']['cruser_id'].')',$prefix.$TCA[$table]['ctrl']['cruser_id'].':desc');
+		if (@$TCA[$table]['ctrl']['fe_cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['fe_cruser_id'].' DESC ('.$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].')',$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].':desc');    
                 		
 		// We add sql calculated fields added by user in flexform
 

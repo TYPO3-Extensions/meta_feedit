@@ -2,8 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2004 Morten Hansen (mth@daimi.au.dk)
-*  (c) 2006 Christophe BALISKY (cbalisky@metaphore.fr)
+*  (c) 2006 Christophe Balisky <christophe@balisky.org>
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -25,8 +24,7 @@
 /**
 * Plugin 'Meta FE edit' for the 'meta_feedit' extension.
 *
-* @author Morten Hansen <mth@daimi.au.dk>
-* @author Christophe BALISKY (cbalisky@metaphore.fr)
+* @author Christophe Balisky <christophe@balisky.org>
 */
 
 
@@ -130,8 +128,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 							if (!in_array($key,$excludedKeys)){
 								$this->lconf[$key]=$this->pi_getFFvalue($piFlexForm,$key,$sheet);
 
-							} else {
-								//echo "<br> on garde : ".$key. " -> ".$this->lconf[$key];
 							}
 						}
 					}
@@ -212,6 +208,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 
 		// Must handle date formats according to editmode and pluginId
 		$mfconf['dateformat']=$conf['dateformat']?$conf['dateformat']:($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?"%m-%e-%Y":"%e-%m-%Y");
+		$mfconf['timeformat']=$conf['timeformat']?$conf['timeformat']:"%H:%M";
 		$mfconf['datetimeformat']=$conf['datetimeformat']?$conf['datetimeformat']:($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?"%H:%M %m-%e-%Y":"%H:%M %e-%m-%Y");
 		
 		$mfconf['fUField']=$conf[$lconf['pluginId'].'.']['fUField']?$conf[$lconf['pluginId'].'.']['fUField']:$conf['default.']['fUField'];
@@ -283,7 +280,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['firstLinkWrap']=$this->metafeeditlib->is_extent($conf['firstLinkWrap'])?$conf['firstLinkWrap']:$lconf['firstLinkWrap'];
 		$mfconf['list.']['lastLinkWrap']=$this->metafeeditlib->is_extent($conf['lastLinkWrap'])?$conf['lastLinkWrap']:$lconf['lastLinkWrap'];
 		$mfconf['list.']['searchBox']=$lconf['searchBox'];
-		$mfconf['list.']['align.']=$conf['list.']['align.'];
+		$mfconf['list.']['align.']=$conf[$pluginId.'.']['list.']['align.']?$conf[$pluginId.'.']['list.']['align.']:$conf['list.']['align.'];
 		$mfconf['list.']['searchBox.']=$conf['searchBox.'];	
 		// advancedSearch
 		$mfconf['list.']['advancedSearchFields']=$this->correctFieldSets($lconf['advancedSearchFields']);
@@ -526,6 +523,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['header']=$conf['list.']['header'];
 		$mfconf['list.']['footer']=$conf['list.']['footer'];
 		$mfconf['evalLastSep.']=$conf['evalLastSep.'];
+		$mfconf['list.']['groupby.']=$conf[$pluginId.'.']['list.']['groupby.']?$conf[$pluginId.'.']['list.']['groupby.']:$conf['list.']['groupby.'];
 		$mfconf['evalSep.']=$conf['evalSep.'];
 		$mfconf['evalWrap.']=$conf['evalWrap.'];
 		$mfconf['previewWrap.']=$conf['previewWrap.'];
@@ -583,6 +581,10 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['grid.']['userFunc_afterRowWhere']=$conf[$pluginId.'.']['grid.']['userFunc_afterRowWhere']; 
 		$mfconf['grid.']['userFunc_afterColWhere']=$conf[$pluginId.'.']['grid.']['userFunc_afterColWhere']; 
 		$mfconf['grid.']['userFunc_afterSecondaryColWhere']=$conf[$pluginId.'.']['grid.']['userFunc_afterSecondaryColWhere']; 
+
+		$mfconf['list.']['sqlcalcfieldstransforms.']=$conf[$pluginId.'.']['list.']['sqlcalcfieldstransforms.']?$conf[$pluginId.'.']['list.']['sqlcalcfieldstransforms.']:$conf['list.']['sqlcalcfieldstransforms.'];
+
+		
 		// We handle override values here
 
 		$OArr=t3lib_div::trimExplode(chr(10),$lconf['listsqlcalcfields']);
@@ -594,7 +596,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 				if ($calcField) $CVArr[]=$OVs[0];
 			}		
 		}
-		
 		$OArr=t3lib_div::trimExplode(chr(10),$lconf['listphpcalcfields']);
 		foreach($OArr as $ORV) {
 			$OVs=explode('=',$ORV,2);
@@ -751,6 +752,11 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			  unset ( $mfconf['inputvar.']['sword']);
 			  unset ( $mfconf['inputvar.']['sortLetter']);
 			  unset ( $_GET['tx_metafeedit']['reset']);
+			  unset ( $_POST['tx_metafeedit']['reset']);
+			  unset ( $_GET['tx_metafeedit']['advancedSearch']);
+			  unset ( $_POST['tx_metafeedit']['advancedSearch']);
+			  unset ( $this->piVars['advancedSearch']);
+			  unset ($mfconf['piVars']['advancedSearch']);
 			  unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sword']);
 			  unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sortLetter']);
 			  unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['advancedSearch']);
@@ -768,13 +774,11 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// cmd : Display mode
 		
 		$cmd=$mfconf['inputvar.']['cmd'];	
-		//echo "<br>Pi1 cmd :".$cmd;
 		$mfconf['inputvar.']['cmd']=$cmd ? $cmd :$mfconf['defaultCmd'];
 		$mfconf['inputvar.']['cmd']=$conf['forcedCmd'] ? $conf['forcedCmd'] :$mfconf['inputvar.']['cmd'];
 		if (!$mfconf['inputvar.']['cmd']) $mfconf['inputvar.']['cmd']=$conf['defaultCmd'];
 		if (!$mfconf['inputvar.']['cmd']) $mfconf['inputvar.']['cmd']='edit';
 		//if ($mfconf['inputvar.']['cmd']=='create') 
-		//echo "<br>Pi1 cmd conf :".$mfconf['inputvar.']['cmd'];
 		// we check here editUnique Creation Mode (must optimize this);
         
 		if ($conf['editUnique']) {
@@ -793,12 +797,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
         }
 		
 		// we handle back url here by calculating referer..
-		//echo '<br>handle backurl :'.$mfconf['inputvar.']['backURL'];
 
 		if (!$mfconf['inputvar.']['BACK']) {
-			//echo '<br>no back :';
 			if (!$this->piVars['referer'][$pluginId]) {
-				//echo '<br>no PIVAR :';
 				$backURL=$_SERVER['HTTP_REFERER'];
 				$this->piVars['referer'][$pluginId]=$_SERVER['HTTP_REFERER'];
 			} else {
@@ -811,15 +812,12 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			$tl=$this->cObj->typoLink_URL($tlconf);
 			
 			if (trim($tl)!=$path) {
-				//echo '<br>'.$tl.' != '.$path;
 				$backURL=str_replace("&BACK[".$pluginId."]=1","",$backURL);
-				//echo '<br>'."&BACK[".$pluginId."]=1 replaced ".$mfconf['inputvar.']['backURL'];
 				if (!strpos($backURL,'?')) $backURL.='?';
 				$backURL.="&BACK[".$pluginId."]=1";
 				$mfconf['inputvar.']['backURL']=$backURL;
 			}
 		}
-        //echo '<br>Pi1 from session '.$mfconf['inputvar.']['backURL'];
 		
 		// we set session variables we want to remember 
 		//=============================================
@@ -834,17 +832,10 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		}
 		
 		if (!is_array($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId])) $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]=$mfconf['inputvar.'];
-		//echo "<br> pi1 res pluginid: $pluginId, pid:".$GLOBALS['TSFE']->id." :";print_r($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]);
 		$GLOBALS["TSFE"]->fe_user->setKey('ses','metafeeditvars',$metafeeditvars);
-		//$GLOBALS["TSFE"]->fe_user->setKey('ses','metafeeditvars',array()); // reset all session vars...
-		//$GLOBALS["TSFE"]->fe_user->setKey('ses','metafeeditvars',$metafeeditvars);
 		$GLOBALS["TSFE"]->fe_user->storeSessionData();
-    //print_r($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]);
-		// We update backURL depending on configuration parameters =========================
-		//print_r($metafeeditvars);			
-		$mfconf['inputvar.']['backURL']=$this->metafeeditlib->makeBackURLTypoLink($mfconf,$mfconf['inputvar.']['backURL']);
-		//echo '<br>Pi1 after configuration update '.$mfconf['inputvar.']['backURL'];
-	
+ 		// We update backURL depending on configuration parameters =========================
+		$mfconf['inputvar.']['backURL']=$this->metafeeditlib->makeBackURLTypoLink($mfconf,$mfconf['inputvar.']['backURL']);	
 		//==================================================================================
 		// JAVASCRIPT LIBRARIES ...
 		if ($mfconf['ajax.']['ajaxOn'] && !t3lib_div::_GP('ajx')) {
