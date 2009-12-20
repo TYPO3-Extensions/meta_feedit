@@ -1613,26 +1613,21 @@ class tx_metafeedit extends  tslib_pibase {
     	return $ret;
     }
 	/**
-	* getEditSumFields : generates template field cells (<td>) for sums of displayed columns ....
-	*
-    * @param	string     	$prefix	: true we output only text mode data (no input fields)....
-	* @param	array		$conf: Configuration array();
-    * @param    integer		$count: by reference, nb fields
-	* @param	boolean     $textmode	: true we output only text mode data (no input fields)....
-    * @param	string     	$type	: true we output only text mode data (no input fields)....
- 	* @param	boolean     $actFlag	: Wether to show actions or group by label in first cell...
+	 * getEditSumFields : generates template field cells (<td>) for sums of displayed columns ....
+	 *
+    * @param	array		$conf: Configuration array();
+    * @param	boolean     $textmode	: true we output only text mode data (no input fields)....
+    * @param    string		$type: ...
     * @return	string		$ret : html code
-	*/
+	 */
 
 	function getEditSumFields($prefix,&$conf,&$count, $textmode=false, $type='',$actFlag=FALSE)
 	{
 		$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
-		$firstemptycell='###FIRSTEMPTYCELL###';
+		$firstemptycell=$actFlag?'':'###FIRSTEMPTYCELL###';
 		$count=0;
 		$ret=$type=='PDF'?'<gb>1</gb>':'';
-		//$ret.=$actFlag?'<td>###FIRSTEMPTYCELL###</td>':'';
-		$fc=0;
 		foreach($fieldArray as $FN) {
 			$params=explode(';',$FN);
 			if ($params[0]!='--div--' && $params[0]!='--fse--' && $params[0]!='--fsb--' ) {
@@ -1645,36 +1640,27 @@ class tx_metafeedit extends  tslib_pibase {
 				
 				if (!in_array($_FN,$sumarray) && !in_array($FN,$sumarray)) {			// If field is not a sum field ...
 					if ($textmode){
-						$ret.=($actFlag&&$firstemptycell)?'<td>###FIRSTEMPTYCELL###</td>':'';
 						if ($type)					// Empty cell for PDF
-							$ret .= '<td><data>'.($firstemptycell?$firstemptycell:'').'</data><size>'.$size.'</size></td>';
+						$ret .= '<td><data>'.($firstemptycell?$firstemptycell:'').'</data><size>'.$size.'</size></td>';
 						else 								// Empty cell for CSV
-							$ret.= ($firstemptycell?$firstemptycell:'').';';
-						if ($firstemptycell) $firstemptycell='';
-
-					} else	{							// Empty cell for html
-						$fc++;
-						//$ret.='<td>'.($firstemptycell?$firstemptycell:'').'</td>';	
-					}					
+						$ret.= ($firstemptycell?$firstemptycell:'').';';
+					}
+					else	{							// Empty cell for Excel
+						$ret.='<td>'.($firstemptycell?$firstemptycell:'').'</td>';	
+					}
+					if ($firstemptycell) $firstemptycell='';
+					
 				} else {   						// Field is a sum field
-					
-					
 					$count++;
 					$mfn=in_array($FN,$sumarray)?$FN:$_FN;
-					if (!$textmode)	{		// Not text mode only
-						if ($fc) {
-							$ret.='<td colspan="'.($fc+$actFlag).'">'.($firstemptycell?$firstemptycell:'').'</td>';
-						}
-						if ($firstemptycell) $firstemptycell='';
+					if (!$textmode)			// Not text mode only
 						$ret.='<td '.($conf['list.']['align.'][$mfn]?'align="'.$conf['list.']['align.'][$mfn].'"':'').'>'.'###'.$prefix.'_FIELD_'.$mfn.'###</td>';
-					} else  {
-						if ($type) 						// Fichier PDF, EXcel 
+					else  {
+						if ($type) 						// Fichier PDF
 							$ret.='<td><data>###'.$prefix.'_FIELD_'.$mfn.'###</data><size>'.$size.'</size></td>';
 						else 
-							//CSV 
 							$ret.=$Lib.'###'.$prefix.'_FIELD_'.$mfn.'###;';
 					}
-					$fc=0;
 				}
 			}
 		}			
@@ -1711,7 +1697,7 @@ class tx_metafeedit extends  tslib_pibase {
 	return $ret;
   }
 	/**
-	 * getGridDataFields
+	 * [Describe function...]
 	 *
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
@@ -1849,8 +1835,7 @@ class tx_metafeedit extends  tslib_pibase {
   		$GROUPBYFIELDS='';
 		$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
 		$nbf=1;
-		$hasActions=$this->metafeeditlib->hasListActions($conf);
-		$nbf=count(t3lib_div::trimExplode(",",$fields))+$hasActions;
+		$nbf=count(t3lib_div::trimExplode(",",$fields))+$this->metafeeditlib->hasListActions($conf);
 
 		if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="<tr><td>";
 	    $fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
@@ -1866,7 +1851,8 @@ class tx_metafeedit extends  tslib_pibase {
 			$size = $this->getSize($conf, $fN, $conf['table']);
 			$div=($textmode?'':'<div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.( $conf['list.']['groupby.'][$fN.'.']['footer']?$conf['list.']['groupby.'][$fN.'.']['footer']:$this->metafeeditlib->getLLFromLabel('total',$conf).' ###GROUPBYFOOTER_'.$fN.'###'.(($conf['list.']['groupByCount']||$conf['list.']['groupby.'][$fN.'.']['footer.']['showcount'])?'(###FOOTERSUM_'.$fN.'_FIELD_metafeeditnbelts###)':'')).($textmode?'':'</div>');
 			if ($conf['list.']['sumFields']) {
-				$sum='<!--###FOOTERSUM_FIELDS### begin -->'.$this->getEditSumFields('FOOTERSUM_'.$fN,$conf,$count, $textmode, $exporttype,$hasActions);
+				$sum='<!--###FOOTERSUM_FIELDS### begin -->'.$this->getEditSumFields('FOOTERSUM_'.$fN,$conf,$count, $textmode, $exporttype);
+				//$tmp.='<tr>'.$this->getSumFields($conf, false, 'html').'</tr>'; //TODO Handle undisplayed sumfields ...
 				$sum.='<!--###FOOTERSUM_FIELDS### end -->';
 				$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$div);
 
@@ -1933,13 +1919,17 @@ class tx_metafeedit extends  tslib_pibase {
  		$actFlag=(!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions']));
 		// Total processing 
     	if ($conf['list.']['sumFields']) {
-    		$sum='<!--###SUM_FIELDS### begin---><tr>'.$this->getEditSumFields('SUM',$conf, $count,false, 'html',$actFlag).'</tr>';   
+    		$sum='<!--###SUM_FIELDS### begin---><tr>'.($actFlag?'<td>###FIRSTEMPTYCELL###</td>':'').$this->getEditSumFields('SUM',$conf, $count,false, 'html',$actFlag).'</tr>';   
     		$sum.='<!--###SUM_FIELDS### end--->';
     		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$this->metafeeditlib->getLLFromLabel('total',$conf).($conf['list.']['totalCount']?' (###SUM_FIELD_metafeeditnbelts###)':''));
     		$tmp.=$sum;
     	}
+        $fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
+
+        $nbf=$conf['list.']['nbCols']?$conf['list.']['nbCols']+$this->metafeeditlib->hasListActions($conf):(count(t3lib_div::trimExplode(",",$fields))+$this->metafeeditlib->hasListActions($conf));
+
     	// MEDIAPLAYER TAGS
-    	$tmp.='</table>###MEDIAPLAYER###'.($conf['blog.']['showComments']?'###MEDIA_ACTION_BLOG###':'').'###PAGENAV###';
+    	$tmp.='<tr class="mfeblog"><td colspan="'.$nbf.'">###MEDIAPLAYER###</td></tr>'.($conf['blog.']['showComments']?'<tr class="mfeblog"><td colspan="'.$nbf.'">###MEDIA_ACTION_BLOG###</td></tr>':'').'<tr class="mfepagenav"><td colspan="'.$nbf.'">###PAGENAV######METAFEEDITNBPAGES######METAFEEDITNBROWS###</td></tr></table>';
     	// BOTTOM ACTION TAGS
     	$tmp.= '</div></div><table class="tx-metafeedit-bottom-actions" style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-BOTTOM###</td></tr></table>';
 		if ($conf['ajax.']['ajaxOn']) $tmp.= '<div id="modalWindow" class="jqmWindow">
