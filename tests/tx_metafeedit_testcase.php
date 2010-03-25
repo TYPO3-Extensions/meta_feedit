@@ -2,7 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2005 Robert Lemke (robert@typo3.org)
+*  (c) 2005 Christophe Balisky <christophe@balisky.org>
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -23,7 +23,7 @@
 ***************************************************************/
 
 /**
- * @author	Robert Lemke <robert@typo3.org>
+ * @author	Christophe Balisky <christophe@balisky.org>
  */
 require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_lib.php');
 
