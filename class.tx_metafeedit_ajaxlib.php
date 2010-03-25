@@ -133,11 +133,11 @@ class tx_metafeedit_ajaxlib {
 					$item['row']=$row;
 					$item['id']=$row[0];
 					$item['data']=$data;
+					//how to add format hook here ?
 					$comboData['rows'][]=$item;
 				}
 			}
 		}
-		//print_r($comboData);
 		return $comboData;
 	}
 
