@@ -83,6 +83,8 @@ require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_widgets.p
 
 	function init(&$caller,&$conf) {
 		$this->cObj = &$GLOBALS['TSFE']->cObj;
+		//echo "init";
+		//print_r($conf);
 		$this->conf=&$conf;
 		$this->caller=$caller;
 		$this->makeXajaxInstance();
