@@ -39,6 +39,7 @@
 class tx_metafeedit_widgets {
 	var $prefixId;
 	var $metafeeditLib;
+	private $conf;
 	
 	function init($prefixId,$metafeeditLib) {
 		$this->prefixId=$prefixId;
@@ -81,11 +82,11 @@ class tx_metafeedit_widgets {
 	function htmlfriendly2($var){
 		$chars = array(
  		10 => '',
-		39 => '\u0027');
+		39 => '');//\u0027
 		return str_replace(array_map('chr', array_keys($chars)), $chars,$var);
 	}
 
-	function comboList($prefix='',$id='',$val='',$onChange='',$onSelect='',$label='',$pagesize=10,&$conf,$FN) {
+	function comboList($prefix='',$id='',$val='',$onChange='',$onSelect='',$label='',$pagesize=10,&$conf,$FN,$onData='') {
 		$advancedSearch=$conf['inputvar.']['advancedSearch'];	
 		$prefix=$prefix?$prefix:'combolist-';
 	    $id=$id?$id:$conf['pluginId'].$FN;
@@ -100,6 +101,7 @@ class tx_metafeedit_widgets {
 		$val=$advancedSearch[$FN];
 		$name=$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']';
 		$callBacks=$onChange.','.$onSelect;
+		if ($onData) $callBacks.=','.$onData;
 		$onMouseOver=' onmouseover="combolistmouseover(\''.$prefix.$id.'\');"';
 		$onMouseOut =' onmouseout="combolistmouseout(\''.$prefix.$id.'\');"';
 		$onFocus=' onmouseover="combolistmouseover(\''.$prefix.$id.'\');"';
@@ -153,7 +155,11 @@ class tx_metafeedit_widgets {
 	}
 	
 	// Cette fonction est le callback principal de notre widget..
-	
+	/** Called from xajax handler
+	* @param array $data array pf form (post?) data
+	* @param tx_xajax_response $objResponse instance of tx_xajax_response
+	* @param tx_metafeedit_ajaxlib $handler instance of tx_metafeedit_ajaxlib
+	**/
 	function handleComboList($data,&$objResponse,&$handler) {
 		//print_r($data);
 		$idwidget=$data[$this->prefixId]['code'];
@@ -190,6 +196,10 @@ class tx_metafeedit_widgets {
 					$c--;
 					$json['cbs'][]=array('id'=>$cb);
 				}
+				
+				//print_r($json);
+				//how to add format hook here ?
+
 				$json['prefix']=$prefix;
 				$json['idwidget']=$idwidget;
 				$json['pagesize']=($pagesize?$pagesize:0);
@@ -225,6 +235,11 @@ class tx_metafeedit_widgets {
 							//$json.='"i'.$key.'":"'.addslashes($field).'"'.($cf?',':'');
 						
 						}
+						if ($callBacksArr[2]) {
+							//echo $callBacksArr[2];
+							t3lib_div::callUserFunction($callBacksArr[2],$rs,$this);
+						}
+						//print_r($rs);
 						$json['rs'][]=$rs;
 						
 						$c--;
