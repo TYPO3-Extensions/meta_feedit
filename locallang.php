@@ -100,7 +100,11 @@ $LOCAL_LANG = Array (
 		'move_bt' => 'Move selected items downwards',
 		'move_down' => 'Move selected items to bottom',
 		'move_delete' => 'Delete selected items',
-		'printedby' => 'Printed by : ',	),
+		'printedby' => 'Printed by : ',	
+		'nbpages' => 'Nb pages : ',
+		'gotopage' => 'Goto page : ',
+		'nbrows' => 'Nb rows : ',
+	),
 	'dk' => Array (
 		'create_header_prefix' => 'Tilføjer ',
 	),
@@ -289,6 +293,9 @@ $LOCAL_LANG = Array (
 		'move_down' => 'Déplacer l\'élément en bas',
 		'move_delete' => 'Supprimer les éléments sélectionnés',
 		'printedby' => 'Imprimé par : ',
+		'nbpages' => 'Nb pages : ',
+		'gotopage' => 'Aller à la page : ',
+		'nbrows' => 'Nb éléments : ',
 
 	),
 	'es' => Array (
