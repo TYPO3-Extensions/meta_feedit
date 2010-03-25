@@ -288,7 +288,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['advancedSearch.']=$conf['advancedSearch.'];
 		$mfconf['list.']['advancedSearchConfig.']=$conf['advancedSearchConfig.'];
 		$mfconf['list.']['advancedSearchAjaxSelector']=$lconf['advancedSearchAjaxSelector'];
-		$mfconf['list.']['advancedSearchAjaxSelector.']=$conf[$lconf['pluginId'].'.']['list.']['advancedSearchAjaxSelector.'];		
+		$mfconf['list.']['advancedSearchAjaxSelector.']=$conf[$lconf['pluginId'].'.']['list.']['advancedSearchAjaxSelector.'];
 		$mfconf['list.']['alphabeticalSearch']=$lconf['alphabeticalSearch'];
 		$mfconf['list.']['alphabeticalSearch.']=$conf['alphabeticalSearch.'];
 		$mfconf['list.']['calendarSearch']=$lconf['calendarSearch'];
