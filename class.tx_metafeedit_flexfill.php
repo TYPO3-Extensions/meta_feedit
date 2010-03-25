@@ -141,6 +141,7 @@ class tx_metafeedit_flexfill {
 			);	
 		}
 	}
+	// ???
 	function mainav(&$params,&$pObj)	{
 		global $TCA;
 		$flex=$this->getFlex();
@@ -359,7 +360,7 @@ class tx_metafeedit_flexfill {
 	}
 
 	/**
-	 * getFieldsFT
+	 * get foreign Table fields
 	 *
 	 * @param	[type]		$$params: ...
 	 * @param	[type]		$table: ...
