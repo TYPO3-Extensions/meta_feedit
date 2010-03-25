@@ -1,5 +1,8 @@
 add new changes on top of this file)
 
+1.6.0 :
+Documentation update
+Added support for plugin.tx_metafeedit_pi1.<pluginid>.list.advancedSearchAjaxSelector.journey.userFunc_alterRow=EXT:ard_cric_travel_info/Libs/class.tx_ardcrictravelinfo_srd.php:tx_ardcrictravelinfo_srd->journeyASWrap
 
 0.0.25 : 
 Updated documentation & language files (thanks to Chris Paige [chris@ready-set-go.biz])
