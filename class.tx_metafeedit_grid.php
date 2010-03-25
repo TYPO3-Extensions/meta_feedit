@@ -416,7 +416,7 @@ class tx_metafeedit_grid {
 							$cMarkerArray['###HIDDENCELLFIELDS###']='<input type="hidden" name="FE['.$table.'][grid]['.$rData.']['.$cData.']['.$conf['uidField'].']" value="'.$cella[$rData][$cData][$conf['uidField']].'">';
 							$cMarkerArray=$this->cObj->fillInMarkerArray($cMarkerArray, $cella[$rData][$cData], '', TRUE, 'FIELD_', $conf['recInMarkersHSC']);
 							$codeJS=$this->cObj->getUpdateJS($this->feadminlib->modifyDataArrForFormUpdate($cella[$rData][$cData]), $conf['table'].'_form',  'FE['.$conf['table'].'][grid]['.$rData.']['.$cData.']',$conf['grid.']['show_fields']);
-							foreach($additionalJS_end as $key=>$value) {
+							if (is_array($additionalJS_end)) foreach($additionalJS_end as $key=>$value) {
 								$conf['additionalJS_end'][$key.'-'.$rData.'-'.$cData]=$this->cObj->substituteMarker($value,'###GRIDCELL###',$cellMarker);
 							}
 							$sqlMode='<input type="hidden" name="FE['.$table.'][grid-sqlmode]['.$rData.']['.$cData.']" value="update">';
