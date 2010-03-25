@@ -711,36 +711,29 @@ class tx_metafeedit_lib {
 		$GROUPBY=$sql['groupBy'];
 		$endgb=0;
 	    foreach($fNA as $fNe) {
-	    	
 		    $fN2=t3lib_div::trimexplode(':',$fNe);
-				$fNi=$fN2[0];
-				if($fN2[2] || $endgb) {
-				    	//$WHERE.=" and $fN2[0]=".$row[$fNi];
-							/* See below
-							$calcField=$conf['list.']['sqlcalcfields.'][$fNi]; // TO BE IMPROVED
-							if ($calcField) {
-								$sumSQLFields.=$sumSQLFields?",$calcField as $fNi":"$calcField as $fNi";
-							}
-							*/
-							if (!$endgb) {
-					    	$GROUPBY=$GROUPBY?$GROUPBY.','.$fN2[0]:$fN2[0];
-					    	$HAVING=$HAVING?$HAVING." and $fN2[0]='".$row[$fNi]."'":" HAVING $fN2[0]='".$row[$fNi]."'";
-					    }
-					} else {
-				    if (strpos($fNi,'.')===false && $row[$fNi]) {
-						//$table = $this->getForeignTableFromField($fNi, $conf,'',&$sql);
-				    	$WHERE.=" and $conf[table].$fNi=".$row[$fNi];
-				    	$GROUPBY=$GROUPBY?$GROUPBY.','.$conf[table].'.'.$fNi:$conf[table].'.'.$fNi;
-				    } else {
-			      	    $WHERE.=$this->makeSQLJoinWhere($fNi,$conf,$row[$fNi]);
-				  	}
-				  }
+			$fNi=$fN2[0];
+			if($fN2[2] || $endgb) {
+				if (!$endgb) {
+					$GROUPBY=$GROUPBY?$GROUPBY.','.$fN2[0]:$fN2[0];
+					$HAVING.=$HAVING?" and $fN2[0]='".$row[$fNi]."'":" HAVING $fN2[0]='".$row[$fNi]."'";
+				}
+			} else {
+				if (strpos($fNi,'.')===false && $row[$fNi]) {
+					//$table = $this->getForeignTableFromField($fNi, $conf,'',&$sql);
+				    $WHERE.=" and $conf[table].$fNi=".$row[$fNi];
+				    $GROUPBY=$GROUPBY?$GROUPBY.','.$conf[table].'.'.$fNi:$conf[table].'.'.$fNi;
+					$HAVING.=$HAVING?" and $fN2[0]='".$row[$fNi]."'":" HAVING $fN2[0]='".$row[$fNi]."'";
+				} else {
+					$WHERE.=$this->makeSQLJoinWhere($fNi,$conf,$row[$fNi]);
+				}
+			 }
 				
-				// We stop at our depth level ...
-	      if ($fNi==$fN) {
-	      	$endgb=1;
+			// We stop at our depth level ...
+			if ($fNi==$fN) {
+				$endgb=1;
 	    	}	      
-		   }
+		  }
 		  $GROUPBY=strpos($GROUPBY,"GROUP BY")?$GROUPBY:($GROUPBY?" GROUP BY ".$GROUPBY:'');
 		  if ($conf['list.']['havingString']) $HAVING=$HAVING?$HAVING.' AND '.$conf['list.']['havingString']:' HAVING '.$conf['list.']['havingString'];
 		  
@@ -4032,20 +4025,11 @@ class tx_metafeedit_lib {
 					if ( $conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['type']=='select' && $conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['foreign_table'] && !$conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['MM']) {
 						$fT=$conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['foreign_table'];						
 						$label=$conf['TCAN'][$fT]['ctrl']['label'];
-						//if (!in_array($fT,$sql['joinTables'])) {
- 						//$aliasA=$this->getTableAlias($sql,$gbtable,$gbtableAlias?$gbtableAlias:$gbtable,$fT,$fN2[0].'.'.$label,$conf);
-
 						$aliasA=$this->getTableAlias($sql,$fN2[0].'.'.$label,$conf);
-                        //$sql['join.'][$aliasA['tableAlias']]=' LEFT JOIN '.$aliasA['tableAlias'].($sql['fields.'][$gbfN.'.']['alias']?' as '.$sql['fields.'][$gbfN.'.']['alias']:'').' ON '.$gbtable.'.'.$gbfN.'='.$aliasA['tableAlias'].'.uid';
-						//}
-						//$sql[''][]=$aliasA['tableAlias'];
-						//$sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$label.' as '.$aliasA['tableAlias'].'_'.strtoupper($label);
 						$GBFields.=','.$aliasA['tableAlias'].'.'.$label.' as '.$aliasA['tableAlias'].'_'.strtoupper($label);
                         $sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$label.' as \''.$fN2[0].'.'.$label.'\'';
-                        //$sql['fieldAliases'][$fN2[0].'.'.$label]=$fN2[0].'.'.$label;
 						$GrpByField[$fN]=$aliasA['tableAlias'].'.'.strtoupper($label);
-						//$SORT=$SORT?$SORT.','.$GrpByField[$fN]:$GrpByField[$fN];
-						$sql['breakOrderBy'][]=$GrpByField[$fN].$dir;
+						$sql['breakOrderBy'][]=$gbtableAlias.'.'.$gbfN.$dir;//$GrpByField[$fN].$dir;
 			  	    } else {
 					 	$sql['breakOrderBy'][]=$gbtableAlias.'.'.$gbfN.$dir;
 						$GBFields.=','.$gbtableAlias.'.'.$gbfN.' as \''.$fN2[0].'\'';
