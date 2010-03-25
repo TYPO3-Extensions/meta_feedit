@@ -2,7 +2,6 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2005 Morten Tranberg Hansen (mth@daimi.au.dk)
 *  (c) 2006 Christophe Balisky <christophe@balisky.org>
 *  All rights reserved
 *
@@ -25,9 +24,7 @@
 /**
  * This is a API for crating and editing records in the frontend.
  * The API is build on top of fe_adminLib.
- * See documentation or extensions 'news_feedit' and 'joboffers_feedit' for examples how to use this API
  *
- * @author	Morten Tranberg Hansen <mth@daimi.au.dk>
  * @author	Christophe Balisky <christophe@balisky.org>
  */
 
@@ -3822,7 +3819,7 @@ function getFormJs($formName,&$conf) {
 							$ajaxWidgets = t3lib_div::makeInstance('tx_metafeedit_widgets');
 							$ajaxWidgets->init($this->prefixId,$this->metafeeditlib);
 							//$ret.=$ajaxWidgets->comboList($this->metafeeditlib->getLLFromLabel($label,$conf),'','','handleData','setData',$this->metafeeditlib->getLLFromLabel($label,$conf),15,$conf,$FN);
-							$ret.=$div.$ajaxWidgets->comboList('','','','handleData','setData','',15,$TConf,$FN).'</div>';
+							$ret.=$div.$ajaxWidgets->comboList('','','','handleData','setData','',15,$TConf,$FN,$conf['list.']['advancedSearchAjaxSelector.'][$FN.'.']['userFunc_alterRow']).'</div>';
 						} else {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
 							//$selectSize=is_array($conf['typoscript.'][$pluginId.'.']['advancedSearch.'][$FN]['forceConfig.'])?$conf['typoscript.'][$pluginId.'.']['forceConfig.'][$FN]['forceSize']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
@@ -3868,5 +3865,4 @@ function getFormJs($formName,&$conf) {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/meta_feedit/class.tx_metafeedit.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/meta_feedit/class.tx_metafeedit.php']);
 }
-
 ?>
