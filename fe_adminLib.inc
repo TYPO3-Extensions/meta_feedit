@@ -2000,7 +2000,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		//if ($this->is_extent($conf['maxPages'])) $this->internal[maxPages']=$conf['maxPages'];
 		if ($this->metafeeditlib->is_extent($conf['list.']['showRange'])) $this->internal['showRange']=$conf['list.']['showRange'];
 		if ($this->metafeeditlib->is_extent($conf['list.']['dontLinkActivePage'])) $this->internal['dontLinkActivePage']=$conf['list.']['dontLinkActivePage'];
-
+		$this->markerArray['###METAFEEDITNBPAGES###']='';
 		if ($conf['list.']['pagination']) {
 			$this->internal['res_count']=$num+$NBSup;
 
@@ -2509,7 +2509,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					$evalGroupBy[$fN]=$std;
 					// We have to reset all son groupbys so that the headers will be regenerated...
 					$resetgbf=FALSE;
-					foreach ($groupBy as $gbf=>$val) {
+					if (is_array($groupBy)) foreach ($groupBy as $gbf=>$val) {
 						if ( $resetgbf) unset($groupBy[$gbf]);
 						if ($gbf==$fN) $resetgbf=TRUE;
 					}
@@ -2524,7 +2524,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			}
 			foreach($newGroupBy as $fN=>$val) {
 				$groupBy[$fN]=$this->metafeeditlib->transformGroupByData($fN,$val,$conf);
+				//$lastgroupBy[$fN]=$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN];
 				$lastgroupBy[$fN]=$this->metafeeditlib->transformGroupByData($fN,$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN],$conf);
+				
 			}
 				
 		}
