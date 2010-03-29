@@ -426,7 +426,7 @@ class tx_metafeedit extends  tslib_pibase {
     		        if($conf['TCAN'][$table]['columns'][$fN]['config']['internal_type']=='file') {
     		                // CBY I removed _file handling here...
     		                //We could add folder specialisation here ...
-							// modif by CMD - permet d'eviter les message d'errreur suite à la gestion des champs supplémentaire sql ou php calculé
+							// modif by CMD - permet d'eviter les message d'errreur suite ï¿½ la gestion des champs supplï¿½mentaire sql ou php calculï¿½
     		                $conf['TCAN'][$table]['columns'][$fN.'_file'] = $conf['TCAN'][$table]['columns'][$fN]; // the new upload field should have the same upload folder as the original field
     		                $conf['TCAN'][$table]['columns'][$fN.'_file']['imagealiasfield']=$fN;
     		                //$conf['TCAN'][$table]['columns'][$fN.'_file']['config']['uploadfolder'] = $conf['TCAN'][$table]['columns'][$fN]['config']['uploadfolder']; // the new upload field should have the same upload folder as the original field
@@ -1319,6 +1319,107 @@ class tx_metafeedit extends  tslib_pibase {
                 $row .= $srow .$options.'</select>'.$hr;
                 return $row.$EVAL_ERROR_FIELD;
                 break;
+            case 'inline':
+                $feData = $conf['inputvar.']['fedata'];
+                $uid = $feData[$masterTable][$conf['uidField']] ? $feData[$masterTable][$conf['uidField']] : $conf['inputvar.']['rU'];
+                $rec = $GLOBALS['TSFE']->sys_page->getRawRecord($masterTable,$uid);
+                if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["foreign_table"]) {               // reference to elements from another table
+                    $options="###FIELD_".$fN."_OPTIONS###";
+                    // gets uids of selected records.
+                    $uids = array();
+                    if($feData[$masterTable][$fN]) {                                // from post var
+                        $uids = explode(",",$feData[$masterTable][$fN]);
+                    } elseif($conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"] && $uid) {  // from mm-relation
+                    	$mmTable=$conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"];
+                        $MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'',$mmTable.'.sorting');
+                        if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
+                        $cnt=mysql_num_rows($MMres);
+                        if($cnt!=$rec[$fN]);
+                        debug("class.tx_metafeedit.php::tx_metafeedit->getFormFieldCode(): Wrong number ($MMres<>$cnt) of selections reached for  field $fN of table $masterTable, mm:  $mmTable");
+                        while($MMrow = mysql_fetch_assoc($MMres))
+                        $uids[] = $MMrow["uid_foreign"];
+                    } else {                                                        // clean from DB
+                        $uids = explode(",",$rec[$fN]);
+                    }
+                } elseif($conf['TCAN'][$masterTable]['columns'][$fN]['config']["items"]) {   // fixed items            
+                    // Get selected uids.
+                    $uids = array();
+                    if($feData[$masterTable][$fN]) {                                // from post var
+                      $uids = explode(",",$feData[$masterTable][$fN]);
+                    } elseif(!is_null($rec)) {                                      // clean from DB
+                      $uids = explode(",",$rec[$fN]);
+                    } elseif($cmd=='create' && $conf['TCAN'][$masterTable]['columns'][$fN]['config']['default']){
+                      $uids = explode(",",$conf['TCAN'][$masterTable]['columns'][$fN]['config']['default']);
+                    }
+                
+                    $items = $conf['TCAN'][$masterTable]['columns'][$fN]['config']["items"];
+                    //$options = '<option value="0">-----</option>';
+                    
+                    if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["itemsProcFunc"]) {     // if itemsProcFunc is set to fill the select box
+                      $options = '';
+                      $params = $conf['TCAN'][$masterTable]['columns'][$fN];
+                      $params['items'] = &$items;
+                      t3lib_div::callUserFunction($conf['TCAN'][$masterTable]['columns'][$fN]['config']["itemsProcFunc"], $params, $this);
+                    }
+                
+					$multi_option='';
+					$multi_option_actif='';
+                    foreach((array)$items as $key => $item) {
+                        $selected = in_array($item[1],$uids)?'selected="selected"':"";
+                        //if($key!=0)
+                        $options .= '<option value="'.$item[1].'"'.$selected.'>'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
+						$multi_option.='<option value="'.$item[1].'">'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
+						if (in_array($item[1],$uids)){
+							$multi_option_actif.='<option value="'.$item[1].'">'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
+						}
+						
+                    } 
+                } else {
+                    // unknown TCA config
+                	$options = '<option><em>Unknown TCA-configuration</em></option>';
+                }
+            
+                $srow = '<select '.$size.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']">';
+                if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"]) {
+                    $size = ' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"].'" ';
+                    
+                    if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["maxitems"]>1) {
+						$double_select=true;
+						if ($double_select){
+						
+							//on vide les options normales qui ne servent pas
+							//$option='';
+							$srow='<table><tr><td>';
+							$srow.='<select '.$size.' multiple="multiple" name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_list" class="'.$this->caller->pi_getClassName('list_table_field').'_list '.$this->caller->pi_getClassName('list_table_field_'.$fN).'_list">';
+							$srow.=''.$multi_option_actif;
+							$srow.='</select></td>';
+							$srow.='<td><a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Top\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur/group_totop.gif" width="14" height="14" border="0" alt="'.$this->metafeeditlib->getLL("move_top", $conf).'" title="'.$this->metafeeditlib->getLL("move_top", $conf).'" /></a><br />';
+							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Up\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//up.gif" width="14" height="14" border="0"  alt="'.$this->metafeeditlib->getLL("move_up", $conf).'" title="'.$this->metafeeditlib->getLL("move_up", $conf).'" /></a><br />';
+							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Down\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//down.gif" width="14" height="14" border="0"  alt="'.$this->metafeeditlib->getLL("move_bt", $conf).'" title="'.$this->metafeeditlib->getLL("move_bt", $conf).'" /></a><br />';
+							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Bottom\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//group_tobottom.gif" width="14" height="14" border="0"  alt="'.$this->metafeeditlib->getLL("move_down", $conf).'" title="'.$this->metafeeditlib->getLL("move_down", $conf).'" /></a><br />';
+							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Remove\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//group_clear.png" width="18" height="20" border="0"  alt="'.$this->metafeeditlib->getLL("move_delete", $conf).'" title="'.$this->metafeeditlib->getLL("move_delete", $conf).'" /></a><br/></td>';
+							$srow.='<td><select  name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_sel"  '.$size.' onchange="setFormValueFromBrowseWin(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',this.options[this.selectedIndex].value,this.options[this.selectedIndex].text,\'\'); " class="'.$this->caller->pi_getClassName('list_table_field').'_list '.$this->caller->pi_getClassName('list_table_field_'.$fN).'_sel">';
+							$srow.=$multi_option;
+							$srow.='';
+							$hr = '</td></tr></table><input type="hidden" name="'.$fieldName.'" />';
+							
+							
+							//$options="";
+				
+							$conf['additionalJS_end']['feedit_'.$fN.'_again_set_data'] = 'setFormRegenerer(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']'.'\');';
+						}else{
+						
+							$size .= ' multiple ';
+							$onchange = ' onchange="feedit_manipulateMultipleSelect(\''.$fieldName.'\')" ';
+							$srow = '<select '.$size.' '.$onchange.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_select">';
+							$hr = '<input type="hidden" name="'.$fieldName.'" />';
+						}
+						
+                    }
+                }
+                $row .= $srow .$options.'</select>'.$hr;
+                return $row.$EVAL_ERROR_FIELD;
+                break;
             case 'radio':
                 if($conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']>1) debug("getFormFieldCode():: WARNING, checkbox have more cols, not implemented yet.");
         
@@ -2009,6 +2110,21 @@ class tx_metafeedit extends  tslib_pibase {
 						switch ($type) {
 							//TODO handle multiple values...
 							case 'select' :
+								if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']) {
+									if (!$conf['TCAN'][$conf['table']]['columns'][$key]['config']['MM']) {
+										$vals=explode(',',$val);
+										$vs=array();
+										foreach($vals as $v) {
+											$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table'],$v);
+											$vs[]=$rec[$conf['TCAN'][$conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']]['ctrl']['label']];
+										}
+										$val=implode(', ',$vs);
+									}
+								} else if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
+									$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
+								}
+								break;
+							case 'inline' :
 								if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']) {
 									if (!$conf['TCAN'][$conf['table']]['columns'][$key]['config']['MM']) {
 										$vals=explode(',',$val);
@@ -3751,13 +3867,13 @@ function getFormJs($formName,&$conf) {
 						$fsi++;
 						continue;
 					}
-					//modif CMD - prise en compte des tables etrangère dans l'AS
+					//modif CMD - prise en compte des tables etrangï¿½re dans l'AS
 					$curTable = $this->metafeeditlib->getForeignTableFromField($FN, $conf,'',array());
 					$type =$TConf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
 					$evals=t3lib_div::trimexplode(',',$TConf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['eval']);
 					
 					if(in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) $type=date;
-					//TODO : metre cette modification de type de donnée en surcharge de TCA
+					//TODO : metre cette modification de type de donnï¿½e en surcharge de TCA
 					//$GLOBALS['TCA'][$this->table]['columns'][$GLOBALS['TCA'][$this->table]['ctrl']['crdate']]['config']['eval']='datetime';
 					//$GLOBALS['TCA'][$this->table]['columns'][$GLOBALS['TCA'][$this->table]['ctrl']['crdate']]['config']['type']='input';
 					//$GLOBALS['TCA'][$this->table]['columns'][$GLOBALS['TCA'][$this->table]['ctrl']['crdate']]['label']=$this->table.'.'.$GLOBALS['TCA'][$this->table]['ctrl']['cr
@@ -3789,7 +3905,7 @@ function getFormJs($formName,&$conf) {
 					  case 'group':
 						  break;
 					  case 'radio':
-						//modif CMD on récup la val courante pour l'afficher en tant que selectionné
+						//modif CMD on rï¿½cup la val courante pour l'afficher en tant que selectionnï¿½
 						$val = is_array($conf['piVars']['advancedSearch'])?$conf['piVars']['advancedSearch'][$conf['pluginId']][$FN]:'';
 						$ret.=$div;
 						for ($i = 0; $i < count ($TConf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items']); ++$i) {
@@ -3802,7 +3918,7 @@ function getFormJs($formName,&$conf) {
 						$ret.='</div>';
 						break;
 					case 'check': 
-						//modif CMD on récup la val courante pour l'afficher en tant que selectionné
+						//modif CMD on rï¿½cup la val courante pour l'afficher en tant que selectionnï¿½
 				
 						$val=is_array($conf['piVars']['advancedSearch'][$conf['pluginId']])?$conf['piVars']['advancedSearch'][$conf['pluginId']][$FN]:'';
 						$sel1=($val==1)?' selected="selected" ':'';
@@ -3818,7 +3934,32 @@ function getFormJs($formName,&$conf) {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'widgets'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/widgets.js"></script>';
 							$ajaxWidgets = t3lib_div::makeInstance('tx_metafeedit_widgets');
 							$ajaxWidgets->init($this->prefixId,$this->metafeeditlib);
-							//$ret.=$ajaxWidgets->comboList($this->metafeeditlib->getLLFromLabel($label,$conf),'','','handleData','setData',$this->metafeeditlib->getLLFromLabel($label,$conf),15,$conf,$FN);
+							$ret.=$div.$ajaxWidgets->comboList('','','','handleData','setData','',15,$TConf,$FN,$conf['list.']['advancedSearchAjaxSelector.'][$FN.'.']['userFunc_alterRow']).'</div>';
+						} else {
+							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
+							//$selectSize=is_array($conf['typoscript.'][$pluginId.'.']['advancedSearch.'][$FN]['forceConfig.'])?$conf['typoscript.'][$pluginId.'.']['forceConfig.'][$FN]['forceSize']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
+							$selectSize=$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']?$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
+							$name = ' name="'.($selectSize>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
+							$ret.=$div.'<select '.($selectSize?'size="'.$selectSize.'" ':'').$name.$this->caller->pi_classParam('form-asfield').'>';
+							$SO='###AS_FIELD_'.$FN.'###';
+							$ret.=$SO.'</select>';
+							if ($selectSize>1) {
+								$ret.='<input type="hidden" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_val"'.$value.' />';
+								$ret.='<script type="text/javascript">
+										/*<![CDATA[*/
+										setSelected(\''.$conf['pluginId'].'_'.$FN.'\');
+										/*]]>*/
+										</script>';
+							}
+							$ret.='</div>';
+						}
+						break;
+					case 'inline':
+						// For select fields we either draw  ajax selection widget or we relace with getselectoptions ...
+						if ($TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['foreign_table'] && $TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']==1 && ($conf['list.']['advancedSearchAjaxSelector'] || $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector.'][$FN])) {
+							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'widgets'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/widgets.js"></script>';
+							$ajaxWidgets = t3lib_div::makeInstance('tx_metafeedit_widgets');
+							$ajaxWidgets->init($this->prefixId,$this->metafeeditlib);
 							$ret.=$div.$ajaxWidgets->comboList('','','','handleData','setData','',15,$TConf,$FN,$conf['list.']['advancedSearchAjaxSelector.'][$FN.'.']['userFunc_alterRow']).'</div>';
 						} else {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
