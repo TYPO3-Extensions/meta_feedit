@@ -282,8 +282,8 @@ class tx_metafeedit_lib {
 							if (is_array($db_rec) && $id) $retVal = $db_rec[0][$selectParts[7]];
 							return $retVal;
 							break;
-						//modif by CMD - permet de récupérer un champs dans une clef de session
-						//si type session alors on retourne la clef trouvé dans la session
+						//modif by CMD - permet de rï¿½cupï¿½rer un champs dans une clef de session
+						//si type session alors on retourne la clef trouvï¿½ dans la session
 						case 'ses':
 							list($pluginId, $field) = t3lib_div::trimExplode('|', $key);
 							if ($field=='') {
@@ -406,7 +406,7 @@ class tx_metafeedit_lib {
 		}
 
 		Function enleveaccents($chaine) {
-			$string = strtr($chaine, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
+			$string = strtr($chaine, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
 			return $string;
 		}
 
@@ -1130,7 +1130,7 @@ class tx_metafeedit_lib {
 							 // points to the field (integer) that holds the fe_users-id of the creator fe_user
 					 if ($GLOBALS['TCA'][$table]['ctrl']['fe_cruser_id'])    {
 						$MMT = $GLOBALS['TCA'][$table]['columns'][$GLOBALS['TCA'][$table]['ctrl']['fe_cruser_id']]['config']['MM'];
-					 	if ($MMT) { //si on est dans une MM faut d'abord récup les id de la table MM
+					 	if ($MMT) { //si on est dans une MM faut d'abord rï¿½cup les id de la table MM
 							$FTUid=$fe_user['uid'];
 							$LTUid=$origArr['uid'];
 							$MMTreq = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$MMT,$MMT.'.uid_local='.$LTUid.' and '.$MMT.'.uid_foreign='.$FTUid);
@@ -1677,7 +1677,116 @@ class tx_metafeedit_lib {
 				}
 				$dataArr['EVAL_'.$_fN] = $values;
 				break;
-			
+			case 'inline':
+			    // field is of select type
+				$values = '';
+				$uids = array();
+				if ($conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']) {
+					// reference to elements from another table
+					$FT = $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'];
+					$label = $conf['label.'][$FT]?$conf['label.'][$FT]:
+					$conf['TCAN'][$FT]['ctrl']['label'];
+										
+					$label_alt = $conf['label_alt.'][$FT]?$conf['label_alt.'][$FT]: 
+						$conf['TCAN'][$FT]['ctrl']['label_alt'];
+
+					$label_alt_force = $conf['label_alt_force.'][$FT]?$conf['label_alt_force.'][$FT]: 
+						$conf['TCAN'][$FT]['ctrl']['label_alt_force'];
+						
+					if ($dataArr[$fN]) {
+						if ($conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"] && $dataArr[$conf['uidField']]) {
+							// from mm-relation
+							$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"], 'uid_local=\''.$dataArr[$conf['uidField']].'\'', '');
+							if (mysql_error()) debug(array(mysql_error(), $query), 'processDataArray()::field='.$fN);
+								if (mysql_num_rows($MMres) != $dataArr[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_processDataArray(): Wrong number ($cnt<>".$dataArr[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+							while ($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
+						} else {
+							// clean from DB
+							$uids = t3lib_div::trimExplode(',', $dataArr[$fN]);
+						}
+						$orClause = '';
+
+
+						$whereClause = " 1 ";
+						foreach($uids as $uid) $orClause .= $orClause ? ' OR '.$conf['uidField'].' LIKE \''.$uid.'\'' :
+						 $conf['uidField'].' = \''.$uid.'\'';
+						$TCAFT = $conf['TCAN'][$FT];
+						$statictable = 0;
+						if (strpos($FT, 'static_') === 0) {
+							$statictable = 1;
+						}
+						if ($FT && $TCAFT['ctrl']['languageField'] && $TCAFT['ctrl']['transOrigPointerField']) {
+							//        $whereClause .= ' AND '.$TCAFT['ctrl']['transOrigPointerField'].'=0';
+						}
+						$orClause = $orClause?" and (".$orClause.") ":
+						"";
+
+						$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'], $whereClause.' '.$orClause);
+						if ($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(), 'sql error');
+						$values = '';
+						$vals = array();
+						$d = $this->cObj->data;
+						while ($resRow = mysql_fetch_assoc($res)) {
+							$this->cObj->start($resRow, $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']);
+							$resLabel = $resRow[$label];
+							$resLabel_alt = $resRow[$label_alt];
+							if ($statictable) {
+								$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
+								$resLabel = $this->getLL('language_'.$code, $conf);
+								if (!$resLabel ) {
+									$resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset);
+								}
+							}
+							$resLabel = $this->cObj->stdWrap($resLabel, $conf['evalWrap.'][$fN.'.']);
+							$resLabel_alt = $this->cObj->stdWrap($resLabel_alt, $conf['evalWrap.'][$fN.'.']);
+							$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
+							$tempLabel = $tempLabel ? $tempLabel : $resLabel_alt;
+							$vals[] = $tempLabel;
+						}
+						$this->cObj->start($d, $table);
+						$cc = count($vals);
+						$i = 0;
+						foreach($vals as $v) {
+							$i++;
+							if ($i == $cc && $cc > 1) {
+								$sep = $conf['evalLastSep.'][$fN]?$conf['evalLastSep.'][$fN]:
+								',';
+							} else {
+								$sep = $conf['evalSep.'][$fN]?$conf['evalSep.'][$fN]:
+								',';
+							}
+							$values .= $values ? $sep . $v :
+							 $v;
+						}
+					}
+				} elseif($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"]) {
+					// fixed items
+					if (isset($dataArr[$fN])) {
+						$vals = t3lib_div::trimExplode(',', $dataArr[$fN]);
+						foreach($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"] as $item) {
+							if (!empty($item)) {
+								list($label, $val) = $item;
+								$label = $this->getLLFromLabel($label,$conf);
+								if (in_array($val, $vals)) {
+									$values .= $values ? ', ' . $label :
+									 $label;
+								}
+							}
+						}
+					}
+					if($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"]) {
+						t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"], $newArr, $this);
+						if (is_array($newArr['items'])) foreach($newArr['items'] as $item) {
+							if (!empty($item)) {
+								list($label, $val) = $item;
+								$label = $this->getLLFromLabel($label,$conf);
+								$values .= $values ? ', ' . $label : $label;
+							}
+						}
+					}
+				}
+				$dataArr['EVAL_'.$_fN] = $values;
+				break;			
 			default:
 				if ($conf['list.']['sqlcalcfields.'][$fN]) {
 					$dataArr['EVAL_'.$fN]=$this->transformSqlCalcField($fN,$dataArr[$fN],$conf);
@@ -1759,56 +1868,79 @@ class tx_metafeedit_lib {
 				}
 				switch((string)$conf['TCAN'][$table]['columns'][$fN]['config']['type']) {
 					case 'group':
-					// we need to update the additional field $fN.'_file'.
-
-					$fieldArray = array_unique(t3lib_div::trimExplode(",", $fe_adminLib->conf[$fe_adminLib->conf['cmdKey'].'.']['fields']));
-					if (in_array($fN, $fieldArray) && !in_array($fN.'_file', $fieldArray)) {
-						// CBY I removed this
-						//$fe_adminLib->additionalUpdateFields .= ','.$fN.'_file';
-					}
-					break;
-					case 'select':
-					if ($conf['TCAN'][$table]['columns'][$fN]['config']['MM']) {
-						//its a MM relation
-						$uid = $content[$conf['uidField']];
-						//modif OSR 2008 09 14
-						$uids ='';
-						$mmTable = $conf['TCAN'][$table]['columns'][$fN]['config']['MM'];
-						$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $mmTable, $mmTable.'.uid_local=\''.$uid.'\'', '', ' '.$mmTable.'.sorting ');
-						if (mysql_error()) debug(array(mysql_error(), $query), 'getFormFieldCode()::field='.$fN);
-						$cnt=mysql_num_rows($MMres);
-						if ($cnt!= $rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_updateArray(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
-						while ($MMrow = mysql_fetch_assoc($MMres)) {
-							if ($uids) {
-								$uids .= ','. $MMrow["uid_foreign"];
-							} else {
-								$uids .= $MMrow["uid_foreign"];
-							}
-
+						// we need to update the additional field $fN.'_file'.
+	
+						$fieldArray = array_unique(t3lib_div::trimExplode(",", $fe_adminLib->conf[$fe_adminLib->conf['cmdKey'].'.']['fields']));
+						if (in_array($fN, $fieldArray) && !in_array($fN.'_file', $fieldArray)) {
+							// CBY I removed this
+							//$fe_adminLib->additionalUpdateFields .= ','.$fN.'_file';
 						}
-						$dataArr[$fN] = $uids;
-					}
-
-					break;
+						break;
+					case 'select':
+						if ($conf['TCAN'][$table]['columns'][$fN]['config']['MM']) {
+							//its a MM relation
+							$uid = $content[$conf['uidField']];
+							//modif OSR 2008 09 14
+							$uids ='';
+							$mmTable = $conf['TCAN'][$table]['columns'][$fN]['config']['MM'];
+							$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $mmTable, $mmTable.'.uid_local=\''.$uid.'\'', '', ' '.$mmTable.'.sorting ');
+							if (mysql_error()) debug(array(mysql_error(), $query), 'getFormFieldCode()::field='.$fN);
+							$cnt=mysql_num_rows($MMres);
+							if ($cnt!= $rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_updateArray(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+							while ($MMrow = mysql_fetch_assoc($MMres)) {
+								if ($uids) {
+									$uids .= ','. $MMrow["uid_foreign"];
+								} else {
+									$uids .= $MMrow["uid_foreign"];
+								}
+	
+							}
+							$dataArr[$fN] = $uids;
+						}
+	
+						break;
+					case 'inline':
+						if ($conf['TCAN'][$table]['columns'][$fN]['config']['MM']) {
+							//its a MM relation
+							$uid = $content[$conf['uidField']];
+							//modif OSR 2008 09 14
+							$uids ='';
+							$mmTable = $conf['TCAN'][$table]['columns'][$fN]['config']['MM'];
+							$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $mmTable, $mmTable.'.uid_local=\''.$uid.'\'', '', ' '.$mmTable.'.sorting ');
+							if (mysql_error()) debug(array(mysql_error(), $query), 'getFormFieldCode()::field='.$fN);
+							$cnt=mysql_num_rows($MMres);
+							if ($cnt!= $rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_updateArray(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+							while ($MMrow = mysql_fetch_assoc($MMres)) {
+								if ($uids) {
+									$uids .= ','. $MMrow["uid_foreign"];
+								} else {
+									$uids .= $MMrow["uid_foreign"];
+								}
+	
+							}
+							$dataArr[$fN] = $uids;
+						}
+	
+						break;
 					case 'input':
-					// if evaltype is date or datetime and defaultValue is 'now' we transform it into the current timestamp + the int following 'now'.
-					// Example: if default value is now+30 we transform it into a timestamp representing the day 30 days from today
-					$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$table]['columns'][$fN]['config']['eval']);
-					
-					if ((in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) && substr($fe_adminLib->conf[$fe_adminLib->conf['cmdKey']."."]["defaultValues."][$fN], 0, 3) == 'now'/* && empty($dataArr[$fN])*/) {
-					$dataArr[$fN] = time() + 24 * 60 * 60 * intval(substr($fe_adminLib->conf[$fe_adminLib->conf['cmdKey']."."]["defaultValues."][$fN], 3));
-				}
-				break;
-				case 'check':
-    				// here we can invert boolean functionnality on screen...
-    				$invert = 0;
-    				if (in_array('invert', t3lib_div::trimexplode(',', $fe_adminLib->conf[$fe_adminLib->cmd."."]['evalValues.'][$fN]))) $invert = 1;
-    				if ($invert) $dataArr[$fN] = $dataArr[$fN]?0:
-    				1;
-				break;
-				case 'text':
-					//$dataArr = $this->rteProcessDataArr($dataArr, $table, $fN, 'rte',$conf,'user_updateArray');
-    				break;
+						// if evaltype is date or datetime and defaultValue is 'now' we transform it into the current timestamp + the int following 'now'.
+						// Example: if default value is now+30 we transform it into a timestamp representing the day 30 days from today
+						$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$table]['columns'][$fN]['config']['eval']);
+						
+						if ((in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) && substr($fe_adminLib->conf[$fe_adminLib->conf['cmdKey']."."]["defaultValues."][$fN], 0, 3) == 'now'/* && empty($dataArr[$fN])*/) {
+							$dataArr[$fN] = time() + 24 * 60 * 60 * intval(substr($fe_adminLib->conf[$fe_adminLib->conf['cmdKey']."."]["defaultValues."][$fN], 3));
+						}
+						break;
+					case 'check':
+	    				// here we can invert boolean functionnality on screen...
+	    				$invert = 0;
+	    				if (in_array('invert', t3lib_div::trimexplode(',', $fe_adminLib->conf[$fe_adminLib->cmd."."]['evalValues.'][$fN]))) $invert = 1;
+	    				if ($invert) $dataArr[$fN] = $dataArr[$fN]?0:
+	    				1;
+						break;
+					case 'text':
+						//$dataArr = $this->rteProcessDataArr($dataArr, $table, $fN, 'rte',$conf,'user_updateArray');
+	    				break;
 			}
 			//MODIF CBY ....
 			$dataArr[$fN]=stripslashes($dataArr[$fN]);
@@ -2013,22 +2145,22 @@ class tx_metafeedit_lib {
  * pour les userFunc par exemple: 
  * pluginid.champ = blablabla
  * default.champ.userfunc = bliblibli
- * supprime la valeur par defaut (car surclassé dans le pluginid)
+ * supprime la valeur par defaut (car surclassï¿½ dans le pluginid)
  * marche aussi dans l'autre sens
  *
  * @param arr	premier tableau (dans lequel on supprime les doublons
  * @param arr	second tableau (dans lequel on trouve les valeur a chercher)
- * @return arr	tableau fusionné des 2 autres
+ * @return arr	tableau fusionnï¿½ des 2 autres
  **/
  function ts_array_merge($arr1, $arr2) {
 	//on test si on a bien des tableaux
 	if (is_array($arr1) && is_array($arr2)) {
-		//tableau des clef par default, necessaire à la comparaison avec le tableau du plugid
+		//tableau des clef par default, necessaire ï¿½ la comparaison avec le tableau du plugid
 		$defClef = array_keys($arr1);
 
 		//on parcour les tableaux afin de faire le trie des clef existant
 		foreach ($arr2 as $key => $value) {
-			$chaine = (strpos($key, '.')===false)?$key:substr($key, 0, -1); // on récupère la chaine a comparer dans l'autre tableau sans le point final
+			$chaine = (strpos($key, '.')===false)?$key:substr($key, 0, -1); // on rï¿½cupï¿½re la chaine a comparer dans l'autre tableau sans le point final
 			if (in_array($chaine, $defClef)) unset($arr1[$chaine]);
 			elseif(in_array($chaine.'.', $defClef)) unset($arr1[$chaine.'.']);
 		}
@@ -2142,10 +2274,33 @@ class tx_metafeedit_lib {
 					}
 				}
 				break;
+			case 'inline':
+
+				if ($conf['TCAN'][$table]['columns'][$fN]['config']['MM']) {
+					//its a MM relation
+					$uids = explode(',', $dataArr[$fN]);
+					// we handle empty relations here ...
+					if (count($uids) == 1) {
+						if (!$uids[0]) $uids = array();
+						}
+					$uid = $content['rec'][$conf['uidField']];
+					$mmTable = $conf['TCAN'][$table]['columns'][$fN]['config']['MM'];
+					// update the $fN in $table
+					//$cObj = t3lib_div::makeInstance('tslib_cObj');
+					$this->cObj->DBgetUpdate($table, $uid, array($fN => count($uids)), $fN, TRUE);
+					// update the MM table
+					$GLOBALS['TYPO3_DB']->exec_DELETEquery($mmTable, 'uid_local='.intval($uid));
+					$tempSorting=1;
+					foreach((array)$uids as $foreign_uid) {
+						$GLOBALS['TYPO3_DB']->exec_INSERTquery($mmTable, array('uid_local' => intval($uid), 'uid_foreign' => intval($foreign_uid),  'sorting'=>$tempSorting));
+						$tempSorting++;
+					}
+				}
+				break;
 			}
 		}
 
-		// appeller fonction utilisateur avant mise à jour du template si elle est présente ...
+		// appeller fonction utilisateur avant mise ï¿½ jour du template si elle est prï¿½sente ...
 		$var_temp_array = array($fe_adminLib, $treeArray);
 		if ($fe_adminLib->conf['userFunc_afterSaveAndBeforeStatus']) t3lib_div::callUserFunction($fe_adminLib->conf['userFunc_afterSaveAndBeforeStatus'], $var_temp_array, $fe_adminLib);
 
@@ -2211,7 +2366,7 @@ class tx_metafeedit_lib {
 			tx_euldap_div::export_user($servArr, $dataArr, $fe_adminLib->thePid, true);
 
 		} */
-		// appeller fonction utilisateur si elle est présente ...
+		// appeller fonction utilisateur si elle est prï¿½sente ...
 		$var_temp_array = array($fe_adminLib, $treeArray);
 		if ($fe_adminLib->conf['userFunc_afterSave']) t3lib_div::callUserFunction($fe_adminLib->conf['userFunc_afterSave'], $var_temp_array, $fe_adminLib);
 		// TODO CBY MERGE updated DATAARR with DATARR
@@ -2394,6 +2549,16 @@ class tx_metafeedit_lib {
         				$templ = $this->cObj->substituteMarker($templ,'###FIELD_'. $fN.'_OPTIONS###',$this->getSelectOptions($fN,$table,$conf));
         			}
         			break;
+        		case 'inline':
+        			$foreignTable = $conf['TCAN'][$table]['columns'][$fN]['config']['foreign_table'];
+        			if ($foreignTable) {
+        			    if (!in_array($foreignTable,$conf['TCATables'])) {
+        			        $this->makeTypo3TCAForTable($conf['TCAN'],$foreignTable);
+        			        $conf['TCATables'][]=$foreignTable;
+        			    }
+        				$templ = $this->cObj->substituteMarker($templ,'###FIELD_'. $fN.'_OPTIONS###',$this->getSelectOptions($fN,$table,$conf));
+        			}
+        			break;
       		}
 		}
 		return $templ;
@@ -2402,11 +2567,11 @@ class tx_metafeedit_lib {
     /**
     * getSelectOptions fills select options for <select tag> in relation fields.
     *
-    * @param	[type]		$fN: ...
-    * @param	[type]		$table: ...
-    * @param	[type]		$conf: ...
-    * @param	[type]		$forceEmptyOption: ...
-    * @param	[type]		$forceVal: value of field wich determines selected value.
+    * @param	string		$fN: field name for which we want to get select options
+    * @param	string		$table: ...
+    * @param	array		$conf: ...
+    * @param	string		$forceEmptyOption: ...
+    * @param	string		$forceVal: value of field wich determines selected value.
     * @return	[type]		...
     */
 	 
@@ -2478,57 +2643,30 @@ class tx_metafeedit_lib {
             $label_alt_force = $conf['label_alt_force.'][$foreignTable]?$conf['label_alt_force.'][$foreignTable]:$conf['TCAN'][$foreignTable]['ctrl']['label_alt_force'];
             
           	$whereClause='';
-			//if ($TCAN[$foreignTable]['ctrl']['languageField'] && $TCAN[$foreignTable]['ctrl']['transOrigPointerField']) {
-      		//$whereClause .= ' AND '.$TCAN[$foreignTable]['ctrl']['transOrigPointerField'].'=0 ';
-			//}
-			if ($uid) {
+
+			/*if ($uid) {
         			$whereClause .= $conf['TCAN'][$table]['whereClause.'][$fN]?$conf['TCAN'][$table]['whereClause.'][$fN]:$conf['TCAN'][$table]['columns'][$fN]['config']["foreign_table_where"];
 			}
-		  else
+		  	else
 			{
 					  	$whereClause .= $conf['TCAN'][$table]['columns'][$fN]['config']["foreign_table_where"];
-			}
-      //$whereClause .= $conf['TCAN'][$table]['columns'][$fN]['config']["foreign_table_where"];
-			//$whereClause = $whereClause ? $whereClause : " AND pid = ###STORAGE_PID### ";
-			// here must check if i should use local PID ???
-      // here must decide storagePid Strategy !!!
-      $whereClause = $whereClause ? $whereClause : (intval($storageAndSiteroot["_STORAGE_PID"])?" AND pid = ###STORAGE_PID### ":"");
-
-	  if ($conf['whereClause.'][$fN] && (($uid && is_array($rec)) || is_array($GLOBALS['TSFE']->fe_user->user))) $whereClause =$conf['whereClause.'][$fN]; 
-      $storageAndSiteroot = $GLOBALS["TSFE"]->getStorageSiterootPids();
-      $whereClause = str_replace('###CURRENT_PID###',intval($storageAndSiteroot["_STORAGE_PID"]),$whereClause); // replaced with STORAGE_PID cause it makes more sense ;)
-      $whereClause = str_replace('###STORAGE_PID###',intval($storageAndSiteroot["_STORAGE_PID"]),$whereClause);
-      $whereClause = str_replace('###META_PID###',intval($conf['pid']),$whereClause);
-      $whereClause = str_replace('###THIS_UID###',intval($uid),$whereClause);
-      $whereClause = str_replace('###SITEROOT###',intval($storageAndSiteroot['_SITEROOT']),$whereClause);
-      if ($uid && is_array($rec)) $whereClause=$this->cObj->substituteMarkerArray($whereClause,$this->cObj->fillInMarkerArray(array(), $rec, '', TRUE, 'FIELD_', $this->recInMarkersHSC));
-      //if ($conf['whereClause.'][$fN] && $uid && is_array($rec)) $whereClause=$this->cObj->substituteMarkerArray($whereClause,$this->cObj->fillInMarkerArray(array(), $rec, '', TRUE, 'FIELD_', $this->recInMarkersHSC));
- 
-	
-	
-	  if (is_array($GLOBALS['TSFE']->fe_user->user)) $whereClause=$this->cObj->substituteMarkerArray($whereClause,$this->cObj->fillInMarkerArray(array(), $GLOBALS['TSFE']->fe_user->user, '', TRUE, 'FEUSER_', $this->recInMarkersHSC));
-	  //appel de fonction modifiant la condition wherestring
-	  if ($conf['whereClause.'][$fN.'.']['userFunc_selectWhere'] && ($conf['inputvar.']['cmd']=='edit' ||$conf['inputvar.']['cmd']=='create')) {
-	    $conf['list.']['gsowhereString']=$whereClause;
-	  	t3lib_div::callUserFunction($conf['whereClause.'][$fN.'.']['userFunc_selectWhere'],$conf,$conf['parentObj']);
-		$whereClause=$conf['list.']['gsowhereString'];
-
-		//$conf['list.']['gsowhereString']='';
-	  }
-      // gets uids of selected records.
-      $uids = array();
-      if($feData[$table][$fN]) {                                // from post var
-      	  	$uids = explode(",",$feData[$table][$fN]);
-      } elseif($conf['TCAN'][$table]['columns'][$fN]['config']["MM"] && $uid) {  // from mm-relation
-      			$mmTable = $conf['TCAN'][$table]['columns'][$fN]['config']['MM'];
-        		$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'','', ' '.$mmTable.'.sorting ');
-        		if (mysql_error())    debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
-				$cnt=mysql_num_rows($MMres);
-          		if($cnt!=$rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->getSelectOptions(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
-          		while($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
-        		} else {                                                        // clean from DB
-          			$uids = explode(",",$rec[$fN]);
-      	}
+			}*/
+			$whereClause=$this->getWhereClause($uid,$table,$fN,$rec,&$conf);
+	  
+		    // gets uids of selected records.
+		    $uids = array();
+		    if($feData[$table][$fN]) {                                // from post var
+		      	  	$uids = explode(",",$feData[$table][$fN]);
+		    } elseif($conf['TCAN'][$table]['columns'][$fN]['config']["MM"] && $uid) {  // from mm-relation
+		      			$mmTable = $conf['TCAN'][$table]['columns'][$fN]['config']['MM'];
+		        		$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'','', ' '.$mmTable.'.sorting ');
+		        		if (mysql_error())    debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
+						$cnt=mysql_num_rows($MMres);
+		          		if($cnt!=$rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->getSelectOptions(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+		          		while($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
+		        		} else {                                                        // clean from DB
+		          			$uids = explode(",",$rec[$fN]);
+		    }
 
 			if (function_exists($this->getOverrideValue))
 			{
@@ -2545,9 +2683,9 @@ class tx_metafeedit_lib {
                 	}
 
 			// ajouter filtres sur relation
-			// ajouter gestion des données liées...
+			// ajouter gestion des donnï¿½es liï¿½es...
 			//$ef=$this->cObj->enableFields($foreignTable);
-			//Modif by CMD - paramétrage manuelle des champ géré par la récupération des MM
+			//Modif by CMD - paramï¿½trage manuelle des champ gï¿½rï¿½ par la rï¿½cupï¿½ration des MM
 			$ignorArr = array();
 			if ($conf['edit.']['dontUseHidden']) {
 				$show_hidden = 1;
@@ -2558,7 +2696,7 @@ class tx_metafeedit_lib {
 			}
 			$ef = $GLOBALS['TSFE']->sys_page->enableFields($foreignTable, $show_hidden?$show_hidden:($table=='pages' ? $GLOBALS['TSFE']->showHiddenPage : $GLOBALS['TSFE']->showHiddenRecords), $ignorArr);
 
-			//permet d'appeller une fonction pour trier le tableau de résultat
+			//permet d'appeller une fonction pour trier le tableau de rï¿½sultat
 			if ($conf['select.'][$fN.'.']['userFunc_selectQuery'] && ($conf['inputvar.']['cmd']=='edit' || $conf['inputvar.']['cmd']=='create')) {
 				$temp = array('ef' => $ef, 'whereClause' => $whereClause);
 				t3lib_div::callUserFunction($conf['select.'][$fN.'.']['userFunc_selectQuery'], $res, $temp);
@@ -2654,12 +2792,11 @@ class tx_metafeedit_lib {
 			$whereClause = $conf['TCAN'][$table]['columns'][$fN]['config']["foreign_table_where"];
 		}
 		
-		//$whereClause .= $conf['TCAN'][$table]['columns'][$fN]['config']["foreign_table_where"];
-		//$whereClause = $whereClause ? $whereClause : " AND pid = ###STORAGE_PID### ";
 		// here must check if i should use local PID ???
 		// here must decide storagePid Strategy !!!
-
-		//$whereClause = $whereClause ? $whereClause : (intval($storageAndSiteroot["_STORAGE_PID"])?" AND pid = ###STORAGE_PID### ":"");
+		
+      	//$whereClause = $whereClause ? $whereClause : (intval($storageAndSiteroot["_STORAGE_PID"])?" AND pid = ###STORAGE_PID### ":"");
+		
 		if ($conf['whereClause.'][$fN] && (($uid && is_array($rec)) || $uid==0 || is_array($GLOBALS['TSFE']->fe_user->user))) $whereClause =$conf['whereClause.'][$fN]; 
 		$storageAndSiteroot = $GLOBALS["TSFE"]->getStorageSiterootPids();
 		$whereClause = str_replace('###CURRENT_PID###',intval($storageAndSiteroot["_STORAGE_PID"]),$whereClause); // replaced with STORAGE_PID cause it makes more sense ;)
@@ -2667,10 +2804,16 @@ class tx_metafeedit_lib {
 		$whereClause = str_replace('###STORAGE_PID###',intval($storageAndSiteroot["_STORAGE_PID"]),$whereClause);
         $whereClause = str_replace('###THIS_UID###',intval($uid),$whereClause);
 		$whereClause = str_replace('###SITEROOT###',intval($storageAndSiteroot['_SITEROOT']),$whereClause);
-		//if ($conf['whereClause.'][$fN] && $uid && is_array($rec)) $whereClause=$this->cObj->substituteMarkerArray($whereClause,$this->cObj->fillInMarkerArray(array(), $rec, '', TRUE, 'FIELD_', $this->recInMarkersHSC));
-		//if ($conf['whereClause.'][$fN] && is_array($GLOBALS['TSFE']->fe_user->user)) $whereClause=$this->cObj->substituteMarkerArray($whereClause,$this->cObj->fillInMarkerArray(array(), $GLOBALS['TSFE']->fe_user->user, '', TRUE, 'FEUSER_', $this->recInMarkersHSC));
 		if ($uid && is_array($rec)) $whereClause=$this->cObj->substituteMarkerArray($whereClause,$this->cObj->fillInMarkerArray(array(), $rec, '', TRUE, 'FIELD_', $this->recInMarkersHSC));
-		if (is_array($GLOBALS['TSFE']->fe_user->user)) $whereClause=$this->cObj->substituteMarkerArray($whereClause,$this->cObj->fillInMarkerArray(array(), $GLOBALS['TSFE']->fe_user->user, '', TRUE, 'FEUSER_', $this->recInMarkersHSC));
+		if (is_array($GLOBALS['TSFE']->fe_user->user)) $whereClause=$this->cObj->substituteMarkerArray($whereClause,$this->cObj->fillInMarkerArray(array(), $GLOBALS['TSFE']->fe_user->user, '', TRUE, 'FEUSER_FIELD_', $this->recInMarkersHSC));
+		
+		//hook to call user function modyfying where string
+		if ($conf['whereClause.'][$fN.'.']['userFunc_selectWhere'] && ($conf['inputvar.']['cmd']=='edit' ||$conf['inputvar.']['cmd']=='create')) {
+			$conf['list.']['gsowhereString']=$whereClause;
+		  	t3lib_div::callUserFunction($conf['whereClause.'][$fN.'.']['userFunc_selectWhere'],$conf,$conf['parentObj']);
+			$whereClause=$conf['list.']['gsowhereString'];
+		}
+		
 		return $whereClause;
 	}
 
@@ -3315,7 +3458,7 @@ class tx_metafeedit_lib {
 
 				foreach(t3lib_div::trimexplode(',',$conf['list.'][show_fields]) as $sF) {
 					$rA=t3lib_div::trimexplode('.',$sF);
-					//modif by CMD - pour gérer le champ dans la table s'il nest pas la table étrangère
+					//modif by CMD - pour gï¿½rer le champ dans la table s'il nest pas la table ï¿½trangï¿½re
 					if ($rA[0]==$FT && isset($rA[1])) {
 						$sql['fields'].= ','.$aliasA['tableAlias'].'.'.$rA[1]." as '$FT.$rA[1]'";
 						$sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$rA[1]." as '$FT.$rA[1]'";
@@ -3411,7 +3554,9 @@ class tx_metafeedit_lib {
 		$relField='';
 		$FN=$field;
 		$p=strpos($FN,'.');
+		
 		//--Join Field Search
+		
 		$FTAA=t3lib_div::trimexplode('.',$FN);
 		$c=count($FTAA);
 		$c--;
@@ -3437,6 +3582,7 @@ class tx_metafeedit_lib {
         	$FN=substr($FN,$p+1);
         	$p=strpos($FN,'.');
 	    }
+	    
 	    $foreignTable = $conf['TCAN'][$relTable]['columns'][$joinField]['config']['foreign_table'];
 	    $foreignTableAlias=$foreignTable.($link?'_'.$link:'');
 	    $table=$relTable;
@@ -3445,9 +3591,12 @@ class tx_metafeedit_lib {
 	    $fieldAlias=$field;
 	    
 	    // We make foreign join ...    
-        $this->makeForeignJoin($conf,$sql,$table,$tableAlias,$joinField,$foreignTable,$foreignTableAlias,$FN,$fieldAlias);
-		// field aliases		
-		$sql['fields.'][$field.'.']['table']=$foreignTable;
+        
+	    $this->makeForeignJoin($conf,$sql,$table,$tableAlias,$joinField,$foreignTable,$foreignTableAlias,$FN,$fieldAlias);
+		
+	    // field aliases		
+		
+	    $sql['fields.'][$field.'.']['table']=$foreignTable;
 		$sql['fields.'][$field.'.']['tableAlias']=$foreignTableAlias;
 		$sql['fields.'][$field.'.']['fieldAlias']=$fieldAlias;
         $sql['fieldArray'][]=$foreignTableAlias.'.'.$FN.' as \''.$fieldAlias.'\'';
@@ -3455,6 +3604,7 @@ class tx_metafeedit_lib {
 				
 		return array('tableAlias'=>$foreignTableAlias,'fieldAlias'=>$fieldAlias);
 	}
+	
 	//TODO
 	function makeFieldAlias($table,$field,$conf) {
 		$alias='';
@@ -3728,11 +3878,11 @@ class tx_metafeedit_lib {
     				foreach(t3lib_div::trimexplode(',',$feVals) as $feVal) {
     					if ($feVal) $OR_arr.= $OR_arr?' OR '.$table.'.'.$fUKeyField.'='.$feVal:$table.'.'.$fUKeyField.'='.$feVal;
     				}
-					// condition pour afficher les enregistrement affecté à "toutes les connexions"
+					// condition pour afficher les enregistrement affectï¿½ ï¿½ "toutes les connexions"
    					$OR_arr.= $OR_arr?' OR '.$table.'.'.$fUKeyField."='-2'":$table.'.'.$fUKeyField."='-2'";
     			} else {
    					if ($feVals) $OR_arr.= $OR_arr?' OR '.$table.'.'.$fUKeyField.'='.$feVals:$table.'.'.$fUKeyField.'='.$feVals;
-					// condition pour afficher les enregistrement affecté à "toutes les connexions"
+					// condition pour afficher les enregistrement affectï¿½ ï¿½ "toutes les connexions"
    					$OR_arr.= $OR_arr?' OR '.$table.'.'.$fUKeyField."='-2'":$table.'.'.$fUKeyField."='-2'";
     		    }
  			}
@@ -4030,7 +4180,15 @@ class tx_metafeedit_lib {
                         $sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$label.' as \''.$fN2[0].'.'.$label.'\'';
 						$GrpByField[$fN]=$aliasA['tableAlias'].'.'.strtoupper($label);
 						$sql['breakOrderBy'][]=$gbtableAlias.'.'.$gbfN.$dir;//$GrpByField[$fN].$dir;
-			  	    } else {
+			  	    } elseif ( $conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['type']=='inline' && $conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['foreign_table'] && !$conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['MM']) {
+						$fT=$conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['foreign_table'];						
+						$label=$conf['TCAN'][$fT]['ctrl']['label'];
+						$aliasA=$this->getTableAlias($sql,$fN2[0].'.'.$label,$conf);
+						$GBFields.=','.$aliasA['tableAlias'].'.'.$label.' as '.$aliasA['tableAlias'].'_'.strtoupper($label);
+                        $sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$label.' as \''.$fN2[0].'.'.$label.'\'';
+						$GrpByField[$fN]=$aliasA['tableAlias'].'.'.strtoupper($label);
+						$sql['breakOrderBy'][]=$gbtableAlias.'.'.$gbfN.$dir;//$GrpByField[$fN].$dir;
+			  		}else {
 					 	$sql['breakOrderBy'][]=$gbtableAlias.'.'.$gbfN.$dir;
 						$GBFields.=','.$gbtableAlias.'.'.$gbfN.' as \''.$fN2[0].'\'';
 						$sql['fieldArray'][]=$gbtableAlias.'.'.$gbfN.' as \''.$fN2[0].'\'';
@@ -4118,7 +4276,32 @@ class tx_metafeedit_lib {
 		    		    $GroupBy=$GroupBy?$GroupBy.','.$GrpByField[$fN]:' GROUP BY '.$GrpByField[$fN];
 						$GBFieldLabel=$aliasA['tableAlias'].'_'.strtoupper($label);
                         //$sql['fieldAliases'][$fN2[0].'.'.$label]=$fN2[0].'.'.$label;
+			  	    } elseif ( $conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['type']=='inline' && $conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['foreign_table'] && !$conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['MM']) {
+						$fT=$conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['foreign_table'];
+						$label=$conf['TCAN'][$fT]['ctrl']['label'];
+						//TODO
+						//$sql['fromTables'].=','.$fT;
+						//if (!in_array($fT,$sql['joinTables'])) {
+						//$aliasA=$this->getTableAlias($sql,$gbtable,$gbtableAlias?$gbtableAlias:$gbtable,$fT,$fN2[0].'.'.$label,$conf);
+
+						$aliasA=$this->getTableAlias($sql,$fN2[0].'.'.$label,$conf);
+						//$sql['fromTables'].
+						//$sql['join.'][$aliasA['tableAlias']]=' LEFT JOIN '.$fT.($sql['fields.'][$gbfN.'.']['fieldAlias']?' as '.$sql['fields.'][$gbfN.'.']['fieldAlias']:'').' ON '.$gbtable.'.'.$gbfN.'='.$aliasA['tableAlias'].'.uid';
+						//}
+						//$sql['joinTables'][]=$fT;
+						//$label=$conf['TCAN'][$fT]['ctrl']['label'];
+						//$sql['fieldArray'][]=$fT.'.'.$label.' as '.$fT.'_'.strtoupper($label);
+						$GBFields.=','.$aliasA['tableAlias'].'.'.$label.' as \''.$fN2[0].'.'.$label.'\'';
+						$sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$label.' as \''.$fN2[0].'.'.$label.'\'';
+						//$GrpByField[$fN]=$fT.'_'.strtoupper($label);
+						$GrpByField[$fN]=$aliasA['tableAlias'].'.'.strtoupper($label);
+						$SORT=$SORT?$SORT.','.$GrpByField[$fN]:$GrpByField[$fN];
+						$sql['orderBy'][]=$GrpByField[$fN];
+		    		    $GroupBy=$GroupBy?$GroupBy.','.$GrpByField[$fN]:' GROUP BY '.$GrpByField[$fN];
+						$GBFieldLabel=$aliasA['tableAlias'].'_'.strtoupper($label);
+                        //$sql['fieldAliases'][$fN2[0].'.'.$label]=$fN2[0].'.'.$label;			  	    	
 			  	    } else {
+			  
 					 	//$SORT=$SORT?$SORT.','.$gbtableAlias.'.'.$gbfN:$gbtableAlias.'.'.$gbfN;
 					 	$sql['orderBy'][]=$gbtableAlias.'.'.$gbfN.$dir;
 						$GBFields.=','.$gbtableAlias.'.'.$gbfN.' as  \''.$fN2[0].'\'';
@@ -4263,7 +4446,7 @@ class tx_metafeedit_lib {
 		}
 		if (is_array($advancedSearch)) {
 			foreach($advancedSearch as $key=>$value) {
-				//modif CMD - ajout des tables etrangère à l'AS
+				//modif CMD - ajout des tables etrangï¿½re ï¿½ l'AS
 				$curTable = $this->getForeignTableFromField($key, $conf,'',&$sql);
 				//modif CMD - recup du TS
 				$valeur='';
@@ -4299,7 +4482,7 @@ class tx_metafeedit_lib {
 					$my_valsup = $value['valsup'];
 				}elseif(is_array($value['default.'])){
 					$my_op = $value['default.']['op'];
-					//TODO format date chercher le format par défaut
+					//TODO format date chercher le format par dï¿½faut
 					$my_val = ($value['default.']['val'] == 'now')?date('d-m-Y'):$value['default.']['val'];
 					$my_valsup = $value['default.']['valsup'];
 				}
