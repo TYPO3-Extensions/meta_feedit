@@ -659,7 +659,7 @@ echo "<br> Next est vide. ";
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT));
 	   if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList rows',$GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT)),$DEBUG);
 
- 		$tpl=$this->prepareCalendarTemplates($conf,&$markerArray,$exporttype);
+ 		$tpl=$this->prepareCalendarTemplates($conf,$markerArray,$exporttype);
 		// process variables
 		
 		// MODIF CBY
@@ -683,7 +683,7 @@ echo "<br> Next est vide. ";
 			$hour++;
 			$markerArray['###NATTR###']=($markerArray['###NATTR###']==1?$markerArray['###NATTR###']=2:$markerArray['###NATTR###']=1);
 		}
-	//krumo($tpl);
+
 		$markerArray['###DAY###']='Planning';
 		$j=$this->cObj->substituteSubpart($tpl['dayCode'], '###HOURDIV###', $item);
 		$content.=$this->cObj->substituteMarkerArray($j, $markerArray);
