@@ -711,12 +711,12 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($conf['debug.']['tsfe']) $this->metafeeditlib->debug('TSFE :',$GLOBALS['TSFE'],$DEBUG);
 		
 		// We update Session vars in case of change of cmd mode
-		$this->metafeeditlib->updateSessionVars(&$this->conf);
+		$this->metafeeditlib->updateSessionVars($this->conf);
         return ($conf['performanceaudit']?t3lib_div::view_array($this->perfArray):'').$content.$conf['debug.']['debugString'].$DEBUG;
 	}
 
 	function getFeuserMail($Arr,&$conf) {
-			// g�rer le cas du mail utilisateur !!!!
+			// gérer le cas du mail utilisateur !!!!
 			if ($conf['fe_cruser_id']) {
 				$feuserid=$Arr[$conf['fe_cruser_id']];
 				$DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField('fe_users','uid',$feuserid,'','','1');
@@ -2038,7 +2038,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT));
 	    if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList rows',$GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT)),$DEBUG);
 
- 		$tpl=$this->prepareListTemplates($conf,&$this->markerArray,$exporttype);
+ 		$tpl=$this->prepareListTemplates($conf,$this->markerArray,$exporttype);
 
 		// process variables
 
