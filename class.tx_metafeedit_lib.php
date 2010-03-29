@@ -338,7 +338,7 @@ class tx_metafeedit_lib {
 	* @param	string		$referer: default link
 	* @return	string		backURL link
 	*/
-	function makeBackURLTypoLink(&$conf,$referer) {
+	function makeBackURLTypoLink(&$conf,&$referer) {
 		switch ($conf['inputvar.']['cmd']) {
 			case 'create' :			
 				//if($conf['create'] && !$conf['disableCreate'] && !$conf['create.']['hide']) {
@@ -877,7 +877,7 @@ class tx_metafeedit_lib {
     * $ret['fNiD']='uid'
     */
     
-	function getForeignTableFromField($fN, &$conf,$table='',$sql=array()) {
+	function getForeignTableFromField($fN, &$conf,$table='',&$sql=array()) {
 	  if (!$fN) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : empty field given !";
 		$ret = array();
 		$fNA = t3lib_div::trimexplode('.', $fN);
@@ -2651,7 +2651,7 @@ class tx_metafeedit_lib {
 			{
 					  	$whereClause .= $conf['TCAN'][$table]['columns'][$fN]['config']["foreign_table_where"];
 			}*/
-			$whereClause=$this->getWhereClause($uid,$table,$fN,$rec,&$conf);
+			$whereClause=$this->getWhereClause($uid,$table,$fN,$rec,$conf);
 	  
 		    // gets uids of selected records.
 		    $uids = array();
@@ -2718,7 +2718,7 @@ class tx_metafeedit_lib {
 				if ($n>$max) break;
 					$n++;
 					if ($conf['general.']['labels.'][$fN.'.']['userFunc_alterRow']) {
-						t3lib_div::callUserFunction($conf['general.']['labels.'][$fN.'.']['userFunc_alterRow'], &$resRow, $conf);
+						t3lib_div::callUserFunction($conf['general.']['labels.'][$fN.'.']['userFunc_alterRow'], $resRow, $conf);
 					}
 					$resLabel = $resRow[$label];
 					$resLabel_alt = $resRow[$label_alt];
@@ -3458,7 +3458,7 @@ class tx_metafeedit_lib {
 
 				foreach(t3lib_div::trimexplode(',',$conf['list.'][show_fields]) as $sF) {
 					$rA=t3lib_div::trimexplode('.',$sF);
-					//modif by CMD - pour g�rer le champ dans la table s'il nest pas la table �trang�re
+					//modif by CMD - pour gérer le champ dans la table s'il nest pas la table �trang�re
 					if ($rA[0]==$FT && isset($rA[1])) {
 						$sql['fields'].= ','.$aliasA['tableAlias'].'.'.$rA[1]." as '$FT.$rA[1]'";
 						$sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$rA[1]." as '$FT.$rA[1]'";
@@ -3500,35 +3500,60 @@ class tx_metafeedit_lib {
 	/**
     * Makes foreign table join for sql request between two tables :
     *
-    * @param	[array]		$conf: configuration array
-    * @param	[array]		$sql: sql array
-    * @param	[string]	$table: left side table of join 
-    * @param	[string]	$tableAlias: Alias of left side table of join 
-    * @param	[string]	$link: $table field on  which join is made ... must be last field join of field path ...Ex :  consumer.father.name => father 
-    * @param	[string]	$foreignTtable: Right side table of join 
-    * @param	[string]	$tableAlias: table alias for which we are joining
-    * @param	[string]	$field: data field for which we are joining (name with no '.'); if field name is 'consumer.address' $link='consumer', $field='address'
-    * @param	[string]	$fieldAlias: Field Alias ..
+    * @param	array		$conf: configuration array
+    * @param	array		$sql: sql array
+    * @param	string		$table: left side table of join 
+    * @param	string		$tableAlias: Alias of left side table of join 
+    * @param	string		$link: $table field on  which join is made ... must be last field join of field path ...Ex :  consumer.father.name => father 
+    * @param	string		$foreignTtable: Right side table of join 
+    * @param	string		$tableAlias: table alias for which we are joining
+    * @param	string		$field: data field for which we are joining (name with no '.'); if field name is 'consumer.address' $link='consumer', $field='address'
+    * @param	string		$fieldAlias: Field Alias ..
+    * @todo optimize 'inline' 'select' selection ..
     */
     
 	function makeForeignJoin(&$conf,&$sql,$table,$tableAlias,$link,$foreignTable,$foreignTableAlias,$field,$fieldAlias) {
-		if (!$conf['TCAN'][$table]['columns'][$link]['config']['MM']) {
-		    // 
-			if ($conf['TCAN'][$table]['columns'][$link]['config']['size']>1) {
-				$sql['joinTables'][]=$foreignTableAlias;		
-			    $sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable.' as '.$foreignTableAlias.' on FIND_IN_SET('.$foreignTableAlias.'.uid,'.$tableAlias.'.'.$link.')>0 ';
-            } else {
-                // Normal 1/1 relation ...
-				$sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable.($foreignTableAlias?' as '.$foreignTableAlias:'').' ON '.$foreignTableAlias.'.uid='.$tableAlias.'.'.$link.' ';
+		//switch ($conf['TCAN'][$table]['columns'][$link]['config']['type']) 
+		if ($conf['TCAN'][$table]['columns'][$link]['config']['type']=='inline') {
+			$ff=$conf['TCAN'][$table]['columns'][$link]['config']['foreign_field']?$conf['TCAN'][$table]['columns'][$link]['config']['foreign_field']:'uid';
+			if (!$conf['TCAN'][$table]['columns'][$link]['config']['MM']) {
+		    		
+				// We handle inline relation based on ',' seperated list of uids
+				if ($conf['TCAN'][$table]['columns'][$link]['config']['size']>1 && !$conf['TCAN'][$table]['columns'][$link]['config']['foreign_field'] ) {
+					$sql['joinTables'][]=$foreignTableAlias;		
+				    $sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable.' as '.$foreignTableAlias.' on FIND_IN_SET('.$foreignTableAlias.'.'.$ff.','.$tableAlias.'.uid)>0 ';
+	            } else {
+	                // Normal 1/n relation ...
+					$sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable.($foreignTableAlias?' as '.$foreignTableAlias:'').' ON '.$foreignTableAlias.'.'.$ff.'='.$tableAlias.'.uid ';
+					$sql['joinTables'][]=$foreignTableAlias;
+			    }
+			} else {
+	            // MM Relations.
+				$MMTable=$conf['TCAN'][$table]['columns'][$link]['config']['MM'];
+				$uidLocal = isset($conf['TCAN'][$foreignTable]['ctrl']['uidLocalField'])?$conf['TCAN'][$foreignTable]['ctrl']['uidLocalField']:'uid';
+				//$this->getTableAlias($sql,$table,$tableAlias,$MMTable,$uidLocal,$conf);
+				$sql['join.'][$foreignTableAlias]=' JOIN '.$MMTable.' ON '.$MMTable.'.uid_local ='.$tableAlias.'.uid JOIN '.$foreignTable.' as '.$foreignTableAlias.' ON '.$foreignTableAlias.'.uid='.$MMTable.'.uid_foreign';
 				$sql['joinTables'][]=$foreignTableAlias;
-		    }
-		} else {
-            // MM Relations.
-			$MMTable=$conf['TCAN'][$table]['columns'][$link]['config']['MM'];
-			$uidLocal = isset($conf['TCAN'][$foreignTable]['ctrl']['uidLocalField'])?$conf['TCAN'][$foreignTable]['ctrl']['uidLocalField']:'uid';
-			//$this->getTableAlias($sql,$table,$tableAlias,$MMTable,$uidLocal,$conf);
-			$sql['join.'][$foreignTableAlias]=' JOIN '.$MMTable.' ON '.$MMTable.'.uid_local ='.$tableAlias.'.uid JOIN '.$foreignTable.' as '.$foreignTableAlias.' ON '.$foreignTableAlias.'.uid='.$MMTable.'.uid_foreign';
-			$sql['joinTables'][]=$foreignTableAlias;
+			}			
+		} else { //select ??			
+			if (!$conf['TCAN'][$table]['columns'][$link]['config']['MM']) {
+		    // 
+				if ($conf['TCAN'][$table]['columns'][$link]['config']['size']>1) {
+					$sql['joinTables'][]=$foreignTableAlias;		
+				    $sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable.' as '.$foreignTableAlias.' on FIND_IN_SET('.$foreignTableAlias.'.uid,'.$tableAlias.'.'.$link.')>0 ';
+	            } else {
+	                // Normal 1/1 relation ...
+					$sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable.($foreignTableAlias?' as '.$foreignTableAlias:'').' ON '.$foreignTableAlias.'.uid='.$tableAlias.'.'.$link.' ';
+					$sql['joinTables'][]=$foreignTableAlias;
+			    }
+			} else {
+	            // MM Relations.
+				$MMTable=$conf['TCAN'][$table]['columns'][$link]['config']['MM'];
+				$uidLocal = isset($conf['TCAN'][$foreignTable]['ctrl']['uidLocalField'])?$conf['TCAN'][$foreignTable]['ctrl']['uidLocalField']:'uid';
+				//$this->getTableAlias($sql,$table,$tableAlias,$MMTable,$uidLocal,$conf);
+				$sql['join.'][$foreignTableAlias]=' JOIN '.$MMTable.' ON '.$MMTable.'.uid_local ='.$tableAlias.'.uid JOIN '.$foreignTable.' as '.$foreignTableAlias.' ON '.$foreignTableAlias.'.uid='.$MMTable.'.uid_foreign';
+				$sql['joinTables'][]=$foreignTableAlias;
+			}
 		}			
 	}
 	
@@ -3572,7 +3597,7 @@ class tx_metafeedit_lib {
 	            $rfA=t3lib_div::trimexplode('.',$relField);
 	            $newRelTable = $conf['TCAN'][$relTable]['columns'][end($rfA)]['config']['foreign_table'];
 		        if (!$sql['tableAliases'][$relTable][$link]) {
-		            $this->getTableAlias(&$sql,$relField.'.'.$FTAA[0],&$conf);
+		            $this->getTableAlias($sql,$relField.'.'.$FTAA[0],$conf);
 		        }
 	            $relLink=$link;
                 $relTable=$newRelTable;
@@ -3582,6 +3607,7 @@ class tx_metafeedit_lib {
         	$FN=substr($FN,$p+1);
         	$p=strpos($FN,'.');
 	    }
+	   	//echo "ooo". $relLink;
 	    
 	    $foreignTable = $conf['TCAN'][$relTable]['columns'][$joinField]['config']['foreign_table'];
 	    $foreignTableAlias=$foreignTable.($link?'_'.$link:'');
@@ -4447,7 +4473,7 @@ class tx_metafeedit_lib {
 		if (is_array($advancedSearch)) {
 			foreach($advancedSearch as $key=>$value) {
 				//modif CMD - ajout des tables etrang�re � l'AS
-				$curTable = $this->getForeignTableFromField($key, $conf,'',&$sql);
+				$curTable = $this->getForeignTableFromField($key, $conf,'',$sql);
 				//modif CMD - recup du TS
 				$valeur='';
 				if ($this->is_extent($value) && !is_array($value)) $valeur=$value;
