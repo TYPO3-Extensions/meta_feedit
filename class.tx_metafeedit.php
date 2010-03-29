@@ -117,7 +117,7 @@ class tx_metafeedit extends  tslib_pibase {
         if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf before USER_INT call size ']=strlen(serialize($conf))." Bytes"; 
 				// In No Cache or Mixt Cache We call USER_INT object
 				if ($conf['cacheMode']<2) {
-				    $content = $this->cObj->cObjGetSingle('USER_INT',&$conf);
+				    $content = $this->cObj->cObjGetSingle('USER_INT',$conf);
 				} else {
 					// In Full cache mode we use user object and count on cHASH to renew cache ..
 					$feAdm=t3lib_div::makeInstance('tx_metafeedit_user_feAdmin');
@@ -755,12 +755,12 @@ class tx_metafeedit extends  tslib_pibase {
             $out_array[$out_sheet]['title'] = $parts[1]?$parts[1]:'Tab '.$out_sheet; //OUCH
             }
               } else {
-        
-        	$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',array());
+        	$sql=array();
+        	$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$sql);
         	$table=$res['relTable'];
         	$fNiD=$res['fNiD'];
-          $label = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$table]['columns'][$fNiD]['label'],$conf);
-          $fieldCode = $this->getPreviewFieldCode($cmd,$conf, $fN, $withHTML);
+          	$label = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$table]['columns'][$fNiD]['label'],$conf);
+          	$fieldCode = $this->getPreviewFieldCode($cmd,$conf, $fN, $withHTML);
         	$reptagbegin='<!-- ###editITEM-'.$fN.'### start -->';
         	$reptagend='<!-- ###editITEM-'.$fN.'### end -->';
             if(!$withHTML) {
@@ -863,7 +863,8 @@ class tx_metafeedit extends  tslib_pibase {
   function getPreviewFieldCode($cmd,&$conf,$fN,$withHTML,&$Lib='') {
     $fN=trim($fN);
     $masterTable=$cmd=='blog'?'tx_metafeedit_comments':$conf['table'];
-    $res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',array());
+    $tab=array();
+    $res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab);
     $Lib=$this->metafeeditlib->getLLFromLabel($res['fieldLabel'],$conf);
     $fN=str_replace('.','_',$res['fieldAlias']); // is the str_replace necessary ?
     $table=$res['relTable'];
@@ -1493,7 +1494,8 @@ class tx_metafeedit extends  tslib_pibase {
 	        if ($params[0]!='--div--'  && $params[0]!='--fse--' && $params[0]!='--fsb--') {
         		$masterTable = $conf['table'];
 				$size = $this->getSize($conf, $FN, $masterTable);
-				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',array());     
+				$tab=array();
+				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',$tab);     
 	        	$Lib=$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf);
 	        	$href=$this->metafeeditlib->hsc($conf,$this->pi_linkTP_keepPIvars_url(array('sort' => $FN.':###SORT_DIR_'.$FN.'###'),1));
 	        	if(!$textmode) {
@@ -1737,7 +1739,8 @@ class tx_metafeedit extends  tslib_pibase {
 				$_FN=str_replace('.','_',$FN);// Must be very careful with this replace business ...
 				$masterTable = $conf['table'];
 				$sumarray=t3lib_div::trimexplode(',',$conf['list.']['sumFields']);
-				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',array());               
+				$tab=array();
+				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',$tab);               
  				$Lib=$this->metafeeditlib->getLLFromLabel('total',$conf).' '.$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf).':';
 				$size = $this->getSize($conf, $_FN, $masterTable);
 				
@@ -2009,7 +2012,7 @@ class tx_metafeedit extends  tslib_pibase {
     	
        	$tmp.='<div'.$this->caller->pi_classParam('editmenu').'>'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-editmenu').'">'.$this->metafeeditlib->getHeader($this->metafeeditlib->getLL("edit_menu_header",$conf),$rech,$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_description",$conf).'</div>').' 
     	<div'.$this->caller->pi_classParam('error').'>###EVAL_ERROR###</div>
-    	<div'.$this->caller->pi_classParam('editmenu-list').'>'.$this->getSearchBox(&$conf);
+    	<div'.$this->caller->pi_classParam('editmenu-list').'>'.$this->getSearchBox($conf);
     
     	$tmp.='<table '.$this->caller->pi_classParam('editmenu-list-table').' style="width: 100%;">'.($conf['list.']['nbCols']?'':'<tr'.$this->caller->pi_classParam('editmenu-list-table-header').'>###ACTIONS-LIST-LIB###'.$this->getListFields($conf).'</tr>').'<!-- ###ALLITEMS### begin -->';
     	// Group By processing
@@ -3868,7 +3871,8 @@ function getFormJs($formName,&$conf) {
 						continue;
 					}
 					//modif CMD - prise en compte des tables etrang�re dans l'AS
-					$curTable = $this->metafeeditlib->getForeignTableFromField($FN, $conf,'',array());
+					$tab=array();
+					$curTable = $this->metafeeditlib->getForeignTableFromField($FN, $conf,'',$tab);
 					$type =$TConf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
 					$evals=t3lib_div::trimexplode(',',$TConf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['eval']);
 					
