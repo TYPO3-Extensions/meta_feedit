@@ -203,7 +203,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->metafeeditexport=t3lib_div::makeInstance('tx_metafeedit_export');
 		$this->metafeeditexport->init($this);
 
-		// We should handle here all GET//POST//PIVARS ... à mettre dans le pi1
+		// We should handle here all GET//POST//PIVARS ... ï¿½ mettre dans le pi1
 
 		$this->pi_setPiVarDefaults();
 		$this->conf['piVars']=$this->piVars;		
@@ -716,7 +716,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	}
 
 	function getFeuserMail($Arr,&$conf) {
-			// gérer le cas du mail utilisateur !!!!
+			// gï¿½rer le cas du mail utilisateur !!!!
 			if ($conf['fe_cruser_id']) {
 				$feuserid=$Arr[$conf['fe_cruser_id']];
 				$DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField('fe_users','uid',$feuserid,'','','1');
@@ -877,7 +877,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	Function removeaccents($string)   
         {    
 	     $string= strtr($string,    
-	   "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ",   
+	   "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   
 	   "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");    
 	      
 	    return $string;    
@@ -1492,12 +1492,25 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						$res = $TYPO3_DB->exec_INSERTquery($colSettings['config']['MM'], $insertFields);
 					}
 				}
+			} elseif (in_array($colName, $fieldsList) && $colSettings['config']['type'] == 'inline' && $colSettings['config']['MM']) {
+				$valuesList = $origArr[$colName];
+				if ($valuesList) {
+					$res = $TYPO3_DB->exec_DELETEquery($colSettings['config']['MM'], 'uid_local='.intval($origArr['uid']));
+					$valuesArray = explode(',', $valuesList);
+					reset($valuesArray);
+					$insertFields = array();
+					$insertFields['uid_local'] = intval($origArr['uid']);
+					$insertFields['tablenames'] = '';
+					$insertFields['sorting'] = 0;
+					while (list(, $theValue) = each($valuesArray)) {
+						$insertFields['uid_foreign'] = intval($theValue);
+						$insertFields['sorting']++;
+						$res = $TYPO3_DB->exec_INSERTquery($colSettings['config']['MM'], $insertFields);
+					}
+				}
 			}
 		}
 	}	// updateMMRelations
-
-
-
 
 	function saveGrid(&$conf,$row,$col,$dataArr,$sqlMode,$secondaryCols=array())	{
         $table=$conf['table'];    
@@ -1672,18 +1685,18 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			//on instancie la tce_main
 			$tce_main=t3lib_div::makeInstance('t3lib_TCEmain');
 
-			//récup de l'ordre dans lequel on trie
+			//rï¿½cup de l'ordre dans lequel on trie
 			if ($this->conf['inputvar.']['orderDir.']['dir']=='up') $toUp = true;
 			else $toUp = false;
 
-			//réup de l'uid a modifier
+			//rï¿½up de l'uid a modifier
 			$rU = $this->conf['inputvar.']['orderDir.']['rU'];
 
-			//récup de la colonne de delete si existe et de la colonne de hidden si existe.
+			//rï¿½cup de la colonne de delete si existe et de la colonne de hidden si existe.
 			$deletedField = isset($this->conf['TCAN'][$this->theTable]['ctrl']['delete'])?$this->conf['TCAN'][$this->theTable]['ctrl']['delete']:'';
 			$hiddenField = isset($this->conf['TCAN'][$this->theTable]['ctrl']['enablecolumns']['disabled'])?$this->conf['TCAN'][$this->theTable]['ctrl']['enablecolumns']['disabled']:'';
 
-			// on récupère l'enregistrement suivant dans l'ordre du sorting
+			// on rï¿½cupï¿½re l'enregistrement suivant dans l'ordre du sorting
 			$fields = $this->theTable.'1.'.$this->conf['uidField']." as 'nextUid'";
 			$tables = $this->theTable.' as '.$this->theTable.'1, '.$this->theTable.' as '.$this->theTable.'2';
 			$where = '1';
@@ -1694,15 +1707,15 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$order = $this->theTable.'1.sorting '.($toUp?'DESC':'ASC');
 			$limit = ($toUp?'1':'0').',1';
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $tables, $where, '', $order, $limit);
-			//si on trouve un résultat (on est donc pas sur le premier second enregistrement ni sur le dernier)
+			//si on trouve un rï¿½sultat (on est donc pas sur le premier second enregistrement ni sur le dernier)
 			if ($GLOBALS['TYPO3_DB']->sql_num_rows($res) >= 1) {
 				$occ = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 				//recherche du nouveau sorting
 				$arrSort = $tce_main->getSortNumber($this->theTable, $rU, '-'.$occ['nextUid']);
-				//on met à jour
+				//on met ï¿½ jour
 				$GLOBALS['TYPO3_DB']->exec_UPDATEquery($this->theTable, $this->conf['uidField'].'='.$rU, array('sorting' => $arrSort['sortNumber']));
 			} elseif ($toUp) {
-				//si on cherche à faire monter l'enregistrement et qu'on est pas au milieu de la liste
+				//si on cherche ï¿½ faire monter l'enregistrement et qu'on est pas au milieu de la liste
 				//on change les limites
 				$limit = '0,1';
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $tables, $where, '', $order, $limit);
@@ -1710,7 +1723,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				if ($GLOBALS['TYPO3_DB']->sql_num_rows($res) >= 1) {
 					//recherche du nouveau sorting
 					$arrSort = $tce_main->getSortNumber($this->theTable, $rU, $this->conf['pid']);
-					//on met à jour
+					//on met ï¿½ jour
 					$GLOBALS['TYPO3_DB']->exec_UPDATEquery($this->theTable, $this->conf['uidField'].'='.$rU, array('sorting' => $arrSort['sortNumber']));
 				}
 			}
@@ -2285,6 +2298,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 		    $type = $conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
 				switch((string)$type) {
 	        	case 'select':
+	        	case 'inline':
 	        	case 'group' :
 	       			$val=$conf['inputvar.']['advancedSearch'][$FN];
 					//TODO check if ajax widget has been generated ..
@@ -2601,8 +2615,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					// what if multiple ???
 					// what if editmenu list  ???
 					if ($FTUid) {
-					     //on récup l'id de l'enregistrement a associer
-						if ($GLOBALS['TCA'][$this->theTable]['columns'][$FTRel]['config']['MM']) { //si on est dans une MM faut d'abord récup les id de la table MM
+					     //on rï¿½cup l'id de l'enregistrement a associer
+						if ($GLOBALS['TCA'][$this->theTable]['columns'][$FTRel]['config']['MM']) { //si on est dans une MM faut d'abord rï¿½cup les id de la table MM
 							$MMT = $GLOBALS['TCA'][$this->theTable]['columns'][$FTRel]['config']['MM'];
 							$LTUid=$origArr["uid"];
 							$MMTreq = $GLOBALS['TYPO3_DB']->exec_SELECT_mm_query('*',$this->theTable,$MMT,$FTable,'AND '.$this->theTable.'.uid='.$origArr['uid']);
@@ -2636,7 +2650,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				}
 			}
 			
-			//<CBY>  on passe en mode détail directement si editUnique est à true et qu'il n'y a qu'un seul élément à éditer.
+			//<CBY>  on passe en mode dï¿½tail directement si editUnique est ï¿½ true et qu'il n'y a qu'un seul ï¿½lï¿½ment ï¿½ ï¿½diter.
 			$DBSELECT=$this->metafeeditlib->DBmayFEUserEditSelectMM($this->theTable,$GLOBALS['TSFE']->fe_user->user, $this->conf['allowedGroups'],$this->conf['fe_userEditSelf'],$mmTable,$this->conf).$GLOBALS['TSFE']->sys_page->deleteClause($this->theTable);
 
 			$TABLES=$mmTable?$this->theTable.','.$mmTable:$this->theTable;
