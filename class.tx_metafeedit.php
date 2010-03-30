@@ -2095,7 +2095,8 @@ class tx_metafeedit extends  tslib_pibase {
 		if (is_array($conf['inputvar.']['advancedSearch'])) {
     		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
     			if($this->metafeeditlib->is_extent($val)) {
-     			    $ftA=$this->metafeeditlib->getForeignTableFromField($key,$conf,'',array());
+    				$tab=array();
+     			    $ftA=$this->metafeeditlib->getForeignTableFromField($key,$conf,'',$tab);
 					$recherche='';
    					if (is_array($val)) {
 						$isset=($this->metafeeditlib->is_extent($val['op']) && ($this->metafeeditlib->is_extent($val['val'])||$this->metafeeditlib->is_extent($val['valsup'])));				
