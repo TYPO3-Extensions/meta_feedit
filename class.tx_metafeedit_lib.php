@@ -1393,7 +1393,8 @@ class tx_metafeedit_lib {
 		    if ($fN=='tx_metafeedit_dont_ctrl_checkboxes') continue;
 			//ugly hack by CMD
 		    if ($fN=='sorting') continue;
-			$res = $intable?$this->getForeignTableFromField($fN, $conf,$intable,array()):$this->getForeignTableFromField($fN, $conf,'',array());			
+		    $tab=array();
+			$res = $intable?$this->getForeignTableFromField($fN, $conf,$intable,$tab):$this->getForeignTableFromField($fN, $conf,'',$tab);			
 			$_fN=str_replace('.','_',$fN);
 			$dataArr[$_fN]=$dataArr[$fN]; // Why do we still do this, field names should have no '.'?
 			$table = $res['relTable']; //we get field sourcetable...
