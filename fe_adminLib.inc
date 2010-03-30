@@ -1357,7 +1357,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	function save(&$conf)	{
 		// Before Save transformations for RTE
 		foreach($this->dataArr as $fN=>$val) {
-			$res = $this->metafeeditlib->getForeignTableFromField($fN, $conf,'',array());			
+			$tab=array();
+			$res = $this->metafeeditlib->getForeignTableFromField($fN, $conf,'',$tab);			
 			$table = $res['relTable']; //we get field sourcetable...
 			$fNiD = $res['fNiD'];
 			switch((string)$conf['TCAN'][$table]['columns'][fNiD]['config']['type']) {

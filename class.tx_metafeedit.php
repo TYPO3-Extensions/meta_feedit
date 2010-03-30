@@ -652,7 +652,8 @@ class tx_metafeedit extends  tslib_pibase {
 				  }
 			
 				  $helpIcon = ($conf['show_help_icons'] ? '<div'.$this->caller->pi_classParam('form-help-icon').'>'.$this->helpIcon($fN).'</div>' : '');
-			 	  $res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',array());
+			 	  $tab=array();
+			 	  $res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab);
 			 	  $table=$res['relTable'];
 				  $fNiD=$res['fNiD'];
 					$masterTable=$cmd=='blog'?'tx_metafeedit_comments':$conf['table'];

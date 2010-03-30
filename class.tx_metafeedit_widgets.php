@@ -90,8 +90,9 @@ class tx_metafeedit_widgets {
 		$advancedSearch=$conf['inputvar.']['advancedSearch'];	
 		$prefix=$prefix?$prefix:'combolist-';
 	    $id=$id?$id:$conf['pluginId'].$FN;
-		if(strpos($FN, '.') !== false) {
-			$curTable = $this->metafeeditLib->getForeignTableFromField($FN, $conf,'',array());
+		if(strpos($FN, '.') !== false) {			
+			$tab=array();
+			$curTable = $this->metafeeditLib->getForeignTableFromField($FN, $conf,'',$tab);
 			$table=$curTable['relTable'];
 			$FieldN=$curTable['fNiD'];
 		} else {
