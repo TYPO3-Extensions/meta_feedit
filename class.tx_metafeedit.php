@@ -1262,14 +1262,22 @@ class tx_metafeedit extends  tslib_pibase {
                       $params['items'] = &$items;
                       t3lib_div::callUserFunction($conf['TCAN'][$masterTable]['columns'][$fN]['config']["itemsProcFunc"], $params, $this);
                     }
-                
+                    // userfunc 
+                    if($conf[$cmd.'.']['itemsProcFunc.'][$fN]) {     // if itemsProcFunc is set to fill the select box
+                      $options = '';
+                      $params = $conf['TCAN'][$masterTable]['columns'][$fN];
+                      $params['items'] = &$items;
+                      t3lib_div::callUserFunction($conf[$cmd.'.']['itemsProcFunc.'][$fN], $params, $this);
+                    } 
+                    
 					$multi_option='';
 					$multi_option_actif='';
                     foreach((array)$items as $key => $item) {
                         $selected = in_array($item[1],$uids)?'selected="selected"':"";
+						$disabled=$item[2]?' disabled="disabled"':'';
                         //if($key!=0)
-                        $options .= '<option value="'.$item[1].'"'.$selected.'>'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
-						$multi_option.='<option value="'.$item[1].'">'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
+                        $options .= '<option value="'.$item[1].'"'.$selected.$disabled.'>'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
+                        $multi_option.='<option value="'.$item[1].'">'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
 						if (in_array($item[1],$uids)){
 							$multi_option_actif.='<option value="'.$item[1].'">'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
 						}
