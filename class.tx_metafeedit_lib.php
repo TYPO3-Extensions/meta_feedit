@@ -1406,7 +1406,6 @@ class tx_metafeedit_lib {
                  if ($conf['debug']) echo "<br>NO TCA definition for masterTable : ".$fe_adminLib->theTable.", table : $table, in table : $intable, field $fNiD, orig field  : $fN";
                 continue;
             }
-					
 			switch($type) {
 				case 'input':
     				// if evaltype is date or datetime and overrideValue is 'now' we transform it into the current timestamp + the int following 'now'.
@@ -1423,7 +1422,7 @@ class tx_metafeedit_lib {
     				    $values = strftime('%H:%M',$dataArr[$fN]);
 
     				}
-    				else if(in_array('datetime',$evals) && !empty($dataArr[$fN])) {
+    				if(in_array('datetime',$evals) && !empty($dataArr[$fN])) {
     				    $values = strftime(($conf['datetimeformat']?$conf['datetimeformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y')),$dataArr[$fN]);
     				}
     				// wwwURL check
@@ -2862,8 +2861,8 @@ class tx_metafeedit_lib {
     function getLLFromLabel($label,&$conf) {
 		if($conf['debug.']['langArray']) return "?$label?";
 		$labela=explode(':',$label);
-		$label2=end($labela);
-
+		$label2=str_replace('.','_',end($labela));
+		
 		// user override of language labels
 		if (isset($conf['LOCAL_LANG'][$conf['LLkey']][$label2])) {
 			return $conf['LOCAL_LANG'][$conf['LLkey']][$label2];
