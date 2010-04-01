@@ -83,7 +83,7 @@ class tx_metafeedit_grid {
 		$conf['markerArray']=$this->feadminlib->markerArray;
 		
 		//-----------------------------------------------------------------------------------------------------------------//
-		// Rï¿½cupï¿½ration de la variable exporttype
+		// Retrieveal of exporttype value
 		
 		// Modif CMD - unused configuration -> see getGridTopActions in class.tx_metafeedit_lib.php
 		//$content_pdf.=$conf['grid.']['gridExportPDF']?$this->metafeeditlib->CreatePDF($content_pdf,$conf):'';
@@ -501,7 +501,7 @@ class tx_metafeedit_grid {
 					$taille = $taille + $pouet->size;
 					}
 				}
-				$taille = $taille / 10;   // pour avoir la taille totale des colonnes en millimï¿½tre
+				$taille = $taille / 10;   // we calculate total column width in millimeters
 
 				if ($taille <21)		// La feuille est de dimension 21 x 29.7
 				$orientation='P';		// portrait
@@ -515,7 +515,7 @@ class tx_metafeedit_grid {
 				$pdf->setMargins(8,12,8);
 				$pdf->AddPage();
 				
-				// titre de la page - Il est dï¿½finit ici et non dans le header pour qu'il ne soit pas prï¿½sent sur chaque page mais seulement la 1ï¿½re
+				// title of page - Defined here and not in  the header so that it won't be present on every page but only on the first.
 				$titre =''; 
 				$titre = $GLOBALS['TSFE']->page['title'];
 				
@@ -543,7 +543,9 @@ class tx_metafeedit_grid {
 						$result = preg("/(^[0-9]+([\.0-9]*))$/" , $val);
 						
 						if ($conf['grid.']['gridEuros'] && $result) {  
-						$value = $val.' ï¿½';
+							$value = $val.' ï¿½';
+							//$value = $val.' €';
+
 						}
 						else {
 						$value = $col->data;

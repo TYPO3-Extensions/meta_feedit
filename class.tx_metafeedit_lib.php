@@ -406,7 +406,7 @@ class tx_metafeedit_lib {
 		}
 
 		Function enleveaccents($chaine) {
-			$string = strtr($chaine, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
+			$string = strtr($chaine, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
 			return $string;
 		}
 
@@ -1130,7 +1130,7 @@ class tx_metafeedit_lib {
 							 // points to the field (integer) that holds the fe_users-id of the creator fe_user
 					 if ($GLOBALS['TCA'][$table]['ctrl']['fe_cruser_id'])    {
 						$MMT = $GLOBALS['TCA'][$table]['columns'][$GLOBALS['TCA'][$table]['ctrl']['fe_cruser_id']]['config']['MM'];
-					 	if ($MMT) { //si on est dans une MM faut d'abord rï¿½cup les id de la table MM
+					 	if ($MMT) { //if MM we must get ID of the MM table
 							$FTUid=$fe_user['uid'];
 							$LTUid=$origArr['uid'];
 							$MMTreq = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$MMT,$MMT.'.uid_local='.$LTUid.' and '.$MMT.'.uid_foreign='.$FTUid);
@@ -2145,22 +2145,22 @@ class tx_metafeedit_lib {
  * pour les userFunc par exemple: 
  * pluginid.champ = blablabla
  * default.champ.userfunc = bliblibli
- * supprime la valeur par defaut (car surclassï¿½ dans le pluginid)
+ * supprime la valeur par defaut (car surclasse dans le pluginid)
  * marche aussi dans l'autre sens
  *
  * @param arr	premier tableau (dans lequel on supprime les doublons
  * @param arr	second tableau (dans lequel on trouve les valeur a chercher)
- * @return arr	tableau fusionnï¿½ des 2 autres
+ * @return arr	tableau fusionne des 2 autres
  **/
  function ts_array_merge($arr1, $arr2) {
 	//on test si on a bien des tableaux
 	if (is_array($arr1) && is_array($arr2)) {
-		//tableau des clef par default, necessaire ï¿½ la comparaison avec le tableau du plugid
+		//tableau des clef par default, necessaire a la comparaison avec le tableau du plugid
 		$defClef = array_keys($arr1);
 
 		//on parcour les tableaux afin de faire le trie des clef existant
 		foreach ($arr2 as $key => $value) {
-			$chaine = (strpos($key, '.')===false)?$key:substr($key, 0, -1); // on rï¿½cupï¿½re la chaine a comparer dans l'autre tableau sans le point final
+			$chaine = (strpos($key, '.')===false)?$key:substr($key, 0, -1); // on recupere la chaine a comparer dans l'autre tableau sans le point final
 			if (in_array($chaine, $defClef)) unset($arr1[$chaine]);
 			elseif(in_array($chaine.'.', $defClef)) unset($arr1[$chaine.'.']);
 		}
@@ -2300,7 +2300,7 @@ class tx_metafeedit_lib {
 			}
 		}
 
-		// appeller fonction utilisateur avant mise ï¿½ jour du template si elle est prï¿½sente ...
+		// appeller fonction utilisateur avant mise a jour du template si elle est presente ...
 		$var_temp_array = array($fe_adminLib, $treeArray);
 		if ($fe_adminLib->conf['userFunc_afterSaveAndBeforeStatus']) t3lib_div::callUserFunction($fe_adminLib->conf['userFunc_afterSaveAndBeforeStatus'], $var_temp_array, $fe_adminLib);
 
@@ -2366,7 +2366,7 @@ class tx_metafeedit_lib {
 			tx_euldap_div::export_user($servArr, $dataArr, $fe_adminLib->thePid, true);
 
 		} */
-		// appeller fonction utilisateur si elle est prï¿½sente ...
+		// appeller fonction utilisateur si elle est presente ...
 		$var_temp_array = array($fe_adminLib, $treeArray);
 		if ($fe_adminLib->conf['userFunc_afterSave']) t3lib_div::callUserFunction($fe_adminLib->conf['userFunc_afterSave'], $var_temp_array, $fe_adminLib);
 		// TODO CBY MERGE updated DATAARR with DATARR
@@ -2683,9 +2683,9 @@ class tx_metafeedit_lib {
                 	}
 
 			// ajouter filtres sur relation
-			// ajouter gestion des donnï¿½es liï¿½es...
+			// ajouter gestion des donnees liees...
 			//$ef=$this->cObj->enableFields($foreignTable);
-			//Modif by CMD - paramï¿½trage manuelle des champ gï¿½rï¿½ par la rï¿½cupï¿½ration des MM
+			//Modif by CMD - parametrage manuelle des champ gï¿½rï¿½ par la rï¿½cupï¿½ration des MM
 			$ignorArr = array();
 			if ($conf['edit.']['dontUseHidden']) {
 				$show_hidden = 1;
@@ -2696,7 +2696,7 @@ class tx_metafeedit_lib {
 			}
 			$ef = $GLOBALS['TSFE']->sys_page->enableFields($foreignTable, $show_hidden?$show_hidden:($table=='pages' ? $GLOBALS['TSFE']->showHiddenPage : $GLOBALS['TSFE']->showHiddenRecords), $ignorArr);
 
-			//permet d'appeller une fonction pour trier le tableau de rï¿½sultat
+			//permet d'appeller une fonction pour trier le tableau de resultat
 			if ($conf['select.'][$fN.'.']['userFunc_selectQuery'] && ($conf['inputvar.']['cmd']=='edit' || $conf['inputvar.']['cmd']=='create')) {
 				$temp = array('ef' => $ef, 'whereClause' => $whereClause);
 				t3lib_div::callUserFunction($conf['select.'][$fN.'.']['userFunc_selectQuery'], $res, $temp);
@@ -3458,7 +3458,7 @@ class tx_metafeedit_lib {
 
 				foreach(t3lib_div::trimexplode(',',$conf['list.'][show_fields]) as $sF) {
 					$rA=t3lib_div::trimexplode('.',$sF);
-					//modif by CMD - pour gÃ©rer le champ dans la table s'il nest pas la table ï¿½trangï¿½re
+					//modif by CMD - pour gerer le champ dans la table s'il nest pas la table etrangere
 					if ($rA[0]==$FT && isset($rA[1])) {
 						$sql['fields'].= ','.$aliasA['tableAlias'].'.'.$rA[1]." as '$FT.$rA[1]'";
 						$sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$rA[1]." as '$FT.$rA[1]'";
@@ -3607,8 +3607,6 @@ class tx_metafeedit_lib {
         	$FN=substr($FN,$p+1);
         	$p=strpos($FN,'.');
 	    }
-	   	//echo "ooo". $relLink;
-	    
 	    $foreignTable = $conf['TCAN'][$relTable]['columns'][$joinField]['config']['foreign_table'];
 	    $foreignTableAlias=$foreignTable.($link?'_'.$link:'');
 	    $table=$relTable;
@@ -3904,11 +3902,11 @@ class tx_metafeedit_lib {
     				foreach(t3lib_div::trimexplode(',',$feVals) as $feVal) {
     					if ($feVal) $OR_arr.= $OR_arr?' OR '.$table.'.'.$fUKeyField.'='.$feVal:$table.'.'.$fUKeyField.'='.$feVal;
     				}
-					// condition pour afficher les enregistrement affectï¿½ ï¿½ "toutes les connexions"
+					// condition pour afficher les enregistrement affecte a "toutes les connexions"
    					$OR_arr.= $OR_arr?' OR '.$table.'.'.$fUKeyField."='-2'":$table.'.'.$fUKeyField."='-2'";
     			} else {
    					if ($feVals) $OR_arr.= $OR_arr?' OR '.$table.'.'.$fUKeyField.'='.$feVals:$table.'.'.$fUKeyField.'='.$feVals;
-					// condition pour afficher les enregistrement affectï¿½ ï¿½ "toutes les connexions"
+					// condition pour afficher les enregistrement affecte a "toutes les connexions"
    					$OR_arr.= $OR_arr?' OR '.$table.'.'.$fUKeyField."='-2'":$table.'.'.$fUKeyField."='-2'";
     		    }
  			}
@@ -4472,9 +4470,9 @@ class tx_metafeedit_lib {
 		}
 		if (is_array($advancedSearch)) {
 			foreach($advancedSearch as $key=>$value) {
-				//modif CMD - ajout des tables etrangï¿½re ï¿½ l'AS
+				//add foreign table fields to advanced search
 				$curTable = $this->getForeignTableFromField($key, $conf,'',$sql);
-				//modif CMD - recup du TS
+				//Typoscript retrieval
 				$valeur='';
 				if ($this->is_extent($value) && !is_array($value)) $valeur=$value;
 				elseif ($this->is_extent($value['default'])  && !is_array($value['default.'])) $valeur=$value['default'];
@@ -4508,7 +4506,7 @@ class tx_metafeedit_lib {
 					$my_valsup = $value['valsup'];
 				}elseif(is_array($value['default.'])){
 					$my_op = $value['default.']['op'];
-					//TODO format date chercher le format par dï¿½faut
+					//TODO format date get default format
 					$my_val = ($value['default.']['val'] == 'now')?date('d-m-Y'):$value['default.']['val'];
 					$my_valsup = $value['default.']['valsup'];
 				}

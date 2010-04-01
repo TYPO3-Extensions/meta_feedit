@@ -426,7 +426,7 @@ class tx_metafeedit extends  tslib_pibase {
     		        if($conf['TCAN'][$table]['columns'][$fN]['config']['internal_type']=='file') {
     		                // CBY I removed _file handling here...
     		                //We could add folder specialisation here ...
-							// modif by CMD - permet d'eviter les message d'errreur suite ï¿½ la gestion des champs supplï¿½mentaire sql ou php calculï¿½
+							// modif by CMD - permet d'eviter les message d'errreur suite à la gestion des champs supplémentaire sql ou php calculé
     		                $conf['TCAN'][$table]['columns'][$fN.'_file'] = $conf['TCAN'][$table]['columns'][$fN]; // the new upload field should have the same upload folder as the original field
     		                $conf['TCAN'][$table]['columns'][$fN.'_file']['imagealiasfield']=$fN;
     		                //$conf['TCAN'][$table]['columns'][$fN.'_file']['config']['uploadfolder'] = $conf['TCAN'][$table]['columns'][$fN]['config']['uploadfolder']; // the new upload field should have the same upload folder as the original field
@@ -3880,18 +3880,14 @@ function getFormJs($formName,&$conf) {
 						$fsi++;
 						continue;
 					}
-					//modif CMD - prise en compte des tables etrangï¿½re dans l'AS
+					//We handle foreign tables in advanced search
 					$tab=array();
 					$curTable = $this->metafeeditlib->getForeignTableFromField($FN, $conf,'',$tab);
 					$type =$TConf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
 					$evals=t3lib_div::trimexplode(',',$TConf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['eval']);
 					
 					if(in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) $type=date;
-					//TODO : metre cette modification de type de donnï¿½e en surcharge de TCA
-					//$GLOBALS['TCA'][$this->table]['columns'][$GLOBALS['TCA'][$this->table]['ctrl']['crdate']]['config']['eval']='datetime';
-					//$GLOBALS['TCA'][$this->table]['columns'][$GLOBALS['TCA'][$this->table]['ctrl']['crdate']]['config']['type']='input';
-					//$GLOBALS['TCA'][$this->table]['columns'][$GLOBALS['TCA'][$this->table]['ctrl']['crdate']]['label']=$this->table.'.'.$GLOBALS['TCA'][$this->table]['ctrl']['cr
-					//dans le meta_feedit.php
+
 					$label=$curTable['fieldLabel'];
 					$type=($curTable['fNiD']=='crdate' && (string)$type=='')?'date':$type;
 					$Lib='<div class="'.$this->caller->pi_getClassName('asl').'">'.$this->metafeeditlib->getLLFromLabel($label,$conf).'</div>';
@@ -3919,7 +3915,7 @@ function getFormJs($formName,&$conf) {
 					  case 'group':
 						  break;
 					  case 'radio':
-						//modif CMD on rï¿½cup la val courante pour l'afficher en tant que selectionnï¿½
+						//We get current value to show it as selected
 						$val = is_array($conf['piVars']['advancedSearch'])?$conf['piVars']['advancedSearch'][$conf['pluginId']][$FN]:'';
 						$ret.=$div;
 						for ($i = 0; $i < count ($TConf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items']); ++$i) {
@@ -3932,7 +3928,7 @@ function getFormJs($formName,&$conf) {
 						$ret.='</div>';
 						break;
 					case 'check': 
-						//modif CMD on rï¿½cup la val courante pour l'afficher en tant que selectionnï¿½
+						//We get current value to show it as selected
 				
 						$val=is_array($conf['piVars']['advancedSearch'][$conf['pluginId']])?$conf['piVars']['advancedSearch'][$conf['pluginId']][$FN]:'';
 						$sel1=($val==1)?' selected="selected" ':'';
