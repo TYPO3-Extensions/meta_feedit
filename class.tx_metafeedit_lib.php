@@ -406,7 +406,7 @@ class tx_metafeedit_lib {
 		}
 
 		Function enleveaccents($chaine) {
-			$string = strtr($chaine, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
+			$string = strtr($chaine, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
 			return $string;
 		}
 
@@ -4645,22 +4645,22 @@ class tx_metafeedit_lib {
 		$lField=$conf['inputvar.']['lField'];
 		if  ($lV && $lField) {	
 			$FT=$conf['TCAN'][$table]['columns'][$lField]['config']['foreign_table'];
+			//print_r($conf['TCAN'][$table]['columns'][$lField]['config']);
+			//echo $FT;
 			if ($FT) {
-				/*$mmTable=$this->conf['TCAN'][$table]['columns'][$lField]['config']['MM'];
-				if ($mmTable) {								
-					$ParentWhere.=" AND ".$mmTable.'.uid_local=\''.$lV.'\'';
-					//TODO
-					//$sql['fromTables'].=','.$mmTable;
-					//$sql['joinTables'][]=$mmTable;
+				$mmTable=$this->conf['TCAN'][$table]['columns'][$lField]['config']['MM'];
+				//echo $mmTable.' - '.$conf['TCAN'][$table]['columns'][$lField]['config']['size'];
+				if ($mmTable || ($conf['TCAN'][$table]['columns'][$lField]['config']['size']>1)) {								
+					$data = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$lV);
 				} 
-				else { // old "," seperated list field
-					//$ParentWhere.=' AND FIND_IN_SET('.$table.'.'.$lField.','.$lV.')>0 ';
+				else {
 					$data = $GLOBALS['TSFE']->sys_page->getRawRecord($FT,$lV);
-				}*/
-				$data = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$lV);
-			
+				}
+
 				$data=$this->user_processDataArray($data, $conf,$table,TRUE);
 			} else  {
+				//$data = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$lV);
+				//$data=$this->user_processDataArray($data, $conf,$table,TRUE);
 				
 			}
 				
