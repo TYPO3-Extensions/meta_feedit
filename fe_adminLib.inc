@@ -2652,7 +2652,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				}
 			}
 			
-			//<CBY>  on passe en mode detail directement si editUnique est � true et qu'il n'y a qu'un seul �l�ment � �diter.
+			//<CBY>  on passe en mode detail directement si editUnique est a true et qu'il n'y a qu'un seul �l�ment � �diter.
 			$DBSELECT=$this->metafeeditlib->DBmayFEUserEditSelectMM($this->theTable,$GLOBALS['TSFE']->fe_user->user, $this->conf['allowedGroups'],$this->conf['fe_userEditSelf'],$mmTable,$this->conf).$GLOBALS['TSFE']->sys_page->deleteClause($this->theTable);
 
 			$TABLES=$mmTable?$this->theTable.','.$mmTable:$this->theTable;
