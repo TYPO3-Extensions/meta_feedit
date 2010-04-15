@@ -152,7 +152,9 @@ class tx_metafeedit_export {
 	// We handle here CSV file generation ...
 	function getCSV(&$content,&$caller) {
 		// We handle the header here 
+		ob_clean();
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);		
+		
 		header("Content-Type: application/csv; charEncoding=utf-8");
 		//header("Content-Encoding:utf-8");
 		//header("Content-Length: ".strlen($content);
@@ -406,6 +408,7 @@ class tx_metafeedit_export {
 			$pdf->setFillColor(255,255,255);
 			$r++;
 		}
+		ob_clean();
 		//Convert to PDF
 		$pdf->Output($caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf', 'I');
 		die;
@@ -569,6 +572,7 @@ class tx_metafeedit_export {
 		}
 		//Convert to PDF
 		$name=$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf';
+		ob_clean();
 		$pdf->Output($name, 'I'); 
 		die;
 
@@ -665,7 +669,7 @@ class tx_metafeedit_export {
 		$cptcols++;	
 		$nbx++;
 		}
-		
+		ob_clean();
 		$pdf->Output();
 		$content = $pdf->Output('test.pdf', 'S');
 		echo $content;
@@ -928,7 +932,7 @@ class tx_metafeedit_export {
 		
 		//-----Create a Writer and output the file to the browser-----
 		$objWriter2007 = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-
+		ob_clean();
 		header('Content-Type: application/vnd.openXMLformats-officedocument.spreadsheetml.sheet');
 		header('Content-Disposition: attachment;filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.xlsx"');
 		header('Cache-Control: max-age=0');
