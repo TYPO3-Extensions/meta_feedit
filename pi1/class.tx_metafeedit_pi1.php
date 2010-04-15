@@ -179,8 +179,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['includeLibs']='typo3conf/ext/meta_feedit/fe_adminLib.inc';
 		$mfconf['userFunc_updateArray']='tx_metafeedit_lib->user_updateArray';
 		$mfconf['evalFunc']='tx_metafeedit_lib->user_processDataArray';
-		$mfconf['infomail']=0;
-		$mfconf['infomail']=0;
 		$mfconf['required_marker']='*';
 		$mfconf['infomail']=0;
 		$mfconf['defaultCmd']='edit';//TODO NEW
@@ -307,7 +305,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['weekdayNameLength']=3;
 		
 		// Exports
-		$mfconf['list.']['pdf']=$lconf['pdf'];			// Récupère l'info de si la case est cochée
+		$mfconf['list.']['pdf']=$lconf['pdf'];			// Rï¿½cupï¿½re l'info de si la case est cochï¿½e
 		$mfconf['list.']['csv']=$lconf['csv'];			
 		$mfconf['list.']['excel']=$lconf['excel'];
 		$mfconf['list.']['euros']=$lconf['euros']; // Deprecated
@@ -317,7 +315,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['TemplatePDFTab']=$lconf['TemplatePDFTab'];
 		$mfconf['list.']['TemplateCSV']=$lconf['TemplateCSV'];
 		$mfconf['list.']['TemplateExcel']=$lconf['TemplateExcel'];
-		$mfconf['edit.']['pdf']=$lconf['editpdf']?$lconf['editpdf']:0;			// Récupère l'info de si la case est cochée		
+		$mfconf['edit.']['pdf']=$lconf['editpdf']?$lconf['editpdf']:0;			// Rï¿½cupï¿½re l'info de si la case est cochï¿½e		
 		
 		// --------------------------------------------------------------------------------------------------------------------- //
 
@@ -861,9 +859,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['meta_feedit'] = 'jQuery().ready(function() {jQuery(\'#modalWindow\').jqm();});';
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['meta_feedit'] = 'jQuery().ready(function() {jQuery(\'#modalWindow\').jqm({overlay: 70,modal: true,trigger: \'.tx-metafeedit-link-edit a\',target: \'#jqmContent\',onHide: closeModal,onShow: openInFrame});});jQuery(\'#modalWindow\').jqm();jQuery(\'#modalWindow\').jqmShow();';
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowSpectateurs('<table><tr><td>".addslashes($this->ajaxWidgets->comboList('spectateurs','','','handlePersondata','setPersonRecap','Recherche Spectateurs',25))."<a href=\'#\' ".addslashes($emptyPersonsClick).">&nbsp;Vider la liste</a></td></tr><tr><td><div id=\'selectedPersons\' class=\'selectedpersons\'>".addslashes($this->metabookinglib->getSelectablePersons())."</div></td></tr><tr><td><a href=\'#\' ".addslashes($createClick)." >Nouveau spectateur</a></td></tr><tr><td><a href=\'#\' ".addslashes($lastMinuteClick)." >Last Minute (Surbooking)</a></td></tr><tr><td>".addslashes($this->ajaxWidgets->comboList('reglements','','','handlePaymentData','setPayment','Recherche Reglement par num ou spectateur ou tiers payant',15))."</td></tr><tr><td><a href=\'#\' ".addslashes($editResteDuClick).">Restes Dus</a>, <a href=\'#\' ".addslashes($editResteDuDetClick).">Restes Dus Detailles</a>, <a href=\'#\' ".addslashes($caisseJourClick).">Caisse Jour</a></td></tr></table>');";
-			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowTickets('<div id=\'selectedRelay\' class=\'selectedrelay\'>".addslashes($this->metabookinglib->getRelay($idrelais))."</div><a href=\'#\' ".addslashes($emptyTransactionsClick).">&nbsp;Vider la liste (sauf règlements en cours)</a>, <a href=\'#\' ".addslashes($onClickPaiement).">&nbsp;Règlement en cours</a>, <a href=\'#\' ".addslashes($refreshTransactionsClick).">&nbsp;Actualiser</a><div id=\'selectedTickets\' class=\'selectedtickets\'>".addslashes($this->metabookinglib->getSelectedTickets(array()))."</div>');";
+			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowTickets('<div id=\'selectedRelay\' class=\'selectedrelay\'>".addslashes($this->metabookinglib->getRelay($idrelais))."</div><a href=\'#\' ".addslashes($emptyTransactionsClick).">&nbsp;Vider la liste (sauf rï¿½glements en cours)</a>, <a href=\'#\' ".addslashes($onClickPaiement).">&nbsp;Rï¿½glement en cours</a>, <a href=\'#\' ".addslashes($refreshTransactionsClick).">&nbsp;Actualiser</a><div id=\'selectedTickets\' class=\'selectedtickets\'>".addslashes($this->metabookinglib->getSelectedTickets(array()))."</div>');";
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowTarifs('<div id=\'selectedTarifs\' class=\'selectedtarifs\'>".addslashes($this->metabookinglib->getSelectableTarifs())."</div>');";
-			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowPrereservations('".addslashes($this->ajaxWidgets->comboList('seance','','','handleSeanceData','setSelectedSeance','Recherche S&eacute;ance',20))."<a href=\'#\' ".addslashes($selectAllPrereservationsClick).">&nbsp;Tout Sélectionner</a><a href=\'#\' ".addslashes($deselectAllPrereservationsClick).">&nbsp;Tout déselectionner</a><a href=\'#\' ".addslashes($emptyPrereservationsClick).">&nbsp;Vider la liste</a><a href=\'#\' ".addslashes($refreshPrereservationsClick).">&nbsp;Actualiser</a><div id=\'selectedPlaces\' class=\'selectedplaces\'>".addslashes($this->metabookinglib->getSelectablePlaces())."</div>');";
+			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowPrereservations('".addslashes($this->ajaxWidgets->comboList('seance','','','handleSeanceData','setSelectedSeance','Recherche S&eacute;ance',20))."<a href=\'#\' ".addslashes($selectAllPrereservationsClick).">&nbsp;Tout Sï¿½lectionner</a><a href=\'#\' ".addslashes($deselectAllPrereservationsClick).">&nbsp;Tout dï¿½selectionner</a><a href=\'#\' ".addslashes($emptyPrereservationsClick).">&nbsp;Vider la liste</a><a href=\'#\' ".addslashes($refreshPrereservationsClick).">&nbsp;Actualiser</a><div id=\'selectedPlaces\' class=\'selectedplaces\'>".addslashes($this->metabookinglib->getSelectablePlaces())."</div>');";
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowSeances('<div id=\'planSeance\' class=\'planseance\'></div>');";
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowCaisse('<div id=\'billetterie\' class=\'billetterie\'></div>');";
 	 	}
