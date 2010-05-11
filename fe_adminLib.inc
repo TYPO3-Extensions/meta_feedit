@@ -137,6 +137,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	var $preview;
 	var $backURL;
 	var $recUid;
+	var $feData=array();
 	var $metafeeditlib;
 	var $metafeeditgrid;
 	var $metafeeditexport;
@@ -238,7 +239,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// backURL is a given URL to return to when login is performed
 		// this should be a seperate function ...
 	
-		$this->backURL = $this->conf['inputvar.']['backURL'];
+		$this->backURL = $this->conf['inputvar.']['backURL'][$conf['pageType']];
 
 		// Uid to edit:		
 		if ($this->conf['inputvar.']['rU'] && $conf['inputvar.']['cmd']!='list') $this->recUid = $this->conf['inputvar.']['rU'];
@@ -389,7 +390,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		);
 		// Setting incoming data. Non-stripped
 		
-		$fe=$conf['inputvar.']['fedata'];
+		$this->feData=$fe=$conf['inputvar.']['fedata'];	
 		if ($conf['inputvar.']['cmd']!='list' || $conf['general.']['listMode']==2) $this->dataArr=$fe[$this->theTable];	// Incoming data.
 		$this->conf['dataArr']=&$this->dataArr;
 		// Setting blog incoming data. Non-stripped
@@ -879,7 +880,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	     $string= strtr($string,    
 	   "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   
 	   "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");    
-	   //"ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ",   
+	   //"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   
 	      
 	    return $string;    
     	}   
@@ -1357,14 +1358,21 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 */
 	function save(&$conf)	{
 		// Before Save transformations for RTE
+		$saveArray=array();
 		foreach($this->dataArr as $fN=>$val) {
+		
+			if (strpos($fN,'.') || substr($fN,0,5)=='EVAL_') {
+				if ($conf['debug.']['sql']) echo "<br/>Save() foreign field $fN update not implemented yet !";
+				continue;
+			}
+			$saveArray[$fN]=$val;
 			$tab=array();
 			$res = $this->metafeeditlib->getForeignTableFromField($fN, $conf,'',$tab);			
 			$table = $res['relTable']; //we get field sourcetable...
 			$fNiD = $res['fNiD'];
 			switch((string)$conf['TCAN'][$table]['columns'][fNiD]['config']['type']) {
 				case 'text':
-					$dataArr = $this->rteProcessDataArr($this->dataArr, $table, $fN, 'db', $conf, "user_processDataArray");
+					$saveArray = $this->rteProcessDataArr($saveArray, $table, $fN, 'db', $conf, "user_processDataArray");
 				break;
 			} 
 			
@@ -1372,12 +1380,12 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		switch($conf['inputvar.']['cmd'])	{
 			case 'edit':
 				if ($conf['blogData']) {
-					$this->dataArr['remote_addr'] = $_SERVER['REMOTE_ADDR'];
+					$saveArray['remote_addr'] = $_SERVER['REMOTE_ADDR'];
 					$newFieldList=$conf['blog.']['show_fields']?$conf['blog.']['show_fields']:'firstname,surname,email,homepage,place,entry,entrycomment,linked_row,remote_addr';
-					$this->cObj->DBgetInsert('tx_metafeedit_comments', $this->thePid, $this->dataArr, $newFieldList, TRUE);
+					$this->cObj->DBgetInsert('tx_metafeedit_comments', $this->thePid, $saveArray, $newFieldList, TRUE);
 					//MODIF CBY
 					if ($conf['debug.']['sql']) 
-							$conf['debug.']['debugString'].="<br/>INSERT SQL <br/>".$this->cObj->DBgetInsert('tx_metafeedit_comments', $this->thePid, $this->dataArr, $newFieldList, FALSE);
+							$conf['debug.']['debugString'].="<br/>INSERT SQL <br/>".$this->cObj->DBgetInsert('tx_metafeedit_comments', $this->thePid, $saveArray, $newFieldList, FALSE);
 					$this->saved=1;
 					break;
 				} 
@@ -1390,11 +1398,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 
 					if ($this->aCAuth($origArr) || $this->metafeeditlib->DBmayFEUserEdit($this->theTable,$origArr,$GLOBALS['TSFE']->fe_user->user,$conf['allowedGroups'],$conf['fe_userEditSelf'],$conf))	{
-						$this->cObj->DBgetUpdate($this->theTable, $theUid, $this->dataArr, $newFieldList, TRUE);
+						$this->cObj->DBgetUpdate($this->theTable, $theUid, $saveArray, $newFieldList, TRUE);
 
 						//MODIF CBY
 						if ($conf['debug.']['sql']) 
-							$conf['debug.']['debugString'].="<br/>UPDATE SQL <br/>".$this->cObj->DBgetUpdate($this->theTable, $theUid, $this->dataArr, $newFieldList, FALSE);
+							$conf['debug.']['debugString'].="<br/>UPDATE SQL <br/>".$this->cObj->DBgetUpdate($this->theTable, $theUid, $saveArray, $newFieldList, FALSE);
 						$this->currentArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$theUid);
 
 
@@ -1415,10 +1423,10 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 						
 					$newFieldList = implode(',',array_intersect(explode(',',$conf['fieldList']),t3lib_div::trimExplode(',',$conf['create.']['fields'],1)));
-					$this->cObj->DBgetInsert($this->theTable, $this->thePid, $this->dataArr, $newFieldList, TRUE);
+					$this->cObj->DBgetInsert($this->theTable, $this->thePid, $saveArray, $newFieldList, TRUE);
 					//MODIF CBY
 					if ($conf['debug.']['sql']) 
-							$conf['debug.']['debugString'].="<br/>INSERT SQL <br/>".$this->cObj->DBgetInsert($this->theTable, $this->thePid, $this->dataArr, $newFieldList, FALSE);
+							$conf['debug.']['debugString'].="<br/>INSERT SQL <br/>".$this->cObj->DBgetInsert($this->theTable, $this->thePid, $saveArray, $newFieldList, FALSE);
 					$newId = $GLOBALS['TYPO3_DB']->sql_insert_id();
 					$this->dataArr[$conf['uidField']]=$newId;
 					$this->currentArr[$conf['uidField']]=$newId;
@@ -1441,15 +1449,22 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 							$extraList.=','.$field;
 
 						}
-						if (count($dataArr))	{
+						$saveArray=array();
+						foreach($dataArr as $fN=>$val) {
+							if (strpos($fN,'.')) {
+								if ($conf['debug.']['sql']) echo "<br/>Save2() foreign field $fN update not implemented yet !";
+								continue;
+							}
+							$saveArray[$fN]=$val;
+						}
+						if (count($saveArray))	{
 					
-							$this->cObj->DBgetUpdate($this->theTable, $newId, $dataArr, $extraList, TRUE);
+							$this->cObj->DBgetUpdate($this->theTable, $newId, $saveArray, $extraList, TRUE);
 							//MODIF CBY
 							if ($conf['debug.']['sql']) 
-								$conf['debug.']['debugString'].="<br/>UPDATE SQL <br/>".$this->cObj->DBgetUpdate($this->theTable, $newId, $dataArr, $extraList, FALSE);
+								$conf['debug.']['debugString'].="<br/>UPDATE SQL <br/>".$this->cObj->DBgetUpdate($this->theTable, $newId, $saveArray, $extraList, FALSE);
 						}
 					}
-
 					$this->currentArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$newId);
 					//die(dot);
 					//$this->logErrors('before user process uid:='.$this->dataArr[$conf['uidField']]);
@@ -2842,6 +2857,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($this->conf['blogData']) $content = $this->cObj->substituteSubpart($content,'###PREVIEWACTIONS###',$action['BACK']); ;
 
 		$content = $this->cObj->substituteMarkerArray($content, $markerArray);
+		if ($conf['debug.']['markerArray']) echo t3lib_div::view_array($markerArray);
+		
 		// Blog Comment Display :
 		// We handle empty fields here ..
  		if ($this->conf['preview.']['noemptyfields'] && $this->preview) {
