@@ -426,7 +426,7 @@ class tx_metafeedit extends  tslib_pibase {
     		        if($conf['TCAN'][$table]['columns'][$fN]['config']['internal_type']=='file') {
     		                // CBY I removed _file handling here...
     		                //We could add folder specialisation here ...
-							// modif by CMD - permet d'eviter les message d'errreur suite à la gestion des champs supplémentaire sql ou php calculé
+							// modif by CMD - permet d'eviter les message d'errreur suite ï¿½ la gestion des champs supplï¿½mentaire sql ou php calculï¿½
     		                $conf['TCAN'][$table]['columns'][$fN.'_file'] = $conf['TCAN'][$table]['columns'][$fN]; // the new upload field should have the same upload folder as the original field
     		                $conf['TCAN'][$table]['columns'][$fN.'_file']['imagealiasfield']=$fN;
     		                //$conf['TCAN'][$table]['columns'][$fN.'_file']['config']['uploadfolder'] = $conf['TCAN'][$table]['columns'][$fN]['config']['uploadfolder']; // the new upload field should have the same upload folder as the original field
@@ -867,7 +867,8 @@ class tx_metafeedit extends  tslib_pibase {
     $tab=array();
     $res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab);
     $Lib=$this->metafeeditlib->getLLFromLabel($res['fieldLabel'],$conf);
-    $fN=str_replace('.','_',$res['fieldAlias']); // is the str_replace necessary ?
+    //$fN=str_replace('.','_',$res['fieldAlias']); // is the str_replace necessary ?
+    $fN=$res['fieldAlias']; // is the str_replace necessary ?
     $table=$res['relTable'];
     $fNiD=$res['fNiD'];
     $EVAL_ERROR_FIELD= $withHTML?'<div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'###</div>':'';
@@ -1918,10 +1919,12 @@ class tx_metafeedit extends  tslib_pibase {
     
     function getGroupByFields(&$conf,$textmode=false,$exporttype='') {
         if ($conf['list.']['groupByFieldBreaks']) {
+        	$hasActions=($exporttype?0:$this->metafeeditlib->hasListActions($conf));
+
         	$GROUPBYFIELDS='<!-- ###GROUPBYFIELDS### begin -->';
         	$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
         	$nbf=1;
-        	$nbf=count(t3lib_div::trimExplode(",",$fields))+$this->metafeeditlib->hasListActions($conf);
+        	$nbf=count(t3lib_div::trimExplode(",",$fields))+$hasActions;
         
         	if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="<tr><td>";
             $fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
@@ -1937,7 +1940,7 @@ class tx_metafeedit extends  tslib_pibase {
         		
         		$size = $this->getSize($conf, $fN, $conf['table']);
             
-                $GROUPBYFIELDS.='<!-- ###GROUPBYFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?$conf['list.']['nbCols']+$this->metafeeditlib->hasListActions($conf):$nbf).'"><div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.( $conf['list.']['groupby.'][$fN.'.']['header']?$conf['list.']['groupby.'][$fN.'.']['header']:'###GROUPBY_'.$fN.'###').($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</div></td></tr>').'<!-- ###GROUPBYFIELD_'.$fN.'### end -->';
+                $GROUPBYFIELDS.='<!-- ###GROUPBYFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?$conf['list.']['nbCols']+$hasActions:$nbf).'"><div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.( $conf['list.']['groupby.'][$fN.'.']['header']?$conf['list.']['groupby.'][$fN.'.']['header']:'###GROUPBY_'.$fN.'###').($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</div></td></tr>').'<!-- ###GROUPBYFIELD_'.$fN.'### end -->';
         		$tab.="";//&nbsp;>&nbsp;";
 				$lvl++;
             }
@@ -1959,7 +1962,7 @@ class tx_metafeedit extends  tslib_pibase {
   		$GROUPBYFIELDS='';
 		$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
 		$nbf=1;
-		$hasActions=$this->metafeeditlib->hasListActions($conf);
+		$hasActions=($exporttype?0:$this->metafeeditlib->hasListActions($conf));
 		$nbf=count(t3lib_div::trimExplode(",",$fields))+$hasActions;
 
 		if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="<tr><td>";
@@ -1982,7 +1985,7 @@ class tx_metafeedit extends  tslib_pibase {
 
 				$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'">').$sum.($textmode?($exporttype?'</tr>':chr(10)):'</tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
 			} else {
-				$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?($conf['list.']['nbCols']+$this->metafeeditlib->hasListActions($conf)):$nbf).'" >').$div.($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</td></tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
+				$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?($conf['list.']['nbCols']+$hasActions):$nbf).'" >').$div.($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</td></tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
 			}
 			$tab.="";//&nbsp;>&nbsp;";
 			$lvl++;
@@ -2026,6 +2029,9 @@ class tx_metafeedit extends  tslib_pibase {
     	$tmp.='<table '.$this->caller->pi_classParam('editmenu-list-table').' style="width: 100%;">'.($conf['list.']['nbCols']?'':'<tr'.$this->caller->pi_classParam('editmenu-list-table-header').'>###ACTIONS-LIST-LIB###'.$this->getListFields($conf).'</tr>').'<!-- ###ALLITEMS### begin -->';
     	// Group By processing
     	$GROUPBYFIELDS=$this->getGroupByFields($conf);
+    	//$hasActions=($exporttype?0:$this->metafeeditlib->hasListActions($conf));
+   		$hasActions=$this->metafeeditlib->hasListActions($conf);
+    	
     	if ($conf['list.']['displayDirection']=='Down') {
     		$tmp.=$GROUPBYFIELDS;
     		//MODIF CBY
@@ -2050,7 +2056,7 @@ class tx_metafeedit extends  tslib_pibase {
     	}
         $fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
 
-        $nbf=$conf['list.']['nbCols']?$conf['list.']['nbCols']+$this->metafeeditlib->hasListActions($conf):(count(t3lib_div::trimExplode(",",$fields))+$this->metafeeditlib->hasListActions($conf));
+        $nbf=$conf['list.']['nbCols']?$conf['list.']['nbCols']+$hasActions:(count(t3lib_div::trimExplode(",",$fields))+$hasActions);
 
     	// MEDIAPLAYER TAGS
     	$tmp.='<tr class="mfeblog"><td colspan="'.$nbf.'">###MEDIAPLAYER###</td></tr>'.($conf['blog.']['showComments']?'<tr class="mfeblog"><td colspan="'.$nbf.'">###MEDIA_ACTION_BLOG###</td></tr>':'').'<tr class="mfepagenav"><td colspan="'.$nbf.'">###PAGENAV######METAFEEDITNBPAGES######METAFEEDITNBROWS###</td></tr></table>';

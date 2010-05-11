@@ -359,10 +359,25 @@ class tx_metafeedit_lib {
 				if ($conf['TCAN'][$conf['table']]['ctrl']['sortby'] && !$conf['disableEdit']) {
 				//$backurl=$this->makeFormTypoLink($conf,"&rU[$pluginId]=".$conf['recUid']);
 				}*/
-				$backLink=$this->makeFormTypoLink($conf,'&BACK['.$conf[pluginId].']=1&cmd['.$conf[pluginId].']=list',false);
+				//$backLink=$this->makeFormTypoLink($conf,'&BACK['.$conf[pluginId].']=1&cmd['.$conf[pluginId].']=list',false);
+				$referer[$conf['pageType']]=$this->makeFormTypoLink($conf,'&BACK['.$conf[pluginId].']=1&cmd['.$conf[pluginId].']=list',false);
 				break;
 			case 'list':
+
 			default :
+				if ($conf['backPagePid'] ) {
+					$tlconf['parameter']=$conf['backPagePid'];
+					if ($conf['no_cache'] || $conf['cacheMode']==0) $tlconf['no_cache']=1;
+					$tlconf['useCacheHash']=1;
+					$referer[$conf['pageType']]=$this->cObj->typoLink_URL($tlconf);
+				} else {
+					if (!$referer[$conf['pageType']]) {
+						$referer[$conf['pageType']]="javascript:history.back();";
+					}
+				}
+		}
+		return $referer;	
+					/*default :
 				if ($conf['backPagePid'] ) {
 					$tlconf['parameter']=$conf['backPagePid'];
 					if ($conf['no_cache'] || $conf['cacheMode']==0) $tlconf['no_cache']=1;
@@ -376,7 +391,7 @@ class tx_metafeedit_lib {
 					}
 				}
 		}
-		return $backLink;
+		return $backLink;*/
 	}
 
 	/**
@@ -721,7 +736,7 @@ class tx_metafeedit_lib {
 			} else {
 				if (strpos($fNi,'.')===false && $row[$fNi]) {
 					//$table = $this->getForeignTableFromField($fNi, $conf,'',&$sql);
-				    $WHERE.=" and $conf[table].$fNi=".$row[$fNi];
+				    $WHERE.=" and $conf[table].$fNi='".$row[$fNi]."'";
 				    $GROUPBY=$GROUPBY?$GROUPBY.','.$conf[table].'.'.$fNi:$conf[table].'.'.$fNi;
 					$HAVING.=$HAVING?" and $fN2[0]='".$row[$fNi]."'":" HAVING $fN2[0]='".$row[$fNi]."'";
 				} else {
@@ -1401,6 +1416,8 @@ class tx_metafeedit_lib {
 			$fNiD = $res['fNiD'];
 			$values = '';
 			if (!$fe_adminLib->markerArray['###EVAL_ERROR_FIELD_'.$_fN.'###']) $fe_adminLib->markerArray['###EVAL_ERROR_FIELD_'.$_fN.'###'] = '';
+			//TODO this should not be necessary
+			if (!$fe_adminLib->markerArray['###EVAL_ERROR_FIELD_'.$fN.'###']) $fe_adminLib->markerArray['###EVAL_ERROR_FIELD_'.$fN.'###'] = '';
             $type=$conf['TCAN'][$table]['columns'][$fNiD]['config']['type'];
         	if (!$type && !$conf['list.']['sqlcalcfields.'][$fN]) {
                  if ($conf['debug']) echo "<br>NO TCA definition for masterTable : ".$fe_adminLib->theTable.", table : $table, in table : $intable, field $fNiD, orig field  : $fN";
@@ -1809,6 +1826,10 @@ class tx_metafeedit_lib {
 					$dataArr['EVAL_'.$_fN] = $this->cObj->stdWrap($dataArr[$fN], $stdConf);
 				}
 			}
+			
+			//TODO this should not be necessary ...
+			$dataArr['EVAL_'.$fN]=$dataArr['EVAL_'.$_fN];
+			
 		}
 
 		if (!$dataArr['tx_metafeedit_dont_ctrl_checkboxes']) {
@@ -2870,7 +2891,7 @@ class tx_metafeedit_lib {
 		$ret=$GLOBALS['TSFE']->sL($label)?$GLOBALS['TSFE']->sL($label):"$label";
 		if ($ret==$label) {
 			// We didn't find label...
-			$labela=explode('.',$label2);
+			$labela=explode('.',$label);
 			$label=end($labela);
 			$ret=$GLOBALS['TSFE']->getLLL($label,$conf['LOCAL_LANG']);
 			//$GLOBALS['TSFE']->sL($label)?$GLOBALS['TSFE']->sL($label):"$label";
@@ -3245,8 +3266,8 @@ class tx_metafeedit_lib {
     	//if ($conf['list.']['recordactions'] && !$conf['ajax.']['ajaxOn']) {
         
        
-    	if ($conf['list.']['recordactions']) {
-    		$ActionArr=t3lib_div::trimexplode(chr(10),$conf['list.']['recordactions']);
+    	if ($conf['edit.']['recordactions']) {
+    		$ActionArr=t3lib_div::trimexplode(chr(10),$conf['edit.']['recordactions']);
       		foreach($ActionArr as $action) {
       			$cmdarr=t3lib_div::trimexplode('|',$action);
     			if (count($cmdarr)>2) {
@@ -4650,14 +4671,23 @@ class tx_metafeedit_lib {
 			if ($FT) {
 				$mmTable=$this->conf['TCAN'][$table]['columns'][$lField]['config']['MM'];
 				//echo $mmTable.' - '.$conf['TCAN'][$table]['columns'][$lField]['config']['size'];
-				if ($mmTable || ($conf['TCAN'][$table]['columns'][$lField]['config']['size']>1)) {								
+				/*if ($mmTable || ($conf['TCAN'][$table]['columns'][$lField]['config']['size']>1)) {								
 					$data = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$lV);
 				} 
 				else {
 					$data = $GLOBALS['TSFE']->sys_page->getRawRecord($FT,$lV);
 				}
-
-				$data=$this->user_processDataArray($data, $conf,$table,TRUE);
+				$data=$this->user_processDataArray($data, $conf,$table,TRUE);*/
+				if ($mmTable || ($conf['TCAN'][$table]['columns'][$lField]['config']['size']>1)) {								
+					$data = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$lV);
+					$t=$table;
+				} 
+				else {
+					$this->makeTypo3TCAForTable($conf['TCAN'],$FT);
+					$data = $GLOBALS['TSFE']->sys_page->getRawRecord($FT,$lV);
+					$t=$FT;
+				}
+				$data=$this->user_processDataArray($data, $conf,$t,TRUE);
 			} else  {
 				//$data = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$lV);
 				//$data=$this->user_processDataArray($data, $conf,$table,TRUE);
