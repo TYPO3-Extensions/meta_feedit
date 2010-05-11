@@ -203,7 +203,7 @@ var closeModal = function(hash)
 
             if (hash.refreshAfterClose == true)
             {
-                window.location.href = document.location.href+((document.location.href.lastIndexOf('cmd=list') > -1)?'':((document.location.href.lastIndexOf('?') > -1)?'&cmd=list':'?&cmd=list'));
+                window.location.href = document.location.href+((document.location.href.lastIndexOf('cmd=list&ajxcb=1') > -1)?'':((document.location.href.lastIndexOf('?') > -1)?'&cmd=list&ajxcb=1':'?&cmd=list&ajxcb=1'));
 				//alert(window.location.href);
             }
             initEdtBtns();
