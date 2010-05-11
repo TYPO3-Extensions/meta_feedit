@@ -57,6 +57,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 	
 	function main($content='',$conf=''){
 		$DEBUG='';
+
 		//global $PAGES_TYPES;		
 		if (!defined ('PATH_typo3conf')) die ('Could not access this script directly!');	  
 		// Meta feedit library init
@@ -99,6 +100,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 
 		$lconf=$this->lconf;
 		$mfconf=$conf['metafeedit.'];
+		$mfconf['pageType']=$GLOBALS['TSFE']->type;
+		
 		$mfconf['performanceaudit']=$lconf['debugPerformances'];
 
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Start ']=$this->metafeeditlib->displaytime()." Seconds"; 
@@ -390,6 +393,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['create.']['hide']=$lconf['hideCreate'];
 
 		$mfconf['edit']=1;
+		$mfconf['edit.']['recordactions']=$lconf['editrecordactions'];
 		$mfconf['edit.']['userFunc_afterSave']='tx_metafeedit_lib->user_afterSave';
 		$mfconf['edit.']['langmarks']=$lconf['editlangmarks'];
 		$mfconf['edit.']['formWrap.']=$conf['editFormWrap.'];
@@ -730,7 +734,12 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['inputvar.']['rU']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'rU');
 		$mfconf['inputvar.']['rU.']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'rU.');
 		$mfconf['inputvar.']['cmd']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'cmd',true);
-		$mfconf['inputvar.']['backURL']=htmlspecialchars_decode((string)$this->metafeeditlib->getMetaFeeditVar($mfconf,'backURL',true));
+		//$mfconf['inputvar.']['backURL']=htmlspecialchars_decode((string)$this->metafeeditlib->getMetaFeeditVar($mfconf,'backURL',true));
+		// backUrl is now also indexed on pageType (for ajax).
+		$mfconf['inputvar.']['backURL']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'backURL',true);
+		foreach($mfconf['inputvar.']['backURL'] as $type=>$val) {
+			$mfconf['inputvar.']['backURL'][$type]=htmlspecialchars_decode((string)$val);
+		}		
 		$mfconf['inputvar.']['preview']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'preview');
 		$mfconf['inputvar.']['blog']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'blog');
 		$mfconf['inputvar.']['doNotSave']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'doNotSave');
@@ -798,7 +807,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		
 		// we handle back url here by calculating referer..
 
-		if (!$mfconf['inputvar.']['BACK']) {
+		/*if (!$mfconf['inputvar.']['BACK']) {
 			if (!$this->piVars['referer'][$pluginId]) {
 				$backURL=$_SERVER['HTTP_REFERER'];
 				$this->piVars['referer'][$pluginId]=$_SERVER['HTTP_REFERER'];
@@ -817,7 +826,34 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 				$backURL.="&BACK[".$pluginId."]=1";
 				$mfconf['inputvar.']['backURL']=$backURL;
 			}
+		}*/
+        
+		// we handle back url here by calculating referer..
+		//9002 is page type if called through ajax
+		//
+		if (!is_array($mfconf['inputvar.']['backURL'])) $mfconf['inputvar.']['backURL']=array();
+		if (!$mfconf['inputvar.']['BACK'] && !t3lib_div::_GP('ajxcb')) {
+			if (!$this->piVars['referer'][$pluginId]) {
+				$mfconf['inputvar.']['backURL'][$mfconf['pageType']]=$_SERVER['HTTP_REFERER'];
+				$this->piVars['referer'][$pluginId]=$_SERVER['HTTP_REFERER'];
+			} else {
+				$mfconf['inputvar.']['backURL'][$mfconf['pageType']]=$this->piVars['referer'][$pluginId];
+			}
+			$patha=parse_url($mfconf['inputvar.']['backURL'][$mfconf['pageType']]);
+			$path=$patha['path'];
+			if (substr($path,0,1)=='/') $path=str_replace('/','',$path);
+			$tlconf['parameter']=$GLOBALS['TSFE']->id;
+			$tl=$this->cObj->typoLink_URL($tlconf);
+			
+			if (trim($tl)!=$path) {
+				$mfconf['inputvar.']['backURL'][$mfconf['pageType']]=str_replace("&BACK[".$pluginId."]=1","",$mfconf['inputvar.']['backURL'][$mfconf['pageType']]);
+				if (!strpos($mfconf['inputvar.']['backURL'][$mfconf['pageType']],'?')) $mfconf['inputvar.']['backURL'][$mfconf['pageType']].='?';
+				$mfconf['inputvar.']['backURL'][$mfconf['pageType']].="&BACK[".$pluginId."]=1";
+				
+				//$mfconf['inputvar.']['backURL']=$backURL;
+			}
 		}
+		
 		
 		// we set session variables we want to remember 
 		//=============================================

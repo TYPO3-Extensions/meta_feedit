@@ -178,9 +178,9 @@ fieldset {margin-bottom:5px;}
 .tx-metafeedit-list_table_field_list{width:200px;}
 .tx-metafeedit-list_table_field_sel{width:200px;}
 #blockfiltre{float:right; margin-right:20px; margin-top:10px}
-.btnPDF,input.btnPDF:focus{background-color:white;text-indent: -1000em;overflow:hidden;background-image:url(/typo3conf/ext/meta_feedit/res/iconePdf.gif);font-size:1px;color:#fff;border:0; background-repeat:no-repeat; cursor:pointer; width:35px; height:35px}
-.btnXLS{background-color:white;text-indent: -1000em;overflow:hidden;background-image:url(/typo3conf/ext/meta_feedit/res/iconeExcel.gif);font-size:1px;color:#fff;border:0; background-repeat:no-repeat; cursor:pointer; width:35px; height:35px}
-.btnCSV{background-color:white;text-indent: -1000em;overflow:hidden;background-image:url(/typo3conf/ext/meta_feedit/res/iconeCsv.gif);font-size:1px;color:#fff;border:0; background-repeat:no-repeat; cursor:pointer; width:35px; height:35px}
+.btnPDF,.tx-metafeedit input.btnPDF:focus{background-color:white;text-indent: -1000em;overflow:hidden;background-image:url(/typo3conf/ext/meta_feedit/res/iconePdf.gif)!important;font-size:1px;color:#fff;border:0; background-repeat:no-repeat; cursor:pointer; width:35px; height:35px}
+.btnXLS{background-color:white;text-indent: -1000em;overflow:hidden;background-image:url(/typo3conf/ext/meta_feedit/res/iconeExcel.gif)!important;font-size:1px;color:#fff;border:0; background-repeat:no-repeat; cursor:pointer; width:35px; height:35px}
+.btnCSV{background-color:white;text-indent: -1000em;overflow:hidden;background-image:url(/typo3conf/ext/meta_feedit/res/iconeCsv.gif)!important;font-size:1px;color:#fff;border:0; background-repeat:no-repeat; cursor:pointer; width:35px; height:35px}
 .meta_cl{float:left;}
 .meta_cli{clear:right;line-height:18px}
 .meta_clr{position:absolute;z-index:500;border:1px solid;background:#ffffff;}

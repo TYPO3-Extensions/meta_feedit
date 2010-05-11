@@ -2245,7 +2245,16 @@
 				</config>
 			</TCEforms>		 
 		</editlangmarks>
-
+		<editrecordactions>
+			<TCEforms>
+				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editrecordactions</label>
+				<config>
+	    				<type>text</type>
+	    				<size>500</size>
+	    				<allowed>fe_users</allowed>    
+				</config>
+			</TCEforms>		 
+		</editrecordactions>
 
 	    </el>
 	  </ROOT>

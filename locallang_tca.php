@@ -250,7 +250,8 @@ $LOCAL_LANG = Array (
 		'meta_feedit.pi_flexform.editAdminValidMailTemplate' => 'Admin valid mail template',
 		'meta_feedit.pi_flexform.editUserNotifyOkMailTemplate' => 'User notify OK mail template',
 		'meta_feedit.pi_flexform.editUserNotifyKoMailTemplate' => 'User notify KO mail template',
-		
+		'meta_feedit.pi_flexform.editrecordactions' => 'Edit record actions',
+
 		//edit Templates -- end
 		
 		//delete Templates -- begin
@@ -286,7 +287,7 @@ $LOCAL_LANG = Array (
 		'meta_feedit.pi_flexform.pdf' => 'PDF',
 		'meta_feedit.pi_flexform.csv' => 'Csv',
 		'meta_feedit.pi_flexform.excel' => 'Excel',
-		'meta_feedit.pi_flexform.euros' => 'Affichage des valeurs numériques en Euros',
+		'meta_feedit.pi_flexform.euros' => 'Affichage des valeurs numï¿½riques en Euros',
 	),
 	'dk' => Array (
 	),
@@ -299,30 +300,30 @@ $LOCAL_LANG = Array (
 	'fr' => Array (
    	'meta_feedit.pi_flexform.gridAjax' => 'Grille',
 		'meta_feedit.pi_flexform.gridEdit' => 'Edition',
-		'meta_feedit.pi_flexform.sheet_general' => 'Configuration générale',
-		'meta_feedit.pi_flexform.sheet_create' => 'Création',
+		'meta_feedit.pi_flexform.sheet_general' => 'Configuration gï¿½nï¿½rale',
+		'meta_feedit.pi_flexform.sheet_create' => 'Crï¿½ation',
 		'meta_feedit.pi_flexform.sheet_edit' => 'Edition',
-		'meta_feedit.pi_flexform.defaultCmd' => 'Commande par défaut',
-		'meta_feedit.pi_flexform.defaultCmd.create' => 'Création',
+		'meta_feedit.pi_flexform.defaultCmd' => 'Commande par dï¿½faut',
+		'meta_feedit.pi_flexform.defaultCmd.create' => 'Crï¿½ation',
 		'meta_feedit.pi_flexform.defaultCmd.edit' => 'Edition',
 		'meta_feedit.pi_flexform.page' => 'Page with records', //
-		'meta_feedit.pi_flexform.disableDelete' => 'Désactiver la suppression',
-		'meta_feedit.pi_flexform.disableEditDelete' => 'Désactiver la suppression à l\'édition', //?
-		'meta_feedit.pi_flexform.requireLogin' => 'Requière que l\'utilisateur soit connecté',
-		'meta_feedit.pi_flexform.no_header' => 'Ne pas afficher les entêtes automatiquement générées',
+		'meta_feedit.pi_flexform.disableDelete' => 'Dï¿½sactiver la suppression',
+		'meta_feedit.pi_flexform.disableEditDelete' => 'Dï¿½sactiver la suppression ï¿½ l\'ï¿½dition', //?
+		'meta_feedit.pi_flexform.requireLogin' => 'Requiï¿½re que l\'utilisateur soit connectï¿½',
+		'meta_feedit.pi_flexform.no_header' => 'Ne pas afficher les entï¿½tes automatiquement gï¿½nï¿½rï¿½es',
 		'meta_feedit.pi_flexform.show_help_icons' => 'Afficher les icones d\'aide (si disponible)',
-		'meta_feedit.pi_flexform.allowedGroups' => 'Groupes autorisés à éditer', //
-		'meta_feedit.pi_flexform.clearCacheOfPages' => 'Pages dont le cache doit être vidé après mise à jour', //
-		'meta_feedit.pi_flexform.disableCreate' => 'Désactiver la création',
+		'meta_feedit.pi_flexform.allowedGroups' => 'Groupes autorisï¿½s ï¿½ ï¿½diter', //
+		'meta_feedit.pi_flexform.clearCacheOfPages' => 'Pages dont le cache doit ï¿½tre vidï¿½ aprï¿½s mise ï¿½ jour', //
+		'meta_feedit.pi_flexform.disableCreate' => 'Dï¿½sactiver la crï¿½ation',
 		'meta_feedit.pi_flexform.noSpecialLoginForm' => 'Show no special form when logged in',
-		'meta_feedit.pi_flexform.fetable' => 'Table à éditer',
+		'meta_feedit.pi_flexform.fetable' => 'Table ï¿½ ï¿½diter',
 		'meta_feedit.pi_flexform.backPagePid' => 'Back Page Pid',
-		'meta_feedit.pi_flexform.fecreatefields' => 'Champs remontés en mode création',
+		'meta_feedit.pi_flexform.fecreatefields' => 'Champs remontï¿½s en mode crï¿½ation',
 		'meta_feedit.pi_flexform.fe_userOwnSelf' => 'Fe User Own Self',
-		'meta_feedit.pi_flexform.feshowfields' => 'Champs affichés',
-		'meta_feedit.pi_flexform.fepreviewfields' =>'Champs affcihés en mode prévisualisation',
-		'meta_feedit.pi_flexform.feeditfields' => 'Champs remontés en mode édition',
-		'meta_feedit.pi_flexform.feeditshowfields' => 'Champs affichés en mode édition',
+		'meta_feedit.pi_flexform.feshowfields' => 'Champs affichï¿½s',
+		'meta_feedit.pi_flexform.fepreviewfields' =>'Champs affcihï¿½s en mode prï¿½visualisation',
+		'meta_feedit.pi_flexform.feeditfields' => 'Champs remontï¿½s en mode ï¿½dition',
+		'meta_feedit.pi_flexform.feeditshowfields' => 'Champs affichï¿½s en mode ï¿½dition',
 		'meta_feedit.pi_flexform.feeditreadonlyfields' => 'Read only fields  in edit mode',
 		'meta_feedit.pi_flexform.ferequiredfields' => 'Champs requis',
 		'meta_feedit.pi_flexform.feapprovefields' => 'Approve Fields',
@@ -334,7 +335,7 @@ $LOCAL_LANG = Array (
 		'meta_feedit.pi_flexform.fecruser_field' => 'User Id Field',
 		'meta_feedit.pi_flexform.fecrgroup_field' => 'Group Id Field',
 		'meta_feedit.pi_flexform.disableEdit' => 'Disable edit',
-		'meta_feedit.pi_flexform.hideCreate' => 'Cacher la création',
+		'meta_feedit.pi_flexform.hideCreate' => 'Cacher la crï¿½ation',
 		'meta_feedit.pi_flexform.hideEdit' => 'Cacher l\'edition',
 		'meta_feedit.pi_flexform.hideDelete' => 'Cacher la suppression',
 		'meta_feedit.pi_flexform.editUnique' => 'Edit unique',
@@ -343,18 +344,18 @@ $LOCAL_LANG = Array (
 		'meta_feedit.pi_flexform.pdf' => 'PDF',
 		'meta_feedit.pi_flexform.csv' => 'Csv',
 		'meta_feedit.pi_flexform.excel' => 'Excel',
-		'meta_feedit.pi_flexform.euros' => 'Affichage des valeurs numériques en Euros',
+		'meta_feedit.pi_flexform.euros' => 'Affichage des valeurs numï¿½riques en Euros',
 		'meta_feedit.pi_flexform.menuLockPid' => 'List lock pid',
 		'meta_feedit.pi_flexform.pagination' => 'Pagination',
 		'meta_feedit.pi_flexform.pageSize' => 'Page size',
 		'meta_feedit.pi_flexform.maxPages' => 'Max Pages',
-		'meta_feedit.pi_flexform.tabLabels' => 'Libéllés d\'onglets (1 par ligne)',
+		'meta_feedit.pi_flexform.tabLabels' => 'Libï¿½llï¿½s d\'onglets (1 par ligne)',
 		'meta_feedit.pi_flexform.fieldSort' => 'Tri par champ',
 		'meta_feedit.pi_flexform.debug' => 'Mode Debug',
 		'meta_feedit.pi_flexform.listnobackbutton' => 'Pas de bouton retour',
 		'meta_feedit.pi_flexform.listAltRows'=> 'Nb couleurs de lignes alternantes',
-		'meta_feedit.pi_flexform.listsqlcalcfields' => 'Champs calculés SQL',
-		'meta_feedit.pi_flexform.listphpcalcfields' => 'Champs calculés PHP',
+		'meta_feedit.pi_flexform.listsqlcalcfields' => 'Champs calculï¿½s SQL',
+		'meta_feedit.pi_flexform.listphpcalcfields' => 'Champs calculï¿½s PHP',
 		'meta_feedit.pi_flexform.no_cache' => 'Pas de cache',
 		'meta_feedit.pi_flexform.searchBox' => 'Show Full Text Searchbox',
 		'meta_feedit.pi_flexform.emailFrom' => 'Mail Expediteur',
@@ -400,6 +401,8 @@ $LOCAL_LANG = Array (
 		'meta_feedit.pi_flexform.setFixedOkDeleteTemplate' => 'Ok Delete Templates',
 		'meta_feedit.pi_flexform.setFixedFailedTemplate' => 'Gabarit d\'echec',
 		//setFixed Templates -- end
+		'meta_feedit.pi_flexform.editrecordactions' => 'Actions en mode Ã©dition',
+	
 		'meta_feedit.pi_flexform.editStatusScreen' => 'Afficher ecran de confirmation',
 		'meta_feedit.pi_flexform.createStatusScreen' => 'Afficher ecran de confirmation',
 		'meta_feedit.pi_flexform.deleteStatusScreen' => 'Afficher ecran de confirmation',
@@ -415,7 +418,7 @@ $LOCAL_LANG = Array (
 		'meta_feedit.pi_flexform.template_file' => 'Use this template file instead of default',
 		'meta_feedit.pi_flexform.generateTemplate' => 'Generate Template in Browser',
 		'meta_feedit.pi_flexform.TemplatePDF' => 'Gabarit PDF pour les listes',
-		'meta_feedit.pi_flexform.TemplatePDFDet' => 'Gabarit PDF pour la vue en détail',
+		'meta_feedit.pi_flexform.TemplatePDFDet' => 'Gabarit PDF pour la vue en dï¿½tail',
 		'meta_feedit.pi_flexform.TemplatePDFTab' => 'Gabarit PDF pour les tabaleaux',
 
 	),
