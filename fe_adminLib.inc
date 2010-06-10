@@ -391,7 +391,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// Setting incoming data. Non-stripped
 		
 		$this->feData=$fe=$conf['inputvar.']['fedata'];	
-		if ($conf['inputvar.']['cmd']!='list' || $conf['general.']['listMode']==2) $this->dataArr=$fe[$this->theTable];	// Incoming data.
+		//if ($conf['inputvar.']['cmd']!='list' || $conf['general.']['listMode']==2) $this->dataArr=$fe[$this->theTable];	// Incoming data.
+		//We take incoming data if we are not in list mode or submit is save...TODO must be improved
+		if ($conf['inputvar.']['cmd']!='list' || $conf['general.']['listMode']==2 || ($conf['inputvar.']['submit']=='save' && $this->conf['editUnique'])) $this->dataArr=$fe[$this->theTable];	// Incoming data.
 		$this->conf['dataArr']=&$this->dataArr;
 		// Setting blog incoming data. Non-stripped
 		$this->markerArray['###EVAL_BLOG_ERROR###'] = '';
