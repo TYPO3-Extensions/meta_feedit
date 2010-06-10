@@ -737,7 +737,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		//$mfconf['inputvar.']['backURL']=htmlspecialchars_decode((string)$this->metafeeditlib->getMetaFeeditVar($mfconf,'backURL',true));
 		// backUrl is now also indexed on pageType (for ajax).
 		$mfconf['inputvar.']['backURL']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'backURL',true);
-		foreach($mfconf['inputvar.']['backURL'] as $type=>$val) {
+		if (is_array($mfconf['inputvar.']['backURL'])) foreach($mfconf['inputvar.']['backURL'] as $type=>$val) {
 			$mfconf['inputvar.']['backURL'][$type]=htmlspecialchars_decode((string)$val);
 		}		
 		$mfconf['inputvar.']['preview']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'preview');
