@@ -1470,7 +1470,7 @@ class tx_metafeedit_lib {
     				$invert = 0;    
     				if ($value === 'on' || $value === 1 || $value === '1') {
     					$dataArr[$_fN] = 1;
-    					$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png">':$this->getLLFromLabel('check_yes',$conf);
+    					$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png" alt="checked"/>':$this->getLLFromLabel('check_yes',$conf);
     				} else {
     					// No value, what should we do ?
     
@@ -1846,7 +1846,7 @@ class tx_metafeedit_lib {
     					$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'':$this->getLLFromLabel('check_no',$conf);
 						if ($invert) {
 							$dataArr[$F] = 1;
-							$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png">':$this->getLLFromLabel('check_yes',$conf);
+							$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png" alt="checked"/>':$this->getLLFromLabel('check_yes',$conf);
 						}
 					} else {
 						if ($invert) {
@@ -3303,7 +3303,7 @@ class tx_metafeedit_lib {
 		return $tmp;
 	}
 	function pageSelector($nbpages,$conf)	{
-		$ret='<form method="POST"><input type="submit" value="'.$this->getLL('gotopage',$conf).'"><select name="'.$this->prefixId.'[pointer]">';
+		$ret='<form method="post" action="#"><input type="submit" value="'.$this->getLL('gotopage',$conf).'"/><select name="'.$this->prefixId.'[pointer]">';
 		for($i=1;$i<=$nbpages;$i++) {
 			//echo $i;
 			//print_r($conf['piVars']);
