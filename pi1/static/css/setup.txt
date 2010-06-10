@@ -96,7 +96,7 @@ fieldset {margin-bottom:5px;}
 */
 /* links */
 .tx-metafeedit-link a {position:relative;padding-left:16px;display:block;border:1px solid #AAA;background: url(/typo3conf/ext/meta_feedit/res/fondbtn.png) repeat-x;height:20px;line-height:20px;color:#666; font-size:10px;font-weight:bold;text-decoration:none;text-align:left}
-.tx-metafeedit-link a:hover,button:hover {color:#900;background: url(/typo3conf/ext/meta_feedit/res/fondbtnhv.png) repeat-x;}
+.tx-metafeedit-link a:hover,.tx-metafeedit button:hover {color:#900;background: url(/typo3conf/ext/meta_feedit/res/fondbtnhv.png) repeat-x;}
 .tx-metafeedit-link a:visited{color:#666; font-size:10px; font-family:Verdana,Arial,Helvetica,sans-serif; font-weight:bold; text-decoration:none}
 .tx-metafeedit-link a i{position:absolute;left:0px;display:block;width:16px;height:16px}
 
