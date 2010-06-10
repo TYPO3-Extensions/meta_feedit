@@ -542,6 +542,10 @@ class tx_metafeedit extends  tslib_pibase {
 					//$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
 					$template .= array_search('getmediaplayertemplate',$callerMethods) || array_search('getMediaPlayerTemplate',$callerMethods)?  $this->caller->getMediaPlayerTemplate($conf): $this->getMediaPlayerTemplate($conf);
 				case 'list':
+					// We load edit templates in list mode if editUnique is set.
+					if ($conf['editUnique']) {
+						$template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
+					}
 					$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
 					if ($conf['piVars']['exporttype']) {
 						if ($conf['list.']['csv']) $template .= array_search('getCSVTemplate',$callerMethods) || array_search('getCSVTemplate',$callerMethods)?  $this->caller->getCSVTemplate($conf) : $this->getCSVTemplate($conf);
