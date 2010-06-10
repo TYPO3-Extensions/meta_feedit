@@ -105,8 +105,8 @@ class tx_metafeedit_widgets {
 		if ($onData) $callBacks.=','.$onData;
 		$onMouseOver=' onmouseover="combolistmouseover(\''.$prefix.$id.'\');"';
 		$onMouseOut =' onmouseout="combolistmouseout(\''.$prefix.$id.'\');"';
-		$onFocus=' onmouseover="combolistmouseover(\''.$prefix.$id.'\');"';
-		$onBlur =' onmouseout="combolistmouseout(\''.$prefix.$id.'\');"';
+		$onFocus=' onfocus="combolistmouseover(\''.$prefix.$id.'\');"';
+		$onBlur =' onblur="combolistmouseout(\''.$prefix.$id.'\');"';
 		$whereClause= $this->metafeeditLib->getWhereClause(0,$table,$FieldN,array(),$conf);
 		$foreignTable = $conf['TCAN'][$table]['columns'][$FieldN]["config"]["allowed"]?$conf['TCAN'][$table]['columns'][$FieldN]["config"]["allowed"]:$conf['TCAN'][$table]['columns'][$FieldN]["config"]["foreign_table"];
 		$fields=$conf['list.']['advancedSearchAjaxSelector.'][$FN.'.']['dataFields']?$conf['list.']['advancedSearchAjaxSelector.'][$FN.'.']['dataFields']:''; //TODO
@@ -139,7 +139,7 @@ class tx_metafeedit_widgets {
 		            <table>
 		                <tr>
 		                    <td>
-		                        <input type=\"input\" id=\"cl_i$prefix$id\" name=\"".$this->prefixId."[data]\" value=\"$tval\" onkeyup=$onKeyUp $onFocus $onBlur $onMouseOver $onMouseOut class=\"wdgt_input\" autocomplete=\"off\"/>
+		                        <input type=\"text\" id=\"cl_i$prefix$id\" name=\"".$this->prefixId."[data]\" value=\"$tval\" onkeyup=$onKeyUp $onFocus $onBlur $onMouseOver $onMouseOut class=\"wdgt_input\" autocomplete=\"off\"/>
 		                        <input type=\"hidden\" id=\"cl_k$prefix$id\" name=\"".$this->prefixId."[kdata]\"value=\"$val\"/>
 		                        <input type=\"hidden\" id=\"cl_n$prefix$id\" name=\"$name\" value=\"$val\"/>
 		                    </td>
@@ -150,7 +150,7 @@ class tx_metafeedit_widgets {
 		                 </tr>
 		              </table>
 		        </div>
-		        <div id=\"cl_res_$prefix$id\" name=\"cl_res_$prefix$id\" class=\"meta_clr\" $onMouseOver $onMouseOut style=\"display:none;\"></div>
+		        <div id=\"cl_res_$prefix$id\" class=\"meta_clr\" $onMouseOver $onMouseOut style=\"display:none;\"></div>
 		    </div>"; 
 		return $html;
 	}
@@ -216,7 +216,7 @@ class tx_metafeedit_widgets {
 				}
 				$json['rs']=array();
 				
-				//contenu des données
+				//contenu des donnï¿½es
 				if (is_array($comboData['rows'])) {
 					$c=count($comboData['rows']);
 					foreach($comboData['rows'] as $i) {
