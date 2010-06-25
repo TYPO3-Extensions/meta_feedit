@@ -420,7 +420,7 @@ class tx_metafeedit_export {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
 			echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
-    	die( 'Caught exception: '.  $e->getMessage());
+			die( 'Caught exception: '.  $e->getMessage());
 		};
 		$count = 0;
 		$taille = 0;

@@ -54,7 +54,7 @@ class tx_metafeedit_ajaxlib {
 		//texte de vidage de recherche
 		$empty='<effacer>';
 		$search=$search==$empty?'':$search;
-		// On concatène les champs, et on en verifie l'unicité !
+		// On concatï¿½ne les champs, et on en verifie l'unicitï¿½ !
 		$sqlfields=$fields?$numField.','.$fields:"$numField,$labelField";
 		$datafields=$fields?$fields:$labelField;
 		$fieldsArray=array_unique(t3lib_div::trimexplode(',',$sqlfields));
@@ -64,7 +64,7 @@ class tx_metafeedit_ajaxlib {
 		$where.=$table=='fe_users'?"disable":"hidden";
 		$where.='=0';
 
-		//calculer comment ajouter un userfunc ici afin de récupérer les entité juridique partenaire par exemple.
+		//calculer comment ajouter un userfunc ici afin de rï¿½cupï¿½rer les entitï¿½ juridique partenaire par exemple.
 		//if ($fe_adminLib->conf['userFunc_ajaxAfterWhere']) t3lib_div::callUserFunction($fe_adminLib->conf['userFunc_afterSave'], $var_temp_array, $fe_adminLib);
 
 		if ($search) { // Modif by CMD - gestion multichamp de recherche
@@ -90,7 +90,7 @@ class tx_metafeedit_ajaxlib {
 			}
 		}
 		$start = ($page)?($page-1)*$pagesize:0;
-		/*repère*/
+		/*repï¿½re*/
 		$distinct=$sameField?'DISTINCT ':'';
 		if ($where)		{
 			//on fait sauter l'ordre by existant pour mettre en place le nouveau
@@ -145,7 +145,7 @@ class tx_metafeedit_ajaxlib {
 		$html='';
 		if ($table=='undefined') return array();
 		
-		// On concatène les champs, et on en verifie l'unicité !
+		// On concatï¿½ne les champs, et on en verifie l'unicitï¿½ !
 		$sqlfields=$fields?$numField.','.$fields:"$numField,$labelField";
 		$datafields=$fields?$fields:$labelField;
 		//$fields="$numField,$labelField";
@@ -209,7 +209,7 @@ class tx_metafeedit_ajaxlib {
 	}
 	
   /**
-    * on choisit une donnée
+    * user select's data
     *
     * @param	array		...
     * @param	object		...

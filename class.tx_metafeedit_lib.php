@@ -359,11 +359,9 @@ class tx_metafeedit_lib {
 				if ($conf['TCAN'][$conf['table']]['ctrl']['sortby'] && !$conf['disableEdit']) {
 				//$backurl=$this->makeFormTypoLink($conf,"&rU[$pluginId]=".$conf['recUid']);
 				}*/
-				//$backLink=$this->makeFormTypoLink($conf,'&BACK['.$conf[pluginId].']=1&cmd['.$conf[pluginId].']=list',false);
 				$referer[$conf['pageType']]=$this->makeFormTypoLink($conf,'&BACK['.$conf[pluginId].']=1&cmd['.$conf[pluginId].']=list',false);
 				break;
 			case 'list':
-
 			default :
 				if ($conf['backPagePid'] ) {
 					$tlconf['parameter']=$conf['backPagePid'];
@@ -376,22 +374,7 @@ class tx_metafeedit_lib {
 					}
 				}
 		}
-		return $referer;	
-					/*default :
-				if ($conf['backPagePid'] ) {
-					$tlconf['parameter']=$conf['backPagePid'];
-					if ($conf['no_cache'] || $conf['cacheMode']==0) $tlconf['no_cache']=1;
-					$tlconf['useCacheHash']=1;
-					$backLink=$this->cObj->typoLink_URL($tlconf);
-				} else {
-					if ($referer) {
-						$backLink=$referer;
-					} else {
-						$backLink="javascript:history.back();";
-					}
-				}
-		}
-		return $backLink;*/
+		return $referer;
 	}
 
 	/**
@@ -421,7 +404,7 @@ class tx_metafeedit_lib {
 		}
 
 		Function enleveaccents($chaine) {
-			$string = strtr($chaine, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
+			$string = strtr($chaine, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
 			return $string;
 		}
 
@@ -905,7 +888,7 @@ class tx_metafeedit_lib {
 			//ugly hack by CMD
 			if ($f!="sorting") {
 				if (!is_array($conf['TCAN'][$ftable]['columns'][$f]) && !$conf['list.']['sqlcalcfields.'][$fN] ) {
-					if ($conf['debug']) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : field  $f / $fN given does not exist in table $ftable ... InTable : $table!";
+					if ($conf['debug']) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : field  $f / $fN given does not exist in table $ftable ... InTable : $table! orig table :".$conf['table'];
 				}
 				if ($conf['TCAN'][$ftable]['columns'][$f]['config']['foreign_table']) $ftable = $conf['TCAN'][$ftable]['columns'][$f]['config']['foreign_table'];		   
 			}
@@ -1695,10 +1678,13 @@ class tx_metafeedit_lib {
 				$dataArr['EVAL_'.$_fN] = $values;
 				break;
 			case 'inline':
-			    // field is of select type
+			    // field is of inline type
 				$values = '';
 				$uids = array();
 				if ($conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']) {
+				
+					$FF=$conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_field'];
+				
 					// reference to elements from another table
 					$FT = $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'];
 					$label = $conf['label.'][$FT]?$conf['label.'][$FT]:
@@ -1827,7 +1813,7 @@ class tx_metafeedit_lib {
 				}
 			}
 			
-			//TODO this should not be necessary ...
+			// FIXME this should not be necessary ...
 			$dataArr['EVAL_'.$fN]=$dataArr['EVAL_'.$_fN];
 			
 		}
@@ -1846,7 +1832,7 @@ class tx_metafeedit_lib {
     					$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'':$this->getLLFromLabel('check_no',$conf);
 						if ($invert) {
 							$dataArr[$F] = 1;
-							$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png" alt="checked"/>':$this->getLLFromLabel('check_yes',$conf);
+							$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png" alt="checked" />':$this->getLLFromLabel('check_yes',$conf);
 						}
 					} else {
 						if ($invert) {
@@ -2109,7 +2095,6 @@ class tx_metafeedit_lib {
 		// we check if typoscript override is present
 		if ($typoscript[$varname.'.']) $res=$typoscript[$varname.'.'];
 		 
-
 		// we check variable against pluginId
 		if (is_array($res)) {
 			if (array_key_exists($pluginId,$res)) {
@@ -4115,10 +4100,10 @@ class tx_metafeedit_lib {
 		case 'date':
 			//$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$conf['table']]['columns'][$fN]['config']['eval']);			
 			//if ((in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) && substr($fe_adminLib->conf[$fe_adminLib->conf['cmdKey']."."]["defaultValues."][$fN], 0, 3) == 'now'/* && empty($dataArr[$fN])*/) {
-			$val=strftime($conf['dateformat']?$conf['dateformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'),$val);
+			$val=strftime($conf['dateformat']?$conf['dateformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%d-%Y' :'%d-%m-%Y'),$val);
 			break;
 		case 'datetime':
-			$val=strftime($conf['datetimeformat']?$conf['datetimeformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'),$val);
+			$val=strftime($conf['datetimeformat']?$conf['datetimeformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%d-%Y' :'%H:%M %d-%m-%Y'),$val);
 			break;
 		case 'time':
 			$val=strftime(($conf['timeformat']?$conf['timeformat']:'%H:%M'),$val);
@@ -4141,10 +4126,10 @@ class tx_metafeedit_lib {
 		case 'date':
 			//$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$conf['table']]['columns'][$fN]['config']['eval']);			
 			//if ((in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) && substr($fe_adminLib->conf[$fe_adminLib->conf['cmdKey']."."]["defaultValues."][$fN], 0, 3) == 'now'/* && empty($dataArr[$fN])*/) {
-			$val=strftime($conf['dateformat']?$conf['dateformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'),$val);
+			$val=strftime($conf['dateformat']?$conf['dateformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%d-%Y' :'%d-%m-%Y'),$val);
 			break;
 		case 'datetime':
-			$val=strftime($conf['datetimeformat']?$conf['datetimeformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'),$val);
+			$val=strftime($conf['datetimeformat']?$conf['datetimeformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%d-%Y' :'%H:%M %d-%m-%Y'),$val);
 			break;
 		case 'time':
 			$val=strftime(($conf['timeformat']?$conf['timeformat']:'%H:%M'),$val);

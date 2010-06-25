@@ -371,8 +371,7 @@ class tx_metafeedit_flexfill {
 		global $TCA;
 		$ta=array();
 		t3lib_div::loadTCA($table);
-
-			// we add uid field.
+		// we add uid field.
 		if (!is_array($GLOBALS['TCA'][$table]['columns']['uid'])) {
 			$GLOBALS['TCA'][$table]['columns']['uid']=array(
 				'exclude'=>1,
@@ -384,7 +383,6 @@ class tx_metafeedit_flexfill {
 				),
 			);	
 		}
-				
         if (is_array($TCA[$table]['columns']))  {
             foreach($TCA[$table]['columns'] as $key => $config)     {
 				if ($config['config']['foreign_table']) {

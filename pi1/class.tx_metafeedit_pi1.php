@@ -57,7 +57,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 	
 	function main($content='',$conf=''){
 		$DEBUG='';
-
 		//global $PAGES_TYPES;		
 		if (!defined ('PATH_typo3conf')) die ('Could not access this script directly!');	  
 		// Meta feedit library init
@@ -97,7 +96,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 					$this->lconf[$key]=$this->pi_getFFvalue($piFlexForm,$key,$sheet);
 
 		// $lconf array : configuration from BE flexform
-
 		$lconf=$this->lconf;
 		$mfconf=$conf['metafeedit.'];
 		$mfconf['pageType']=$GLOBALS['TSFE']->type;
@@ -208,9 +206,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 
 
 		// Must handle date formats according to editmode and pluginId
-		$mfconf['dateformat']=$conf['dateformat']?$conf['dateformat']:($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?"%m-%e-%Y":"%e-%m-%Y");
+		$mfconf['dateformat']=$conf['dateformat']?$conf['dateformat']:($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?"%m-%d-%Y":"%d-%m-%Y");
 		$mfconf['timeformat']=$conf['timeformat']?$conf['timeformat']:"%H:%M";
-		$mfconf['datetimeformat']=$conf['datetimeformat']?$conf['datetimeformat']:($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?"%H:%M %m-%e-%Y":"%H:%M %e-%m-%Y");
+		$mfconf['datetimeformat']=$conf['datetimeformat']?$conf['datetimeformat']:($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?"%H:%M %m-%d-%Y":"%H:%M %d-%m-%Y");
 		
 		$mfconf['fUField']=$conf[$lconf['pluginId'].'.']['fUField']?$conf[$lconf['pluginId'].'.']['fUField']:$conf['default.']['fUField'];
 		$mfconf['fU']=$conf[$lconf['pluginId'].'.']['fU']?$conf[$lconf['pluginId'].'.']['fU']:$conf['default.']['fU'];
@@ -701,6 +699,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		
 		// We prepare session variables
 		//CBY07
+		// is this necessary ?
 		$GLOBALS["TSFE"]->fe_user->fetchSessionData();
 		$metafeeditvars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
 		//$mfconf['debug.']['debugString'].="<br>metafeeditvars before <br>".t3lib_div::view_array($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]);
@@ -739,7 +738,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['inputvar.']['backURL']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'backURL',true);
 		if (is_array($mfconf['inputvar.']['backURL'])) foreach($mfconf['inputvar.']['backURL'] as $type=>$val) {
 			$mfconf['inputvar.']['backURL'][$type]=htmlspecialchars_decode((string)$val);
-		}		
+		}
 		$mfconf['inputvar.']['preview']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'preview');
 		$mfconf['inputvar.']['blog']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'blog');
 		$mfconf['inputvar.']['doNotSave']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'doNotSave');
@@ -853,7 +852,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 				//$mfconf['inputvar.']['backURL']=$backURL;
 			}
 		}
-		
 		
 		// we set session variables we want to remember 
 		//=============================================

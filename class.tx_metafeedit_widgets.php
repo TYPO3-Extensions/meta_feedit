@@ -216,7 +216,7 @@ class tx_metafeedit_widgets {
 				}
 				$json['rs']=array();
 				
-				//contenu des donn�es
+				//Data content
 				if (is_array($comboData['rows'])) {
 					$c=count($comboData['rows']);
 					foreach($comboData['rows'] as $i) {

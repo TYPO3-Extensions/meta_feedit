@@ -506,7 +506,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				if ($this->conf['evalFunc'])	{
 					$this->dataArr = $this->userProcess('evalFunc',$this->dataArr);
 				}
-
 				// if not preview and no failures, then set data...
 				if (!$this->failure && $this->conf['inputvar.']['BACK']!=1  && (!$this->preview || $this->conf['blogData']) && !$conf['inputvar.']['doNotSave'])	{	// doNotSave is a global var (eg a 'Cancel' submit button) that prevents the data from being processed
 					$this->save($this->conf);
@@ -880,9 +879,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	Function removeaccents($string)   
         {    
 	     $string= strtr($string,    
-	   "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   
+	   "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ",   
 	   "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");    
-	   //"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   
+	   //"ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ",   
 	      
 	    return $string;    
     	}   
@@ -2860,7 +2859,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 		$content = $this->cObj->substituteMarkerArray($content, $markerArray);
 		if ($conf['debug.']['markerArray']) echo t3lib_div::view_array($markerArray);
-		
 		// Blog Comment Display :
 		// We handle empty fields here ..
  		if ($this->conf['preview.']['noemptyfields'] && $this->preview) {

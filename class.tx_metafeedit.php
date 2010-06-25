@@ -426,7 +426,7 @@ class tx_metafeedit extends  tslib_pibase {
     		        if($conf['TCAN'][$table]['columns'][$fN]['config']['internal_type']=='file') {
     		                // CBY I removed _file handling here...
     		                //We could add folder specialisation here ...
-							// modif by CMD - permet d'eviter les message d'errreur suite ï¿½ la gestion des champs supplï¿½mentaire sql ou php calculï¿½
+							// modif by CMD - permet d'eviter les message d'errreur suite à la gestion des champs supplémentaire sql ou php calculé
     		                $conf['TCAN'][$table]['columns'][$fN.'_file'] = $conf['TCAN'][$table]['columns'][$fN]; // the new upload field should have the same upload folder as the original field
     		                $conf['TCAN'][$table]['columns'][$fN.'_file']['imagealiasfield']=$fN;
     		                //$conf['TCAN'][$table]['columns'][$fN.'_file']['config']['uploadfolder'] = $conf['TCAN'][$table]['columns'][$fN]['config']['uploadfolder']; // the new upload field should have the same upload folder as the original field
@@ -854,8 +854,6 @@ class tx_metafeedit extends  tslib_pibase {
     return $result.$res;
   }
 
-
-
   /**
  * Gets the PREVIEW fieldcode for field ($fN) of the form. This depends on the fields type.
  *
@@ -872,7 +870,9 @@ class tx_metafeedit extends  tslib_pibase {
     $res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab);
     $Lib=$this->metafeeditlib->getLLFromLabel($res['fieldLabel'],$conf);
     //$fN=str_replace('.','_',$res['fieldAlias']); // is the str_replace necessary ?
-    $fN=$res['fieldAlias']; // is the str_replace necessary ?
+	
+	$fN=$res['fieldAlias'];
+	$_fN=str_replace('.','_',$fN);
     $table=$res['relTable'];
     $fNiD=$res['fNiD'];
     $EVAL_ERROR_FIELD= $withHTML?'<div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'###</div>':'';
@@ -1050,9 +1050,20 @@ class tx_metafeedit extends  tslib_pibase {
         if (($cmd=="edit" || $cmd=='create') && in_array($fN, $readOnlyArr)) {
         	return $this->getPreviewFieldCode($cmd,$conf,$fN,1);
         }
+		
+		$table=$conf['table'];
+		$tab=array();
+		$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab);
+		$Lib=$this->metafeeditlib->getLLFromLabel($res['fieldLabel'],$conf);
+		
+		$ftable=$res['relTable'];
+		$fNiD=$res['fNiD'];
+    
 
-        // blog hack !! to be changed
-        $masterTable=$cmd=='blog'?'tx_metafeedit_comments':$conf['table'];
+        $masterTable=$cmd=='blog'?'tx_metafeedit_comments':$table;
+
+		$type = $conf['TCAN'][$ftable]["columns"][$fNiD]['config']["type"];
+		
         $gridMark=$bgrid?'###GRIDCELL###':'';
         $gridMarkAlt=$bgrid?'###GRIDCELLALT###':'';
         $fieldName = 'FE['.$masterTable.']'.$gridMark.'['.$fN.']';
@@ -1069,7 +1080,8 @@ class tx_metafeedit extends  tslib_pibase {
         $EVAL_ERROR_FIELD=$bgrid?'':'<div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'###</div>';
         $onchange = 'onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';
         $defaultParams_feVal = ' name="'.$fieldName.'_feVal" '.$onchange.$class;
-        $type = $conf['TCAN'][$masterTable]["columns"][$fN]['config']["type"];
+		
+        //$type = $conf['TCAN'][$masterTable]["columns"][$fN]['config']["type"];
         switch((string)$type) {
             case "input":
 				//$onchange = 'onblur="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"'.' onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';
@@ -1922,9 +1934,9 @@ class tx_metafeedit extends  tslib_pibase {
     */
     
     function getGroupByFields(&$conf,$textmode=false,$exporttype='') {
+		$GROUPBYFIELDS='';
         if ($conf['list.']['groupByFieldBreaks']) {
-        	$hasActions=($exporttype?0:$this->metafeeditlib->hasListActions($conf));
-
+			$hasActions=($exporttype?0:$this->metafeeditlib->hasListActions($conf));
         	$GROUPBYFIELDS='<!-- ###GROUPBYFIELDS### begin -->';
         	$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
         	$nbf=1;
@@ -1962,6 +1974,7 @@ class tx_metafeedit extends  tslib_pibase {
 	 */
 	 
   function getGroupByFooterFields(&$conf,$textmode=false,$exporttype='') {
+	$GROUPBYFIELDS='';
   	if ($conf['list.']['groupByFieldBreaks']) {
   		$GROUPBYFIELDS='';
 		$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
@@ -3943,7 +3956,7 @@ function getFormJs($formName,&$conf) {
 						$val=is_array($conf['piVars']['advancedSearch'][$conf['pluginId']])?$conf['piVars']['advancedSearch'][$conf['pluginId']][$FN]:'';
 						$sel1=($val==1)?' selected="selected" ':'';
 						$sel2=($this->metafeeditlib->is_extent($val) && $val==0)?' selected="selected" ':'';
-						$ret.=$div.'<select name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"'.$value.$this->caller->pi_classParam('form-asfield').'/>';
+						$ret.=$div.'<select name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"'.$this->caller->pi_classParam('form-asfield').'>';
 						$SO='<option value=""></option><option value="1"'.$sel1.'>'.$this->metafeeditlib->getLL("check_yes",$conf).'</option><option value="0"'.$sel2.'>'.$this->metafeeditlib->getLL("check_no",$conf).'</option>';
 						$ret.=$SO.'</select></div>';
 						break;
