@@ -61,7 +61,7 @@ $TCA["tx_metafeedit_actions"] = Array (
 		
 		"title" => Array (		
 			"exclude" => 1,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_actions.title",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_actions.title",		
 			"config" => Array (
 				"type" => "input",	
 				"size" => "30",	
@@ -72,7 +72,7 @@ $TCA["tx_metafeedit_actions"] = Array (
 		
 		"image" => Array (		
 			"exclude" => 1,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_actions.image",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_actions.image",		
 			"config" => Array (
 				"type" => "group",
 				"internal_type" => "file",
@@ -87,7 +87,7 @@ $TCA["tx_metafeedit_actions"] = Array (
 		),
 		"url" => Array (		
 			"exclude" => 1,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_actions.url",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_actions.url",		
 			"config" => Array (
 				"type" => "input",		
 				"size" => "15",
@@ -109,7 +109,7 @@ $TCA["tx_metafeedit_actions"] = Array (
 		
 		"page" => Array (		
 			"exclude" => 1,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_actions.page",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_actions.page",		
 			"config" => Array (
 				"type" => "group",
 				"internal_type" => "db",
@@ -122,7 +122,7 @@ $TCA["tx_metafeedit_actions"] = Array (
 
 		"tooltip" => Array (		
 			"exclude" => 1,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_actions.tooltip",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_actions.tooltip",		
 			"config" => Array (
 				"type" => "text",
 				"cols" => "30",	
@@ -131,7 +131,7 @@ $TCA["tx_metafeedit_actions"] = Array (
 		),
 		"category" => Array (		
 			"exclude" => 1,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_actions.category",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_actions.category",		
 			"config" => Array (
 				"type" => "input",	
 				"size" => "30",	
@@ -179,7 +179,7 @@ $TCA["tx_metafeedit_comments"] = Array (
 		'crdate' => Array (
 			'exclude' => 1,	
 			'l10n_mode' => 'mergeIfNotBlank',
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_comments.crdate",	
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_comments.crdate",	
 			'config' => Array (
 				'type' => 'input',
 				'size' => '10',
@@ -192,7 +192,7 @@ $TCA["tx_metafeedit_comments"] = Array (
 		'tstamp' => Array (
 			'exclude' => 1,	
 			'l10n_mode' => 'mergeIfNotBlank',
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_comments.tstamp",	
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_comments.tstamp",	
 			'config' => Array (
 				'type' => 'input',
 				'size' => '10',
@@ -204,7 +204,7 @@ $TCA["tx_metafeedit_comments"] = Array (
 		),
 		"firstname" => Array (		
 			"exclude" => 0,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_comments.firstname",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_comments.firstname",		
 			"config" => Array (
 				"type" => "input",	
 				"size" => "30",	
@@ -214,7 +214,7 @@ $TCA["tx_metafeedit_comments"] = Array (
 		),
 		"surname" => Array (		
 			"exclude" => 0,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_comments.surname",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_comments.surname",		
 			"config" => Array (
 				"type" => "input",	
 				"size" => "48",	
@@ -224,7 +224,7 @@ $TCA["tx_metafeedit_comments"] = Array (
 		),
 		"email" => Array (		
 			"exclude" => 0,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_comments.email",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_comments.email",		
 			"config" => Array (
 				"type" => "input",	
 				"size" => "30",	
@@ -234,7 +234,7 @@ $TCA["tx_metafeedit_comments"] = Array (
 		),
 		"homepage" => Array (		
 			"exclude" => 0,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_comments.homepage",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_comments.homepage",		
 			"config" => Array (
 				"type" => "input",	
 				"size" => "30",	
@@ -254,7 +254,7 @@ $TCA["tx_metafeedit_comments"] = Array (
 		),
 		"place" => Array (		
 			"exclude" => 0,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_comments.place",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_comments.place",		
 			"config" => Array (
 				"type" => "input",	
 				"size" => "30",	
@@ -264,7 +264,7 @@ $TCA["tx_metafeedit_comments"] = Array (
 		),
 		"entry" => Array (		
 			"exclude" => 0,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_comments.entry",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_comments.entry",		
 			"config" => Array (
 				"type" => "text",
 				"cols" => "30",
@@ -274,7 +274,7 @@ $TCA["tx_metafeedit_comments"] = Array (
 		),
 		"entrycomment" => Array (		
 			"exclude" => 0,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_comments.entrycomment",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_comments.entrycomment",		
 			"config" => Array (
 				"type" => "text",
 				"cols" => "30",
@@ -284,7 +284,7 @@ $TCA["tx_metafeedit_comments"] = Array (
 		),
 		"remote_addr" => Array (		
 			"exclude" => 0,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_comments.remote_addr",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_comments.remote_addr",		
 			"config" => Array (
 				"type" => "input",	
 				"size" => "30",	
@@ -294,7 +294,7 @@ $TCA["tx_metafeedit_comments"] = Array (
 		),
 		"linked_row" => Array (		
 			"exclude" => 0,		
-			"label" => "LLL:EXT:meta_feedit/locallang_db.php:tx_metafeedit_comments.linked_row",		
+			"label" => "LLL:EXT:meta_feedit/locallang_db.xml:tx_metafeedit_comments.linked_row",		
 			"config" => Array (
 				"type" => "group",
 				"internal_type" => "db",

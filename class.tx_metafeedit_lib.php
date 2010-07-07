@@ -404,7 +404,7 @@ class tx_metafeedit_lib {
 		}
 
 		Function enleveaccents($chaine) {
-			$string = strtr($chaine, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
+			$string = strtr($chaine, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
 			return $string;
 		}
 
@@ -1263,7 +1263,7 @@ class tx_metafeedit_lib {
 		if($GLOBALS['TCA'][$FTable]['ctrl']['sortby'] && !is_array($GLOBALS['TCA'][$FTable]['columns'][$GLOBALS['TCA'][$FTable]['ctrl']['sortby']])) {
 			$GLOBALS['TCA'][$FTable]['columns'][$GLOBALS['TCA'][$FTable]['ctrl']['sortby']]=array(
 				'exclude'=>1,
-				'label'=>'LLL:EXT:meta_feedit/locallang.php:sorting',
+				'label'=>'LLL:EXT:meta_feedit/locallang.xml:sorting',
 				'config'=>array(
 					'type'=>'input',
 					'size'=>10,
@@ -1276,7 +1276,7 @@ class tx_metafeedit_lib {
 		if (!is_array($GLOBALS['TCA'][$FTable]['columns'][$uidField])) {
 			$GLOBALS['TCA'][$FTable]['columns'][$uidField]=array(
 				'exclude'=>1,
-				'label'=>'LLL:EXT:meta_feedit/locallang.php:uid',
+				'label'=>'LLL:EXT:meta_feedit/locallang.xml:uid',
 				'config'=>array(
 					'type'=>'input',
 					'size'=>10,
@@ -1288,7 +1288,7 @@ class tx_metafeedit_lib {
 		if (!is_array($GLOBALS['TCA'][$FTable]['columns']['pid'])) {
 			$GLOBALS['TCA'][$FTable]['columns']['pid']=array(
 				'exclude'=>1,
-				'label'=>'LLL:EXT:meta_feedit/locallang.php:pid',
+				'label'=>'LLL:EXT:meta_feedit/locallang.xml:pid',
 				'config'=>array(
 					'type'=>'select',
 					'size'=>1,
@@ -4485,12 +4485,9 @@ class tx_metafeedit_lib {
 				if ($this->is_extent($valeur)) {
 					//if (!$conf['TCAN'][$curTable['table']]['columns'][$key]['config']['MM']) {
 					if (!$conf['TCAN'][$curTable['relTable']]['columns'][$key]['config']['MM']) {
-						//modif by CMD
-						//Not the good way to correct the problem.
-						//temporaly solved
-						//wait for CBY to check this
-						//$sql['advancedWhere'].=" AND ".$curTable['relTableAlias'].".".$curTable['fNiD']." LIKE '$valeur' ";
-						$champ=($curTable['tableAlias'])?$curTable['relTableAlias'].".".$curTable['fNiD']:$curTable['relTableAlias']."_".$curTable['fieldAlias'];
+						//$champ=($curTable['tableAlias'])?$curTable['relTableAlias'].".".$curTable['fNiD']:$curTable['relTableAlias']."_".$curTable['fieldAlias'];
+						// Bug correction :
+						$champ=($curTable['tableAlias'])?$curTable['tableAlias'].".".$curTable['fNiD']:$curTable['relTableAlias']."_".$curTable['fieldAlias'];
 						$fids=t3lib_div::trimexplode(',',$valeur);
 						foreach($fids as $fid) {
 							$sql['advancedWhere'].=" AND FIND_IN_SET('$fid',$champ)"; 

@@ -45,7 +45,7 @@ class tx_metafeedit_pi1_wizicon {
 		return $wizardItems;
 	}
 	function includeLocalLang()	{
-		include(t3lib_extMgm::extPath("meta_feedit")."locallang.php");
+		include(t3lib_extMgm::extPath("meta_feedit")."locallang.xml");
 		return $LOCAL_LANG;
 	}
 }

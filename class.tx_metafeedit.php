@@ -333,7 +333,7 @@ class tx_metafeedit extends  tslib_pibase {
   	  if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf before Language size ']=strlen(serialize($conf))." Bytes"; 
   	    
     	// loads default locallang
-    	$this->LOCAL_LANG = $GLOBALS['TSFE']->readLLfile(t3lib_extMgm::extPath($this->extKey).'locallang.php');
+    	$this->LOCAL_LANG = $GLOBALS['TSFE']->readLLfile(t3lib_extMgm::extPath($this->extKey).'locallang.xml');
     	// loads callers locallang
     	$this->LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($this->LOCAL_LANG,$this->caller->LOCAL_LANG);
         
@@ -426,7 +426,7 @@ class tx_metafeedit extends  tslib_pibase {
     		        if($conf['TCAN'][$table]['columns'][$fN]['config']['internal_type']=='file') {
     		                // CBY I removed _file handling here...
     		                //We could add folder specialisation here ...
-							// modif by CMD - permet d'eviter les message d'errreur suite à la gestion des champs supplémentaire sql ou php calculé
+							// modif by CMD - permet d'eviter les message d'errreur suite ï¿½ la gestion des champs supplï¿½mentaire sql ou php calculï¿½
     		                $conf['TCAN'][$table]['columns'][$fN.'_file'] = $conf['TCAN'][$table]['columns'][$fN]; // the new upload field should have the same upload folder as the original field
     		                $conf['TCAN'][$table]['columns'][$fN.'_file']['imagealiasfield']=$fN;
     		                //$conf['TCAN'][$table]['columns'][$fN.'_file']['config']['uploadfolder'] = $conf['TCAN'][$table]['columns'][$fN]['config']['uploadfolder']; // the new upload field should have the same upload folder as the original field

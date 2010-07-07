@@ -1,0 +1,756 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+    <meta type="array">
+        <description>locallang_tca</description>
+        <type>database</type>
+        <csh_table></csh_table>
+        <labelContext type="array">
+        </labelContext>
+    </meta>
+    <data type="array">
+        <languageKey index="default" type="array">
+            <label index="meta_feedit.pi_flexform.feeditevalvalues">Edit eval Values</label>
+            <label index="meta_feedit.pi_flexform.fecreateevalvalues">Create eval Values</label>
+            <label index="meta_feedit.pi_flexform.editPreview">Edit Preview</label>
+            <label index="meta_feedit.pi_flexform.gridAjax">Grid</label>
+            <label index="meta_feedit.pi_flexform.gridEdit">Edit</label>
+            <label index="meta_feedit.pi_flexform.sheet_general">General Settings</label>
+            <label index="meta_feedit.pi_flexform.sheet_cal">Calendar mode Settings</label>
+            <label index="meta_feedit.pi_flexform.sheet_quickstart">Quick Start</label>
+            <label index="meta_feedit.pi_flexform.sheet_create">Create</label>
+            <label index="meta_feedit.pi_flexform.sheet_edit">Edit</label>
+            <label index="meta_feedit.pi_flexform.idField">Id Field</label>
+            <label index="meta_feedit.pi_flexform.advancedSearch">Advanced Search</label>
+            <label index="meta_feedit.pi_flexform.advancedSearchFields">Advanced Search Fields (default list fields)</label>
+            <label index="meta_feedit.pi_flexform.advancedSearchAjaxSelector">Advanced Search Ajax Selectors</label>
+            <label index="meta_feedit.pi_flexform.calendarSearch">Calendar Search</label>
+            <label index="meta_feedit.pi_flexform.alphabeticalSearch">Alphabetical Search</label>
+            <label index="meta_feedit.pi_flexform.categorySearch">Category Search</label>
+            <label index="meta_feedit.pi_flexform.foreignTables">Foreign Tables</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd">Default command</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd.auto">Auto</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd.create">Create</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd.edit">Edit</label>
+            <label index="meta_feedit.pi_flexform.page">Page with records</label>
+            <label index="meta_feedit.pi_flexform.xhtml">XHTML compliancy</label>
+            <label index="meta_feedit.pi_flexform.referenceMetafeedit">Reference MetaFeEdit (DB select)</label>
+            <label index="meta_feedit.pi_flexform.referenceMetafeeditText">Reference MetaFeEdit (uid in clear text)</label>
+            <label index="meta_feedit.pi_flexform.referenceKeyExclude">Reference Excluded Fields</label>
+            <label index="meta_feedit.pi_flexform.referenceExcludeDbRelation">Reference Excluded DB Relation</label>
+            <label index="meta_feedit.pi_flexform.sheet_debug">Debug</label>
+            <label index="meta_feedit.pi_flexform.debugSQL">Generated SQL</label>
+            <label index="meta_feedit.pi_flexform.debugKrumo">Use Krumo to debug (requires extension Krumo)</label>
+            <label index="meta_feedit.pi_flexform.debugMarkerArray">Marker Array</label>
+            <label index="meta_feedit.pi_flexform.debugLangArray">Lang Array</label>
+            <label index="meta_feedit.pi_flexform.debugConf">Conf</label>
+            <label index="meta_feedit.pi_flexform.debugPerformances">Performances</label>
+            <label index="meta_feedit.pi_flexform.debugTemplate">Template</label>
+            <label index="meta_feedit.pi_flexform.debugVars">POST,GET, PiVars... Variables</label>
+            <label index="meta_feedit.pi_flexform.debugTSFE">TSFE</label>
+            <label index="meta_feedit.pi_flexform.disableDelete">Disable delete</label>
+            <label index="meta_feedit.pi_flexform.disableEditDelete">Disable Edit delete</label>
+            <label index="meta_feedit.pi_flexform.defaultListMode">Default List Mode</label>
+            <label index="meta_feedit.pi_flexform.defaultListMode.list">List</label>
+            <label index="meta_feedit.pi_flexform.defaultListMode.calendar">Calendar</label>
+            <label index="meta_feedit.pi_flexform.defaultListMode.datagrid">Data Grid</label>
+            <label index="meta_feedit.pi_flexform.requireLogin">Require that a user is logged in</label>
+            <label index="meta_feedit.pi_flexform.no_header">Dont display automatic generated headers</label>
+            <label index="meta_feedit.pi_flexform.show_help_icons">Show help icons (if availiable)</label>
+            <label index="meta_feedit.pi_flexform.allowedGroups">Allowed editor groups</label>
+            <label index="meta_feedit.pi_flexform.clearCacheOfPages">Pages to clear cache of</label>
+            <label index="meta_feedit.pi_flexform.disableCreate">Disable create</label>
+            <label index="meta_feedit.pi_flexform.hideCreate">Hide create</label>
+            <label index="meta_feedit.pi_flexform.hideEdit">Hide edit</label>
+            <label index="meta_feedit.pi_flexform.hideDelete">Hide delete</label>
+            <label index="meta_feedit.pi_flexform.noSpecialLoginForm">Show no special form when logged in</label>
+            <label index="meta_feedit.pi_flexform.fetable">Table to edit</label>
+            <label index="meta_feedit.pi_flexform.previewnoemptyfields">No Empty Fields</label>
+            <label index="meta_feedit.pi_flexform.backPagePid">Back Page Pid</label>
+            <label index="meta_feedit.pi_flexform.editBackPagePid">Back Page Pid</label>
+            <label index="meta_feedit.pi_flexform.fecreatefields">Creation Fields</label>
+            <label index="meta_feedit.pi_flexform.feparsevalues">parseValues</label>
+            <label index="meta_feedit.pi_flexform.groupBySize">Group By Size (for vertical display)</label>
+            <label index="meta_feedit.pi_flexform.displaydirection">Display direction</label>
+            <label index="meta_feedit.pi_flexform.editlangmarks">Language marks (lg.label=val)</label>
+            <label index="meta_feedit.pi_flexform.createlangmarks">Language marks (lg.label=val)</label>
+            <label index="meta_feedit.pi_flexform.rUJoinField">rU Join Field</label>
+            <label index="meta_feedit.pi_flexform.noUserCheck">No User Check</label>
+            <label index="meta_feedit.pi_flexform.editUserCheck">User Check</label>
+            <label index="meta_feedit.pi_flexform.deleteUserCheck">User Check</label>
+            <label index="meta_feedit.pi_flexform.deleteGroupCheck">Group Check</label>
+            <label index="meta_feedit.pi_flexform.editGroupCheck">Group Check</label>
+            <label index="meta_feedit.pi_flexform.fe_userOwnSelf">Fe User Own Self</label>
+            <label index="meta_feedit.pi_flexform.feshowfields">Creation show Fields</label>
+            <label index="meta_feedit.pi_flexform.fepreviewfields">Preview Fields</label>
+            <label index="meta_feedit.pi_flexform.listMediaPlayer">Show Media Player</label>
+            <label index="meta_feedit.pi_flexform.feeditfields">Edit Fields</label>
+            <label index="meta_feedit.pi_flexform.noActions">No actions</label>
+            <label index="meta_feedit.pi_flexform.noHeaders">No headers</label>
+            <label index="meta_feedit.pi_flexform.cacheMode">Cache Mode</label>
+            <label index="meta_feedit.pi_flexform.sheet_ajax">AjaxParameters</label>
+            <label index="meta_feedit.pi_flexform.ajaxOn">Activate WEB 2.0 Functionnality</label>
+            <label index="meta_feedit.pi_flexform.jqueryCompatMode">Activate jQuery compatibility mode (for use with mootools, prototype, ...)</label>
+            <label index="meta_feedit.pi_flexform.cacheMode.noCache">No Cache</label>
+            <label index="meta_feedit.pi_flexform.cacheMode.mixtCache">Mixt Cache</label>
+            <label index="meta_feedit.pi_flexform.cacheMode.fullCache">Full Cache</label>
+            <label index="meta_feedit.pi_flexform.calMode">Calendar Mode</label>
+            <label index="meta_feedit.pi_flexform.calMode.default">default</label>
+            <label index="meta_feedit.pi_flexform.calMode.dayView">Day view</label>
+            <label index="meta_feedit.pi_flexform.calMode.weekView">WeekView</label>
+            <label index="meta_feedit.pi_flexform.calMode.monthView">Month view</label>
+            <label index="meta_feedit.pi_flexform.calMode.yearView">Year view</label>
+            <label index="meta_feedit.pi_flexform.calMode.upcomingEventsView">Upcoming events view</label>
+            <label index="meta_feedit.pi_flexform.calMode.fullCache">WeekView</label>
+            <label index="meta_feedit.pi_flexform.T3SourceTreePid">Source Tree to copy</label>
+            <label index="meta_feedit.pi_flexform.T3TreeTargetPid">Tree copy target</label>
+            <label index="meta_feedit.pi_flexform.T3FEGroupsPID">Page to store fe groups</label>
+            <label index="meta_feedit.pi_flexform.T3AdminUid">BE user to use to copy</label>
+            <label index="meta_feedit.pi_flexform.T3TableHomePidField">Field storing Copied Tree Pid</label>
+            <label index="meta_feedit.pi_flexform.enableColumns">Use Enable Columns</label>
+            <label index="meta_feedit.pi_flexform.feeditshowfields">Edit show Fields</label>
+            <label index="meta_feedit.pi_flexform.fecreatereadonlyfields">Read Only Fields</label>
+            <label index="meta_feedit.pi_flexform.feeditreadonlyfields">Read only fields  in edit mode</label>
+            <label index="meta_feedit.pi_flexform.ferequiredfields">Required Fields</label>
+            <label index="meta_feedit.pi_flexform.feapprovefields">Approve Fields</label>
+            <label index="meta_feedit.pi_flexform.feeditoverridevalues">Edit Override Values</label>
+            <label index="meta_feedit.pi_flexform.fecreateoverridevalues">Create Override Values</label>
+            <label index="meta_feedit.pi_flexform.fedeletefields">Delete Fields</label>
+            <label index="meta_feedit.pi_flexform.fecruser_field">User Id Field</label>
+            <label index="meta_feedit.pi_flexform.fecrgroup_field">Group Id Field</label>
+            <label index="meta_feedit.pi_flexform.disableEdit">Disable edit</label>
+            <label index="meta_feedit.pi_flexform.editUnique">Edit unique</label>
+            <label index="meta_feedit.pi_flexform.menuLockPid">List lock pid</label>
+            <label index="meta_feedit.pi_flexform.pagination">Pagination</label>
+            <label index="meta_feedit.pi_flexform.pageSize">Page size</label>
+            <label index="meta_feedit.pi_flexform.nbCols">Nb cols table presentation</label>
+            <label index="meta_feedit.pi_flexform.maxPages">Max Pages</label>
+            <label index="meta_feedit.pi_flexform.tabLabels">Tab Labels (1 per line)</label>
+            <label index="meta_feedit.pi_flexform.fieldSort">Field sorting</label>
+            <label index="meta_feedit.pi_flexform.listnobackbutton">No Back Button</label>
+            <label index="meta_feedit.pi_flexform.listAltRows">Nb alternate row colors</label>
+            <label index="meta_feedit.pi_flexform.listsqlcalcfields">SQL Calculated Fields</label>
+            <label index="meta_feedit.pi_flexform.listphpcalcfields">PHP Calculated Fields</label>
+            <label index="meta_feedit.pi_flexform.listnodetail">No group by detail</label>
+            <label index="meta_feedit.pi_flexform.listHavingString">Having string</label>
+            <label index="meta_feedit.pi_flexform.debug">Debug mode</label>
+            <label index="meta_feedit.pi_flexform.no_cache">No cache</label>
+            <label index="meta_feedit.pi_flexform.searchBox">Show Full Text Searchbox</label>
+            <label index="meta_feedit.pi_flexform.emailFrom">From Mail</label>
+            <label index="meta_feedit.pi_flexform.sendAdminMail">Send Admin Mail</label>
+            <label index="meta_feedit.pi_flexform.sendFEUserMail">Send FE User Mail</label>
+            <label index="meta_feedit.pi_flexform.sendDataMail">Send Data Mail</label>
+            <label index="meta_feedit.pi_flexform.dataMailField">Mail Field for dataMail</label>
+            <label index="meta_feedit.pi_flexform.sendAdminInfoMail">Send Admin Info Mail</label>
+            <label index="meta_feedit.pi_flexform.sendFEUserInfoMail">Send FE User Info Mail</label>
+            <label index="meta_feedit.pi_flexform.sendDataInfoMail">Send Data Info Mail</label>
+            <label index="meta_feedit.pi_flexform.emailFromName">From Mail Name</label>
+            <label index="meta_feedit.pi_flexform.emailAdmin">Admin Mail</label>
+            <label index="meta_feedit.pi_flexform.divide2tabs">Tab mode</label>
+            <label index="meta_feedit.pi_flexform.createPid">Create Page PID</label>
+            <label index="meta_feedit.pi_flexform.groupByFields">Group By Fields</label>
+            <label index="meta_feedit.pi_flexform.groupByFieldBreaks">Group By Field Breaks</label>
+            <label index="meta_feedit.pi_flexform.orderByFields">Order By Fields (default)</label>
+            <label index="meta_feedit.pi_flexform.sumFields">Sum Fields</label>
+            <label index="meta_feedit.pi_flexform.editPid">Edit Page PID</label>
+            <label index="meta_feedit.pi_flexform.checkT3Rights">Check TYPO3 rights to edit/save/delete/...</label>
+            <label index="meta_feedit.pi_flexform.sheet_blogs">Blogs</label>
+            <label index="meta_feedit.pi_flexform.allowComments">Allow Commenting</label>
+            <label index="meta_feedit.pi_flexform.showComments">Show Comments</label>
+            <label index="meta_feedit.pi_flexform.blogtemplate">Blog Template</label>
+            <label index="meta_feedit.pi_flexform.blogCaptcha">Captcha spam protect</label>
+            <label index="meta_feedit.pi_flexform.rowField">Row Field</label>
+            <label index="meta_feedit.pi_flexform.colField">Col Field</label>
+            <label index="meta_feedit.pi_flexform.beginDateField">Begin Date Field</label>
+            <label index="meta_feedit.pi_flexform.endDateField">End Date Field</label>
+            <label index="meta_feedit.pi_flexform.sheet_generalTemplate">General templates</label>
+            <label index="meta_feedit.pi_flexform.generalAuthTemplate">Authorisation template</label>
+            <label index="meta_feedit.pi_flexform.generalNoPermTemplate">No permission template</label>
+            <label index="meta_feedit.pi_flexform.sheet_TemplatePDF">Template PDF</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDF">Template PDF for lists</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDFDet">Template PDF for detail</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDFTab">Template PDF for tables</label>
+            <label index="meta_feedit.pi_flexform.sheet_TemplateCSV">Template CSV</label>
+            <label index="meta_feedit.pi_flexform.TemplateCSV">Template CSV</label>
+            <label index="meta_feedit.pi_flexform.sheet_TemplateExcel">Template Excel</label>
+            <label index="meta_feedit.pi_flexform.TemplateExcel">Template Excel</label>
+            <label index="meta_feedit.pi_flexform.sheet_list">List</label>
+            <label index="meta_feedit.pi_flexform.sheet_listTemplate">List templates</label>
+            <label index="meta_feedit.pi_flexform.listItemTemplate">Item template</label>
+            <label index="meta_feedit.pi_flexform.listNoItemTemplate">No item template</label>
+            <label index="meta_feedit.pi_flexform.listrecordactions">List record actions</label>
+            <label index="meta_feedit.pi_flexform.listJumpPageOnGroupBy">Jump page on group by</label>
+            <label index="meta_feedit.pi_flexform.listWhereString">Where String</label>
+            <label index="meta_feedit.pi_flexform.listOrderByString">Post Order By String</label>
+            <label index="meta_feedit.pi_flexform.listPreOrderByString">Pre Order By String</label>
+            <label index="meta_feedit.pi_flexform.listExtraFields">Extra Fields (not shown)</label>
+            <label index="meta_feedit.pi_flexform.listlangmarks">Language marks (lg.label=val)</label>
+            <label index="meta_feedit.pi_flexform.listPid">List Page PID</label>
+            <label index="meta_feedit.pi_flexform.listFields">List show fields</label>
+            <label index="meta_feedit.pi_flexform.listHiddenFields">List extra fields</label>
+            <label index="meta_feedit.pi_flexform.sheet_grid">Data grid</label>
+            <label index="meta_feedit.pi_flexform.sheet_gridTemplate">Grid template</label>
+            <label index="meta_feedit.pi_flexform.gridItemTemplate">Item template</label>
+            <label index="meta_feedit.pi_flexform.gridNoItemTemplate">No item template</label>
+            <label index="meta_feedit.pi_flexform.gridrecordactions">Grid record actions</label>
+            <label index="meta_feedit.pi_flexform.gridWhereString">Where String</label>
+            <label index="meta_feedit.pi_flexform.gridOrderByString">Order By String</label>
+            <label index="meta_feedit.pi_flexform.gridExtraFields">Extra Fields (not shown)</label>
+            <label index="meta_feedit.pi_flexform.gridLangmarks">Language marks (lg.label=val)</label>
+            <label index="meta_feedit.pi_flexform.gridPid">Grid Page Pid</label>
+            <label index="meta_feedit.pi_flexform.gridFields">Grid show fields</label>
+            <label index="meta_feedit.pi_flexform.gridHiddenFields">Grid extra fields</label>
+            <label index="meta_feedit.pi_flexform.gridExportPDF">Export PDF</label>
+            <label index="meta_feedit.pi_flexform.gridExportCSV">Export CSV</label>
+            <label index="meta_feedit.pi_flexform.gridExportExcel">Export Excel</label>
+            <label index="meta_feedit.pi_flexform.gridEuros">Display numeric values in euros</label>
+            <label index="meta_feedit.pi_flexform.gridMediaPlayer">Show Media Player</label>
+            <label index="meta_feedit.pi_flexform.gridOrderByFields">Order By Fields</label>
+            <label index="meta_feedit.pi_flexform.gridCols">Nb Cols</label>
+            <label index="meta_feedit.pi_flexform.gridRows">Nb Rows</label>
+            <label index="meta_feedit.pi_flexform.gridRowField">Row Field</label>
+            <label index="meta_feedit.pi_flexform.gridColField">Col Field</label>
+            <label index="meta_feedit.pi_flexform.gridBackPagePid">Back Page Pid</label>
+            <label index="meta_feedit.pi_flexform.gridrUJoinField">rU Join Field</label>
+            <label index="meta_feedit.pi_flexform.sheet_createTemplate">Create templates</label>
+            <label index="meta_feedit.pi_flexform.createScreenTemplate">Create screen template</label>
+            <label index="meta_feedit.pi_flexform.createPreviewTemplate">Preview template</label>
+            <label index="meta_feedit.pi_flexform.createScreenLoginTemplate">Create screen login template</label>
+            <label index="meta_feedit.pi_flexform.createPreviewLoginTemplate">Preview login template</label>
+            <label index="meta_feedit.pi_flexform.createSavedTemplate">Saved template</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyMailTemplate">User notify mail template</label>
+            <label index="meta_feedit.pi_flexform.createDataNotifyMailTemplate">Data notify mail template</label>
+            <label index="meta_feedit.pi_flexform.createAdminNotifyMailTemplate">Admin notify mail template</label>
+            <label index="meta_feedit.pi_flexform.createAdminValidMailTemplate">Admin valid mail template</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyOkMailTemplate">User notify OK mail template</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyKoMailTemplate">User notify KO mail template</label>
+            <label index="meta_feedit.pi_flexform.sheet_editTemplate">Edit templates</label>
+            <label index="meta_feedit.pi_flexform.editScreenTemplate">Edit screen template</label>
+            <label index="meta_feedit.pi_flexform.editPreviewTemplate">Preview template</label>
+            <label index="meta_feedit.pi_flexform.editSavedTemplate">Saved template</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyMailTemplate">User notify mail template</label>
+            <label index="meta_feedit.pi_flexform.editAdminNotifyMailTemplate">Admin notify mail template</label>
+            <label index="meta_feedit.pi_flexform.editDataNotifyMailTemplate">Data notify mail template</label>
+            <label index="meta_feedit.pi_flexform.editAdminValidMailTemplate">Admin valid mail template</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyOkMailTemplate">User notify OK mail template</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyKoMailTemplate">User notify KO mail template</label>
+            <label index="meta_feedit.pi_flexform.editrecordactions">Edit record actions</label>
+            <label index="meta_feedit.pi_flexform.sheet_deleteTemplate">Delete templates</label>
+            <label index="meta_feedit.pi_flexform.deletePreviewTemplate">Preview template</label>
+            <label index="meta_feedit.pi_flexform.deleteSavedTemplate">Saved template</label>
+            <label index="meta_feedit.pi_flexform.deleteUserNotifyMailTemplate">User notify mail template</label>
+            <label index="meta_feedit.pi_flexform.deleteAdminNotifyMailTemplate">Admin notify mail template</label>
+            <label index="meta_feedit.pi_flexform.setFixedTemplate">Set fixed templates</label>
+            <label index="meta_feedit.pi_flexform.setFixedOkTemplate">Ok template</label>
+            <label index="meta_feedit.pi_flexform.setFixedOkDeleteTemplate">Ok delete template</label>
+            <label index="meta_feedit.pi_flexform.setFixedFailedTemplate">Failed template</label>
+            <label index="meta_feedit.pi_flexform.editStatusScreen">Show status screen</label>
+            <label index="meta_feedit.pi_flexform.createStatusScreen">Show status screen</label>
+            <label index="meta_feedit.pi_flexform.deleteStatusScreen">Show status screen</label>
+            <label index="meta_feedit.pi_flexform.createPreview">Create Preview</label>
+            <label index="meta_feedit.pi_flexform.fetemplate">Template</label>
+            <label index="meta_feedit.pi_flexform.sheet_preview">Preview</label>
+            <label index="meta_feedit.pi_flexform.sheet_setfixed">Mails</label>
+            <label index="meta_feedit.pi_flexform.sheet_delete">Delete</label>
+            <label index="meta_feedit.pi_flexform.useTemplate">use template</label>
+            <label index="meta_feedit.pi_flexform.extTables">Extension TCAs to take into account</label>
+            <label index="meta_feedit.pi_flexform.fe_userEditSelf">Can user edit his info</label>
+            <label index="meta_feedit.pi_flexform.template_file">Use this template file instead of default</label>
+            <label index="meta_feedit.pi_flexform.generateTemplate">Generate Template in Browser</label>
+            <label index="meta_feedit.pi_flexform.pluginId">Plugin Id</label>
+            <label index="meta_feedit.pi_flexform.pdf">PDF</label>
+            <label index="meta_feedit.pi_flexform.csv">Csv</label>
+            <label index="meta_feedit.pi_flexform.excel">Excel</label>
+            <label index="meta_feedit.pi_flexform.euros">Display numeric valuees in Euros</label>
+        </languageKey>
+        <languageKey index="fr" type="array">
+            <label index="meta_feedit.pi_flexform.gridAjax">Grille</label>
+            <label index="meta_feedit.pi_flexform.gridEdit">Edition</label>
+            <label index="meta_feedit.pi_flexform.sheet_general">Configuration générale</label>
+            <label index="meta_feedit.pi_flexform.sheet_create">Création</label>
+            <label index="meta_feedit.pi_flexform.sheet_edit">Edition</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd">Commande par défaut</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd.create">Création</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd.edit">Edition</label>
+            <label index="meta_feedit.pi_flexform.page">Page with records</label>
+            <label index="meta_feedit.pi_flexform.disableDelete">Désactiver la suppression</label>
+            <label index="meta_feedit.pi_flexform.disableEditDelete">Désactiver la suppression à l'édition</label>
+            <label index="meta_feedit.pi_flexform.requireLogin">Requière que l'utilisateur soit connecté</label>
+            <label index="meta_feedit.pi_flexform.no_header">Ne pas afficher les entêtes automatiquement générées</label>
+            <label index="meta_feedit.pi_flexform.show_help_icons">Afficher les icones d'aide (si disponible)</label>
+            <label index="meta_feedit.pi_flexform.allowedGroups">Groupes autorisés à éditer</label>
+            <label index="meta_feedit.pi_flexform.clearCacheOfPages">Pages dont le cache doit être vidé après mise à jour</label>
+            <label index="meta_feedit.pi_flexform.disableCreate">Désactiver la création</label>
+            <label index="meta_feedit.pi_flexform.noSpecialLoginForm">Show no special form when logged in</label>
+            <label index="meta_feedit.pi_flexform.fetable">Table à éditer</label>
+            <label index="meta_feedit.pi_flexform.backPagePid">Back Page Pid</label>
+            <label index="meta_feedit.pi_flexform.fecreatefields">Champs remontés en mode création</label>
+            <label index="meta_feedit.pi_flexform.fe_userOwnSelf">Fe User Own Self</label>
+            <label index="meta_feedit.pi_flexform.feshowfields">Champs affichés</label>
+            <label index="meta_feedit.pi_flexform.fepreviewfields">Champs affcihés en mode prévisualisation</label>
+            <label index="meta_feedit.pi_flexform.feeditfields">Champs remontés en mode édition</label>
+            <label index="meta_feedit.pi_flexform.feeditshowfields">Champs affichés en mode édition</label>
+            <label index="meta_feedit.pi_flexform.feeditreadonlyfields">Read only fields  in edit mode</label>
+            <label index="meta_feedit.pi_flexform.ferequiredfields">Champs requis</label>
+            <label index="meta_feedit.pi_flexform.feapprovefields">Approve Fields</label>
+            <label index="meta_feedit.pi_flexform.feeditoverridevalues">Edit Override Values</label>
+            <label index="meta_feedit.pi_flexform.fecreateoverridevalues">Create Override Values</label>
+            <label index="meta_feedit.pi_flexform.feeditevalvalues">Edit eval Values</label>
+            <label index="meta_feedit.pi_flexform.fecreateevalvalues">Create eval Values</label>
+            <label index="meta_feedit.pi_flexform.fedeletefields">Delete Fields</label>
+            <label index="meta_feedit.pi_flexform.fecruser_field">User Id Field</label>
+            <label index="meta_feedit.pi_flexform.fecrgroup_field">Group Id Field</label>
+            <label index="meta_feedit.pi_flexform.disableEdit">Disable edit</label>
+            <label index="meta_feedit.pi_flexform.hideCreate">Cacher la création</label>
+            <label index="meta_feedit.pi_flexform.hideEdit">Cacher l'edition</label>
+            <label index="meta_feedit.pi_flexform.hideDelete">Cacher la suppression</label>
+            <label index="meta_feedit.pi_flexform.editUnique">Edit unique</label>
+            <label index="meta_feedit.pi_flexform.editDontUseHidden">Don't use hidden check on MM edit</label>
+            <label index="meta_feedit.pi_flexform.editDontUseDate">Don't use date check on MM edit</label>
+            <label index="meta_feedit.pi_flexform.pdf">PDF</label>
+            <label index="meta_feedit.pi_flexform.csv">Csv</label>
+            <label index="meta_feedit.pi_flexform.excel">Excel</label>
+            <label index="meta_feedit.pi_flexform.euros">Affichage des valeurs numériques en Euros</label>
+            <label index="meta_feedit.pi_flexform.menuLockPid">List lock pid</label>
+            <label index="meta_feedit.pi_flexform.pagination">Pagination</label>
+            <label index="meta_feedit.pi_flexform.pageSize">Page size</label>
+            <label index="meta_feedit.pi_flexform.maxPages">Max Pages</label>
+            <label index="meta_feedit.pi_flexform.tabLabels">Libéllés d'onglets (1 par ligne)</label>
+            <label index="meta_feedit.pi_flexform.fieldSort">Tri par champ</label>
+            <label index="meta_feedit.pi_flexform.debug">Mode Debug</label>
+            <label index="meta_feedit.pi_flexform.listnobackbutton">Pas de bouton retour</label>
+            <label index="meta_feedit.pi_flexform.listAltRows">Nb couleurs de lignes alternantes</label>
+            <label index="meta_feedit.pi_flexform.listsqlcalcfields">Champs calculés SQL</label>
+            <label index="meta_feedit.pi_flexform.listphpcalcfields">Champs calculés PHP</label>
+            <label index="meta_feedit.pi_flexform.no_cache">Pas de cache</label>
+            <label index="meta_feedit.pi_flexform.searchBox">Show Full Text Searchbox</label>
+            <label index="meta_feedit.pi_flexform.emailFrom">Mail Expediteur</label>
+            <label index="meta_feedit.pi_flexform.sendAdminMail">Send Admin Mail</label>
+            <label index="meta_feedit.pi_flexform.dataMailField">Mail Field for dataMail</label>
+            <label index="meta_feedit.pi_flexform.emailFromName">From Mail Name</label>
+            <label index="meta_feedit.pi_flexform.emailAdmin">Admin Mail</label>
+            <label index="meta_feedit.pi_flexform.divide2tabs">Tab mode</label>
+            <label index="meta_feedit.pi_flexform.createPid">Create Page PID</label>
+            <label index="meta_feedit.pi_flexform.listFields">List fields</label>
+            <label index="meta_feedit.pi_flexform.listPid">List Page PID</label>
+            <label index="meta_feedit.pi_flexform.editPid">Edit Page PID</label>
+            <label index="meta_feedit.pi_flexform.checkT3Rights">Check TYPO3 rights to edit/save/delete/...</label>
+            <label index="meta_feedit.pi_flexform.editPreview">Edit Preview</label>
+            <label index="meta_feedit.pi_flexform.createTemplate">Create Templates</label>
+            <label index="meta_feedit.pi_flexform.createSavedTemplate">Saved Templates</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyMailTemplate">User Notify Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.createAdminNotifyMailTemplate">Admin Notify Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.createAdminValidMailTemplate">Admin Valid Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyOkMailTemplate">User Notify OK Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyKoMailTemplate">User Notify KO Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.editTemplate">Edit Templates</label>
+            <label index="meta_feedit.pi_flexform.editSavedTemplate">Saved Templates</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyMailTemplate">User Notify Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.editAdminNotifyMailTemplate">Admin Notify Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.editAdminValidMailTemplate">Admin Valid Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyOkMailTemplate">User Notify OK Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyKoMailTemplate">User Notify KO Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.deleteTemplate">Delete Templates</label>
+            <label index="meta_feedit.pi_flexform.deleteSavedTemplate">Saved Templates</label>
+            <label index="meta_feedit.pi_flexform.deleteUserNotifyMailTemplate">User Notify Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.deleteAdminNotifyMailTemplate">Admin Notify Mail Templates</label>
+            <label index="meta_feedit.pi_flexform.setFixedTemplate">Set Fixed Templates</label>
+            <label index="meta_feedit.pi_flexform.setFixedOkTemplate">Ok Templates</label>
+            <label index="meta_feedit.pi_flexform.setFixedOkDeleteTemplate">Ok Delete Templates</label>
+            <label index="meta_feedit.pi_flexform.setFixedFailedTemplate">Gabarit d'echec</label>
+            <label index="meta_feedit.pi_flexform.editrecordactions">Actions en mode édition</label>
+            <label index="meta_feedit.pi_flexform.editStatusScreen">Afficher ecran de confirmation</label>
+            <label index="meta_feedit.pi_flexform.createStatusScreen">Afficher ecran de confirmation</label>
+            <label index="meta_feedit.pi_flexform.deleteStatusScreen">Afficher ecran de confirmation</label>
+            <label index="meta_feedit.pi_flexform.createPreview">Create Preview</label>
+            <label index="meta_feedit.pi_flexform.fetemplate">Gabarit</label>
+            <label index="meta_feedit.pi_flexform.sheet_preview">Preview</label>
+            <label index="meta_feedit.pi_flexform.sheet_setfixed">Mails</label>
+            <label index="meta_feedit.pi_flexform.sheet_delete">Delete</label>
+            <label index="meta_feedit.pi_flexform.sheet_list">List</label>
+            <label index="meta_feedit.pi_flexform.useTemplate">use template</label>
+            <label index="meta_feedit.pi_flexform.extTables">Extension TCAs to take into account</label>
+            <label index="meta_feedit.pi_flexform.fe_userEditSelf">Can user edit his info</label>
+            <label index="meta_feedit.pi_flexform.template_file">Use this template file instead of default</label>
+            <label index="meta_feedit.pi_flexform.generateTemplate">Generate Template in Browser</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDF">Gabarit PDF pour les listes</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDFDet">Gabarit PDF pour la vue en détail</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDFTab">Gabarit PDF pour les tabaleaux</label>
+        </languageKey>
+    </data>
+    <orig_hash type="array">
+        <languageKey index="default" type="array">
+            <label index="meta_feedit.pi_flexform.feeditevalvalues" type="integer">146508744</label>
+            <label index="meta_feedit.pi_flexform.fecreateevalvalues" type="integer">23857637</label>
+            <label index="meta_feedit.pi_flexform.editPreview" type="integer">13725418</label>
+            <label index="meta_feedit.pi_flexform.gridAjax" type="integer">85413139</label>
+            <label index="meta_feedit.pi_flexform.gridEdit" type="integer">131916066</label>
+            <label index="meta_feedit.pi_flexform.sheet_general" type="integer">86983571</label>
+            <label index="meta_feedit.pi_flexform.sheet_cal" type="integer">140515097</label>
+            <label index="meta_feedit.pi_flexform.sheet_quickstart" type="integer">68283050</label>
+            <label index="meta_feedit.pi_flexform.sheet_create" type="integer">109504151</label>
+            <label index="meta_feedit.pi_flexform.sheet_edit" type="integer">131916066</label>
+            <label index="meta_feedit.pi_flexform.idField" type="integer">130212691</label>
+            <label index="meta_feedit.pi_flexform.advancedSearch" type="integer">215279197</label>
+            <label index="meta_feedit.pi_flexform.advancedSearchFields" type="integer">143822960</label>
+            <label index="meta_feedit.pi_flexform.advancedSearchAjaxSelector" type="integer">152918635</label>
+            <label index="meta_feedit.pi_flexform.calendarSearch" type="integer">237735040</label>
+            <label index="meta_feedit.pi_flexform.alphabeticalSearch" type="integer">244200896</label>
+            <label index="meta_feedit.pi_flexform.categorySearch" type="integer">84355684</label>
+            <label index="meta_feedit.pi_flexform.foreignTables" type="integer">88756308</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd" type="integer">134897597</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd.auto" type="integer">7049857</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd.create" type="integer">109504151</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd.edit" type="integer">131916066</label>
+            <label index="meta_feedit.pi_flexform.page" type="integer">174879384</label>
+            <label index="meta_feedit.pi_flexform.xhtml" type="integer">175781222</label>
+            <label index="meta_feedit.pi_flexform.referenceMetafeedit" type="integer">79211704</label>
+            <label index="meta_feedit.pi_flexform.referenceMetafeeditText" type="integer">150158921</label>
+            <label index="meta_feedit.pi_flexform.referenceKeyExclude" type="integer">106496426</label>
+            <label index="meta_feedit.pi_flexform.referenceExcludeDbRelation" type="integer">242445902</label>
+            <label index="meta_feedit.pi_flexform.sheet_debug" type="integer">174078213</label>
+            <label index="meta_feedit.pi_flexform.debugSQL" type="integer">255486583</label>
+            <label index="meta_feedit.pi_flexform.debugKrumo" type="integer">48265730</label>
+            <label index="meta_feedit.pi_flexform.debugMarkerArray" type="integer">202879560</label>
+            <label index="meta_feedit.pi_flexform.debugLangArray" type="integer">92636526</label>
+            <label index="meta_feedit.pi_flexform.debugConf" type="integer">6371142</label>
+            <label index="meta_feedit.pi_flexform.debugPerformances" type="integer">161889991</label>
+            <label index="meta_feedit.pi_flexform.debugTemplate" type="integer">41469073</label>
+            <label index="meta_feedit.pi_flexform.debugVars" type="integer">45848621</label>
+            <label index="meta_feedit.pi_flexform.debugTSFE" type="integer">4070253</label>
+            <label index="meta_feedit.pi_flexform.disableDelete" type="integer">201299398</label>
+            <label index="meta_feedit.pi_flexform.disableEditDelete" type="integer">78212407</label>
+            <label index="meta_feedit.pi_flexform.defaultListMode" type="integer">245640790</label>
+            <label index="meta_feedit.pi_flexform.defaultListMode.list" type="integer">82717130</label>
+            <label index="meta_feedit.pi_flexform.defaultListMode.calendar" type="integer">150966827</label>
+            <label index="meta_feedit.pi_flexform.defaultListMode.datagrid" type="integer">66442986</label>
+            <label index="meta_feedit.pi_flexform.requireLogin" type="integer">113933465</label>
+            <label index="meta_feedit.pi_flexform.no_header" type="integer">45120327</label>
+            <label index="meta_feedit.pi_flexform.show_help_icons" type="integer">208173918</label>
+            <label index="meta_feedit.pi_flexform.allowedGroups" type="integer">7368863</label>
+            <label index="meta_feedit.pi_flexform.clearCacheOfPages" type="integer">121345564</label>
+            <label index="meta_feedit.pi_flexform.disableCreate" type="integer">245681040</label>
+            <label index="meta_feedit.pi_flexform.hideCreate" type="integer">205375402</label>
+            <label index="meta_feedit.pi_flexform.hideEdit" type="integer">140271718</label>
+            <label index="meta_feedit.pi_flexform.hideDelete" type="integer">121208707</label>
+            <label index="meta_feedit.pi_flexform.noSpecialLoginForm" type="integer">45043866</label>
+            <label index="meta_feedit.pi_flexform.fetable" type="integer">208736658</label>
+            <label index="meta_feedit.pi_flexform.previewnoemptyfields" type="integer">31278590</label>
+            <label index="meta_feedit.pi_flexform.backPagePid" type="integer">55695292</label>
+            <label index="meta_feedit.pi_flexform.editBackPagePid" type="integer">55695292</label>
+            <label index="meta_feedit.pi_flexform.fecreatefields" type="integer">23296824</label>
+            <label index="meta_feedit.pi_flexform.feparsevalues" type="integer">190189212</label>
+            <label index="meta_feedit.pi_flexform.groupBySize" type="integer">163997479</label>
+            <label index="meta_feedit.pi_flexform.displaydirection" type="integer">198367124</label>
+            <label index="meta_feedit.pi_flexform.editlangmarks" type="integer">136027626</label>
+            <label index="meta_feedit.pi_flexform.createlangmarks" type="integer">136027626</label>
+            <label index="meta_feedit.pi_flexform.rUJoinField" type="integer">129608825</label>
+            <label index="meta_feedit.pi_flexform.noUserCheck" type="integer">47913814</label>
+            <label index="meta_feedit.pi_flexform.editUserCheck" type="integer">201181080</label>
+            <label index="meta_feedit.pi_flexform.deleteUserCheck" type="integer">201181080</label>
+            <label index="meta_feedit.pi_flexform.deleteGroupCheck" type="integer">160706068</label>
+            <label index="meta_feedit.pi_flexform.editGroupCheck" type="integer">160706068</label>
+            <label index="meta_feedit.pi_flexform.fe_userOwnSelf" type="integer">76664401</label>
+            <label index="meta_feedit.pi_flexform.feshowfields" type="integer">143796892</label>
+            <label index="meta_feedit.pi_flexform.fepreviewfields" type="integer">148407649</label>
+            <label index="meta_feedit.pi_flexform.listMediaPlayer" type="integer">61938527</label>
+            <label index="meta_feedit.pi_flexform.feeditfields" type="integer">153672988</label>
+            <label index="meta_feedit.pi_flexform.noActions" type="integer">119905046</label>
+            <label index="meta_feedit.pi_flexform.noHeaders" type="integer">15203507</label>
+            <label index="meta_feedit.pi_flexform.cacheMode" type="integer">117454628</label>
+            <label index="meta_feedit.pi_flexform.sheet_ajax" type="integer">97091794</label>
+            <label index="meta_feedit.pi_flexform.ajaxOn" type="integer">57192708</label>
+            <label index="meta_feedit.pi_flexform.jqueryCompatMode" type="integer">181360586</label>
+            <label index="meta_feedit.pi_flexform.cacheMode.noCache" type="integer">167378139</label>
+            <label index="meta_feedit.pi_flexform.cacheMode.mixtCache" type="integer">268258058</label>
+            <label index="meta_feedit.pi_flexform.cacheMode.fullCache" type="integer">142206804</label>
+            <label index="meta_feedit.pi_flexform.calMode" type="integer">194729164</label>
+            <label index="meta_feedit.pi_flexform.calMode.default" type="integer">203553129</label>
+            <label index="meta_feedit.pi_flexform.calMode.dayView" type="integer">11439816</label>
+            <label index="meta_feedit.pi_flexform.calMode.weekView" type="integer">137817994</label>
+            <label index="meta_feedit.pi_flexform.calMode.monthView" type="integer">263227273</label>
+            <label index="meta_feedit.pi_flexform.calMode.yearView" type="integer">202317207</label>
+            <label index="meta_feedit.pi_flexform.calMode.upcomingEventsView" type="integer">36339134</label>
+            <label index="meta_feedit.pi_flexform.calMode.fullCache" type="integer">137817994</label>
+            <label index="meta_feedit.pi_flexform.T3SourceTreePid" type="integer">55433127</label>
+            <label index="meta_feedit.pi_flexform.T3TreeTargetPid" type="integer">51274935</label>
+            <label index="meta_feedit.pi_flexform.T3FEGroupsPID" type="integer">28591545</label>
+            <label index="meta_feedit.pi_flexform.T3AdminUid" type="integer">3943928</label>
+            <label index="meta_feedit.pi_flexform.T3TableHomePidField" type="integer">21370657</label>
+            <label index="meta_feedit.pi_flexform.enableColumns" type="integer">196387466</label>
+            <label index="meta_feedit.pi_flexform.feeditshowfields" type="integer">110678822</label>
+            <label index="meta_feedit.pi_flexform.fecreatereadonlyfields" type="integer">61728417</label>
+            <label index="meta_feedit.pi_flexform.feeditreadonlyfields" type="integer">237891208</label>
+            <label index="meta_feedit.pi_flexform.ferequiredfields" type="integer">240432002</label>
+            <label index="meta_feedit.pi_flexform.feapprovefields" type="integer">142579029</label>
+            <label index="meta_feedit.pi_flexform.feeditoverridevalues" type="integer">36181603</label>
+            <label index="meta_feedit.pi_flexform.fecreateoverridevalues" type="integer">210810333</label>
+            <label index="meta_feedit.pi_flexform.fedeletefields" type="integer">163974272</label>
+            <label index="meta_feedit.pi_flexform.fecruser_field" type="integer">174364208</label>
+            <label index="meta_feedit.pi_flexform.fecrgroup_field" type="integer">250309552</label>
+            <label index="meta_feedit.pi_flexform.disableEdit" type="integer">2850985</label>
+            <label index="meta_feedit.pi_flexform.editUnique" type="integer">1028008</label>
+            <label index="meta_feedit.pi_flexform.menuLockPid" type="integer">98859053</label>
+            <label index="meta_feedit.pi_flexform.pagination" type="integer">213614928</label>
+            <label index="meta_feedit.pi_flexform.pageSize" type="integer">149872847</label>
+            <label index="meta_feedit.pi_flexform.nbCols" type="integer">236721076</label>
+            <label index="meta_feedit.pi_flexform.maxPages" type="integer">105454128</label>
+            <label index="meta_feedit.pi_flexform.tabLabels" type="integer">10909177</label>
+            <label index="meta_feedit.pi_flexform.fieldSort" type="integer">111877093</label>
+            <label index="meta_feedit.pi_flexform.listnobackbutton" type="integer">133404960</label>
+            <label index="meta_feedit.pi_flexform.listAltRows" type="integer">100578012</label>
+            <label index="meta_feedit.pi_flexform.listsqlcalcfields" type="integer">229861118</label>
+            <label index="meta_feedit.pi_flexform.listphpcalcfields" type="integer">137800131</label>
+            <label index="meta_feedit.pi_flexform.listnodetail" type="integer">46139720</label>
+            <label index="meta_feedit.pi_flexform.listHavingString" type="integer">4416012</label>
+            <label index="meta_feedit.pi_flexform.debug" type="integer">247661194</label>
+            <label index="meta_feedit.pi_flexform.no_cache" type="integer">52766339</label>
+            <label index="meta_feedit.pi_flexform.searchBox" type="integer">105532643</label>
+            <label index="meta_feedit.pi_flexform.emailFrom" type="integer">73057154</label>
+            <label index="meta_feedit.pi_flexform.sendAdminMail" type="integer">177184379</label>
+            <label index="meta_feedit.pi_flexform.sendFEUserMail" type="integer">7069766</label>
+            <label index="meta_feedit.pi_flexform.sendDataMail" type="integer">40841192</label>
+            <label index="meta_feedit.pi_flexform.dataMailField" type="integer">142199408</label>
+            <label index="meta_feedit.pi_flexform.sendAdminInfoMail" type="integer">129000553</label>
+            <label index="meta_feedit.pi_flexform.sendFEUserInfoMail" type="integer">194878554</label>
+            <label index="meta_feedit.pi_flexform.sendDataInfoMail" type="integer">49497777</label>
+            <label index="meta_feedit.pi_flexform.emailFromName" type="integer">242735898</label>
+            <label index="meta_feedit.pi_flexform.emailAdmin" type="integer">123698880</label>
+            <label index="meta_feedit.pi_flexform.divide2tabs" type="integer">73446764</label>
+            <label index="meta_feedit.pi_flexform.createPid" type="integer">262349507</label>
+            <label index="meta_feedit.pi_flexform.groupByFields" type="integer">83161966</label>
+            <label index="meta_feedit.pi_flexform.groupByFieldBreaks" type="integer">129183629</label>
+            <label index="meta_feedit.pi_flexform.orderByFields" type="integer">199403597</label>
+            <label index="meta_feedit.pi_flexform.sumFields" type="integer">187484008</label>
+            <label index="meta_feedit.pi_flexform.editPid" type="integer">247215442</label>
+            <label index="meta_feedit.pi_flexform.checkT3Rights" type="integer">86270703</label>
+            <label index="meta_feedit.pi_flexform.sheet_blogs" type="integer">225156771</label>
+            <label index="meta_feedit.pi_flexform.allowComments" type="integer">186808169</label>
+            <label index="meta_feedit.pi_flexform.showComments" type="integer">59534609</label>
+            <label index="meta_feedit.pi_flexform.blogtemplate" type="integer">148325141</label>
+            <label index="meta_feedit.pi_flexform.blogCaptcha" type="integer">14685455</label>
+            <label index="meta_feedit.pi_flexform.rowField" type="integer">241329982</label>
+            <label index="meta_feedit.pi_flexform.colField" type="integer">236182481</label>
+            <label index="meta_feedit.pi_flexform.beginDateField" type="integer">28577140</label>
+            <label index="meta_feedit.pi_flexform.endDateField" type="integer">180104554</label>
+            <label index="meta_feedit.pi_flexform.sheet_generalTemplate" type="integer">27249216</label>
+            <label index="meta_feedit.pi_flexform.generalAuthTemplate" type="integer">227109168</label>
+            <label index="meta_feedit.pi_flexform.generalNoPermTemplate" type="integer">228073808</label>
+            <label index="meta_feedit.pi_flexform.sheet_TemplatePDF" type="integer">64975367</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDF" type="integer">162065232</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDFDet" type="integer">7629314</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDFTab" type="integer">89334777</label>
+            <label index="meta_feedit.pi_flexform.sheet_TemplateCSV" type="integer">176859935</label>
+            <label index="meta_feedit.pi_flexform.TemplateCSV" type="integer">176859935</label>
+            <label index="meta_feedit.pi_flexform.sheet_TemplateExcel" type="integer">74207773</label>
+            <label index="meta_feedit.pi_flexform.TemplateExcel" type="integer">74207773</label>
+            <label index="meta_feedit.pi_flexform.sheet_list" type="integer">82717130</label>
+            <label index="meta_feedit.pi_flexform.sheet_listTemplate" type="integer">233259242</label>
+            <label index="meta_feedit.pi_flexform.listItemTemplate" type="integer">43899623</label>
+            <label index="meta_feedit.pi_flexform.listNoItemTemplate" type="integer">148812731</label>
+            <label index="meta_feedit.pi_flexform.listrecordactions" type="integer">10894215</label>
+            <label index="meta_feedit.pi_flexform.listJumpPageOnGroupBy" type="integer">206270141</label>
+            <label index="meta_feedit.pi_flexform.listWhereString" type="integer">137860477</label>
+            <label index="meta_feedit.pi_flexform.listOrderByString" type="integer">105907636</label>
+            <label index="meta_feedit.pi_flexform.listPreOrderByString" type="integer">260083126</label>
+            <label index="meta_feedit.pi_flexform.listExtraFields" type="integer">156794208</label>
+            <label index="meta_feedit.pi_flexform.listlangmarks" type="integer">136027626</label>
+            <label index="meta_feedit.pi_flexform.listPid" type="integer">220918372</label>
+            <label index="meta_feedit.pi_flexform.listFields" type="integer">74777057</label>
+            <label index="meta_feedit.pi_flexform.listHiddenFields" type="integer">72163941</label>
+            <label index="meta_feedit.pi_flexform.sheet_grid" type="integer">128095540</label>
+            <label index="meta_feedit.pi_flexform.sheet_gridTemplate" type="integer">123425806</label>
+            <label index="meta_feedit.pi_flexform.gridItemTemplate" type="integer">43899623</label>
+            <label index="meta_feedit.pi_flexform.gridNoItemTemplate" type="integer">148812731</label>
+            <label index="meta_feedit.pi_flexform.gridrecordactions" type="integer">242394286</label>
+            <label index="meta_feedit.pi_flexform.gridWhereString" type="integer">137860477</label>
+            <label index="meta_feedit.pi_flexform.gridOrderByString" type="integer">237876920</label>
+            <label index="meta_feedit.pi_flexform.gridExtraFields" type="integer">156794208</label>
+            <label index="meta_feedit.pi_flexform.gridLangmarks" type="integer">136027626</label>
+            <label index="meta_feedit.pi_flexform.gridPid" type="integer">246838788</label>
+            <label index="meta_feedit.pi_flexform.gridFields" type="integer">146406135</label>
+            <label index="meta_feedit.pi_flexform.gridHiddenFields" type="integer">167540139</label>
+            <label index="meta_feedit.pi_flexform.gridExportPDF" type="integer">184026886</label>
+            <label index="meta_feedit.pi_flexform.gridExportCSV" type="integer">201650660</label>
+            <label index="meta_feedit.pi_flexform.gridExportExcel" type="integer">266195198</label>
+            <label index="meta_feedit.pi_flexform.gridEuros" type="integer">121327831</label>
+            <label index="meta_feedit.pi_flexform.gridMediaPlayer" type="integer">61938527</label>
+            <label index="meta_feedit.pi_flexform.gridOrderByFields" type="integer">140512419</label>
+            <label index="meta_feedit.pi_flexform.gridCols" type="integer">256528414</label>
+            <label index="meta_feedit.pi_flexform.gridRows" type="integer">148091136</label>
+            <label index="meta_feedit.pi_flexform.gridRowField" type="integer">241329982</label>
+            <label index="meta_feedit.pi_flexform.gridColField" type="integer">236182481</label>
+            <label index="meta_feedit.pi_flexform.gridBackPagePid" type="integer">55695292</label>
+            <label index="meta_feedit.pi_flexform.gridrUJoinField" type="integer">129608825</label>
+            <label index="meta_feedit.pi_flexform.sheet_createTemplate" type="integer">19631827</label>
+            <label index="meta_feedit.pi_flexform.createScreenTemplate" type="integer">161617718</label>
+            <label index="meta_feedit.pi_flexform.createPreviewTemplate" type="integer">60773166</label>
+            <label index="meta_feedit.pi_flexform.createScreenLoginTemplate" type="integer">232972810</label>
+            <label index="meta_feedit.pi_flexform.createPreviewLoginTemplate" type="integer">38945616</label>
+            <label index="meta_feedit.pi_flexform.createSavedTemplate" type="integer">116719933</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyMailTemplate" type="integer">32812878</label>
+            <label index="meta_feedit.pi_flexform.createDataNotifyMailTemplate" type="integer">257594763</label>
+            <label index="meta_feedit.pi_flexform.createAdminNotifyMailTemplate" type="integer">188147376</label>
+            <label index="meta_feedit.pi_flexform.createAdminValidMailTemplate" type="integer">203280858</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyOkMailTemplate" type="integer">161228040</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyKoMailTemplate" type="integer">268215112</label>
+            <label index="meta_feedit.pi_flexform.sheet_editTemplate" type="integer">77385498</label>
+            <label index="meta_feedit.pi_flexform.editScreenTemplate" type="integer">212395011</label>
+            <label index="meta_feedit.pi_flexform.editPreviewTemplate" type="integer">60773166</label>
+            <label index="meta_feedit.pi_flexform.editSavedTemplate" type="integer">116719933</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyMailTemplate" type="integer">32812878</label>
+            <label index="meta_feedit.pi_flexform.editAdminNotifyMailTemplate" type="integer">188147376</label>
+            <label index="meta_feedit.pi_flexform.editDataNotifyMailTemplate" type="integer">257594763</label>
+            <label index="meta_feedit.pi_flexform.editAdminValidMailTemplate" type="integer">203280858</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyOkMailTemplate" type="integer">161228040</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyKoMailTemplate" type="integer">268215112</label>
+            <label index="meta_feedit.pi_flexform.editrecordactions" type="integer">114403269</label>
+            <label index="meta_feedit.pi_flexform.sheet_deleteTemplate" type="integer">102479008</label>
+            <label index="meta_feedit.pi_flexform.deletePreviewTemplate" type="integer">60773166</label>
+            <label index="meta_feedit.pi_flexform.deleteSavedTemplate" type="integer">116719933</label>
+            <label index="meta_feedit.pi_flexform.deleteUserNotifyMailTemplate" type="integer">32812878</label>
+            <label index="meta_feedit.pi_flexform.deleteAdminNotifyMailTemplate" type="integer">188147376</label>
+            <label index="meta_feedit.pi_flexform.setFixedTemplate" type="integer">229366365</label>
+            <label index="meta_feedit.pi_flexform.setFixedOkTemplate" type="integer">116232507</label>
+            <label index="meta_feedit.pi_flexform.setFixedOkDeleteTemplate" type="integer">176579317</label>
+            <label index="meta_feedit.pi_flexform.setFixedFailedTemplate" type="integer">29507896</label>
+            <label index="meta_feedit.pi_flexform.editStatusScreen" type="integer">150702340</label>
+            <label index="meta_feedit.pi_flexform.createStatusScreen" type="integer">150702340</label>
+            <label index="meta_feedit.pi_flexform.deleteStatusScreen" type="integer">150702340</label>
+            <label index="meta_feedit.pi_flexform.createPreview" type="integer">4165368</label>
+            <label index="meta_feedit.pi_flexform.fetemplate" type="integer">41469073</label>
+            <label index="meta_feedit.pi_flexform.sheet_preview" type="integer">52420219</label>
+            <label index="meta_feedit.pi_flexform.sheet_setfixed" type="integer">42081529</label>
+            <label index="meta_feedit.pi_flexform.sheet_delete" type="integer">254438473</label>
+            <label index="meta_feedit.pi_flexform.useTemplate" type="integer">264277244</label>
+            <label index="meta_feedit.pi_flexform.extTables" type="integer">134094769</label>
+            <label index="meta_feedit.pi_flexform.fe_userEditSelf" type="integer">20314162</label>
+            <label index="meta_feedit.pi_flexform.template_file" type="integer">104343006</label>
+            <label index="meta_feedit.pi_flexform.generateTemplate" type="integer">134422688</label>
+            <label index="meta_feedit.pi_flexform.pluginId" type="integer">221054059</label>
+            <label index="meta_feedit.pi_flexform.pdf" type="integer">197991272</label>
+            <label index="meta_feedit.pi_flexform.csv" type="integer">186702570</label>
+            <label index="meta_feedit.pi_flexform.excel" type="integer">203260335</label>
+            <label index="meta_feedit.pi_flexform.euros" type="integer">188417921</label>
+        </languageKey>
+        <languageKey index="fr" type="array">
+            <label index="meta_feedit.pi_flexform.gridAjax" type="integer">85413139</label>
+            <label index="meta_feedit.pi_flexform.gridEdit" type="integer">131916066</label>
+            <label index="meta_feedit.pi_flexform.sheet_general" type="integer">86983571</label>
+            <label index="meta_feedit.pi_flexform.sheet_create" type="integer">109504151</label>
+            <label index="meta_feedit.pi_flexform.sheet_edit" type="integer">131916066</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd" type="integer">134897597</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd.create" type="integer">109504151</label>
+            <label index="meta_feedit.pi_flexform.defaultCmd.edit" type="integer">131916066</label>
+            <label index="meta_feedit.pi_flexform.page" type="integer">174879384</label>
+            <label index="meta_feedit.pi_flexform.disableDelete" type="integer">201299398</label>
+            <label index="meta_feedit.pi_flexform.disableEditDelete" type="integer">78212407</label>
+            <label index="meta_feedit.pi_flexform.requireLogin" type="integer">113933465</label>
+            <label index="meta_feedit.pi_flexform.no_header" type="integer">45120327</label>
+            <label index="meta_feedit.pi_flexform.show_help_icons" type="integer">208173918</label>
+            <label index="meta_feedit.pi_flexform.allowedGroups" type="integer">7368863</label>
+            <label index="meta_feedit.pi_flexform.clearCacheOfPages" type="integer">121345564</label>
+            <label index="meta_feedit.pi_flexform.disableCreate" type="integer">245681040</label>
+            <label index="meta_feedit.pi_flexform.noSpecialLoginForm" type="integer">45043866</label>
+            <label index="meta_feedit.pi_flexform.fetable" type="integer">208736658</label>
+            <label index="meta_feedit.pi_flexform.backPagePid" type="integer">55695292</label>
+            <label index="meta_feedit.pi_flexform.fecreatefields" type="integer">23296824</label>
+            <label index="meta_feedit.pi_flexform.fe_userOwnSelf" type="integer">76664401</label>
+            <label index="meta_feedit.pi_flexform.feshowfields" type="integer">143796892</label>
+            <label index="meta_feedit.pi_flexform.fepreviewfields" type="integer">148407649</label>
+            <label index="meta_feedit.pi_flexform.feeditfields" type="integer">153672988</label>
+            <label index="meta_feedit.pi_flexform.feeditshowfields" type="integer">110678822</label>
+            <label index="meta_feedit.pi_flexform.feeditreadonlyfields" type="integer">237891208</label>
+            <label index="meta_feedit.pi_flexform.ferequiredfields" type="integer">240432002</label>
+            <label index="meta_feedit.pi_flexform.feapprovefields" type="integer">142579029</label>
+            <label index="meta_feedit.pi_flexform.feeditoverridevalues" type="integer">36181603</label>
+            <label index="meta_feedit.pi_flexform.fecreateoverridevalues" type="integer">210810333</label>
+            <label index="meta_feedit.pi_flexform.feeditevalvalues" type="integer">146508744</label>
+            <label index="meta_feedit.pi_flexform.fecreateevalvalues" type="integer">23857637</label>
+            <label index="meta_feedit.pi_flexform.fedeletefields" type="integer">163974272</label>
+            <label index="meta_feedit.pi_flexform.fecruser_field" type="integer">174364208</label>
+            <label index="meta_feedit.pi_flexform.fecrgroup_field" type="integer">250309552</label>
+            <label index="meta_feedit.pi_flexform.disableEdit" type="integer">2850985</label>
+            <label index="meta_feedit.pi_flexform.hideCreate" type="integer">205375402</label>
+            <label index="meta_feedit.pi_flexform.hideEdit" type="integer">140271718</label>
+            <label index="meta_feedit.pi_flexform.hideDelete" type="integer">121208707</label>
+            <label index="meta_feedit.pi_flexform.editUnique" type="integer">1028008</label>
+            <label index="meta_feedit.pi_flexform.editDontUseHidden" type="integer">222419149</label>
+            <label index="meta_feedit.pi_flexform.editDontUseDate" type="integer">222419149</label>
+            <label index="meta_feedit.pi_flexform.pdf" type="integer">197991272</label>
+            <label index="meta_feedit.pi_flexform.csv" type="integer">186702570</label>
+            <label index="meta_feedit.pi_flexform.excel" type="integer">203260335</label>
+            <label index="meta_feedit.pi_flexform.euros" type="integer">188417921</label>
+            <label index="meta_feedit.pi_flexform.menuLockPid" type="integer">98859053</label>
+            <label index="meta_feedit.pi_flexform.pagination" type="integer">213614928</label>
+            <label index="meta_feedit.pi_flexform.pageSize" type="integer">149872847</label>
+            <label index="meta_feedit.pi_flexform.maxPages" type="integer">105454128</label>
+            <label index="meta_feedit.pi_flexform.tabLabels" type="integer">10909177</label>
+            <label index="meta_feedit.pi_flexform.fieldSort" type="integer">111877093</label>
+            <label index="meta_feedit.pi_flexform.debug" type="integer">247661194</label>
+            <label index="meta_feedit.pi_flexform.listnobackbutton" type="integer">133404960</label>
+            <label index="meta_feedit.pi_flexform.listAltRows" type="integer">100578012</label>
+            <label index="meta_feedit.pi_flexform.listsqlcalcfields" type="integer">229861118</label>
+            <label index="meta_feedit.pi_flexform.listphpcalcfields" type="integer">137800131</label>
+            <label index="meta_feedit.pi_flexform.no_cache" type="integer">52766339</label>
+            <label index="meta_feedit.pi_flexform.searchBox" type="integer">105532643</label>
+            <label index="meta_feedit.pi_flexform.emailFrom" type="integer">73057154</label>
+            <label index="meta_feedit.pi_flexform.sendAdminMail" type="integer">177184379</label>
+            <label index="meta_feedit.pi_flexform.dataMailField" type="integer">142199408</label>
+            <label index="meta_feedit.pi_flexform.emailFromName" type="integer">242735898</label>
+            <label index="meta_feedit.pi_flexform.emailAdmin" type="integer">123698880</label>
+            <label index="meta_feedit.pi_flexform.divide2tabs" type="integer">73446764</label>
+            <label index="meta_feedit.pi_flexform.createPid" type="integer">262349507</label>
+            <label index="meta_feedit.pi_flexform.listFields" type="integer">74777057</label>
+            <label index="meta_feedit.pi_flexform.listPid" type="integer">220918372</label>
+            <label index="meta_feedit.pi_flexform.editPid" type="integer">247215442</label>
+            <label index="meta_feedit.pi_flexform.checkT3Rights" type="integer">86270703</label>
+            <label index="meta_feedit.pi_flexform.editPreview" type="integer">13725418</label>
+            <label index="meta_feedit.pi_flexform.createTemplate" type="integer">222419149</label>
+            <label index="meta_feedit.pi_flexform.createSavedTemplate" type="integer">116719933</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyMailTemplate" type="integer">32812878</label>
+            <label index="meta_feedit.pi_flexform.createAdminNotifyMailTemplate" type="integer">188147376</label>
+            <label index="meta_feedit.pi_flexform.createAdminValidMailTemplate" type="integer">203280858</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyOkMailTemplate" type="integer">161228040</label>
+            <label index="meta_feedit.pi_flexform.createUserNotifyKoMailTemplate" type="integer">268215112</label>
+            <label index="meta_feedit.pi_flexform.editTemplate" type="integer">222419149</label>
+            <label index="meta_feedit.pi_flexform.editSavedTemplate" type="integer">116719933</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyMailTemplate" type="integer">32812878</label>
+            <label index="meta_feedit.pi_flexform.editAdminNotifyMailTemplate" type="integer">188147376</label>
+            <label index="meta_feedit.pi_flexform.editAdminValidMailTemplate" type="integer">203280858</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyOkMailTemplate" type="integer">161228040</label>
+            <label index="meta_feedit.pi_flexform.editUserNotifyKoMailTemplate" type="integer">268215112</label>
+            <label index="meta_feedit.pi_flexform.deleteTemplate" type="integer">222419149</label>
+            <label index="meta_feedit.pi_flexform.deleteSavedTemplate" type="integer">116719933</label>
+            <label index="meta_feedit.pi_flexform.deleteUserNotifyMailTemplate" type="integer">32812878</label>
+            <label index="meta_feedit.pi_flexform.deleteAdminNotifyMailTemplate" type="integer">188147376</label>
+            <label index="meta_feedit.pi_flexform.setFixedTemplate" type="integer">229366365</label>
+            <label index="meta_feedit.pi_flexform.setFixedOkTemplate" type="integer">116232507</label>
+            <label index="meta_feedit.pi_flexform.setFixedOkDeleteTemplate" type="integer">176579317</label>
+            <label index="meta_feedit.pi_flexform.setFixedFailedTemplate" type="integer">29507896</label>
+            <label index="meta_feedit.pi_flexform.editrecordactions" type="integer">114403269</label>
+            <label index="meta_feedit.pi_flexform.editStatusScreen" type="integer">150702340</label>
+            <label index="meta_feedit.pi_flexform.createStatusScreen" type="integer">150702340</label>
+            <label index="meta_feedit.pi_flexform.deleteStatusScreen" type="integer">150702340</label>
+            <label index="meta_feedit.pi_flexform.createPreview" type="integer">4165368</label>
+            <label index="meta_feedit.pi_flexform.fetemplate" type="integer">41469073</label>
+            <label index="meta_feedit.pi_flexform.sheet_preview" type="integer">52420219</label>
+            <label index="meta_feedit.pi_flexform.sheet_setfixed" type="integer">42081529</label>
+            <label index="meta_feedit.pi_flexform.sheet_delete" type="integer">254438473</label>
+            <label index="meta_feedit.pi_flexform.sheet_list" type="integer">82717130</label>
+            <label index="meta_feedit.pi_flexform.useTemplate" type="integer">264277244</label>
+            <label index="meta_feedit.pi_flexform.extTables" type="integer">134094769</label>
+            <label index="meta_feedit.pi_flexform.fe_userEditSelf" type="integer">20314162</label>
+            <label index="meta_feedit.pi_flexform.template_file" type="integer">104343006</label>
+            <label index="meta_feedit.pi_flexform.generateTemplate" type="integer">134422688</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDF" type="integer">162065232</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDFDet" type="integer">7629314</label>
+            <label index="meta_feedit.pi_flexform.TemplatePDFTab" type="integer">89334777</label>
+        </languageKey>
+    </orig_hash>
+    <orig_text type="array">
+        <languageKey index="default" type="array">
+        </languageKey>
+        <languageKey index="fr" type="array">
+        </languageKey>
+    </orig_text>
+</T3locallang>

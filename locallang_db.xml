@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+    <meta type="array">
+        <description>locallang_db</description>
+        <type>database</type>
+        <csh_table></csh_table>
+        <labelContext type="array">
+        </labelContext>
+    </meta>
+    <data type="array">
+        <languageKey index="default" type="array">
+            <label index="tt_content.list_type_pi1">Meta FE Edit</label>
+            <label index="tx_metafeedit_actions">meta admin actions</label>
+            <label index="tx_metafeedit_actions.title">title</label>
+            <label index="tx_metafeedit_actions.image">image</label>
+            <label index="tx_metafeedit_actions.url">url</label>
+            <label index="tx_metafeedit_actions.tooltip">tooltip</label>
+            <label index="tx_metafeedit_actions.page">page</label>
+            <label index="tx_metafeedit_actions.category">category</label>
+            <label index="tx_metafeedit_comments">Comments</label>
+            <label index="tx_metafeedit_comments.firstname">Firstname</label>
+            <label index="tx_metafeedit_comments.surname">Surname</label>
+            <label index="tx_metafeedit_comments.email">E-Mail</label>
+            <label index="tx_metafeedit_comments.homepage">Website</label>
+            <label index="tx_metafeedit_comments.place">Place</label>
+            <label index="tx_metafeedit_comments.entry">Title</label>
+            <label index="tx_metafeedit_comments.entrycomment">Comment</label>
+            <label index="tx_metafeedit_comments.remote_addr">Remote Address</label>
+            <label index="tx_metafeedit_comments.uid_tt_news">[uid_tt_news]</label>
+            <label index="tx_metafeedit_comments.crdate">Creation date/time</label>
+            <label index="tx_metafeedit_comments.tstamp">Last update</label>
+            <label index="tx_metafeedit_general.crdate">Creation date</label>
+            <label index="tx_metafeedit_general.uid">Unique Id</label>
+        </languageKey>
+        <languageKey index="fr" type="array">
+            <label index="tt_content.list_type_pi1">Meta FE Edit</label>
+            <label index="tx_metafeedit_actions">Actions meta admin</label>
+            <label index="tx_metafeedit_actions.title">titre</label>
+            <label index="tx_metafeedit_actions.image">image</label>
+            <label index="tx_metafeedit_actions.url">url</label>
+            <label index="tx_metafeedit_actions.tooltip">tooltip</label>
+            <label index="tx_metafeedit_actions.page">page</label>
+            <label index="tx_metafeedit_actions.category">catégorie</label>
+            <label index="tx_metafeedit_comments">Commentaires</label>
+            <label index="tx_metafeedit_comments.firstname">Prénom</label>
+            <label index="tx_metafeedit_comments.surname">Nom</label>
+            <label index="tx_metafeedit_comments.email">E-Mail</label>
+            <label index="tx_metafeedit_comments.homepage">WWW</label>
+            <label index="tx_metafeedit_comments.place">Lieu</label>
+            <label index="tx_metafeedit_comments.entry">Titre</label>
+            <label index="tx_metafeedit_comments.entrycomment">Commentaire</label>
+            <label index="tx_metafeedit_comments.remote_addr">Adresse IP</label>
+            <label index="tx_metafeedit_comments.linked_row">Information liée</label>
+            <label index="tx_metafeedit_comments.crdate">Date/heure de création</label>
+            <label index="tx_metafeedit_comments.tstamp">Dernière mise à jour</label>
+        </languageKey>
+    </data>
+    <orig_hash type="array">
+        <languageKey index="default" type="array">
+            <label index="tt_content.list_type_pi1" type="integer">93001914</label>
+            <label index="tx_metafeedit_actions" type="integer">79138135</label>
+            <label index="tx_metafeedit_actions.title" type="integer">224214449</label>
+            <label index="tx_metafeedit_actions.image" type="integer">126354850</label>
+            <label index="tx_metafeedit_actions.url" type="integer">91411684</label>
+            <label index="tx_metafeedit_actions.tooltip" type="integer">232520731</label>
+            <label index="tx_metafeedit_actions.page" type="integer">119038151</label>
+            <label index="tx_metafeedit_actions.category" type="integer">206500690</label>
+            <label index="tx_metafeedit_comments" type="integer">138493032</label>
+            <label index="tx_metafeedit_comments.firstname" type="integer">4290288</label>
+            <label index="tx_metafeedit_comments.surname" type="integer">149247351</label>
+            <label index="tx_metafeedit_comments.email" type="integer">8578394</label>
+            <label index="tx_metafeedit_comments.homepage" type="integer">22789021</label>
+            <label index="tx_metafeedit_comments.place" type="integer">129617664</label>
+            <label index="tx_metafeedit_comments.entry" type="integer">192455458</label>
+            <label index="tx_metafeedit_comments.entrycomment" type="integer">12485638</label>
+            <label index="tx_metafeedit_comments.remote_addr" type="integer">64664334</label>
+            <label index="tx_metafeedit_comments.uid_tt_news" type="integer">252865210</label>
+            <label index="tx_metafeedit_comments.crdate" type="integer">142477405</label>
+            <label index="tx_metafeedit_comments.tstamp" type="integer">37146859</label>
+            <label index="tx_metafeedit_general.crdate" type="integer">51454473</label>
+            <label index="tx_metafeedit_general.uid" type="integer">111407808</label>
+        </languageKey>
+        <languageKey index="fr" type="array">
+            <label index="tt_content.list_type_pi1" type="integer">93001914</label>
+            <label index="tx_metafeedit_actions" type="integer">79138135</label>
+            <label index="tx_metafeedit_actions.title" type="integer">224214449</label>
+            <label index="tx_metafeedit_actions.image" type="integer">126354850</label>
+            <label index="tx_metafeedit_actions.url" type="integer">91411684</label>
+            <label index="tx_metafeedit_actions.tooltip" type="integer">232520731</label>
+            <label index="tx_metafeedit_actions.page" type="integer">119038151</label>
+            <label index="tx_metafeedit_actions.category" type="integer">206500690</label>
+            <label index="tx_metafeedit_comments" type="integer">138493032</label>
+            <label index="tx_metafeedit_comments.firstname" type="integer">4290288</label>
+            <label index="tx_metafeedit_comments.surname" type="integer">149247351</label>
+            <label index="tx_metafeedit_comments.email" type="integer">8578394</label>
+            <label index="tx_metafeedit_comments.homepage" type="integer">22789021</label>
+            <label index="tx_metafeedit_comments.place" type="integer">129617664</label>
+            <label index="tx_metafeedit_comments.entry" type="integer">192455458</label>
+            <label index="tx_metafeedit_comments.entrycomment" type="integer">12485638</label>
+            <label index="tx_metafeedit_comments.remote_addr" type="integer">64664334</label>
+            <label index="tx_metafeedit_comments.linked_row" type="integer">222419149</label>
+            <label index="tx_metafeedit_comments.crdate" type="integer">142477405</label>
+            <label index="tx_metafeedit_comments.tstamp" type="integer">37146859</label>
+        </languageKey>
+    </orig_hash>
+    <orig_text type="array">
+        <languageKey index="default" type="array">
+        </languageKey>
+        <languageKey index="fr" type="array">
+        </languageKey>
+    </orig_text>
+</T3locallang>

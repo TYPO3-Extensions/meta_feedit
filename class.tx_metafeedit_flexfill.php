@@ -105,7 +105,7 @@ class tx_metafeedit_flexfill {
 		if($GLOBALS["TCA"][$table]['ctrl']['sortby'] && !is_array($GLOBALS["TCA"][$table]['columns'][$GLOBALS["TCA"][$table]['ctrl']['sortby']])) {
 			$GLOBALS["TCA"][$table]['columns'][$GLOBALS["TCA"][$table]['ctrl']['sortby']]=array(
 				'exclude'=>1,
-				'label'=>'LLL:EXT:meta_feedit/locallang.php:sorting',
+				'label'=>'LLL:EXT:meta_feedit/locallang.xml:sorting',
 				'config'=>array(
 					'type'=>'input',
 					'size'=>10,
@@ -118,7 +118,7 @@ class tx_metafeedit_flexfill {
 		if (!is_array($GLOBALS['TCA'][$table]['columns']['uid'])) {
 			$GLOBALS['TCA'][$table]['columns']['uid']=array(
 				'exclude'=>1,
-				'label'=>'LLL:EXT:meta_feedit/locallang.php:uid',
+				'label'=>'LLL:EXT:meta_feedit/locallang.xml:uid',
 				'config'=>array(
 					'type'=>'input',
 					'size'=>10,
@@ -130,7 +130,7 @@ class tx_metafeedit_flexfill {
 		if (!is_array($GLOBALS['TCA'][$table]['columns']['pid'])) {
 			$GLOBALS['TCA'][$table]['columns']['pid']=array(
 				'exclude'=>1,
-				'label'=>'LLL:EXT:meta_feedit/locallang.php:pid',
+				'label'=>'LLL:EXT:meta_feedit/locallang.xml:pid',
 				'config'=>array(
 					'type'=>'select',
 					'size'=>1,
@@ -375,7 +375,7 @@ class tx_metafeedit_flexfill {
 		if (!is_array($GLOBALS['TCA'][$table]['columns']['uid'])) {
 			$GLOBALS['TCA'][$table]['columns']['uid']=array(
 				'exclude'=>1,
-				'label'=>'LLL:EXT:meta_feedit/locallang.php:uid',
+				'label'=>'LLL:EXT:meta_feedit/locallang.xml:uid',
 				'config'=>array(
 					'type'=>'input',
 					'size'=>10,
