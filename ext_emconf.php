@@ -36,6 +36,7 @@ $EM_CONF[$_EXTKEY] = array(
 		'depends' => array(
 			'cms' => '',
 			'fpdf' => '',
+			'div' => '',
 		),
 		'conflicts' => array(
 		),
