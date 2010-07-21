@@ -41,6 +41,7 @@ require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_treecopy.
 require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_ajax.php');
 require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_lib.php');
 require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_widgets.php');
+require_once(t3lib_extMgm::extPath('div').'class.tx_div.php'); 
 
 if(t3lib_extmgm::isLoaded('rtehtmlarea')) require_once(t3lib_extMgm::extPath('rtehtmlarea').'pi2/class.tx_rtehtmlarea_pi2.php');
 if(t3lib_extmgm::isLoaded('rlmp_dateselectlib')) require_once(t3lib_extMgm::extPath('rlmp_dateselectlib').'class.tx_rlmpdateselectlib.php');
