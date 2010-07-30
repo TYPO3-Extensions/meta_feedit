@@ -1388,9 +1388,7 @@ class tx_metafeedit_lib {
 		if ($conf['stdWrap.'] || $conf[$conf['cmdmode'].'.']['stdWrap.'] || $conf[$conf['cmdmode'].'.']['item_stdWrap.'] || $conf['fileWrap.'] || $conf['evalWrap.']) {
 			$this->cObj->start(count($dataArr)?$dataArr:array(), $table);
 		}
-		print_r($dataArr);
 		foreach((array)$dataArr as $fN => $value) {
-			echo "#### $fN";
 		    if (in_array(substr($fN,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 			//special fields not to handle 
 		    if ($fN=='tx_metafeedit_dont_ctrl_checkboxes') continue;
@@ -1858,7 +1856,6 @@ class tx_metafeedit_lib {
 			}
 			unset($dataArr['tx_metafeedit_dont_ctrl_checkboxes']);
 		}
-		print_r($fe_adminLib->markerArray);
 		return $dataArr;
 	}
 
