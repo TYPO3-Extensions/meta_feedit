@@ -40,6 +40,7 @@ class tx_metafeedit_lib {
 	var $freeCap;
 	var $feadminlib;
 	var $returnvalue;
+	var $t3lib_TCEforms;
 
     /**
     * iniatialising Lib Object
@@ -72,9 +73,11 @@ class tx_metafeedit_lib {
     
     	$this->cObj = &$GLOBALS['TSFE']->cObj;
     	if (t3lib_extMgm::isLoaded('sr_freecap')) { // CBY TODO  addd check if captcha requested in flexform
-    	require_once(t3lib_extMgm::extPath('sr_freecap').'pi2/class.tx_srfreecap_pi2.php');
-    	$this->freeCap = t3lib_div::makeInstance('tx_srfreecap_pi2');
+    		require_once(t3lib_extMgm::extPath('sr_freecap').'pi2/class.tx_srfreecap_pi2.php');
+    		$this->freeCap = t3lib_div::makeInstance('tx_srfreecap_pi2');
         }
+        if (!is_object($GLOBALS['BE_USER'])) $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $this->t3lib_TCEforms = t3lib_div::makeInstance('t3lib_TCEforms');
     	$this->starttime();
     }
 
@@ -876,7 +879,7 @@ class tx_metafeedit_lib {
     */
     
 	function getForeignTableFromField($fN, &$conf,$table='',&$sql=array()) {
-	  if (!$fN) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : empty field given !";
+	  if (!$fN) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : empty field given for $table!";
 		$ret = array();
 		$fNA = t3lib_div::trimexplode('.', $fN);
 		$fNiD = end($fNA);
@@ -1385,12 +1388,17 @@ class tx_metafeedit_lib {
 		if ($conf['stdWrap.'] || $conf[$conf['cmdmode'].'.']['stdWrap.'] || $conf[$conf['cmdmode'].'.']['item_stdWrap.'] || $conf['fileWrap.'] || $conf['evalWrap.']) {
 			$this->cObj->start(count($dataArr)?$dataArr:array(), $table);
 		}
+		print_r($dataArr);
 		foreach((array)$dataArr as $fN => $value) {
+			echo "#### $fN";
 		    if (in_array(substr($fN,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 			//special fields not to handle 
 		    if ($fN=='tx_metafeedit_dont_ctrl_checkboxes') continue;
 			//ugly hack by CMD
-		    if ($fN=='sorting') continue;
+		    if ($GLOBALS['TCA'][$FTable]['ctrl']['sortby'] && $fN==$GLOBALS['TCA'][$FTable]['ctrl']['sortby']) {
+		    	$fe_adminLib->markerArray['###EVAL_ERROR_FIELD_'.$GLOBALS['TCA'][$FTable]['ctrl']['sortby'].'###'] = '';
+		    	continue;
+		    }
 		    $tab=array();
 			$res = $intable?$this->getForeignTableFromField($fN, $conf,$intable,$tab):$this->getForeignTableFromField($fN, $conf,'',$tab);			
 			$_fN=str_replace('.','_',$fN);
@@ -1399,9 +1407,10 @@ class tx_metafeedit_lib {
 			$fNiD = $res['fNiD'];
 			$values = '';
 			if (!$fe_adminLib->markerArray['###EVAL_ERROR_FIELD_'.$_fN.'###']) $fe_adminLib->markerArray['###EVAL_ERROR_FIELD_'.$_fN.'###'] = '';
-			//TODO this should not be necessary
+			//@TODO this should not be necessary
 			if (!$fe_adminLib->markerArray['###EVAL_ERROR_FIELD_'.$fN.'###']) $fe_adminLib->markerArray['###EVAL_ERROR_FIELD_'.$fN.'###'] = '';
-            $type=$conf['TCAN'][$table]['columns'][$fNiD]['config']['type'];
+            
+			$type=$conf['TCAN'][$table]['columns'][$fNiD]['config']['type'];
         	if (!$type && !$conf['list.']['sqlcalcfields.'][$fN]) {
                  if ($conf['debug']) echo "<br>NO TCA definition for masterTable : ".$fe_adminLib->theTable.", table : $table, in table : $intable, field $fNiD, orig field  : $fN";
                 continue;
@@ -1665,7 +1674,9 @@ class tx_metafeedit_lib {
 						}
 					}
 					if($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"]) {
-						t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"], $newArr, $this);
+						$this->t3lib_TCEforms->procItems($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"],$conf,$conf['TCAN'][$table]['columns'][$fNiD]['config'],$table,$dataArr,$fNiD);
+						//t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"], $newArr, $this);
+						
 						if (is_array($newArr['items'])) foreach($newArr['items'] as $item) {
 							if (!empty($item)) {
 								list($label, $val) = $item;
@@ -1778,7 +1789,9 @@ class tx_metafeedit_lib {
 						}
 					}
 					if($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"]) {
-						t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"], $newArr, $this);
+						//$newArr=array();
+						//t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"], $newArr, $this);
+						$this->t3lib_TCEforms->procItems($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"],$conf['TCAN'][$table]['columns'][$fNiD],$conf['TCAN'][$table]['columns'][$fNiD]['config'],$table,$dataArr,$fNiD);
 						if (is_array($newArr['items'])) foreach($newArr['items'] as $item) {
 							if (!empty($item)) {
 								list($label, $val) = $item;
@@ -1845,6 +1858,7 @@ class tx_metafeedit_lib {
 			}
 			unset($dataArr['tx_metafeedit_dont_ctrl_checkboxes']);
 		}
+		print_r($fe_adminLib->markerArray);
 		return $dataArr;
 	}
 
@@ -2625,9 +2639,10 @@ class tx_metafeedit_lib {
 
         			if($conf['TCAN'][$table]['columns'][$fN]['config']["itemsProcFunc"]) {     // if itemsProcFunc is set to fill the select box
           				$options = '';
-          				$params = $conf['TCAN'][$table]['columns'][$fN];
-          				$params['items'] = &$items;
-          				t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fN]['config']["itemsProcFunc"], $params, $this);
+          				//$params = $conf['TCAN'][$table]['columns'][$fN];
+          				//$params['items'] = &$items;          				
+          				//t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fN]['config']["itemsProcFunc"], $params, $this);
+         				$this->t3lib_TCEforms->procItems($items,$conf['TCAN'][$table]['columns'][$fN],$conf['TCAN'][$table]['columns'][$fN]['config'],$table,$feData[$table],$fN);
         			}
 
         			foreach((array)$items as $key => $item) {
@@ -4405,7 +4420,7 @@ class tx_metafeedit_lib {
 			}
 		} 
 		
-		//Modif by cmd - we handle default sorting of table if empty and exist
+		//we handle default sorting of table if empty and exist
 		if (empty($sql['orderBy']) && $conf['TCAN'][$table]['ctrl']['sortby']) {
 			$sql['orderBy'][] = $table.'.'.$conf['TCAN'][$table]['ctrl']['sortby'];
 		}
