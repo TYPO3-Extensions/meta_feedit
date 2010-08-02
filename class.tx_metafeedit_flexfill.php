@@ -50,6 +50,7 @@ class tx_metafeedit_flexfill {
 		if (!$flex) return;
 		$flexarr=t3lib_div::xml2array($flex);
 		$table=@$flexarr['data']['sQuickStart']['lDEF']['fetable']['vDEF'];
+		if (!$table) return;
 		$this->loadTCA($table);
 
 		$FTs=explode(",",$flexarr['data']['sDEF']['lDEF']['foreignTables']['vDEF']);
@@ -85,6 +86,7 @@ class tx_metafeedit_flexfill {
 			}		
 		}
 		$this->clearTCA($table);
+		//print_r($GLOBALS["TCA"][$table]);
 	}
 	function clearTCA($table) {
 		global $TCA;
@@ -93,6 +95,7 @@ class tx_metafeedit_flexfill {
 	}
 	
 	function LoadTCA($table) {
+		if (!$table) return;
 		global $TCA;
 		t3lib_div::loadTCA($table);
 
@@ -148,6 +151,7 @@ class tx_metafeedit_flexfill {
 		if (!$flex) return;
 		$flexarr=t3lib_div::xml2array($flex);
 		$table=@$flexarr['data']['sQuickStart']['lDEF']['fetable']['vDEF'];
+		if (!$table) return;
 		$this->loadTCA($table);
 		$FTs=explode(",",$flexarr['data']['sDEF']['lDEF']['foreignTables']['vDEF']);
 		$params['items']=array();
@@ -199,6 +203,7 @@ class tx_metafeedit_flexfill {
 		if (!$flex) return;
 		$flexarr=t3lib_div::xml2array($flex);
 		$table=@$flexarr['data']['sQuickStart']['lDEF']['fetable']['vDEF'];
+		if (!$table) return;
 		$this->loadTCA($table);
 		$FTs=explode(",",@$flexarr['data']['sDEF']['lDEF']['foreignTables']['vDEF']);
 		$params['items']=array();
@@ -227,6 +232,7 @@ class tx_metafeedit_flexfill {
 		if (!$flex) return;
 		$flexarr=t3lib_div::xml2array($flex);
 		$table=@$flexarr['data']['sQuickStart']['lDEF']['fetable']['vDEF'];
+		if (!$table) return;
 		$this->loadTCA($table);
 		$params['items']=array();
 		$params['items'][]=Array('', '');
@@ -271,6 +277,7 @@ class tx_metafeedit_flexfill {
 		if (!$flex) return;
 		$flexarr=t3lib_div::xml2array($flex);
 		$table=@$flexarr['data']['sQuickStart']['lDEF']['fetable']['vDEF'];
+		if (!$table) return;
 		$FTs=explode(",",@$flexarr['data']['sDEF']['lDEF']['foreignTables']['vDEF']);
 		$this->loadTCA($table);
 		$params['items']=array();
@@ -299,6 +306,7 @@ class tx_metafeedit_flexfill {
 	 * @return	[type]		...
 	 */
 	function getFields(&$params,$table,$rel) {
+		if (!$table) return;
 		global $TCA;
 		$prefix=$rel?$rel.'.':'';
 		t3lib_div::loadTCA($table);
@@ -325,6 +333,7 @@ class tx_metafeedit_flexfill {
 	 * @return	array		...
 	 */
 	function getFields_OB(&$params,$table,$rel,&$flexarr) {
+		if (!$table) return;
 		global $TCA;
 		$rel=str_replace('.','_',$rel);
 		$prefix=$rel?$rel.'.':'';
@@ -367,7 +376,7 @@ class tx_metafeedit_flexfill {
 	 * @return	[type]		...
 	 */
 	function getFieldsFT(&$params,$table,$prefix='') {
-
+		if (!$table) return;
 		global $TCA;
 		$ta=array();
 		t3lib_div::loadTCA($table);

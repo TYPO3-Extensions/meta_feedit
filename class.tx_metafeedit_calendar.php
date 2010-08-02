@@ -567,7 +567,7 @@ echo "<br> Next est vide. ";
     
 	function displayCalendarScreen($TABLES,$DBSELECT,&$conf,&$markerArray,&$perfArray)	{
 
-    if ($conf['performanceaudit']) $perfArray['fe_adminLib.inc displaylist start:']=$this->metafeeditlib->displaytime()." Seconds";
+    if ($conf['performanceaudit']) $perfArray['class.tx_metafeedit_calendar.php displayCalendarScreen start:']=$this->metafeeditlib->displaytime()." Seconds";
 	  //-- initialisation
 		$conf['cmdmode']='cal';
 		$content='';
@@ -721,7 +721,7 @@ echo "<br> Next est vide. ";
 		$content=$this->cObj->substituteSubpart($content, '###CATCTNRDIV###', $item);
 		$content=$this->cObj->substituteMarkerArray($content, $markerArray);
 		
-  if ($conf['performanceaudit']) $perfArray['fe_adminLib.inc displaylist end:']=$this->metafeeditlib->displaytime()." Seconds";
+  if ($conf['performanceaudit']) $perfArray['class.tx_metafeedit_calendar.php displayCalendarScreen end:']=$this->metafeeditlib->displaytime()." Seconds";
 	return $content.$DEBUG;
 
 	}

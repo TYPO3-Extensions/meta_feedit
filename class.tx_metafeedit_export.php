@@ -23,7 +23,7 @@
 ***************************************************************/
 /**
 * This is a Class for generating records in some files like CSV, PDF EXCEL, it generated buttons too.
-* called by fe_adminLib.inc
+* called by fe_adminLib.php
 * @author      Christophe BALISKY <cbalisky@metaphore.fr>
 */
 //define('FPDF_FONTPATH',t3lib_extMgm::extPath('meta_feedit').'res/fonts/');
@@ -79,7 +79,7 @@ class tx_metafeedit_export {
 	var $cObj;
 	var $caller;
 	/**
-	 * Initialisation function called by fe_adminlib.inc allow this class to acces $conf array
+	 * Initialisation function called by fe_adminlib.php allow this class to acces $conf array
 	 *
 	 * @return	nothing
 	 */

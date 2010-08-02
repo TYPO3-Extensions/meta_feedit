@@ -23,7 +23,7 @@
 	***************************************************************/
 	/**
 	* This is a Class for editing multiple records in datagrid in the frontend.
-	* called by fe_adminLib.inc
+	* called by fe_adminLib.php
 	* @author      Christophe BALISKY <cbalisky@metaphore.fr>
 	*/
 require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_lib.php');
@@ -544,7 +544,7 @@ class tx_metafeedit_grid {
 						
 						if ($conf['grid.']['gridEuros'] && $result) {  
 							$value = $val.' ï¿½';
-							//$value = $val.' €';
+							//$value = $val.' ï¿½';
 
 						}
 						else {

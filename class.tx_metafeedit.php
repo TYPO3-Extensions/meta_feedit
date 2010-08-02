@@ -51,7 +51,7 @@ if(t3lib_extmgm::isLoaded('rlmp_dateselectlib')) require_once(t3lib_extMgm::extP
 if(t3lib_extmgm::isLoaded('eu_ldap')) require_once(t3lib_extMgm::extPath('eu_ldap').'mod1/class.tx_euldap_div.php');
 if (t3lib_extMgm::isLoaded('kb_md5fepw')) require_once(t3lib_extMgm::extPath('kb_md5fepw').'class.tx_kbmd5fepw_funcs.php');
 
-require_once(t3lib_extMgm::extPath('meta_feedit').'fe_adminLib.inc');
+require_once(t3lib_extMgm::extPath('meta_feedit').'fe_adminLib.php');
 
 // FE editing class
 
@@ -111,7 +111,7 @@ class tx_metafeedit extends  tslib_pibase {
         if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init feAconf done :']=$this->metafeeditlib->displaytime()." Seconds"; 
         if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after Init feAConf size ']=strlen(serialize($conf))." Bytes"; 
 
-        // we call fe_adminLib.inc here ...
+        // we call fe_adminLib.php here ...
         $conf['caller_additionalJS_post']=$this->additionalJS_post;
         $conf['caller_additionalJS_end']=$this->additionalJS_end;
 		
@@ -2073,7 +2073,7 @@ class tx_metafeedit extends  tslib_pibase {
     		$tmp.=$sum;
     	}
         $fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
-
+        
         $nbf=$conf['list.']['nbCols']?$conf['list.']['nbCols']+$hasActions:(count(t3lib_div::trimExplode(",",$fields))+$hasActions);
 
     	// MEDIAPLAYER TAGS
@@ -2197,7 +2197,7 @@ class tx_metafeedit extends  tslib_pibase {
 		$filtercnt=count($filterArray);
 		if ($orderby) $filterArray[]=$orderby;
 
-		// Should all be replaceD by marker and evaluation should be done in metafeedit_lib called from feadminlib.inc
+		// Should all be replaceD by marker and evaluation should be done in metafeedit_lib called from feadminlib.php
     	/*$filter='<div id="blockfiltre">';
     	$filter2=$this->metafeeditlib->getLL("filtre_recherche",$conf).'<br />';
 		if ($fulltext) $filter2.= '<tr><td class="searchf">'.$fulltext.' </td></tr>';

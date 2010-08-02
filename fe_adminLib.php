@@ -261,6 +261,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// *****************
 		// order by handling , is this usefull ?
 		// *******************
+		
 		if ($this->conf['inputvar.']['orderDir']==1 && !$this->preview && !$conf['inputvar.']['doNotSave'])	{	// Delete record if delete command is sent + the preview flag is NOT set.
             if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc order start:']=$this->metafeeditlib->displaytime()." Seconds";
 			$this->orderRecord();
@@ -289,13 +290,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		}
 
 		$fArr=t3lib_div::trimexplode(',',$this->conf['fieldList']);
-		foreach($fArr as $fN) {
+		foreach($fArr as $fN) {			
 			if (in_array(substr($fN,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 			$this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'###']='';
-			//MODIF CBY
 			$this->markerArray['###FIELD_EVAL_'.$fN.'###']='';
 			$this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$fN).'###']='';
-			//MODIF CBY
 			$this->markerArray['###FIELD_EVAL_'.str_replace('.','_',$fN).'###']='';
 
  			if ( $GLOBALS['TCA'][$this->theTable]['columns'][$fN]['config']['type']=='group') {
@@ -769,8 +768,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		}
 
 		if (is_array($parseValues))	{
-				reset($parseValues);
-			  while(list($theField,$theValue)=each($parseValues))	{
+			reset($parseValues);
+			  while(list($theField,$theValue)=each($parseValues))	{			  	
 				$this->markerArray['###EVAL_ERROR_FIELD_'.$theField.'###']='';
 				$this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$theField).'###']='';
 				$listOfCommands = t3lib_div::trimExplode(',',$theValue,1);
@@ -879,9 +878,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	Function removeaccents($string)   
         {    
 	     $string= strtr($string,    
-	   "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ",   
+	   "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   
 	   "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");    
-	   //"ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ",   
+	   //"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   
 	      
 	    return $string;    
     	}   
@@ -1702,9 +1701,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if (($GLOBALS['TSFE']->loginUser &&  $this->conf['requireLogin']) || ( $this->aCAuth($origArr)&& $this->conf['requireLogin'])||!$this->conf['requireLogin'])	{	// Must be logged in OR be authenticated by the aC code in order to reorder
 			//on instancie la tce_main
 			$tce_main=t3lib_div::makeInstance('t3lib_TCEmain');
-
+			//print_r($this->conf['inputvar.']['orderDir.']);
 			//recup de l'ordre dans lequel on trie
-			if ($this->conf['inputvar.']['orderDir.']['dir']=='up') $toUp = true;
+			if ($this->conf['inputvar.']['orderDir.']['dir']=='up') {
+				$toUp = true;
+			}
 			else $toUp = false;
 
 			//recup de l'uid a modifier
@@ -1722,9 +1723,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$where.= ($hiddenField!=''?' and '.$this->theTable.'1.hidden=0 and '.$this->theTable.'2.hidden=0':''); //hidden clause
 			$where.= ' and '.$this->theTable.'1.sorting '.($toUp?'<':'>').' '.$this->theTable.'2.sorting';
 			$where.= ' and '.$this->theTable.'2.'.$this->conf['uidField'].'='.$rU;
+			$where.= ($this->conf['edit.']['menuLockPid'] && $this->conf['pid'])?' and '.$this->theTable.'1.pid='.$this->conf['pid'].' and '.$this->theTable.'2.pid='.$this->conf['pid']:'';
 			$order = $this->theTable.'1.sorting '.($toUp?'DESC':'ASC');
 			$limit = ($toUp?'1':'0').',1';
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $tables, $where, '', $order, $limit);
+			//echo $GLOBALS['TYPO3_DB']->SELECTquery($fields, $tables, $where, '', $order, $limit);
 			//si on trouve un resultat (on est donc pas sur le premier second enregistrement ni sur le dernier)
 			if ($GLOBALS['TYPO3_DB']->sql_num_rows($res) >= 1) {
 				$occ = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);

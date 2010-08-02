@@ -97,6 +97,10 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 
 		// $lconf array : configuration from BE flexform
 		$lconf=$this->lconf;
+		
+		//@todo Why on earth do I have to do this ?
+		if (!$lconf['fetable']) return '';
+		
 		$mfconf=$conf['metafeedit.'];
 		$mfconf['pageType']=$GLOBALS['TSFE']->type;
 		
@@ -177,7 +181,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['piVars']=$this->piVars;
 		$mfconf['table']=$lconf['fetable'];
 		$mfconf['userFunc']='tx_metafeedit_user_feAdmin->user_init';
-		$mfconf['includeLibs']='typo3conf/ext/meta_feedit/fe_adminLib.inc';
+		$mfconf['includeLibs']='typo3conf/ext/meta_feedit/fe_adminLib.php';
 		$mfconf['userFunc_updateArray']='tx_metafeedit_lib->user_updateArray';
 		$mfconf['evalFunc']='tx_metafeedit_lib->user_processDataArray';
 		$mfconf['required_marker']='*';
@@ -912,7 +916,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// Performance Audit
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Meta feedit initialise done:']=$this->metafeeditlib->displaytime()." Seconds"; 
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Conf metafeedit size Fin ']=strlen(serialize($mfconf))." Bytes"; 
-
 		$content=$mthfeedit->init($this,$mfconf);
 		// Performance audit
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 End ']=$this->metafeeditlib->displaytime(); 
