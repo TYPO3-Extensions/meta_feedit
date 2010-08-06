@@ -3474,6 +3474,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 *
 	 * @return	void
 	 */
+	
 	function clearCacheIfSet()	{
 		if ($this->conf['clearCacheOfPages'])	{
 			$cc_pidList = $GLOBALS['TYPO3_DB']->cleanIntList($this->conf['clearCacheOfPages']);
