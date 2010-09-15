@@ -124,7 +124,6 @@ class tx_metafeedit extends  tslib_pibase {
 					$feAdm=t3lib_div::makeInstance('tx_metafeedit_user_feAdmin');
 					$content=$feAdm->user_init("",$conf);
 				}
-				//die($content);
 
 		    if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit USER_INT call done :']=$this->metafeeditlib->displaytime()." Seconds"; 
 		
@@ -154,7 +153,7 @@ class tx_metafeedit extends  tslib_pibase {
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf size ']=strlen(serialize($conf))." Bytes"; 
 		    /**** ADDS THE REQUIRED JAVASCRIPTS ****/    
 
-    	$content .= $this->getJSAfter();
+    	$content .= $this->getJSAfter($conf);
 		return ($conf['performanceaudit']?t3lib_div::view_array($this->caller->perfArray):'').$form.$content;
   	}    
 
@@ -183,8 +182,8 @@ class tx_metafeedit extends  tslib_pibase {
         if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit cache Mode : '.$conf['cacheMode']]=$this->metafeeditlib->displaytime()." Seconds"; 
   	    if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf Enter size ']=strlen(serialize($conf))." Bytes"; 
         $conf['prefixId']= 'tx_metafeedit';
-        $conf['$additionalJS_post'] = array();
-        $conf['$additionalJS_end'] = array();
+        $conf['additionalJS_post'] = array();
+        $conf['additionalJS_end'] = array();
 
         //$conf['performanceaudit']=$caller->performanceaudit;
         
@@ -197,6 +196,8 @@ class tx_metafeedit extends  tslib_pibase {
         // we check here editUnique Creation Mode
                 
         if ($conf['editUnique']) {
+        	//@todo check why I have to do this ?
+        	$conf['inputvar.']['cmd']='edit';
         	$mmTable='';
         	$DBSELECT=$this->metafeeditlib->DBmayFEUserEditSelectMM($this->table,$GLOBALS['TSFE']->fe_user->user, $conf['allowedGroups'],$conf['fe_userEditSelf'],$mmTable,$conf).$GLOBALS['TSFE']->sys_page->deleteClause($this->table);
         	$thePid = intval($conf['pid']) ? intval($conf['pid']) : $GLOBALS['TSFE']->id;
@@ -3729,11 +3730,11 @@ function getFormJs($formName,&$conf) {
 	 *
 	 * @return	[type]		...
 	 */
-  function getJSAfter() {
+  function getJSAfter($conf) {
   	if (!$GLOBALS['TSFE']->config['config']['removeDefaultJS']) {
-   		return '<script type="text/javascript">'.implode(chr(10), $this->additionalJS_post).'</script>'.chr(10).'<script type="text/javascript">'.implode(chr(10), $this->additionalJS_end).'</script>';
+   		return '<script type="text/javascript">'.implode(chr(10), $this->additionalJS_post).'</script>'.chr(10).'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_end']).'</script>';
 		} else {
- 			return $this->metafeeditlib->inline2TempFile(implode(chr(10), $this->additionalJS_post), 'js').chr(10).$this->metafeeditlib->inline2TempFile(implode(chr(10), $this->additionalJS_end), 'js');//'<script type="text/javascript" src="'.TSpagegen::inline2TempFile(implode(chr(10), $this->additionalJS_post), 'js').'"></script>'.chr(10).'<script type="text/javascript" src="'.TSpagegen::inline2TempFile(implode(chr(10), $this->additionalJS_end), 'js').'"></script>';
+ 			return $this->metafeeditlib->inline2TempFile(implode(chr(10), $this->additionalJS_post), 'js').chr(10).$this->metafeeditlib->inline2TempFile(implode(chr(10), $conf['additionalJS_end']), 'js');
 	  }			
   }
 

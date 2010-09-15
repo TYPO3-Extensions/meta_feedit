@@ -45,7 +45,12 @@ class tx_metafeedit_pi1_wizicon {
 		return $wizardItems;
 	}
 	function includeLocalLang()	{
-		include(t3lib_extMgm::extPath("meta_feedit")."locallang.xml");
+	    $typoVersion = t3lib_div::int_from_ver($GLOBALS['TYPO_VERSION']);
+        if ($typoVersion >= 3008000) {
+            $LOCAL_LANG = $GLOBALS['LANG']->includeLLFile(t3lib_extMgm::extPath('meta_feedit').'locallang.xml',FALSE);
+        } else {
+            include(t3lib_extMgm::extPath('meta_feedit').'locallang.php');
+        }
 		return $LOCAL_LANG;
 	}
 }

@@ -648,6 +648,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			}
 		}
 
+
 		// MODIF CBY
 		// here we deduct missing fields from showFields,readonlyFields,overridValues,evalValues and processValues
 		$mfconf['edit.']['show_fields']=implode(',',$this->metafeeditlib->clean_array(array_unique(array_merge(t3lib_div::trimExplode(',',$this->correctFieldSets($mfconf['edit.']['show_fields'])),t3lib_div::trimExplode(',',$mfconf['edit.']['readonlyFields'])))));
@@ -794,6 +795,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// we check here editUnique Creation Mode (must optimize this);
         
 		if ($conf['editUnique']) {
+			//@todo why do i have to do this ?
+			$mfconf['inputvar.']['cmd']='edit';
+			
 			$mmTable='';
 			$DBSELECT=$this->metafeeditlib->DBmayFEUserEditSelectMM($this->theTable,$GLOBALS['TSFE']->fe_user->user, $mfconf['allowedGroups'],$mfconf['fe_userEditSelf'],$mmTable,$mfconf).$GLOBALS['TSFE']->sys_page->deleteClause($this->theTable);
 			$thePid = intval($mfconf['pid']) ? intval($mfconf['pid']) : $GLOBALS['TSFE']->id;
