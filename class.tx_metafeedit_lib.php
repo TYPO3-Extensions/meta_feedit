@@ -91,9 +91,9 @@ class tx_metafeedit_lib {
 	 
     function getJSAfter(&$feadminlib,&$conf) {
         $JS= $conf['noJS']?'':
-        '<script type="text/javascript">'.implode(chr(10), $conf['caller_additionalJS_post']).'</script>'.chr(10).
-        '<script type="text/javascript">'.implode(chr(10), $conf['caller_additionalJS_end']).'</script>';
-        return $JS.(is_array($conf['additionalJS_post'])?'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_post']).'</script>'.chr(10):'').(is_array($conf['additionalJS_end'])?'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_end']).'</script>':'');
+        (count($conf['caller_additionalJS_post'])?'<script type="text/javascript">'.implode(chr(10), $conf['caller_additionalJS_post']).'</script>'.chr(10):'').
+        (count($conf['caller_additionalJS_end'])?'<script type="text/javascript">'.implode(chr(10), $conf['caller_additionalJS_end']).'</script>':'');
+        return $JS.(count($conf['additionalJS_post'])?'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_post']).'</script>'.chr(10):'').(count($conf['additionalJS_end'])?'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_end']).'</script>':'');
     }
     /**
     * inline2TempFile : compatibility version since version 4.3 of typo3 has changed 
@@ -105,9 +105,8 @@ class tx_metafeedit_lib {
     */
 	function inline2TempFile($script,$ext) {
 		$ret=TSpagegen::inline2TempFile($script,$ext);
-		//TODO better test 
+		//TODO better test on typo3 version
 		if (!strpos($ret,'</script>')) $ret='<script type="text/javascript" src="'.$ret.'"></script>';
-		//'<script type="text/javascript" src="'.TSpagegen::inline2TempFile($script,'js').'"></script>';	
 		return $ret;
 	}
 	
@@ -906,6 +905,48 @@ class tx_metafeedit_lib {
 		$ret['fNiD'] = $fNiD;
 		return $ret;
 	}
+	
+	   /**
+    * getForeignTableFromField2
+    *
+    * @param	string		$fN: full field name path from $table ...(with '.' as seperators).  Must not be empty
+    * @param	array		$conf : configuration array();
+     * @return	array		The subpart with all markers found in current $this->markerArray substituted.
+    * this function handles Foreign table relations (level 1) , it allows us to get foreign table name from field
+    * it returns foreigntable name and name of field in foreign table
+ 	* it also loads TCA of unloaded tables
+    */
+    
+	function getForeignTableFromField2($fN,$ftable, &$confTcan) {
+	  if (!$fN) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField2 : empty field given for $table!";
+		$fNA = t3lib_div::trimexplode('.', $fN);
+		$fNiD = end($fNA);
+		//$ftable = $conf['table'];
+		$relTable=$ftable;
+		foreach ($fNA as $f) {
+        	if (strstr($f,'--fse--') || strstr($f,'--fsb--'))     continue;
+		    $relTable=$ftable;
+		    
+			if ($f!="sorting") {
+				if (!is_array($confTcan[$ftable])) {
+					$this->makeTypo3TCAForTable($confTcan,$ftable);
+				}
+				if (!is_array($confTcan[$ftable]['columns'][$f]) && !$conf['list.']['sqlcalcfields.'][$fN] ) {
+					if ($conf['debug']) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : field  $f / $fN given does not exist in table $ftable ... InTable : $table! orig table :".$conf['table'];
+				}
+
+				if ($confTcan[$ftable]['columns'][$f]['config']['foreign_table']) $ftable =$confTcan[$ftable]['columns'][$f]['config']['foreign_table'];	
+				if (!is_array($confTcan[$ftable])) {
+					$this->makeTypo3TCAForTable($confTcan,$ftable);
+				}			
+			}
+		}
+		
+		$ret = $ftable?$ftable:$relTable; // if we found a foreign table we return otherwhise table is main table..
+
+		return $ret;
+	}
+	
 
     /**
     * makeSQLJoin
@@ -1380,6 +1421,8 @@ class tx_metafeedit_lib {
 	function user_processDataArray($content, &$inconf,$intable='',$forceInConf=FALSE) {
 		
 		$fe_adminLib = &$inconf['parentObj'];
+		//echo $forceInConf;
+		//krumo($fe_adminLib);
 		$conf = $forceInConf?$inconf:$fe_adminLib->conf;
 		
 		$dataArr = $content;
@@ -1581,11 +1624,8 @@ class tx_metafeedit_lib {
 				if ($conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']) {
 					// reference to elements from another table
 					$FT = $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'];
-					$label = $conf['label.'][$FT]?$conf['label.'][$FT]:
-					$conf['TCAN'][$FT]['ctrl']['label'];
-										
-					$label_alt = $conf['label_alt.'][$FT]?$conf['label_alt.'][$FT]: 
-						$conf['TCAN'][$FT]['ctrl']['label_alt'];
+					$label = $conf['label.'][$FT]?$conf['label.'][$FT]:$conf['TCAN'][$FT]['ctrl']['label'];
+					$label_alt = $conf['label_alt.'][$FT]?$conf['label_alt.'][$FT]:$conf['TCAN'][$FT]['ctrl']['label_alt'];
 
 					$label_alt_force = $conf['label_alt_force.'][$FT]?$conf['label_alt_force.'][$FT]: 
 						$conf['TCAN'][$FT]['ctrl']['label_alt_force'];
@@ -4660,8 +4700,6 @@ class tx_metafeedit_lib {
 		$lField=$conf['inputvar.']['lField'];
 		if  ($lV && $lField) {	
 			$FT=$conf['TCAN'][$table]['columns'][$lField]['config']['foreign_table'];
-			//print_r($conf['TCAN'][$table]['columns'][$lField]['config']);
-			//echo $FT;
 			if ($FT) {
 				$mmTable=$this->conf['TCAN'][$table]['columns'][$lField]['config']['MM'];
 				//echo $mmTable.' - '.$conf['TCAN'][$table]['columns'][$lField]['config']['size'];

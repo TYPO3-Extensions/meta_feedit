@@ -647,16 +647,13 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 				if ($OVs[0]) $EVArr[]=$OVs[0];
 			}
 		}
-
-
 		// MODIF CBY
 		// here we deduct missing fields from showFields,readonlyFields,overridValues,evalValues and processValues
 		$mfconf['edit.']['show_fields']=implode(',',$this->metafeeditlib->clean_array(array_unique(array_merge(t3lib_div::trimExplode(',',$this->correctFieldSets($mfconf['edit.']['show_fields'])),t3lib_div::trimExplode(',',$mfconf['edit.']['readonlyFields'])))));
 		$mfconf['edit.']['fields']=implode(',',$this->metafeeditlib->clean_array(array_unique(array_merge($EVArr,t3lib_div::trimExplode(',',$mfconf['edit.']['fields']),t3lib_div::trimExplode(',',$this->correctFieldSets($mfconf['edit.']['show_fields']))))));
 		$mfconf['create.']['show_fields']=implode(',',$this->metafeeditlib->clean_array(array_unique(array_merge(t3lib_div::trimExplode(',',$this->correctFieldSets($mfconf['create.']['show_fields'])),t3lib_div::trimExplode(',',$mfconf['create.']['readonlyFields'])))));
 		$mfconf['create.']['fields']=implode(',',$this->metafeeditlib->clean_array(array_unique(array_merge($CVArr,t3lib_div::trimExplode(',',$mfconf['create.']['fields']),t3lib_div::trimExplode(',',$this->correctFieldSets($mfconf['create.']['show_fields']))))));
-		//$this->conf=$conf;
-	
+
 		/*** GLOBAL TCA overrides ... ***/
 		
 		$GLOBALS['TCA'][$lconf['fetable']]['ctrl']['fe_cruser_id']=$lconf['fecruser_field'];

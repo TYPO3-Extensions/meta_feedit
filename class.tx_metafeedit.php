@@ -128,7 +128,7 @@ class tx_metafeedit extends  tslib_pibase {
 		    if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit USER_INT call done :']=$this->metafeeditlib->displaytime()." Seconds"; 
 		
 				/**** ADDS THE REQUIRED JAVASCRIPTS ****/
-				$content = $this->getJSBefore($conf) . $content;
+				$content = $this->getJSBefore($conf).$content;
 		    // XAJAX form handler. Must not be generated if we are in an ajax call.
 		    $onSubmit = ' onsubmit="return false;" ';
 		    $form=t3lib_div::_GP('ajx')?'':'<form style="display:inline;height:10px;padding:0px;margin:0px;" '.$onSubmit.' action="#" method="post" enctype="multipart/form-data" id="xfm" name="xfm">'.
@@ -204,7 +204,6 @@ class tx_metafeedit extends  tslib_pibase {
             $lockPid = $conf['edit.']['menuLockPid'] ? ' AND pid='.intval($thePid) : '';
             $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $this->table.($mmTable?','.$mmTable:'') , '1 '.$lockPid.$DBSELECT);
             $resu=$GLOBALS['TYPO3_DB']->sql_num_rows($res);
-            //TODO CBY I must improve this condition !!
         	if ($resu===0 &&  $this->cmd!='setfixed') $conf['inputvar.']['cmd']='create';
         }
         
@@ -279,11 +278,12 @@ class tx_metafeedit extends  tslib_pibase {
        // We handle foreign tables of fields
         $lfields=t3lib_div::trimexplode(',',$conf['list.']['advancedSearchFields']);
         foreach ($lfields as $lf) {
-        	if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
+         	if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
         }
         // We add fe_user table just in case we need feuser join.		
         if (!in_array('fe_users',$FTs)) $FTs['fe_users']='fe_users';
         if (!in_array('tx_metafeedit_comments',$FTs)) $FTs['tx_metafeedit_comments']='tx_metafeedit_comments';
+                
         $conf['TCATables']=$FTs;
 		//We handle here tables from other software than T3 !!
 		//TODO : We should do this for every foreign table
@@ -310,7 +310,10 @@ class tx_metafeedit extends  tslib_pibase {
 		foreach($FTs as $FTable) {
 		    $this->metafeeditlib->makeTypo3TCAForTable($conf['TCAN'],$FTable);
 		}
-		
+		//We get related foreign tabels if necessary
+        foreach ($lfields as $lf) {
+        	$r=$this->metafeeditlib->getForeignTableFromField2($lf,$conf['table'],$conf['TCAN']);
+        }		
 	    // Set private TCA var
 		
 		if (is_array($conf['general.']['tsOverride.'])) {
@@ -718,10 +721,10 @@ class tx_metafeedit extends  tslib_pibase {
           $fieldDescription = '<html><head><title>'.$field.'</title><style type="text/css">'.preg_replace("(\r)"," ",preg_replace("(\n)"," ",$conf['help_window_style'])).'</style></head><body'.$this->caller->pi_classParam('help-body').'><div'.$this->caller->pi_classParam('help-text').'>'.$fieldDescription.'</div></body></html>';
           $aOnClick = 'top.vHWin=window.open(\'\',\'viewFieldHelpFE\',\'height=20,width=300,status=0,menubar=0,scrollbars=1\');top.vHWin.document.writeln(\''.$fieldDescription.'\');top.vHWin.document.close();top.vHWin.focus();return false;';
         
-          $script =
+          $script ='';/*
             '<script type="text/javascript">' .
             '' .
-            '</script>';
+            '</script>';*/
         
           require_once(PATH_t3lib . 'class.t3lib_iconworks.php');
           return
@@ -3607,13 +3610,11 @@ function getFormJs($formName,&$conf) {
 
 				for (a=0;a<l;a++)	{
 					if (fObjSel.options[a].selected!=1)	{
-							// Add non-selected element:
 						localArray_V[c]=fObjSel.options[a].value;
 						localArray_L[c]=fObjSel.options[a].text;
 						localArray_S[c]=0;
 						c++;
 
-							// Transfer any accumulated and reset:
 						if (tA.length > 0)	{
 							for (aa=0;aa<tA.length;aa++)	{
 								localArray_V[c]=fObjSel.options[tA[aa]].value;
@@ -3706,19 +3707,18 @@ function getFormJs($formName,&$conf) {
 			}
 		}
 		return "";
-	}
-	
-     ';
-/*]]>*/
-
-   	if (!$GLOBALS['TSFE']->config['config']['removeDefaultJS']) {
-  		$result.='<script type="text/javascript">'.$script.'</script>';
+	}';
+	/*
+	 * @todo big bug here if i try to insert code directly, remove false when problem solved
+	 */
+   	if (false && !$GLOBALS['TSFE']->config['config']['removeDefaultJS']) {
+  		$result.='<script type="text/javascript">/*<![CDATA[*/'.$script.']]>*/</script>';
    		$result .= $this->additionalJS_initial;
     	if ($this->additionalJS_pre) $result.'<script type="text/javascript">'. implode('', $this->additionalJS_pre).'</script>';
   	} else {
-  	 	$result.=$this->metafeeditlib->inline2TempFile($script,'js');//'<script type="text/javascript" src="'.TSpagegen::inline2TempFile($script,'js').'"></script>';
+  	 	$result.=$this->metafeeditlib->inline2TempFile($script,'js');
    		$result.= $this->additionalJS_initial;
-    	if ($this->additionalJS_pre) $result.=$this->metafeeditlib->inline2TempFile(implode('', $this->additionalJS_pre),'js');    //'<script type="text/javascript" src="'.TSpagegen::inline2TempFile( implode('', $this->additionalJS_pre),'js').'"></script>';
+    	if ($this->additionalJS_pre) $result.=$this->metafeeditlib->inline2TempFile(implode('', $this->additionalJS_pre),'js');
   	}
     if($conf['divide2tabs'])
 		$result .= $this->templateObj->getDynTabMenuJScode();
@@ -3733,9 +3733,9 @@ function getFormJs($formName,&$conf) {
   function getJSAfter($conf) {
   	if (!$GLOBALS['TSFE']->config['config']['removeDefaultJS']) {
    		return '<script type="text/javascript">'.implode(chr(10), $this->additionalJS_post).'</script>'.chr(10).'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_end']).'</script>';
-		} else {
- 			return $this->metafeeditlib->inline2TempFile(implode(chr(10), $this->additionalJS_post), 'js').chr(10).$this->metafeeditlib->inline2TempFile(implode(chr(10), $conf['additionalJS_end']), 'js');
-	  }			
+	} else {
+		return (count($this->additionalJS_post)?$this->metafeeditlib->inline2TempFile(implode(chr(10), $this->additionalJS_post), 'js'):'').(count($conf['additionalJS_end'])?chr(10).$this->metafeeditlib->inline2TempFile(implode(chr(10), $conf['additionalJS_end']), 'js'):'');
+	}			
   }
 
   /**
