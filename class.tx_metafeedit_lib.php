@@ -1252,7 +1252,7 @@ class tx_metafeedit_lib {
 		while ($crow = mysql_fetch_assoc($cres)) {
 			  $markerArray=array();
 				$markerArray = $this->cObj->fillInMarkerArray($markerArray, $crow, '', TRUE, 'FIELD_', FALSE);
-				$markerArray['###FIELD_EVAL_crdate###'] = strftime(($conf['datetimeformat']?$conf['datetimeformat']:"%H:%M %e-%m-%Y"),$crow['crdate']);
+				$markerArray['###FIELD_EVAL_crdate###'] = strftime(($conf['datetimeformat']?$conf['datetimeformat']:"%H:%M %d-%m-%Y"),$crow['crdate']);
 				// we must unset uid so that we point on uid of calling object
 				unset($markerArray['###FIELD_uid###']);
 				$ret.=$this->cObj->substituteMarkerArray($blogCommentTpl, $markerArray);

@@ -1359,6 +1359,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	function save(&$conf)	{
 		// Before Save transformations for RTE
 		$saveArray=array();
+		//print_r($this->dataArr);
 		foreach($this->dataArr as $fN=>$val) {
 		
 			if (strpos($fN,'.') || substr($fN,0,5)=='EVAL_') {
@@ -2771,6 +2772,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	function displayEditForm($origArr,&$conf,$exporttype='')	{
 		//We merge data with override values and eval values ...
 		$currentArr = array_merge($origArr,(array)$this->dataArr);
+		
+		//print_r($currentArr);
 		$arr=explode(',',$conf['fieldList']);
 		$pluginId=$conf['pluginId'];
 		$back_lnk = $this->conf['typoscript.'][$pluginId.'.']['edit.']['nobackbutton']?false:($this->conf['typoscript.']['default.']['edit.']['nobackbutton']?false:true);
@@ -2782,17 +2785,24 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			if (!$this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$key).'###']) $this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$key).'###']='';
 			if ( $GLOBALS['TCA'][$this->theTable]['columns'][$key]['config']['type']=='group' &&  $GLOBALS['TCA'][$this->theTable]['columns'][$key]['config']['internal_type']=='file')	{
 				if (!$this->markerArray['###EVAL_ERROR_FIELD_'.$key.'_file###']) $this->markerArray['###EVAL_ERROR_FIELD_'.$key.'_file###']='';
-			// we handle here field_file copy in field.
+				if (!$this->markerArray['###EVAL_FIELD_'.$key.'_file_file###']) $this->markerArray['###EVAL_FIELD_'.$key.'_file_file###']='';
+				if (!$this->markerArray['###EVAL_FIELD_'.$key.'_file###']) $this->markerArray['###EVAL_FIELD_'.$key.'_file###']='';
+				if (!$this->markerArray['###FIELD_'.$key.'_file_file###']) $this->markerArray['###FIELD_'.$key.'_file_file###']='';
+				if (!$this->markerArray['###FIELD_'.$key.'_file###']) $this->markerArray['###FIELD_'.$key.'_file###']='';
+				// we handle here field_file copy in field.
 			//if ($this->dataArr[$key.'_file'] and !in_array($this->dataArr[$key.'_file'],explode(',',$currentArr[$key]))) $currentArr[$key]=$currentArr[$key]?$currentArr[$key].','.$this->dataArr[$key.'_file']:$this->dataArr[$key.'_file'];
 			}
 		}
 		if ($this->conf['debug'])	debug('displayEditForm(): '.'###TEMPLATE_EDIT'.$this->previewLabel.'###',1);
 		$templateCode = $this->cObj->getSubpart($this->templateCode, '###TEMPLATE_EDIT'.$this->previewLabel.($exporttype?'_'.$exporttype:'').'###');
+		//print_r($currentArr);
+		//if ($this->preview) echo $templateCode;
 		$failure = t3lib_div::_GP('noWarnings')?'':$this->failure;
 		if (!$failure)	{$templateCode = $this->cObj->substituteSubpart($templateCode, '###SUB_REQUIRED_FIELDS_WARNING###', '');}
 		$templateCode = $this->removeRequired($templateCode,$failure);
 		$this->metafeeditlib->setCObjects($this->conf,$this->markerArray,$templateCode,$currentArr);
 		//krumo($this->markerArray);
+		
 		$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $currentArr, '', TRUE, 'FIELD_', FALSE);
 		//$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $currentArr, '', TRUE, 'FIELD_', $this->conf['general.']['xhtml']);
 		$markerArray['###HIDDENFIELDS###'].= '<input type="hidden" name="FE['.$this->theTable.']['.$this->conf['uidField'].']" value="'.$currentArr[$this->conf['uidField']].'" />'.($conf['blogData']?'<input type="hidden" name="cameFromBlog['.$pluginId.']" value="1" />':'');

@@ -354,7 +354,7 @@ class tx_metafeedit extends  tslib_pibase {
         }
         
         // get override language data coming from typoscript. Should handle multiple languages ...
-        // TOOPTIMIZE : We should only load default and local language translations ... 
+        //@todo : We should only load default and local language translations ... 
        
          if (is_array($conf['_LOCAL_LANG.'])){
             foreach($conf['_LOCAL_LANG.'] as $key=>$valarr) {
@@ -911,26 +911,27 @@ class tx_metafeedit extends  tslib_pibase {
       }
       // special cases requiring presentation transformation
 	  $evals=t3lib_div::trimexplode(',',$conf['TCAN'][$table]['columns'][$fNiD]['config']["eval"]);
-	  
       if(in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) $values = '###FIELD_EVAL_'.$fN.'###';
       if (in_array('wwwURL',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
       if (in_array('email',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
-
-
+      
       $feData = t3lib_div::_POST("FE");
 
       // Format the values.                
 	  // TODO: This only shows the date on a nice format if it is send to the page, not if it is from an overrideValue.
 	  
       if($isPassword) $values = '********';
-      else if(in_array('date',$evals) && !empty($feData[$masterTable][$fN])) {
-				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'),$feData[$masterTable][$fN]);
+      /* @todo check if this part is still necessary;
+       * 
+       **/
+       else if(in_array('date',$evals) && !empty($feData[$masterTable][$fN])) {
+				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%d-%Y' :'%d-%m-%Y'),$feData[$masterTable][$fN]);
       } else if(in_array('datetime',$evals) && !empty($feData[$masterTable][$fN])) {
-				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'),$feData[$masterTable][$fN]);
+				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%d-%Y' :'%H:%M %d-%m-%Y'),$feData[$masterTable][$fN]);
       } else if(in_array('time',$evals) && !empty($feData[$masterTable][$fN])) {
 				$values = strftime('%H:%M',$feData[$masterTable][$fN]);
       }
-
+     
       if($displayTwice) {
 				$fieldName_again = 'FE['.$masterTable.']['.$fN.'_again]';
 				return $withHTML?'<input type="hidden" name="'.$fieldName.'" /><input type="hidden" name="'.$fieldName_again.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
@@ -948,7 +949,9 @@ class tx_metafeedit extends  tslib_pibase {
       break;
     case 'group':
       if($conf['TCAN'][$table]['columns'][$fNiD]['config']["internal_type"]=='file') {
-      	return $withHTML?'<input type="hidden" name="'.$fieldName.'" /><input type="hidden" name="FE['.$masterTable.']['.$fN.'_file]" value="###FIELD_'.$fN.'_file###"/>###FIELD_EVAL_'.$fN.'###'.$EVAL_ERROR_FIELD:'###FIELD_'.$fN.'###'.$EVAL_ERROR_FIELD;
+      	//echo '<br>'.$feData[$masterTable][$fN].' ==== '.$fN.' ---- '.$conf['TCAN'][$table]['columns'][$fNiD]['config']["eval"];     	
+      	//print_r($feData[$masterTable]);
+      	return $withHTML?'<input type="hidden" name="'.$fieldName.'" value="###FIELD_'.$fN.'_file_file###" /><input type="hidden" name="FE['.$masterTable.']['.$fN.'_file]" value="###FIELD_'.$fN.'_file_file###"/>###FIELD_EVAL_'.$fN.'###'.$EVAL_ERROR_FIELD:'###FIELD_'.$fN.'###'.$EVAL_ERROR_FIELD;
       } else {  // we assume internal_type = db
       	$values = '###FIELD_EVAL_'.$fN.'###';
         if($conf['TCAN'][$table]['columns'][$fNiD]['config']["allowed"]) {  // reference to elements from another table
@@ -1127,11 +1130,11 @@ class tx_metafeedit extends  tslib_pibase {
                     (t3lib_extmgm::isLoaded('rlmp_dateselectlib') && !empty($conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']) ?
                     (is_int(array_search('date',t3lib_div::trimExplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"])))
                     ?
-                    tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y'))))
+                    tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%d-%Y' :'%d-%m-%Y'))))
                     :
                     (is_int(array_search('datetime',t3lib_div::trimExplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval'])))
                     ?
-                    tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=> ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y'))))
+                    tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=> ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%d-%Y' :'%H:%M %d-%m-%Y'))))
                     : ''))
                     : '').$EVAL_ERROR_FIELD;
                 }
@@ -3932,9 +3935,9 @@ function getFormJs($formName,&$conf) {
 						  $ret.=$div.'<input type="radio" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_equal" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][op]" value="=" ###ASCHECKEDEQUAL### /><label for="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_equal">=</label>';
 						  $ret.='<input type="radio" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_inf" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][op]" value="<" ###ASCHECKEDINF### /><label for="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_inf">&lt;</label>';
 						  $ret.='<input type="radio" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_sup" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][op]" value=">" ###ASCHECKEDSUP### /><label for="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_sup">&gt;</label>';
-						  $ret.='<input type="text" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][val]" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.val" value="###ASFIELD_'.$FN.'_VAL###" '.$this->caller->pi_classParam('form-asfield').' />'.(t3lib_extmgm::isLoaded('rlmp_dateselectlib')?tx_rlmpdateselectlib::getInputButton($this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.val',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y')))):'');
+						  $ret.='<input type="text" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][val]" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.val" value="###ASFIELD_'.$FN.'_VAL###" '.$this->caller->pi_classParam('form-asfield').' />'.(t3lib_extmgm::isLoaded('rlmp_dateselectlib')?tx_rlmpdateselectlib::getInputButton($this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.val',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%d-%Y' :'%d-%m-%Y')))):'');
 						  $ret.='<input type="radio" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_between" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][op]" value="><" ###ASCHECKEDBETWEEN###/><label for="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.op_between">&gt;&lt;</label>';
-						  $ret.='<input type="text" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][valsup]" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.valsup" value="###ASFIELD_'.$FN.'_VALSUP###" '.$this->caller->pi_classParam('form-asfield').'/>'.(t3lib_extmgm::isLoaded('rlmp_dateselectlib')?tx_rlmpdateselectlib::getInputButton($this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.valsup',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y')))):'');
+						  $ret.='<input type="text" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.'][valsup]" id="'.$this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.valsup" value="###ASFIELD_'.$FN.'_VALSUP###" '.$this->caller->pi_classParam('form-asfield').'/>'.(t3lib_extmgm::isLoaded('rlmp_dateselectlib')?tx_rlmpdateselectlib::getInputButton($this->prefixId.'.advancedSearch.'.$conf['pluginId'].'.'.$FN.'.valsup',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%d-%Y' :'%d-%m-%Y')))):'');
 						  $ret.='</div>';
 						  break;
 					  case 'group':
