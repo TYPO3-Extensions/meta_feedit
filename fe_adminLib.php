@@ -694,7 +694,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
         if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc process end:']=$this->metafeeditlib->displaytime()." Seconds";
 
 	    // Return content:
-	    $content.=$this->metafeeditlib->getJSAfter($this,$this->conf);
+	    //$content.=$this->metafeeditlib->getJSAfter($this,$this->conf);
 	    if ($conf['debug.']['vars']) {
 	  	    $this->metafeeditlib->debug('Post Vars :',$_POST,$DEBUG);
 	  	    $this->metafeeditlib->debug('GET Vars :',$_GET,$DEBUG);
@@ -2796,7 +2796,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($this->conf['debug'])	debug('displayEditForm(): '.'###TEMPLATE_EDIT'.$this->previewLabel.'###',1);
 		$templateCode = $this->cObj->getSubpart($this->templateCode, '###TEMPLATE_EDIT'.$this->previewLabel.($exporttype?'_'.$exporttype:'').'###');
 		//print_r($currentArr);
-		//if ($this->preview) echo $templateCode;
+		//if (!$this->preview) echo $templateCode;
 		$failure = t3lib_div::_GP('noWarnings')?'':$this->failure;
 		if (!$failure)	{$templateCode = $this->cObj->substituteSubpart($templateCode, '###SUB_REQUIRED_FIELDS_WARNING###', '');}
 		$templateCode = $this->removeRequired($templateCode,$failure);
@@ -3020,6 +3020,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if (is_array($this->conf[$this->conf['cmdKey'].'.']['evalValues.']))	{
 			reset($this->conf[$this->conf['cmdKey'].'.']['evalValues.']);
 			while(list($theField,$theValue)=each($this->conf[$this->conf['cmdKey'].'.']['evalValues.']))	{
+				
 				$listOfCommands = t3lib_div::trimExplode(',',$theValue,1);
 				while(list(,$cmd)=each($listOfCommands))	{
 					$cmdParts = preg_split('/\[|\]/',$cmd);	// Point is to enable parameters after each command enclosed in brackets [..]. These will be in position 1 in the array.

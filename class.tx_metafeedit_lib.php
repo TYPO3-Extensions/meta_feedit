@@ -88,13 +88,13 @@ class tx_metafeedit_lib {
     * @param	[type]		$conf: ...
     * @return	[type]		...
     */
-	 
+	 /*
     function getJSAfter(&$feadminlib,&$conf) {
         $JS= $conf['noJS']?'':
-        (count($conf['caller_additionalJS_post'])?'<script type="text/javascript">'.implode(chr(10), $conf['caller_additionalJS_post']).'</script>'.chr(10):'').
-        (count($conf['caller_additionalJS_end'])?'<script type="text/javascript">'.implode(chr(10), $conf['caller_additionalJS_end']).'</script>':'');
-        return $JS.(count($conf['additionalJS_post'])?'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_post']).'</script>'.chr(10):'').(count($conf['additionalJS_end'])?'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_end']).'</script>':'');
-    }
+        (count($conf['caller_additionalJS_post'])?'<script rel="yo11" type="text/javascript">'.implode(chr(10), $conf['caller_additionalJS_post']).'</script>'.chr(10):'').
+        (count($conf['caller_additionalJS_end'])?'<script rel="yo9" type="text/javascript">'.implode(chr(10), $conf['caller_additionalJS_end']).'</script>':'');
+        return $JS.(count($conf['additionalJS_post'])?'<script rel="yo6" type="text/javascript">'.implode(chr(10), $conf['additionalJS_post']).'</script>'.chr(10):'').(count($conf['additionalJS_end'])?'<script rel="yo5" type="text/javascript">'.implode(chr(10), $conf['additionalJS_end']).'</script>':'');
+    }*/
     /**
     * inline2TempFile : compatibility version since version 4.3 of typo3 has changed 
     * in new version only gives uri of temp file

@@ -721,10 +721,7 @@ class tx_metafeedit extends  tslib_pibase {
           $fieldDescription = '<html><head><title>'.$field.'</title><style type="text/css">'.preg_replace("(\r)"," ",preg_replace("(\n)"," ",$conf['help_window_style'])).'</style></head><body'.$this->caller->pi_classParam('help-body').'><div'.$this->caller->pi_classParam('help-text').'>'.$fieldDescription.'</div></body></html>';
           $aOnClick = 'top.vHWin=window.open(\'\',\'viewFieldHelpFE\',\'height=20,width=300,status=0,menubar=0,scrollbars=1\');top.vHWin.document.writeln(\''.$fieldDescription.'\');top.vHWin.document.close();top.vHWin.focus();return false;';
         
-          $script ='';/*
-            '<script type="text/javascript">' .
-            '' .
-            '</script>';*/
+          $script ='';
         
           require_once(PATH_t3lib . 'class.t3lib_iconworks.php');
           return
@@ -1231,7 +1228,7 @@ class tx_metafeedit extends  tslib_pibase {
 						
 									$conf['additionalJS_end']['feedit_'.$fN.'_again_set_data'] = 'setFormRegenerer(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']'.'\');';
 								}else{
-									$size .= ' multiple ';
+									$size .= ' multiple="multiple" ';
 									$onchange = ' onchange="feedit_manipulateMultipleSelect(\''.$fieldName.'\')" ';
 									$srow = '<select '.$size.' '.$onchange.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_select">';
 									$hr = '<input type="hidden" name="'.$fieldName.'" />';
@@ -1343,7 +1340,7 @@ class tx_metafeedit extends  tslib_pibase {
 							$conf['additionalJS_end']['feedit_'.$fN.'_again_set_data'] = 'setFormRegenerer(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']'.'\');';
 						}else{
 						
-							$size .= ' multiple ';
+							$size .= ' multiple="multiple" ';
 							$onchange = ' onchange="feedit_manipulateMultipleSelect(\''.$fieldName.'\')" ';
 							$srow = '<select '.$size.' '.$onchange.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_select">';
 							$hr = '<input type="hidden" name="'.$fieldName.'" />';
@@ -1444,7 +1441,7 @@ class tx_metafeedit extends  tslib_pibase {
 							$conf['additionalJS_end']['feedit_'.$fN.'_again_set_data'] = 'setFormRegenerer(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']'.'\');';
 						}else{
 						
-							$size .= ' multiple ';
+							$size .= ' multiple="multiple" ';
 							$onchange = ' onchange="feedit_manipulateMultipleSelect(\''.$fieldName.'\')" ';
 							$srow = '<select '.$size.' '.$onchange.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_select">';
 							$hr = '<input type="hidden" name="'.$fieldName.'" />';
@@ -3715,10 +3712,10 @@ function getFormJs($formName,&$conf) {
 	 * @todo big bug here if i try to insert code directly, remove false when problem solved
 	 */
    	if (false && !$GLOBALS['TSFE']->config['config']['removeDefaultJS']) {
-  		$result.='<script type="text/javascript">/*<![CDATA[*/'.$script.']]>*/</script>';
+  		$result.='<script type="text/javascript" >/*<![CDATA[*/'.$script.']]>*/</script>';
    		$result .= $this->additionalJS_initial;
-    	if ($this->additionalJS_pre) $result.'<script type="text/javascript">'. implode('', $this->additionalJS_pre).'</script>';
-  	} else {
+    	if ($this->additionalJS_pre) $result.(count($this->additionalJS_pre)?'<script type="text/javascript">'. implode('', $this->additionalJS_pre).'</script>':'');
+   	} else {
   	 	$result.=$this->metafeeditlib->inline2TempFile($script,'js');
    		$result.= $this->additionalJS_initial;
     	if ($this->additionalJS_pre) $result.=$this->metafeeditlib->inline2TempFile(implode('', $this->additionalJS_pre),'js');
@@ -3734,8 +3731,8 @@ function getFormJs($formName,&$conf) {
 	 * @return	[type]		...
 	 */
   function getJSAfter($conf) {
-  	if (!$GLOBALS['TSFE']->config['config']['removeDefaultJS']) {
-   		return '<script type="text/javascript">'.implode(chr(10), $this->additionalJS_post).'</script>'.chr(10).'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_end']).'</script>';
+  	if (!$GLOBALS['TSFE']->config['config']['removeDefaultJS'] ) {
+   		return (count($this->additionalJS_post)?'<script type="text/javascript">'.implode(chr(10), $this->additionalJS_post).'</script>'.chr(10):'').(count($conf['additionalJS_end'])?'<script type="text/javascript">'.implode(chr(10), $conf['additionalJS_end']).'</script>':'');
 	} else {
 		return (count($this->additionalJS_post)?$this->metafeeditlib->inline2TempFile(implode(chr(10), $this->additionalJS_post), 'js'):'').(count($conf['additionalJS_end'])?chr(10).$this->metafeeditlib->inline2TempFile(implode(chr(10), $conf['additionalJS_end']), 'js'):'');
 	}			
@@ -3977,7 +3974,7 @@ function getFormJs($formName,&$conf) {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
 							//$selectSize=is_array($conf['typoscript.'][$pluginId.'.']['advancedSearch.'][$FN]['forceConfig.'])?$conf['typoscript.'][$pluginId.'.']['forceConfig.'][$FN]['forceSize']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
 							$selectSize=$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']?$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
-							$name = ' name="'.($selectSize>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
+							$name = ' name="'.($selectSize>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple="multiple"':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
 							$ret.=$div.'<select '.($selectSize?'size="'.$selectSize.'" ':'').$name.$this->caller->pi_classParam('form-asfield').'>';
 							$SO='###AS_FIELD_'.$FN.'###';
 							$ret.=$SO.'</select>';
@@ -4003,7 +4000,7 @@ function getFormJs($formName,&$conf) {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
 							//$selectSize=is_array($conf['typoscript.'][$pluginId.'.']['advancedSearch.'][$FN]['forceConfig.'])?$conf['typoscript.'][$pluginId.'.']['forceConfig.'][$FN]['forceSize']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
 							$selectSize=$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']?$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
-							$name = ' name="'.($selectSize>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
+							$name = ' name="'.($selectSize>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple="multiple"':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
 							$ret.=$div.'<select '.($selectSize?'size="'.$selectSize.'" ':'').$name.$this->caller->pi_classParam('form-asfield').'>';
 							$SO='###AS_FIELD_'.$FN.'###';
 							$ret.=$SO.'</select>';

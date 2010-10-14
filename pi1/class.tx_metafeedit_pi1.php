@@ -55,10 +55,10 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 	* @return [type]  ...
 	*/
 	
-	function main($content='',$conf=''){
+	function main($content='',$conf='',$configurationFile=''){
 		$DEBUG='';
 		//global $PAGES_TYPES;		
-		if (!defined ('PATH_typo3conf')) die ('Could not access this script directly!');	  
+		if (!defined ('PATH_typo3conf')) die ('Could not access this script directly!');	 
 		// Meta feedit library init
 		$this->metafeeditlib=t3lib_div::makeInstance('tx_metafeedit_lib');
 		$GLOBALS['TSFE']->includeTCA();
@@ -66,10 +66,17 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$this->pi_initPIflexForm(); // Init FlexForm configuration for plugin
 		$this->pi_loadLL();
 		$this->lconf=array(); // Setup our storage array...
-		// Assign the flexform data to a local variable for easier access
-		$piFlexForm=$this->cObj->data['pi_flexform'];
-
-		// php5 version test
+		
+		if ($configurationFile && file_exists('fileadmin/meta_feedit/'.$configurationFile)) {
+			//echo "rrr".file_get_contents('fileadmin/meta_feedit/'.$configurationFile);
+			$configstore=json_decode(file_get_contents('fileadmin/meta_feedit/'.$configurationFile),true);
+			$conf=$configstore['tsconf'];
+			$piFlexForm=$configstore['flexForm'];
+		} else {
+			if ($configurationFile) die ('Configuration file '.$configurationFile.' does not exist.');
+			// Assign the flexform data to a local variable for easier access
+			$piFlexForm=$flexForm=$this->cObj->data['pi_flexform'];
+		}
 		
 		$versionArray=explode('.',phpversion());
 		if ($versionArray[0]<5) die('Extension meta_feedit requires php5 !');
@@ -100,7 +107,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		
 		//@todo Why on earth do I have to do this ?
 		if (!$lconf['fetable']) return '';
-		
+
 		$mfconf=$conf['metafeedit.'];
 		$mfconf['pageType']=$GLOBALS['TSFE']->type;
 		
@@ -194,6 +201,29 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// CBY : pluginId !!! must add flexformupdate here ...
 		$mfconf['general.']['pluginUid']=$this->cObj->data['uid'];
 		$pluginId=$mfconf['pluginId']=$lconf['pluginId']?$lconf['pluginId']:$this->cObj->data['uid'];	
+		$storeConf['tsconf']=$conf;
+		$storeConf['flexForm']=$flexForm;
+		//echo json_encode($flexForm);
+		//$storeConf['lConf']=$lconf;
+		if (!file_exists('fileadmin/meta_feedit')) mkdir('fileadmin/meta_feedit');
+		$file='fileadmin/meta_feedit/'.$pluginId.'.json';
+		if (!$configurationFile && t3lib_div::_GP('tx_metafeedit_save')) {
+			$f = fopen($file, "w");
+			if($f) {
+				// We update localconf.php
+				//echo "\$json".str_replace( '}', "}\n", $ob_out );
+				$w=fwrite($f,json_encode($storeConf));
+				if (!$w) echo "Can't write to $file";
+				
+				//$w=fwrite($f,$this->prettyPrint(json_encode($storeConf)));
+				
+				$rf=fflush($f);
+				if (!$rf) echo "Can't flush to $file";
+				$c=fclose($f);	
+				if (!$c) echo "Can't close $file";
+			}
+		}				
+		
 		$mfconf['general.']['authTpl']=$lconf['generalAuthTemplate'];
 		$mfconf['general.']['noPermTpl']=$lconf['generalNoPermTemplate'];
 		$mfconf['general.']['fe_cruser_id']=$lconf['fecruser_field'];
@@ -944,6 +974,69 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			$conf['metafeedit.']['inputvar.']['lField']=$this->metafeeditlib->getMetaFeeditVar($conf['metafeedit.'],'lField');
 		}*/
 	}
+	/**
+     * Pretty-print JSON string
+     *
+     * Use 'format' option to select output format - currently html and txt supported, txt is default
+     * Use 'indent' option to override the indentation string set in the format - by default for the 'txt' format it's a tab
+     *
+     * @param string $json Original JSON string
+     * @param array $options Encoding options
+     * @return string
+     */
+    public  function prettyPrint($json, $options = array())
+    {
+        $tokens = preg_split('|([\{\}\]\[,])|', $json, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $result = "";
+        $indent = 0;
+
+        $format= "txt";
+
+        $ind = "\t";
+
+        if(isset($options['format'])) {
+            $format = $options['format'];
+        }
+
+        switch ($format):
+            case 'html':
+                $line_break = "<br />";
+                $ind = "\$nbsp;\$nbsp;\$nbsp;\$nbsp;";
+                break;
+            default:
+            case 'txt':
+                $line_break = "\n";
+                $ind = "\t";
+                break;
+        endswitch;
+
+        //override the defined indent setting with the supplied option
+        if(isset($options['indent'])) {
+            $ind = $options['indent'];
+        }
+
+        foreach($tokens as $token) {
+            if($token == "") continue;
+
+            $prefix = str_repeat($ind, $indent);
+            if($token == "{" || $token == "[") {
+                $indent++;
+                if($result != "" && $result[strlen($result)-1] == $line_break) {
+                    $result .= $prefix;
+                }
+                $result .= "$token$line_break";
+            } else if($token == "}" || $token == "]") {
+                $indent--;
+                $prefix = str_repeat($ind, $indent);
+                $result .= "$line_break$prefix$token";
+            } else if($token == ",") {
+                $result .= "$token$line_break" ;
+            } else {
+                $result .= $prefix.$token;
+            }
+        }
+        return $result;
+   }
 	
 	/**
 	* correctDivs
