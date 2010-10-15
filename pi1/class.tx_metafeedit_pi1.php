@@ -69,7 +69,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		
 		if ($configurationFile && file_exists('fileadmin/meta_feedit/'.$configurationFile)) {
 			//echo "rrr".file_get_contents('fileadmin/meta_feedit/'.$configurationFile);
-			$configstore=json_decode(file_get_contents('fileadmin/meta_feedit/'.$configurationFile),true);
+			$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents('fileadmin/meta_feedit/'.$configurationFile)),true);
 			$conf=$configstore['tsconf'];
 			$piFlexForm=$configstore['flexForm'];
 		} else {
@@ -212,10 +212,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			if($f) {
 				// We update localconf.php
 				//echo "\$json".str_replace( '}', "}\n", $ob_out );
-				$w=fwrite($f,json_encode($storeConf));
+				//$w=fwrite($f,json_encode($storeConf));
+				$w=fwrite($f,$this->prettyPrint(json_encode($storeConf)));
 				if (!$w) echo "Can't write to $file";
-				
-				//$w=fwrite($f,$this->prettyPrint(json_encode($storeConf)));
 				
 				$rf=fflush($f);
 				if (!$rf) echo "Can't flush to $file";
