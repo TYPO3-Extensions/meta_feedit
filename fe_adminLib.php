@@ -334,6 +334,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 		// we handle Global parameters for links from other page
 		$this->markerArray['###GLOBALPARAMS###']='';
+		$this->markerArray['###GLOBALPARAMS###'].=t3lib_div::_GP('eID')?'&eID='.t3lib_div::_GP('eID'):'';
+		$this->markerArray['###GLOBALPARAMS###'].=t3lib_div::_GP('config')?'&config='.t3lib_div::_GP('config'):'';
 		$this->markerArray['###GLOBALPARAMS###'].=$this->piVars['referer'][$this->conf['pluginId']]?'&tx_metafeedit[referer]['.$this->conf['pluginId'].']='.rawurlencode($this->piVars['referer'][$this->conf['pluginId']]):'';
 	    $this->conf['GLOBALPARAMS']=$this->markerArray['###GLOBALPARAMS###'];						
 		$prma=array();
@@ -344,7 +346,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if (!strpos($pl,'?')) $pl.='?';
 		//$pl=$this->metafeeditlib->hsc($this->conf,$pl);
 		$this->markerArray['###FORM_URL###'] = $this->metafeeditlib->hsc($this->conf,$pl.$this->markerArray['###GLOBALPARAMS###']);
-		$this->markerArray['###FORM_URL_NO_PRM###']=$this->metafeeditlib->hsc($this->conf,$pl);;
+		$this->markerArray['###FORM_URL_NO_PRM###']=$this->metafeeditlib->hsc($this->conf,$pl.$this->markerArray['###GLOBALPARAMS###']);
 		$this->markerArray['###FORM_URL_ENC###'] = rawurlencode($this->markerArray['###FORM_URL###']);
 		$this->markerArray['###FORM_URL_HSC###'] = htmlspecialchars($pl.$this->markerArray['###GLOBALPARAMS###']);
 		$this->markerArray['###NEW_URL###']=$this->metafeeditlib->hsc($this->conf,$this->pi_getPageLink($formid,'',array( 'no_cache'=>1, 'cmd['.$this->conf['pluginId'].']'=>'create', 'rU['.$this->conf['pluginId'].']' => '', 'backURL['.$this->conf['pluginId'].']'=> $pl)));

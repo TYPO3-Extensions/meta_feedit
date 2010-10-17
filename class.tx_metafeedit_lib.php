@@ -4536,17 +4536,26 @@ class tx_metafeedit_lib {
 				elseif ($this->is_extent($value['default'])  && !is_array($value['default.'])) $valeur=$value['default'];
 				if ($this->is_extent($valeur)) {
 					//if (!$conf['TCAN'][$curTable['table']]['columns'][$key]['config']['MM']) {
-					if (!$conf['TCAN'][$curTable['relTable']]['columns'][$key]['config']['MM']) {
+					if (!$conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['MM']) {
 						//$champ=($curTable['tableAlias'])?$curTable['relTableAlias'].".".$curTable['fNiD']:$curTable['relTableAlias']."_".$curTable['fieldAlias'];
 						// Bug correction :
+						
 						$champ=($curTable['tableAlias'])?$curTable['tableAlias'].".".$curTable['fNiD']:$curTable['relTableAlias']."_".$curTable['fieldAlias'];
 						$fids=t3lib_div::trimexplode(',',$valeur);
-						foreach($fids as $fid) {
-							$sql['advancedWhere'].=" AND FIND_IN_SET('$fid',$champ)"; 
+						//@todo test if input/select, ....
+						//print_r( $conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']);
+						switch ($conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type']) {
+							case 'input' :
+								$sql['advancedWhere'].=" AND $champ like '$valeur%'"; 
+								break;
+							default :
+								foreach($fids as $fid) {
+									$sql['advancedWhere'].=" AND FIND_IN_SET('$fid',$champ)"; 
+								}
 						}
 					} else {
 						//$mmTable=$conf['TCAN'][$curTable['table']]['columns'][$key]['config']['MM'];
-						$mmTable=$conf['TCAN'][$curTable['relTable']]['columns'][$key]['config']['MM'];
+						$mmTable=$conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['MM'];
 						//$uidLocal=isset($conf['TCAN'][$mmTable]['ctrl']['uidLocalField'])?$conf['TCAN'][$mmTable]['ctrl']['uidLocalField']:'uid';
 						$uidLocal=isset($conf['TCAN'][$curTable['relTable']]['ctrl']['uidLocalField'])?$conf['TCAN'][$curTable['relTable']]['ctrl']['uidLocalField']:'uid';
 					 	$sql['advancedWhere'].= 'AND '.$mmTable.'.uid_local='.$curTable['relTable'].'.'.$uidLocal;

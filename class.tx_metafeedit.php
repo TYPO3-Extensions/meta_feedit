@@ -104,6 +104,7 @@ class tx_metafeedit extends  tslib_pibase {
   	function init(&$caller,&$conf)	{
 
         $this->initialize($caller,$conf);
+         
         if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init done :']=$this->metafeeditlib->displaytime()." Seconds"; 
         // command specific initialisation 
         $this->initCmd($conf);
@@ -1533,7 +1534,7 @@ class tx_metafeedit extends  tslib_pibase {
 	        			if ($this->piVars['exporttype']==EXCEL)
 	        			    $ret.='<th><data>'.$Lib.'</data><size>'.$size.'</size></th>';
 	        			else
-	        			    $ret.=$conf['list.']['sortFields']?'<th><a class="###SORT_CLASS_'.$FN.'###" href="'.$href.'">'.$Lib.'</a></th>':'<th>'.$Lib.'</th>';
+	        			    $ret.=$conf['list.']['sortFields']?'<th><a class="###SORT_CLASS_'.$FN.'###" href="'.$href.'###GLOBALPARAMS###">'.$Lib.'</a></th>':'<th>'.$Lib.'</th>';
 	        	} else if ($type) {
 							//$img=0;
 							//if( $conf['TCAN'][$masterTable]['columns'][$FN]['config']['type']== 'group' &&  $conf['TCAN'][$masterTable]['columns'][$FN]['config']['internal_type']=='file') $img=1;
@@ -2147,7 +2148,8 @@ class tx_metafeedit extends  tslib_pibase {
 							}
 						} 
 					} else {
-						$type=$conf['TCAN'][$conf['table']]['columns'][$key]['config']['type'];
+						$curTable = $this->metafeeditlib->getForeignTableFromField($key, $conf,'',$sql);
+						$type=$conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
 						switch ($type) {
 							//TODO handle multiple values...
 							case 'select' :

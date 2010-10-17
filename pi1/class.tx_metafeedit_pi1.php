@@ -72,6 +72,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents('fileadmin/meta_feedit/'.$configurationFile)),true);
 			$conf=$configstore['tsconf'];
 			$piFlexForm=$configstore['flexForm'];
+			//@todo use pidhandler here if necessary
+			//echo 'page : '.$piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF'];
 		} else {
 			if ($configurationFile) die ('Configuration file '.$configurationFile.' does not exist.');
 			// Assign the flexform data to a local variable for easier access
@@ -933,7 +935,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowSeances('<div id=\'planSeance\' class=\'planseance\'></div>');";
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowCaisse('<div id=\'billetterie\' class=\'billetterie\'></div>');";
 	 	}
-		//CBY
+	 	//CBY
 		$mfconf['parentObj']=&$this;
 		if ($mfconf['userFunc_afterInitConf']) t3lib_div::callUserFunction($mfconf['userFunc_afterInitConf'],$mfconf,$this);
 
@@ -949,6 +951,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$content=$mthfeedit->init($this,$mfconf);
 		// Performance audit
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 End ']=$this->metafeeditlib->displaytime(); 
+		
 		return $this->pi_wrapInBaseClass($content);
 	}
 
