@@ -67,9 +67,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$this->pi_loadLL();
 		$this->lconf=array(); // Setup our storage array...
 		
-		if ($configurationFile && file_exists('fileadmin/meta_feedit/'.$configurationFile)) {
+		if ($configurationFile && file_exists('fileadmin/reports/'.$configurationFile)) {
 			//echo "rrr".file_get_contents('fileadmin/meta_feedit/'.$configurationFile);
-			$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents('fileadmin/meta_feedit/'.$configurationFile)),true);
+			$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents('fileadmin/reports/'.$configurationFile)),true);
 			$conf=$configstore['tsconf'];
 			$piFlexForm=$configstore['flexForm'];
 			//@todo use pidhandler here if necessary
@@ -207,8 +207,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$storeConf['flexForm']=$flexForm;
 		//echo json_encode($flexForm);
 		//$storeConf['lConf']=$lconf;
-		if (!file_exists('fileadmin/meta_feedit')) mkdir('fileadmin/meta_feedit');
-		$file='fileadmin/meta_feedit/'.$pluginId.'.json';
+		if (!file_exists('fileadmin/reports')) mkdir('fileadmin/reports');
+		$file='fileadmin/reports/'.$pluginId.'.json';
 		if (!$configurationFile && t3lib_div::_GP('tx_metafeedit_save')) {
 			$f = fopen($file, "w");
 			if($f) {
