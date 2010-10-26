@@ -68,10 +68,16 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$this->lconf=array(); // Setup our storage array...
 		
 		if ($configurationFile && file_exists('fileadmin/reports/'.$configurationFile)) {
-			//echo "rrr".file_get_contents('fileadmin/meta_feedit/'.$configurationFile);
+			require_once(t3lib_extMgm::extPath('meta_feedit').'lib/PidHandler.php');
+			$pidHandler=t3lib_div::makeInstance('Tx_ArdMcm_Lib_PidHandler');
 			$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents('fileadmin/reports/'.$configurationFile)),true);
 			$conf=$configstore['tsconf'];
 			$piFlexForm=$configstore['flexForm'];
+			$piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF'];
+			$pid=intval($piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
+			if ($pid==0 && $piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']) $pid=$pidHandler->getPid($piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
+			if ($pid) $piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']=$pid;
+						
 			//@todo use pidhandler here if necessary
 			//echo 'page : '.$piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF'];
 		} else {
@@ -203,13 +209,20 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// CBY : pluginId !!! must add flexformupdate here ...
 		$mfconf['general.']['pluginUid']=$this->cObj->data['uid'];
 		$pluginId=$mfconf['pluginId']=$lconf['pluginId']?$lconf['pluginId']:$this->cObj->data['uid'];	
-		$storeConf['tsconf']=$conf;
-		$storeConf['flexForm']=$flexForm;
+		
 		//echo json_encode($flexForm);
 		//$storeConf['lConf']=$lconf;
+		
 		if (!file_exists('fileadmin/reports')) mkdir('fileadmin/reports');
 		$file='fileadmin/reports/'.$pluginId.'.json';
 		if (!$configurationFile && t3lib_div::_GP('tx_metafeedit_save')) {
+			require_once(t3lib_extMgm::extPath('meta_feedit').'lib/PidHandler.php');
+			$pidHandler=t3lib_div::makeInstance('Tx_ArdMcm_Lib_PidHandler');
+			$pid=intval($flexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
+			$path= $pidHandler->getPath($pid);
+			if ($path) $flexForm['data']['sQuickStart']['lDEF']['page']['vDEF']=$path;
+			$storeConf['tsconf']=$conf;
+		    $storeConf['flexForm']=$flexForm;
 			$f = fopen($file, "w");
 			if($f) {
 				// We update localconf.php
