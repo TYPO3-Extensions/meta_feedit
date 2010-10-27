@@ -918,7 +918,10 @@ class tx_metafeedit_lib {
     */
     
 	function getForeignTableFromField2($fN,$ftable, &$confTcan) {
-	  if (!$fN) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField2 : empty field given for $table!";
+	  if (!$fN && $conf['debug']) {
+	  	echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField2 : empty field given for $table!";
+	  	return '';
+	  }
 		$fNA = t3lib_div::trimexplode('.', $fN);
 		$fNiD = end($fNA);
 		//$ftable = $conf['table'];

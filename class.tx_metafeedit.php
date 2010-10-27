@@ -311,9 +311,9 @@ class tx_metafeedit extends  tslib_pibase {
 		foreach($FTs as $FTable) {
 		    $this->metafeeditlib->makeTypo3TCAForTable($conf['TCAN'],$FTable);
 		}
-		//We get related foreign tabels if necessary
-        foreach ($lfields as $lf) {
-        	$r=$this->metafeeditlib->getForeignTableFromField2($lf,$conf['table'],$conf['TCAN']);
+		//We get related foreign tables if necessary
+    foreach ($lfields as $lf) {
+        	if ($lf) $r=$this->metafeeditlib->getForeignTableFromField2($lf,$conf['table'],$conf['TCAN']);
         }		
 	    // Set private TCA var
 		
