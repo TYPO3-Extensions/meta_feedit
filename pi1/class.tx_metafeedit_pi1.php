@@ -230,6 +230,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		if (!file_exists('fileadmin/reports')) mkdir('fileadmin/reports');
 		$file='fileadmin/reports/'.$pluginId.'.json';
 		if (!$configurationFile && t3lib_div::_GP('tx_metafeedit_save')) {
+
 			require_once(t3lib_extMgm::extPath('meta_feedit').'lib/PidHandler.php');
 			$pidHandler=t3lib_div::makeInstance('Tx_ArdMcm_Lib_PidHandler');
 			$pid=intval($flexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
@@ -237,6 +238,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			if ($path) $flexForm['data']['sQuickStart']['lDEF']['page']['vDEF']=$path;
 			$storeConf['tsconf']=$conf;
 		    $storeConf['flexForm']=$flexForm;
+
 			$f = fopen($file, "w");
 			if($f) {
 				// We update localconf.php
