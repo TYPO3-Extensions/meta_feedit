@@ -38,8 +38,9 @@ require_once(t3lib_extMgm::extPath('meta_feedit').'pi1/class.tx_metafeedit_pi1.p
 		//$ts = $GLOBALS['TYPO3_CONF_VARS']['FE']['defaultTypoScript_setup.'][43];
 		// Parsing  Typoscript
 		//$tsparserObj->parse($ts);
-						
-		$configFile=t3lib_div::_GP('config')?t3lib_div::_GP('config').'.json':'';
+	 	$module=t3lib_div::_GP('module');
+	 	// Report path is either in fileadmin/reports or in module Reports path
+		$configFile=t3lib_div::_GP('config')?($module?'typo3conf/ext/'.$module.'/Resources/Private/Reports/':'').t3lib_div::_GP('config').'.json':'';
 		$c=new tx_metafeedit_pi1();
 		$c->cObj=$GLOBALS['TSFE']->cObj;
 		$content= $c->main('','',$configFile);
