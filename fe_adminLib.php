@@ -336,6 +336,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->markerArray['###GLOBALPARAMS###']='';
 		$this->markerArray['###GLOBALPARAMS###'].=t3lib_div::_GP('eID')?'&eID='.t3lib_div::_GP('eID'):'';
 		$this->markerArray['###GLOBALPARAMS###'].=t3lib_div::_GP('config')?'&config='.t3lib_div::_GP('config'):'';
+		$this->markerArray['###GLOBALPARAMS###'].=t3lib_div::_GP('module')?'&module='.t3lib_div::_GP('module'):'';
 		$this->markerArray['###GLOBALPARAMS###'].=$this->piVars['referer'][$this->conf['pluginId']]?'&tx_metafeedit[referer]['.$this->conf['pluginId'].']='.rawurlencode($this->piVars['referer'][$this->conf['pluginId']]):'';
 	    $this->conf['GLOBALPARAMS']=$this->markerArray['###GLOBALPARAMS###'];						
 		$prma=array();
