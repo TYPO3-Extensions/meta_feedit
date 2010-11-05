@@ -721,7 +721,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		/**** SET VARIABLES FROM FLEXFORM ****/
 		
 		$pid=$lconf['page']? $lconf['page'] :$mfconf['pid'];
-		$mfconf['pid']=$pid ? $pid :''; //$GLOBALS['TSFE']->id;
+		$mfconf['pid']=$pid ? $pid :'';
 
 		// Set the noSpecialLoginForm
 		if($lconf['noSpecialLoginForm']) {
@@ -764,8 +764,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// is this necessary ?
 		$GLOBALS["TSFE"]->fe_user->fetchSessionData();
 		$metafeeditvars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
-		//$mfconf['debug.']['debugString'].="<br>metafeeditvars before <br>".t3lib_div::view_array($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]);
-	 	//krumo($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]);
 		if ($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['referer']) $mfconf['piVars']['referer'][$pluginId]=$metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['referer'];
 				
 		// We handle here all transmitted variables ....

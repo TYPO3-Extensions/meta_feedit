@@ -873,7 +873,10 @@ class tx_metafeedit_lib {
     * Ex : if editing table fe_users, for relation usergroups.uid this function would return :
     * $ret['table']='fe_groups'
     * $ret['relTable']='fe_users'
+    * $ret['relTableAlias']='???'
     * $ret['tableAlias']='fe_groups_usergroups'
+    * $ret['fieldLabel']='??'
+    * $ret['fieldAlias']='????'
     * $ret['fNiD']='uid'
     */
     
@@ -896,17 +899,17 @@ class tx_metafeedit_lib {
 			}
 		}
 		
-		$ret['table'] = $ftable?$ftable:$relTable; // if we found a foreign table we return otherwhise table is main table..
+		$ret['table'] = $ftable?$ftable:$relTable; // if we found a foreign table we return it otherwhise table is main table..
 	    $ret['relTable'] = $relTable; // if we found a foreign table we return otherwhise table is main table..
 	    $ret['relTableAlias'] = $relTable; // TODO add alias calc here !!!
-	    $ret['tableAlias']=($fNiD!=$fN?$sql['tableAliases'][$ret['table']][str_replace('.','_',str_replace('.'.$fNiD,'',$fN))]:$ret['table']);
+	    $ret['tableAlias']=($fNiD!=$fN?$sql['tableAliases'][$ret['table']][str_replace('.','_',str_replace('.'.$fNiD,'',$fN))]:$relTable);//$ret['table']);
 		$ret['fieldLabel']=$conf['TCAN'][$ret['relTable']]['columns'][trim($fNiD)]['label']?$conf['TCAN'][$ret['relTable']]['columns'][trim($fNiD)]['label']:$fN;
 		$ret['fieldAlias']=$fN; //call makeFieldalias here ...
 		$ret['fNiD'] = $fNiD;
 		return $ret;
 	}
 	
-	   /**
+	/**
     * getForeignTableFromField2
     *
     * @param	string		$fN: full field name path from $table ...(with '.' as seperators).  Must not be empty
@@ -914,7 +917,8 @@ class tx_metafeedit_lib {
      * @return	array		The subpart with all markers found in current $this->markerArray substituted.
     * this function handles Foreign table relations (level 1) , it allows us to get foreign table name from field
     * it returns foreigntable name and name of field in foreign table
- 	* it also loads TCA of unloaded tables
+ 	* it also loads TCA of unloaded tables :
+ 	* 
     */
     
 	function getForeignTableFromField2($fN,$ftable, &$confTcan) {
@@ -2820,10 +2824,11 @@ class tx_metafeedit_lib {
 
 			}
 			*/
-			if (!$conf['select.'][$fN.'.']['dontDoOrder'] && ($conf['inputvar.']['cmd']=='edit' || $conf['inputvar.']['cmd']=='create')) {
+			
+			if (!$conf['select.'][$fN.'.']['dontDoOrder'] && ($conf['inputvar.']['cmd']=='edit' || $conf['inputvar.']['cmd']=='create' || $conf['inputvar.']['cmd']=='list')) {
 				array_multisort($sortAux, SORT_ASC, $sortTab);
 			}
-
+			//print_r($sortAux);
 			foreach($sortTab as $resRow) {	
 				$selected = in_array($resRow[$conf['uidField']],$uids)?"selected":"";
 				$selected=$selected?$selected:($resRow[$conf['uidField']]==$forceVal?'selected':'');
@@ -2860,6 +2865,26 @@ class tx_metafeedit_lib {
 		
 		if ($conf['whereClause.'][$fN] && (($uid && is_array($rec)) || $uid==0 || is_array($GLOBALS['TSFE']->fe_user->user))) $whereClause =$conf['whereClause.'][$fN]; 
 		$storageAndSiteroot = $GLOBALS["TSFE"]->getStorageSiterootPids();
+		
+		// Handle PidHandler Paths here
+		
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['ARDDESKTOP']['extensionpids']) && t3lib_extmgm::isLoaded('ard_mcm') ) {
+			$pidHandler=t3lib_div::makeInstance('Tx_ArdMcm_Lib_PidHandler');
+			foreach($GLOBALS['TYPO3_CONF_VARS']['ARDDESKTOP']['extensionpids'] as $extension=>$extensionconf) {
+				$defaultpid=0;
+				//$root=$extensionconf['rootpid']?$extensionconf['rootpid']:$defaultpid;
+				if (is_array($extensionconf['pidpaths'])) foreach($extensionconf['pidpaths'] as $path) {
+			 		$pid=$pidHandler->getPid($path);
+			 		//echo '###gv_'.$extension.'_'.implode('_',explode('/',$path)).'### ---'.$pid;
+			 		$whereClause=str_replace('###gv_'.$extension.'_'.implode('_',explode('/',$path)).'###',intval($pid),$whereClause);
+				}
+				if (is_array($extensionconf['grouppaths'])) foreach($extensionconf['grouppaths'] as $path) {
+					$uid=$pidHandler->getGroupUid($path);
+					$path=str_replace(' ','_',$path);
+			 		$whereClause=str_replace('###gv_gr_'.$extension.'_'.implode('_',explode('/',$path)).'###',intval($pid),$whereClause);
+				}
+			}
+		}
 		$whereClause = str_replace('###CURRENT_PID###',intval($storageAndSiteroot["_STORAGE_PID"]),$whereClause); // replaced with STORAGE_PID cause it makes more sense ;)
 		$whereClause = str_replace('###META_PID###',intval($conf['pid']),$whereClause);
 		$whereClause = str_replace('###STORAGE_PID###',intval($storageAndSiteroot["_STORAGE_PID"]),$whereClause);
@@ -3913,8 +3938,11 @@ class tx_metafeedit_lib {
 					//TODO
 					//$sql['fromTables'].=','.$mmTable;
 					//$sql['joinTables'][]=$mmTable;
-				} 
-				else { // old "," seperated list field
+				} elseif ($conf['TCAN'][$table]['columns'][$lField]['config']['type']=='inline' && $conf['TCAN'][$table]['columns'][$lField]['config']['foreign_field']) {
+                     //$ParentWhere.=" AND $FT.".$conf['TCAN'][$table]['columns'][$lField]['config']['foreign_field'].'='.$lV;
+                     $ParentWhere.=" AND $table.uid=$lV";
+
+                 } else { // old "," seperated list field
 					$ParentWhere.=' AND FIND_IN_SET('.$table.'.'.$lField.','.$lV.')>0 ';
 				}
 			} else  {
@@ -4551,6 +4579,8 @@ class tx_metafeedit_lib {
 							case 'input' :
 								$sql['advancedWhere'].=" AND $champ like '$valeur%'"; 
 								break;
+							case 'select' :
+								//print_r($curTable);
 							default :
 								foreach($fids as $fid) {
 									$sql['advancedWhere'].=" AND FIND_IN_SET('$fid',$champ)"; 
