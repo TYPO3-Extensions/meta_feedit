@@ -68,8 +68,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$this->lconf=array(); // Setup our storage array...
 		// We try by default in fileadmin/reports
 		if ($configurationFile && file_exists('fileadmin/reports/'.$configurationFile)) {
-			require_once(t3lib_extMgm::extPath('meta_feedit').'lib/PidHandler.php');
-			$pidHandler=t3lib_div::makeInstance('Tx_ArdMcm_Lib_PidHandler');
+			
+			if (!class_exists('Tx_MetaFeedit_Lib_PidHandler') )require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/Lib/PidHandler.php');
+			$pidHandler=t3lib_div::makeInstance('Tx_MetaFeedit_Lib_PidHandler');
 			$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents('fileadmin/reports/'.$configurationFile)),true);
 			$conf=$configstore['tsconf'];
 			$piFlexForm=$configstore['flexForm'];
@@ -82,8 +83,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			// we try otherwise the default file ....
 
 		} elseif ($configurationFile && file_exists($configurationFile)) {
-			require_once(t3lib_extMgm::extPath('meta_feedit').'lib/PidHandler.php');
-			$pidHandler=t3lib_div::makeInstance('Tx_ArdMcm_Lib_PidHandler');
+			
+			if (!class_exists('Tx_MetaFeedit_Lib_PidHandler') ) require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/Lib/PidHandler.php');
+			$pidHandler=t3lib_div::makeInstance('Tx_MetaFeedit_Lib_PidHandler');
 			$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents($configurationFile)),true);
 			$conf=$configstore['tsconf'];
 			$piFlexForm=$configstore['flexForm'];
@@ -231,8 +233,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$file='fileadmin/reports/'.$pluginId.'.json';
 		if (!$configurationFile && t3lib_div::_GP('tx_metafeedit_save')) {
 
-			require_once(t3lib_extMgm::extPath('meta_feedit').'lib/PidHandler.php');
-			$pidHandler=t3lib_div::makeInstance('Tx_ArdMcm_Lib_PidHandler');
+			require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/Lib/PidHandler.php');
+			$pidHandler=t3lib_div::makeInstance('Tx_MetaFeedit_Lib_PidHandler');
 			$pid=intval($flexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
 			$path= $pidHandler->getPath($pid);
 			if ($path) $flexForm['data']['sQuickStart']['lDEF']['page']['vDEF']=$path;
