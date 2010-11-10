@@ -2869,9 +2869,9 @@ class tx_metafeedit_lib {
 		// Handle PidHandler Paths here
 		
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['ARDDESKTOP']['extensionpids']) && t3lib_extmgm::isLoaded('ard_mcm') ) {
-   			require_once(t3lib_extMgm::extPath('ard_mcm').'Classes/Lib/PidHandler.php');
+   			require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/Lib/PidHandler.php');
 			
-			$pidHandler=t3lib_div::makeInstance('Tx_ArdMcm_Lib_PidHandler');
+			$pidHandler=t3lib_div::makeInstance('Tx_MetaFeedit_Lib_PidHandler');
 			foreach($GLOBALS['TYPO3_CONF_VARS']['ARDDESKTOP']['extensionpids'] as $extension=>$extensionconf) {
 				$defaultpid=0;
 				//$root=$extensionconf['rootpid']?$extensionconf['rootpid']:$defaultpid;
