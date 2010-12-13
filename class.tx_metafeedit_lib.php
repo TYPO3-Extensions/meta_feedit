@@ -218,12 +218,12 @@ class tx_metafeedit_lib {
 		}
 
 		/**
-		* [Describe function...]
+		* getData Function
 		*
-		* @param [type]  $val: ...
+		* @param string  $val: value of getData path
 		* @param [type]  $P: ...
-		* @param [type]  $cObj: ...
-		* @return [type]  ...
+		* @param object  $cObj: ...
+		* @return mixed  getData's evaluated path value
 		*/
 		
 		function getData($val, $P, &$cObj) {
@@ -284,7 +284,7 @@ class tx_metafeedit_lib {
 							if (is_array($db_rec) && $id) $retVal = $db_rec[0][$selectParts[7]];
 							return $retVal;
 							break;
-						//modif by CMD - permet de rï¿½cupï¿½rer un champs dans une clef de session
+						//We get data from session array
 						//si type session alors on retourne la clef trouvï¿½ dans la session
 						case 'ses':
 							list($pluginId, $field) = t3lib_div::trimExplode('|', $key);
@@ -342,7 +342,11 @@ class tx_metafeedit_lib {
 	*/
 	function makeBackURLTypoLink(&$conf,&$referer) {
 		switch ($conf['inputvar.']['cmd']) {
-			case 'create' :			
+			case 'create' :		
+				if ($conf['defaultCmd']=='create') { 					
+					$referer[$conf['pageType']]=$this->makeFormTypoLink($conf,'&BACK['.$conf[pluginId].']=1&cmd['.$conf[pluginId].']=create',false);
+					break;
+				}					
 				//if($conf['create'] && !$conf['disableCreate'] && !$conf['create.']['hide']) {
 				//$backurl=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$conf['GLOBALPARAMS']);
 			case 'delete' :			
@@ -406,7 +410,8 @@ class tx_metafeedit_lib {
 		}
 
 		Function enleveaccents($chaine) {
-			$string = strtr($chaine, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
+			$string = strtr($chaine, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");
+			//$string = strtr($chaine, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
 			return $string;
 		}
 
@@ -459,26 +464,6 @@ class tx_metafeedit_lib {
 	 * @return	[type]		...
 	 */
 		function buildMp3PlayerFlashCode($file,&$conf) {
-					// Get playlist record
-			//$this->playlist = $this->pi_getRecord('tx_femp3player_playlists',$this->conf['playlist']);
-
-			// Check playlist
-			//if (is_array($this->playlist)) {
-
-				// Get player path
-				//$player = $this->conf['skins.'][$this->conf['playerParams.']['useSkin']];
-
-				// Creating valid pathes for the MP3 player
-				$swfPath = str_replace(PATH_site,'',t3lib_div::getFileAbsFileName('EXT:fe_mp3player/pi1/mp3player.swf'));
-
-				//$this->conf['playerParams.']['autoStart']=True; // . '&showPlaylist=' . $this->conf['playerParams.']['showPlaylist'] . '&showDisplay=' . $this->conf['playerParams.']['showDisplay'] . '&gskinColor=' . $this->conf['playerParams.']['gskinColor'];
-			// File path
-			//$filePath = str_replace(PATH_site, '/', t3lib_div::getFileAbsFileName($file));
-
-
-			// Add FlashVars param to TS
-			//$this->conf['swfParams.']['FlashVars'] = 'file=' . $filePath . $autoStart . $fullScreen;
-			//$this->conf['swfParams.']['FlashVars'] = "playlist=index.php%3Fid%3D484%26type%3D9000%26playlist%3D1%26autoStart%3D1%26showPlaylist%3D1%26showDisplay%3D1%26gskinColor%3D1";
 
 			// Add movie param to TS
 			$conf['swfParams.']['movie'] = $swfPath;
@@ -1918,7 +1903,6 @@ class tx_metafeedit_lib {
 			$conf = $fe_adminLib->conf;
 			$dataArr = $content;
 			$table = $fe_adminLib->theTable;
-			
 			//We handle override values here ..
 			/*echo "COntent";
 			$fNA=tx_metafeedit_lib::getOverrideFields($fe_adminLib->cmd,$fe_adminLib->conf);
@@ -2067,7 +2051,6 @@ class tx_metafeedit_lib {
 	    // Get the type value
 	    $type = 0; // default value
 	    $typeField = $TCA['ctrl']['type'];
-	    //$uid=$uid?$uid:t3lib_div::_GET('rU');
 		$uid=$conf['inputvar.']['rU']?$conf['inputvar.']['rU']:$dataArr[$conf['uidField']];
 	    if($typeField && $uid) { // get the type from the database else use default value
 	      $rec = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$uid);
@@ -2551,8 +2534,7 @@ class tx_metafeedit_lib {
         				// fetch data from table
         				$feData =  $conf['inputvar.']['fedata'];
         				$uid = $feData[$table][$conf['uidField']] ? $feData[$table][$conf['uidField']] : $conf['inputvar.']['rU'];
-        				//$uid = $uid ? $uid : t3lib_div::_GET('rU');
-        
+         
         				if (!$uid) $uid=$recuid;
         				$uid = $uid ? $uid : (($conf['fe_userEditSelf'] && $table=='fe_users')?$GLOBALS['TSFE']->fe_user->user['uid']:''); // fe_userEditSelf ??
         				$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$uid);
@@ -2828,7 +2810,6 @@ class tx_metafeedit_lib {
 			if (!$conf['select.'][$fN.'.']['dontDoOrder'] && ($conf['inputvar.']['cmd']=='edit' || $conf['inputvar.']['cmd']=='create' || $conf['inputvar.']['cmd']=='list')) {
 				array_multisort($sortAux, SORT_ASC, $sortTab);
 			}
-			//print_r($sortAux);
 			foreach($sortTab as $resRow) {	
 				$selected = in_array($resRow[$conf['uidField']],$uids)?"selected":"";
 				$selected=$selected?$selected:($resRow[$conf['uidField']]==$forceVal?'selected':'');
@@ -2936,6 +2917,81 @@ class tx_metafeedit_lib {
 		}
 		return $processedSettings;
 	}
+
+	/**
+		*  Store the setfixed vars and return a replacement hash
+		*/
+	function setShortUrl($vars) {
+		global $TYPO3_DB;
+
+			// create a unique hash value
+		$regHash_array = t3lib_div::cHashParams(t3lib_div::implodeArrayForUrl('',$vars));
+		$regHash_calc = t3lib_div::shortMD5(serialize($regHash_array),20);
+			// and store it with a serialized version of the array in the DB
+		$res = $TYPO3_DB->exec_SELECTquery('md5hash','cache_md5params','md5hash='.$TYPO3_DB->fullQuoteStr($regHash_calc,'cache_md5params'));
+		if (!$TYPO3_DB->sql_num_rows($res))  {
+			$insertFields = array (
+				'md5hash' => $regHash_calc,
+				'tstamp' => time(),
+				'type' => 99,
+				'params' => serialize($vars)
+			);
+			$TYPO3_DB->exec_INSERTquery('cache_md5params',$insertFields);
+		}
+		$TYPO3_DB->sql_free_result($res);
+		return $regHash_calc;
+	}
+	
+	/**
+	*  Get the stored variables using the hash value to access the database
+	*/
+	function getShortUrl($regHash) {
+		global $TYPO3_DB;
+
+			// get the serialised array from the DB based on the passed hash value
+		$varArray = array();
+		$res = $TYPO3_DB->exec_SELECTquery('params','cache_md5params','md5hash='.$TYPO3_DB->fullQuoteStr($regHash,'cache_md5params'));
+		while ($row = $TYPO3_DB->sql_fetch_assoc($res)) {
+			$varArray = unserialize($row['params']);
+		}
+		$TYPO3_DB->sql_free_result($res);
+
+			// convert the array to one that will be properly incorporated into the GET global array.
+		$retArray = array();
+		foreach($varArray as $key => $val)	{
+			$search = array('[%5D]', '[%5B]');
+			$replace = array('\']', '\'][\'');
+			$newkey = "['" . preg_replace($search, $replace, $key);
+			eval("\$retArray" . $newkey . "='$val';");
+		}
+		return $retArray;
+	}	// getShortUrl
+
+
+	/**
+	*  Get the stored variables using the hash value to access the database
+	*/
+	function deleteShortUrl ($regHash) {
+		global $TYPO3_DB;
+
+		if ($regHash != '')	{
+			// get the serialised array from the DB based on the passed hash value
+			$TYPO3_DB->exec_DELETEquery('cache_md5params','md5hash='.$TYPO3_DB->fullQuoteStr($regHash,'cache_md5params'));
+		}
+	}
+
+
+	/**
+	*  Clears obsolete hashes used for short url's
+	*/
+	function cleanShortUrlCache () {
+		global $TYPO3_DB;
+
+		$shortUrlLife = intval($this->conf['shortUrlLife']) ? strval(intval($this->conf['shortUrlLife'])) : '30';
+		$max_life = time() - (86400 * intval($shortUrlLife));
+		$res = $TYPO3_DB->exec_DELETEquery('cache_md5params', 'tstamp<' . $max_life . ' AND type=99');
+	}	// cleanShortUrlCache
+	
 	
     /**
     * Language override functions ...
@@ -3372,10 +3428,7 @@ class tx_metafeedit_lib {
 	function pageSelector($nbpages,$conf)	{
 		$ret='<form method="post" action="#"><input type="submit" value="'.$this->getLL('gotopage',$conf).'"/><select name="'.$this->prefixId.'[pointer]">';
 		for($i=1;$i<=$nbpages;$i++) {
-			//echo $i;
-			//print_r($conf['piVars']);
 			$select=$conf['piVars']['pointer']==($i-1)?'selected="selected"':'';
-			//echo "<br> $i - $select -".$conf['piVars']['pointer'];
 			$ret.="<option $select value=\"".($i-1)."\">$i</option>";
 		}
 		$ret.='</select></form>';
@@ -4576,13 +4629,11 @@ class tx_metafeedit_lib {
 						$champ=($curTable['tableAlias'])?$curTable['tableAlias'].".".$curTable['fNiD']:$curTable['relTableAlias']."_".$curTable['fieldAlias'];
 						$fids=t3lib_div::trimexplode(',',$valeur);
 						//@todo test if input/select, ....
-						//print_r( $conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']);
 						switch ($conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type']) {
 							case 'input' :
-								$sql['advancedWhere'].=" AND $champ like '$valeur%'"; 
+								$sql['advancedWhere'].=" AND $champ like '".addslashes($valeur)."%'"; 
 								break;
 							case 'select' :
-								//print_r($curTable);
 							default :
 								foreach($fids as $fid) {
 									$sql['advancedWhere'].=" AND FIND_IN_SET('$fid',$champ)"; 
