@@ -112,6 +112,7 @@
             <label index="meta_feedit.pi_flexform.feeditreadonlyfields">Read only fields  in edit mode</label>
             <label index="meta_feedit.pi_flexform.ferequiredfields">Required Fields</label>
             <label index="meta_feedit.pi_flexform.feapprovefields">Approve Fields</label>
+			<label index="meta_feedit.pi_flexform.fesetfixoverridevalues">Setfix override values</label>
             <label index="meta_feedit.pi_flexform.feeditoverridevalues">Edit Override Values</label>
             <label index="meta_feedit.pi_flexform.fecreateoverridevalues">Create Override Values</label>
             <label index="meta_feedit.pi_flexform.fedeletefields">Delete Fields</label>
@@ -140,9 +141,9 @@
             <label index="meta_feedit.pi_flexform.sendFEUserMail">Send FE User Mail</label>
             <label index="meta_feedit.pi_flexform.sendDataMail">Send Data Mail</label>
             <label index="meta_feedit.pi_flexform.dataMailField">Mail Field for dataMail</label>
-            <label index="meta_feedit.pi_flexform.sendAdminInfoMail">Send Admin Info Mail</label>
-            <label index="meta_feedit.pi_flexform.sendFEUserInfoMail">Send FE User Info Mail</label>
-            <label index="meta_feedit.pi_flexform.sendDataInfoMail">Send Data Info Mail</label>
+            <label index="meta_feedit.pi_flexform.sendAdminInfoMail">Send Admin Info Mail (sends an information mail to administrator upon every record operation)</label>
+            <label index="meta_feedit.pi_flexform.sendFEUserInfoMail">Send FE User Info Mail (sends an information mail to connected user's email upon every record operation)</label>
+            <label index="meta_feedit.pi_flexform.sendDataInfoMail">Send Data Info Mail (sends an information mail to email stored in record upon every record operation)</label>
             <label index="meta_feedit.pi_flexform.emailFromName">From Mail Name</label>
             <label index="meta_feedit.pi_flexform.emailAdmin">Admin Mail</label>
             <label index="meta_feedit.pi_flexform.divide2tabs">Tab mode</label>
@@ -261,6 +262,9 @@
             <label index="meta_feedit.pi_flexform.csv">Csv</label>
             <label index="meta_feedit.pi_flexform.excel">Excel</label>
             <label index="meta_feedit.pi_flexform.euros">Display numeric valuees in Euros</label>
+            <label index="meta_feedit.pi_flexform.ajaxDomReady">DomReady event code</label>
+            <label index="meta_feedit.pi_flexform.useDistinct">Use distinct in sql clauses</label>
+            <label index="meta_feedit.pi_flexform.ajaxLibs">Js libraries to load</label>
         </languageKey>
         <languageKey index="fr" type="array">
             <label index="meta_feedit.pi_flexform.gridAjax">Grille</label>
@@ -375,6 +379,9 @@
             <label index="meta_feedit.pi_flexform.TemplatePDF">Gabarit PDF pour les listes</label>
             <label index="meta_feedit.pi_flexform.TemplatePDFDet">Gabarit PDF pour la vue en détail</label>
             <label index="meta_feedit.pi_flexform.TemplatePDFTab">Gabarit PDF pour les tabaleaux</label>
+            <label index="meta_feedit.pi_flexform.ajaxDomReady">Code évènement DomReady</label>
+           <label index="meta_feedit.pi_flexform.useDistinct">Utiliser distinct dans les clauses SQL</label>
+            <label index="meta_feedit.pi_flexform.ajaxLibs">Librairies Js à charger</label>
         </languageKey>
     </data>
     <orig_hash type="array">

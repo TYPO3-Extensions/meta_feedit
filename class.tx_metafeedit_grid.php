@@ -181,9 +181,10 @@ class tx_metafeedit_grid {
 		
 		//echo $GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where']);;
 		//die(sql);
-		
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where']);
-		if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayGrid row count ',$GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where']),$DEBUG);
+		$distinct=$conf['general.']['useDistinct']?" distinct ":"";
+	    
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where']);
+		if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayGrid row count ',$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where']),$DEBUG);
 		while($item = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))	{
 			$cella[$item[$jRowField]][$item[$jColField]]=$item;
 			if ($secondaryColFields) {
@@ -192,8 +193,6 @@ class tx_metafeedit_grid {
 			$cella[$item[$jRowField]][$item[$jColField]][$secondaryColFields]=0;
 		}
 		
-		//print_r($cella);
-		//die(cell);
 		//MODIF CBY
 			
 			// Grid Row Data loop
@@ -242,7 +241,6 @@ class tx_metafeedit_grid {
 				if ($conf['debug.']['sql']) $DEBUG.="<br/>Row Field SQL 2 <br/>".$GLOBALS['TYPO3_DB']->SELECTquery($sqlrow['fields'].','.$conf['TCAN'][$rowTable]['ctrl']['label'],$sqlrow['fromTables'],$sqlrow['where']);   
 				
 				while ($item=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) { 
-				    //print_r($row);
 					$nbRows++;
 					$rowId[$nbRows]=$item['uid'];
 					$rowLabel[$nbRows]=$item[$conf['TCAN'][$rowTable]['ctrl']['label']];
@@ -299,10 +297,8 @@ class tx_metafeedit_grid {
 			  	$this->metafeeditlib->getParentJoin($conf,$sql2,$secondaryTable);
 					if ($conf['grid.']['userFunc_afterSecondaryColWhere']) t3lib_div::callUserFunction($conf['grid.']['userFunc_afterSecondaryColWhere'],$conf,$conf['parentObj']);
 					if ($conf['parentObj']->conf['grid.']['col.']['secondaryWhereString']) $sql2['where'].=$conf['parentObj']->conf['grid.']['col.']['secondaryWhereString'];
-					//print_r($sql2);
 				}
 				$conf['parentObj']=&$this->feadminlib;
-				//print_r($conf['grid.']);
 				if ($conf['grid.']['userFunc_afterColWhere']) t3lib_div::callUserFunction($conf['grid.']['userFunc_afterColWhere'],$conf,$conf['parentObj']);
 				if ($conf['parentObj']->conf['grid.']['col.']['whereString']) $sqlcol['where'].=$conf['parentObj']->conf['grid.']['col.']['whereString'];
 				if ($conf['debug.']['sql']) $DEBUG.="<br/>Col Field SQL <br/>".t3lib_div::view_array($sqlcol);   
@@ -435,7 +431,6 @@ class tx_metafeedit_grid {
 						$color='';
 						$codeJS='';
 						$cMarkerArray['###GRIDCELLALT###']="$colLabel[$j]";
-						//echo "<br>$rData, $cData,$cData2"; print_r($cella2[$rData][$cData][$cData2]);
 						if ($cella2[$rData][$cData][$cData2]) {		
 							$cMarkerArray['###HIDDENCELLFIELDS###']='<input type="hidden" name="FE['.$table.'][grid]['.$rData.']['.$cData.']['.$cData2.']['.$conf['uidField'].']" value="'.$cella2[$rData][$cData][$cData2][$conf['uidField']].'">';
 							$cMarkerArray=$this->cObj->fillInMarkerArray($cMarkerArray, $cella2[$rData][$cData][$cData2], '', TRUE, 'FIELD_', $conf['recInMarkersHSC']);

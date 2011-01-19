@@ -240,7 +240,6 @@
 			// XML root end
 			$xml[] = '</player>';
 		}
-		//print_r($xml);
 		// Return XML code
 		return implode(chr(10),$xml);
 	}

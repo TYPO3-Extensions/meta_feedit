@@ -162,7 +162,6 @@ class tx_metafeedit_widgets {
 	* @param tx_metafeedit_ajaxlib $handler instance of tx_metafeedit_ajaxlib
 	**/
 	function handleComboList($data,&$objResponse,&$handler) {
-		//print_r($data);
 		$idwidget=$data[$this->prefixId]['code'];
 		$prefix=$data[$this->prefixId]['prefix'];
 		$idcombo=$prefix.$idwidget;
@@ -198,7 +197,6 @@ class tx_metafeedit_widgets {
 					$json['cbs'][]=array('id'=>$cb);
 				}
 				
-				//print_r($json);
 				//how to add format hook here ?
 
 				$json['prefix']=$prefix;
@@ -240,7 +238,6 @@ class tx_metafeedit_widgets {
 							//echo $callBacksArr[2];
 							t3lib_div::callUserFunction($callBacksArr[2],$rs,$this);
 						}
-						//print_r($rs);
 						$json['rs'][]=$rs;
 						
 						$c--;

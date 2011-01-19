@@ -310,15 +310,15 @@
             <label index="check_yes">Oui</label>
             <label index="check_no">Non</label>
             <label index="search_nothing">Aucun</label>
-            <label index="move_top">Déplacer vers le haut les éléments sélectionnés</label>
-            <label index="move_up">Déplacer l'élément vers le haut</label>
-            <label index="move_bt">Déplacer l'élément vers le bas</label>
-            <label index="move_down">Déplacer l'élément en bas</label>
-            <label index="move_delete">Supprimer les éléments sélectionnés</label>
-            <label index="printedby">Imprimé par : </label>
+            <label index="move_top">D&amp;eacute;placer vers le haut les &amp;eacute;l&amp;eacute;ments s&amp;eacute;lectionn&amp;eacute;s</label>
+            <label index="move_up">D&amp;eacute;placer l'&amp;eacute;l&amp;eacute;ment vers le haut</label>
+            <label index="move_bt">D&amp;eacute;placer l'&amp;eacute;l&amp;eacute;ment vers le bas</label>
+            <label index="move_down">D&amp;eacute;placer l'&amp;eacute;l&amp;eacute;ment en bas</label>
+            <label index="move_delete">Supprimer les &amp;eacute;l&amp;eacute;ments s&amp;eacute;lectionn&amp;eacute;s</label>
+            <label index="printedby">Imprim&amp;eacute; par : </label>
             <label index="nbpages">Nb pages : </label>
-            <label index="gotopage">Aller à la page : </label>
-            <label index="nbrows">Nb éléments : </label>
+            <label index="gotopage">Aller &amp;agrave;la page : </label>
+            <label index="nbrows">Nb &amp;eacute;l&amp;eacute;ments : </label>
         </languageKey>
     </data>
     <orig_hash type="array">

@@ -8,7 +8,7 @@
 * @package TYPO3
 * @subpackage	tx_metafeedit
 * @todo 	Mettre typoscript pour url pour fonctions d'impression
-* @todo 	Vérification cohérence des données
+* @todo 	VÃ©rification cohÃ©rence des donnÃ©es
 **/
 
 /***************************************************************
@@ -83,8 +83,6 @@ require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_widgets.p
 
 	function init(&$caller,&$conf) {
 		$this->cObj = &$GLOBALS['TSFE']->cObj;
-		//echo "init";
-		//print_r($conf);
 		$this->conf=&$conf;
 		$this->caller=$caller;
 		$this->makeXajaxInstance();
@@ -117,7 +115,7 @@ require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_widgets.p
 		$this->xajax->processRequests();
 
 		// Else create javascript and add it to the header output
-		if (!t3lib_div::_GP('ajx')) $GLOBALS['TSFE']->additionalHeaderData[$this->conf['prefixId']] = $this->xajax->getJavascript(t3lib_extMgm::siteRelPath('xajax'));
+		if (!t3lib_div::_GP('ajx')) $GLOBALS['TSFE']->additionalHeaderData[$this->conf['prefixId']] = $this->xajax->getJavascript('/'.t3lib_extMgm::siteRelPath('xajax'));
 	}
 
 
@@ -167,7 +165,7 @@ require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_widgets.p
 				$content="<hr>len: $l <br>";
 				$content.="debug<hr>".$GLOBALS["TSFE"]->fe_user->getKey('ses','dbg').'<br>';
 				
-				// TODO vérifier cohérence des données....
+				// TODO vÃ©rifier cohÃ©rence des donnÃ©es....
 
 				$objResponse->addAssign('debug', 'innerHTML', $content);
 	  }

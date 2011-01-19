@@ -67,7 +67,7 @@ class tx_metafeedit_ajaxlib {
 		//calculer comment ajouter un userfunc ici afin de r�cup�rer les entit� juridique partenaire par exemple.
 		//if ($fe_adminLib->conf['userFunc_ajaxAfterWhere']) t3lib_div::callUserFunction($fe_adminLib->conf['userFunc_afterSave'], $var_temp_array, $fe_adminLib);
 
-		if ($search) { // Modif by CMD - gestion multichamp de recherche
+		if ($search) { // We handle multi criteria search here
 			if (intval($search) > 0) {
 				$where.=" AND $table.$numField like '$search%'";
 				$orderby="$table.$numField asc";
@@ -90,10 +90,9 @@ class tx_metafeedit_ajaxlib {
 			}
 		}
 		$start = ($page)?($page-1)*$pagesize:0;
-		/*rep�re*/
 		$distinct=$sameField?'DISTINCT ':'';
 		if ($where)		{
-			//on fait sauter l'ordre by existant pour mettre en place le nouveau
+			//We replace existing orderby with new one
 			if (strpos(strtoupper($whereField), 'ORDER BY')!==false) {
 				$pos = strpos($whereField, 'ORDER BY');
 				$whereField = $pos==0?'':substr($whereField, 0, $pos-1);
@@ -220,7 +219,6 @@ class tx_metafeedit_ajaxlib {
 		$idwidget=trim($data[$this->prefixId]['code']);
 		$operateur=$GLOBALS['TSFE']->fe_user->user['uid'];
 		$id=$data[$this->prefixId]['data'];
-		//print_r($data);
 		$tdata=$data[$this->prefixId]['tdata'];
 		$prefix=trim($data[$this->prefixId]['prefix']);
 		$ret=array();

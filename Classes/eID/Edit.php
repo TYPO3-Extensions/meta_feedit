@@ -49,8 +49,6 @@ require_once(t3lib_extMgm::extPath('meta_feedit').'pi1/class.tx_metafeedit_pi1.p
 		// We update  user int scripts here if necessary
 		if ($GLOBALS['TSFE']->isINTincScript())	
 		{
-			//print_r($GLOBALS['TSFE']->config);
-			//echo $content;
 			$GLOBALS['TSFE']->content=$content;
 			$GLOBALS['TSFE']->INTincScript();
 			$content=$GLOBALS['TSFE']->content;

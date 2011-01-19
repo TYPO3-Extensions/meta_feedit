@@ -221,7 +221,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->templateCode = $this->conf['templateContent']; //? $this->conf['templateContent']: $this->cObj->fileResource($this->conf['templateFile']);
 		// Checking template file
 		if (!$this->templateCode)	{
-			$content = 'No template file found: '.$this->conf['templateFile'];
+			$content = 'No template file found : '.$this->conf['templateFile'];
 			return $content;
 		}
 
@@ -248,8 +248,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
       
 		$this->fUField = $this->conf['fUField']?$this->conf['fUField']:t3lib_div::_GP('fUField['.$this->conf['pluginId'].']');
 		$this->fUKeyField = $this->conf['fUKeyField']?$this->conf['fUKeyField']:t3lib_div::_GP('fUKeyField['.$this->conf['pluginId'].']');
-		//$this->fUField = $this->conf['fUField'][$this->conf['pluginId']]?$this->conf['fUField'][$this->conf['pluginId']]:t3lib_div::_GP('fUField['.$this->conf['pluginId'].']');
-		//$this->fUKeyField = $this->conf['fUKeyField'][$this->conf['pluginId']]?$this->conf['fUKeyField'][$this->conf['pluginId']]:t3lib_div::_GP('fUKeyField['.$this->conf['pluginId'].']');
 		$this->fU = $this->conf['fU']?$this->conf['fU']:t3lib_div::_GP('fU['.$this->conf['pluginId'].']');
 
 		$this->conf['recUid']=$this->recUid;
@@ -293,12 +291,17 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		foreach($fArr as $fN) {			
 			if (in_array(substr($fN,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 			$this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'###']='';
+			$this->markerArray['###CSS_ERROR_FIELD_'.$fN.'###']='';
 			$this->markerArray['###FIELD_EVAL_'.$fN.'###']='';
 			$this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$fN).'###']='';
+			$this->markerArray['###CSS_ERROR_FIELD_'.str_replace('.','_',$fN).'###']='';
 			$this->markerArray['###FIELD_EVAL_'.str_replace('.','_',$fN).'###']='';
 
  			if ( $GLOBALS['TCA'][$this->theTable]['columns'][$fN]['config']['type']=='group') {
-				if ($GLOBALS['TCA'][$this->theTable]['columns'][$fN]['config']['internal_type']=='file') $this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'_file###']='';
+				if ($GLOBALS['TCA'][$this->theTable]['columns'][$fN]['config']['internal_type']=='file') {
+					$this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'_file###']='';
+					$this->markerArray['###CSS_ERROR_FIELD_'.$fN.'_file###']='';
+				}
 				$this->markerArray['###FIELD_EVAL_'.$fN.'###']='';
 			}
 		}
@@ -307,11 +310,15 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		foreach($fbArr as $fN) {
 			if (in_array(substr($fN,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 			$this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'###']='';
+			$this->markerArray['###CSS_ERROR_FIELD_'.$fN.'###']='';
 
 			//$this->markerArray['###FIELD_EVAL_'.$fN.'###']='';
 
  			if ( $GLOBALS['TCA'][$this->theTable]['columns'][$fN]['config']['type']=='group') {
-				if ($GLOBALS['TCA'][$this->theTable]['columns'][$fN]['config']['internal_type']=='file') $this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'_file###']='';
+				if ($GLOBALS['TCA'][$this->theTable]['columns'][$fN]['config']['internal_type']=='file') {
+					$this->markerArray['###EVAL_ERROR_FIELD_'.$fN.'_file###']='';
+					$this->markerArray['###CSS_ERROR_FIELD_'.$fN.'_file###']='';
+				}
 				$this->markerArray['###FIELD_EVAL_'.$fN.'###']='';
 			}
 		}
@@ -379,7 +386,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				$this->conf['cmdmode']='edit';
 			break;
 		}
-		
 		$pluginId=$conf['pluginId'];
 		$this->markerArray['###HIDDENFIELDS###'] =
 			($this->authCode?'<input type="hidden" name="aC['.$pluginId.']" value="'.htmlspecialchars($this->authCode).'" />':'').
@@ -509,7 +515,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					$this->dataArr = $this->userProcess('evalFunc',$this->dataArr);
 				}
 				// if not preview and no failures, then set data...
-				if (!$this->failure && $this->conf['inputvar.']['BACK']!=1  && (!$this->preview || $this->conf['blogData']) && !$conf['inputvar.']['doNotSave'])	{	// doNotSave is a global var (eg a 'Cancel' submit button) that prevents the data from being processed
+				if (!$this->failure && $this->conf['inputvar.']['BACK']!=1  && (!$this->preview || $this->conf['blogData']) && !$conf['inputvar.']['doNotSave'])	{
+					// doNotSave is a global var (eg a 'Cancel' submit button) that prevents the data from being processed
 					$this->save($this->conf);
 					if ($this->conf['evalFunc'])	{
 						$this->currentArr = $this->userProcess('evalFunc',$this->currentArr);
@@ -556,6 +563,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// DISPLAY FORMS:
 		// ***********************
 		if ($this->saved) {
+			//@todo why do we do this we lose override values here !!
+			//$savedData=$this->dataArr;
 			$this->dataArr=array_merge($this->dataArr,$this->currentArr);
 			// Clear page cache
 			$this->clearCacheIfSet();
@@ -564,8 +573,25 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				case 'delete':
 					$key='DELETE';
 					break;
-				case 'list':
 				case 'create':
+					/** create mode is valid :
+					 * - in list mode (new element  button)
+					 * - in create only screen (for aexample a subscription screen).
+					 */
+					switch ($this->conf['defaultCmd']) {						
+						case 'create' :
+							$key='CREATE';
+							// We force status screen if default command is create.
+							// and no preview is set ...
+							if (!$this->preview) $this->conf[$this->conf['inputvar.']['cmd'].'.']['statusScreen']=1;
+							
+							break;
+						default:
+							$key='EDIT';
+							break;
+					};
+					break;
+				case 'list':
 				case 'edit':
 					$key='EDIT';
 					break;
@@ -574,7 +600,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					$key='CREATE';
 				break;
 			}
-
 			// We handle status screen
 			if (($this->conf[$this->conf['inputvar.']['cmd'].'.']['statusScreen'] && ($this->conf['inputvar.']['cmd']=='edit' || $this->conf['inputvar.']['cmd']=='create')) ||  (!($this->conf['inputvar.']['cmd']=='list' && $this->conf['general.']['listMode']==2) && ($this->conf['inputvar.']['cmd']!='edit' && $this->conf['inputvar.']['cmd']!='create'))) {
 				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Status screen start:']=$this->metafeeditlib->displaytime()." Seconds";
@@ -618,7 +643,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			}
 
 		
-			if ($this->conf['email.']['sendAdminMail'] || $this->conf['email.']['sendAdminMail'] || $this->conf['email.']['sendFEUserMail'] || $this->conf['email.']['sendDataMail'] || $this->conf['email.']['sendDataInfoMail'] || $this->conf['email.']['sendFEUserInfoMail'] || $this->conf['email.']['sendAdminInfoMail']) {
+			if ($this->conf['email.']['sendAdminMail'] || $this->conf['email.']['sendFEUserMail'] || $this->conf['email.']['sendDataMail'] || $this->conf['email.']['sendDataInfoMail'] || $this->conf['email.']['sendFEUserInfoMail'] || $this->conf['email.']['sendAdminInfoMail']) {
 				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Notification mail start:']=$this->metafeeditlib->displaytime()." Seconds";
 					
 				$this->compileMail(
@@ -631,9 +656,18 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Notification mail end:']=$this->metafeeditlib->displaytime()." Seconds";
 			}
 			switch($this->conf['inputvar.']['cmd'])	{
+			    case 'setfixed':
+			        $this->conf['inputvar.']['cmd']=$this->conf['defaultCmd'];
 				case 'delete':
 				case 'create':
-					$this->conf['inputvar.']['cmd']='edit';
+					switch ($this->conf['defaultCmd']) {						
+						case 'create' :
+							$this->conf['inputvar.']['cmd']='create';
+							break;
+						default:
+							$this->conf['inputvar.']['cmd']='edit';
+							break;
+					};					
 					break;
 				default:
 					$this->conf['inputvar.']['cmd']='list';
@@ -654,12 +688,15 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
             if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc process start:']=$this->metafeeditlib->displaytime()." Seconds";
 		    switch($this->conf['inputvar.']['cmd'])	{
 			    case 'setfixed':
-			        $this->conf['cmdmode']='setfixed';
 				    $content = $this->procesSetFixed();
+			        $this->conf['cmdmode']=$this->conf['defaultCmd'];
+			        $this->conf['inputvar.']['cmd']=$this->conf['defaultCmd'];
 			        break;
 			    case 'infomail':
 			        $this->conf['cmdmode']='infomail';
 				    $content = $this->sendInfoMail();
+			        $this->conf['cmdmode']=$this->conf['defaultCmd'];
+			        $this->conf['inputvar.']['cmd']=$this->conf['defaultCmd'];
 			        break;
 			    case 'delete':
 			        $this->conf['cmdmode']='delete';
@@ -687,7 +724,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				krumo($this->conf['LOCAL_LANG']);
 			}
 	    }
-	    
 		// Delete temp files:
 		
 		foreach($this->unlinkTempFiles as $tempFileName)	{
@@ -696,8 +732,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	    
         if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc process end:']=$this->metafeeditlib->displaytime()." Seconds";
 
-	    // Return content:
-	    //$content.=$this->metafeeditlib->getJSAfter($this,$this->conf);
 	    if ($conf['debug.']['vars']) {
 	  	    $this->metafeeditlib->debug('Post Vars :',$_POST,$DEBUG);
 	  	    $this->metafeeditlib->debug('GET Vars :',$_GET,$DEBUG);
@@ -719,7 +753,14 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
         return ($conf['performanceaudit']?t3lib_div::view_array($this->perfArray):'').$content.$conf['debug.']['debugString'].$DEBUG;
 	}
 
+	/**
+	 * Gets connected users email
+	 * @param array $Arr incoming dataArray
+	 * @param array $conf configuration array
+	 * @return string email (should never be empty !!) 
+	 */
 	function getFeuserMail($Arr,&$conf) {
+			$recipient='';
 			// handle user mail !!!!
 			if ($conf['fe_cruser_id']) {
 				$feuserid=$Arr[$conf['fe_cruser_id']];
@@ -727,9 +768,14 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				$recipient=$DBrows[0]['email'];
 				
 			} elseif ($GLOBALS['TSFE']->fe_user->user[email]) {
+				// Are we conencted, if so we take conencted user's email ???
 				$recipient=$GLOBALS['TSFE']->fe_user->user[email];
 			} else {
-				$recipient=$Arr[$conf['email.']['field']];
+				if (!$conf['email.']['field']) echo 'Record Email field is not defined';
+				$emailfields=t3lib_div::trimexplode(',',$conf['email.']['field']);				
+				foreach($emailfields as $ef) {
+					$recipient.=$recipient?$Arr[$conf['email.']['field']].';'.$recipient:$Arr[$conf['email.']['field']];
+				}
 			}
 			return $recipient;
 	}
@@ -755,9 +801,17 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		//$parseValues=array_merge(is_array($this->conf['parseValues.'])?$this->conf['parseValues.']:array(),is_array($evalValues)?$evalValues:array());
 		if(is_array($this->conf['parseValues.'])) {
 			$parseValues=$this->conf['parseValues.'];
-	  	if (is_array($evalValues)) {
-	   		$parseValues=array_merge($parseValues,$evalValues);
-	  	}
+			if (is_array($evalValues)) {
+			    $arr=$parseValues;
+				foreach ($evalValues as $key=>$val) {
+					if ($arr[$key]) {
+						$arr[$key]=implode(',',array_merge(t3lib_div::trimexplode(',',$parseValues[$key]),t3lib_div::trimexplode(',',$evalValues[$key])));
+					} else {
+						$arr[$key]=$val;
+					}					
+				}
+				$parseValues=$arr;
+			}
 		}
 		else $parseValues = $evalValues;
 		
@@ -774,7 +828,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			reset($parseValues);
 			  while(list($theField,$theValue)=each($parseValues))	{			  	
 				$this->markerArray['###EVAL_ERROR_FIELD_'.$theField.'###']='';
+				$this->markerArray['###CSS_ERROR_FIELD_'.$theField.'###']='';
 				$this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$theField).'###']='';
+				$this->markerArray['###CSS_ERROR_FIELD_'.str_replace('.','_',$theField).'###']='';
 				$listOfCommands = t3lib_div::trimExplode(',',$theValue,1);
 				while(list(,$cmd)=each($listOfCommands))	{
 					$cmdParts = preg_split('/\[|\]/',$cmd);	// Point is to enable parameters after each command enclosed in brackets [..]. These will be in position 1 in the array.
@@ -786,7 +842,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						case 'lower':
 						case 'upper':
 							$this->dataArr[$theField] = $this->cObj->caseshift($this->dataArr[$theField],$theCmd);
-						break;
+							break;
+						case 'upperfirst':
+							$val = $this->cObj->caseshift($this->dataArr[$theField],'lower');
+							$this->dataArr[$theField]=strtoupper(substr($val,0,1)).substr($val,1);
+							break;
 						case 'nospace':
 							$this->dataArr[$theField] = str_replace(' ', '', $this->dataArr[$theField]);
 						break;
@@ -881,9 +941,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	Function removeaccents($string)   
         {    
 	     $string= strtr($string,    
-	   "�����������������������������������������������������",   
+	   "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ",   
 	   "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");    
-	   //"�����������������������������������������������������",   
 	      
 	    return $string;    
     	}   
@@ -1029,6 +1088,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		}
 		if ($this->failure) {
 			$this->markerArray['###EVAL_ERROR_FIELD_'.$theField.'###'] = is_array($this->failureMsg[$theField]) ? implode('<br />',$this->failureMsg[$theField]) : '';
+			$this->markerArray['###CSS_ERROR_FIELD_'.$theField.'###']='tx-metafeedit-form-field-error ';
 			$this->markerArray['###EVAL_ERROR###'] = $this->metafeeditlib->makeErrorMarker($this->conf,$this->metafeeditlib->getLL('error_occured',$this->conf));
 		}	
 	}
@@ -1072,6 +1132,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						}
 					}
 			
+				} elseif  (strpos($theValue,"<")===0) {
+					// We override value with other incoming field
+					$f=substr($theValue,1);
+					$v=$this->dataArr[$f];
+					if ($v) $data=$v;
 				} else {
 					$data=$theValue;
 				}
@@ -1094,7 +1159,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 * @see init()
 	 */
 	function defaultValues(&$conf)	{
-			// Addition of default values
+		// Addition of default values
 		if (is_array($conf[$conf['cmdKey'].'.']['defaultValues.']))	{
 			reset($conf[$conf['cmdKey'].'.']['defaultValues.']);
 			while(list($theField,$theValue)=each($conf[$conf['cmdKey'].'.']['defaultValues.']))	{
@@ -1192,7 +1257,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						case 'uniqueInPid':
 							$whereef= $GLOBALS['TSFE']->sys_page->enableFields($masterTable);
 							if ($DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField($masterTable,$theField,$this->dataArr[$theField], 'AND pid IN ('.$recordTestPid.')'.$whereef,'','','1'))	{
-
 							if (!$recExist || $DBrows[0][$this->conf['uidField']]!=$this->dataArr[$this->conf['uidField']])	{	// Only issue an error if the record is not existing (if new...) and if the record with the false value selected was not our self.
 									$this->failureMsg[$theField][] = $this->getFailure($theField, $theCmd, $this->metafeeditlib->getLL('error_value_existed',$this->conf));
 								}
@@ -1283,18 +1347,25 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					}
 				}
 				$this->markerArray['###EVAL_ERROR_FIELD_'.$theField.'###'] = is_array($this->failureMsg[$theField]) ? implode('<br />',$this->failureMsg[$theField]) : '';
+				//$this->markerArray['###CSS_ERROR_FIELD_'.$theField.'###']=$this->markerArray['###EVAL_ERROR_FIELD_'.$theField.'###']?'tx-metafeedit-form-error ':'';
+				$this->markerArray['###CSS_ERROR_FIELD_'.$theField.'###']=is_array($this->failureMsg[$theField])?'tx-metafeedit-form-field-error ':'';
 			}
 		}
 		//$this->failure=implode(',',$tempArr);	 //$failure will show which fields were not OK
 		if (count($this->failureMsg) >0) {
 			$this->failure=1;
-			if (count($tempArr)) $this->failure=implode(',',$tempArr);
+			if (count($tempArr)) {
+				foreach($tempArr as $ta) {
+					$this->markerArray['###CSS_ERROR_FIELD_'.$ta.'###']='tx-metafeedit-form-field-error ';
+				}
+				$this->failure=implode(',',$tempArr);
+			}
 			$this->markerArray['###EVAL_ERROR###'] = $this->metafeeditlib->makeErrorMarker($this->conf,$this->metafeeditlib->getLL('error_occured',$this->conf));
 		} else { 
 			$this->failure=0;
 			if (count($tempArr)) {
-			$this->failure=implode(',',$tempArr);
-			$this->markerArray['###EVAL_ERROR###'] =  $this->metafeeditlib->makeErrorMarker($this->conf,$this->getFailure('_FORM', '_REQUIRED', $this->metafeeditlib->getLL('error_required',$this->conf))); //$this->metafeeditlib->getLL('error_required',$this->conf);
+				$this->failure=implode(',',$tempArr);
+				$this->markerArray['###EVAL_ERROR###'] =  $this->metafeeditlib->makeErrorMarker($this->conf,$this->getFailure('_FORM', '_REQUIRED', $this->metafeeditlib->getLL('error_required',$this->conf))); 
 			}
 		}
 		
@@ -1362,7 +1433,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	function save(&$conf)	{
 		// Before Save transformations for RTE
 		$saveArray=array();
-		//print_r($this->dataArr);
 		foreach($this->dataArr as $fN=>$val) {
 		
 			if (strpos($fN,'.') || substr($fN,0,5)=='EVAL_') {
@@ -1386,11 +1456,12 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				if ($conf['blogData']) {
 					$saveArray['remote_addr'] = $_SERVER['REMOTE_ADDR'];
 					$newFieldList=$conf['blog.']['show_fields']?$conf['blog.']['show_fields']:'firstname,surname,email,homepage,place,entry,entrycomment,linked_row,remote_addr';
-					$this->cObj->DBgetInsert('tx_metafeedit_comments', $this->thePid, $saveArray, $newFieldList, TRUE);
+					$res1=$this->cObj->DBgetInsert('tx_metafeedit_comments', $this->thePid, $saveArray, $newFieldList, TRUE);
+					if (!$res1 && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
 					//MODIF CBY
 					if ($conf['debug.']['sql']) 
 							$conf['debug.']['debugString'].="<br/>INSERT SQL <br/>".$this->cObj->DBgetInsert('tx_metafeedit_comments', $this->thePid, $saveArray, $newFieldList, FALSE);
-					$this->saved=1;
+					if ($res1) $this->saved=1;
 					break;
 				} 
 			
@@ -1402,8 +1473,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 
 					if ($this->aCAuth($origArr) || $this->metafeeditlib->DBmayFEUserEdit($this->theTable,$origArr,$GLOBALS['TSFE']->fe_user->user,$conf['allowedGroups'],$conf['fe_userEditSelf'],$conf))	{
-						$this->cObj->DBgetUpdate($this->theTable, $theUid, $saveArray, $newFieldList, TRUE);
-
+						$res1=$this->cObj->DBgetUpdate($this->theTable, $theUid, $saveArray, $newFieldList, TRUE);
+						if (!$res1 && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
+						
 						//MODIF CBY
 						if ($conf['debug.']['sql']) 
 							$conf['debug.']['debugString'].="<br/>UPDATE SQL <br/>".$this->cObj->DBgetUpdate($this->theTable, $theUid, $saveArray, $newFieldList, FALSE);
@@ -1414,7 +1486,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						$this->userProcess_alt($conf['edit.']['userFunc_afterSave'],$conf['edit.']['userFunc_afterSave.'],array('rec'=>$this->currentArr, 'origRec'=>$origArr));
 						$this->currentArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$theUid);
 
-						$this->saved=1;
+						if ($res1) $this->saved=1;
 					} else {
 						$this->error='###TEMPLATE_NO_PERMISSIONS###';
 					}
@@ -1425,9 +1497,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			default:
 				if ($conf['create'])	{
 
-						
 					$newFieldList = implode(',',array_intersect(explode(',',$conf['fieldList']),t3lib_div::trimExplode(',',$conf['create.']['fields'],1)));
-					$this->cObj->DBgetInsert($this->theTable, $this->thePid, $saveArray, $newFieldList, TRUE);
+					$res1=$this->cObj->DBgetInsert($this->theTable, $this->thePid, $saveArray, $newFieldList, TRUE);
+					if (!$res1 && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
 					//MODIF CBY
 					if ($conf['debug.']['sql']) 
 							$conf['debug.']['debugString'].="<br/>INSERT SQL <br/>".$this->cObj->DBgetInsert($this->theTable, $this->thePid, $saveArray, $newFieldList, FALSE);
@@ -1463,7 +1535,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						}
 						if (count($saveArray))	{
 					
-							$this->cObj->DBgetUpdate($this->theTable, $newId, $saveArray, $extraList, TRUE);
+							$res1=$this->cObj->DBgetUpdate($this->theTable, $newId, $saveArray, $extraList, TRUE);
+							if (!$res1 && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
 							//MODIF CBY
 							if ($conf['debug.']['sql']) 
 								$conf['debug.']['debugString'].="<br/>UPDATE SQL <br/>".$this->cObj->DBgetUpdate($this->theTable, $newId, $saveArray, $extraList, FALSE);
@@ -1478,7 +1551,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					$this->userProcess_alt($conf['create.']['userFunc_afterSave'],$conf['create.']['userFunc_afterSave.'],$rec);
 					//$this->logErrors('after user process uid:='.$this->dataArr[$conf['uidField']]);
 					$this->currentArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$newId);
-					$this->saved=1;
+					if ($res1) $this->saved=1;
 				}
 			break;
 		}
@@ -1705,7 +1778,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if (($GLOBALS['TSFE']->loginUser &&  $this->conf['requireLogin']) || ( $this->aCAuth($origArr)&& $this->conf['requireLogin'])||!$this->conf['requireLogin'])	{	// Must be logged in OR be authenticated by the aC code in order to reorder
 			//on instancie la tce_main
 			$tce_main=t3lib_div::makeInstance('t3lib_TCEmain');
-			//print_r($this->conf['inputvar.']['orderDir.']);
 			//recup de l'ordre dans lequel on trie
 			if ($this->conf['inputvar.']['orderDir.']['dir']=='up') {
 				$toUp = true;
@@ -1731,7 +1803,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$order = $this->theTable.'1.sorting '.($toUp?'DESC':'ASC');
 			$limit = ($toUp?'1':'0').',1';
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $tables, $where, '', $order, $limit);
-			//echo $GLOBALS['TYPO3_DB']->SELECTquery($fields, $tables, $where, '', $order, $limit);
 			//si on trouve un resultat (on est donc pas sur le premier second enregistrement ni sur le dernier)
 			if ($GLOBALS['TYPO3_DB']->sql_num_rows($res) >= 1) {
 				$occ = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
@@ -1833,9 +1904,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			//$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $this->dataArr, '', TRUE, 'FIELD_', $conf['general.']['xhtml']);
 			if ($conf['create.']['preview'] && !$this->previewLabel)	{$markerArray['###HIDDENFIELDS###'].= '<input type="hidden" name="preview['.$pluginId.']" value="1" />';}
 			$content = $this->cObj->substituteMarkerArray($templateCode, $markerArray);
-		    //$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($this->dataArr), $this->theTable.'_form', 'FE['.$this->theTable.']', $conf['fieldList'].$this->additionalUpdateFields);
-			//$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($currentArr), $this->theTable.'_form',  'FE['.$this->theTable.']', $this->conf['edit.']['show_fields'].$this->additionalUpdateFields);
-			$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($this->dataArr), $this->theTable.'_form',  'FE['.$this->theTable.']', $this->conf['edit.']['show_fields'].$this->additionalUpdateFields);
+			$content.=$this->cObj->getUpdateJS($this->modifyDataArrForFormUpdate($this->dataArr), $this->theTable.'_form',  'FE['.$this->theTable.']', $this->conf['create.']['show_fields'].$this->additionalUpdateFields);
 		} else { die('PLUGIN META FEEDIT : Create mode not allowed !');}
 		return $content;
 	}
@@ -1892,6 +1961,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$conf['cmdmode']='list';
 		$content='';
 		$DEBUG='';
+		$distinct=$conf['general.']['useDistinct']?" distinct ":"";
+		
 		$dispDir= $conf['list.']['displayDirection']?$conf['list.']['displayDirection']:'Right'; //-- this should be handled in template choice...
 		//global $TCA;
 		//$pluginId=$conf['pluginId'];
@@ -1954,9 +2025,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// This counts the number of lines ...
 
 		//TODO add distinct or not through flexform ...
-
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']);
-	    if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList row count ',$GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']),$DEBUG);
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']);
+	    if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList row count ',$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']),$DEBUG);
 		$num=$GLOBALS['TYPO3_DB']->sql_num_rows($res);	// If there are menu-items ...
 		$this->markerArray['###METAFEEDITNBROWS###']='<span class="nbrows">'.$this->metafeeditlib->getLL("nbrows",$this->conf).$num.'</span>';
 		$NBSup=0; // Number of empty elements for page breaks and group by breaks;
@@ -2060,8 +2130,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 		// List SQL REQUEST with limitations, pagination, etc ...
 		
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT));
-	    if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList rows',$GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT)),$DEBUG);
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT));
+	    if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList rows',$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT)),$DEBUG);
 
  		$tpl=$this->prepareListTemplates($conf,$this->markerArray,$exporttype);
 
@@ -2478,6 +2548,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 							 $markerArray['###FIELD_EVAL_'.$FTRel.'.'.$key.'###']='';
 							 $markerArray['###EVAL_ERROR_FIELD_'.$FTRel.'.'.$key.'###']='';
 							 $markerArray['###EVAL_ERROR_FIELD_'.$FTRel.'_'.$key.'###']='';
+							 $markerArray['###CSS_ERROR_FIELD_'.$FTRel.'.'.$key.'###']='';
+							 $markerArray['###CSS_ERROR_FIELD_'.$FTRel.'_'.$key.'###']='';
 						}
 					}
 				}
@@ -2669,6 +2741,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 							$this->markerArray['###FIELD_EVAL_'.$FTRel.'.'.$key.'###']='';
 							$this->markerArray['###EVAL_ERROR_FIELD_'.$FTRel.'.'.$key.'###']='';
 							$this->markerArray['###EVAL_ERROR_FIELD_'.$FTRel.'_'.$key.'###']='';
+							$this->markerArray['###CSS_ERROR_FIELD_'.$FTRel.'.'.$key.'###']='';
+							$this->markerArray['###CSS_ERROR_FIELD_'.$FTRel.'_'.$key.'###']='';
 						} 
 					}
 					
@@ -2776,7 +2850,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		//We merge data with override values and eval values ...
 		$currentArr = array_merge($origArr,(array)$this->dataArr);
 		
-		//print_r($currentArr);
 		$arr=explode(',',$conf['fieldList']);
 		$pluginId=$conf['pluginId'];
 		$back_lnk = $this->conf['typoscript.'][$pluginId.'.']['edit.']['nobackbutton']?false:($this->conf['typoscript.']['default.']['edit.']['nobackbutton']?false:true);
@@ -2784,10 +2857,16 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		foreach($arr as $key) {
 			if (in_array(substr($key,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 
-			if (!$this->markerArray['###EVAL_ERROR_FIELD_'.$key.'###']) $this->markerArray['###EVAL_ERROR_FIELD_'.$key.'###']='';
+			if (!$this->markerArray['###EVAL_ERROR_FIELD_'.$key.'###']) {
+				$this->markerArray['###EVAL_ERROR_FIELD_'.$key.'###']='';
+				$this->markerArray['###CSS_ERROR_FIELD_'.$key.'###']='';
+			}
 			if (!$this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$key).'###']) $this->markerArray['###EVAL_ERROR_FIELD_'.str_replace('.','_',$key).'###']='';
 			if ( $GLOBALS['TCA'][$this->theTable]['columns'][$key]['config']['type']=='group' &&  $GLOBALS['TCA'][$this->theTable]['columns'][$key]['config']['internal_type']=='file')	{
-				if (!$this->markerArray['###EVAL_ERROR_FIELD_'.$key.'_file###']) $this->markerArray['###EVAL_ERROR_FIELD_'.$key.'_file###']='';
+				if (!$this->markerArray['###EVAL_ERROR_FIELD_'.$key.'_file###']) {
+						$this->markerArray['###EVAL_ERROR_FIELD_'.$key.'_file###']='';
+						$this->markerArray['###CSS_ERROR_FIELD_'.$key.'_file###']='';
+				}
 				if (!$this->markerArray['###EVAL_FIELD_'.$key.'_file_file###']) $this->markerArray['###EVAL_FIELD_'.$key.'_file_file###']='';
 				if (!$this->markerArray['###EVAL_FIELD_'.$key.'_file###']) $this->markerArray['###EVAL_FIELD_'.$key.'_file###']='';
 				if (!$this->markerArray['###FIELD_'.$key.'_file_file###']) $this->markerArray['###FIELD_'.$key.'_file_file###']='';
@@ -2798,8 +2877,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		}
 		if ($this->conf['debug'])	debug('displayEditForm(): '.'###TEMPLATE_EDIT'.$this->previewLabel.'###',1);
 		$templateCode = $this->cObj->getSubpart($this->templateCode, '###TEMPLATE_EDIT'.$this->previewLabel.($exporttype?'_'.$exporttype:'').'###');
-		//print_r($currentArr);
-		//if (!$this->preview) echo $templateCode;
+
 		$failure = t3lib_div::_GP('noWarnings')?'':$this->failure;
 		if (!$failure)	{$templateCode = $this->cObj->substituteSubpart($templateCode, '###SUB_REQUIRED_FIELDS_WARNING###', '');}
 		$templateCode = $this->removeRequired($templateCode,$failure);
@@ -2922,66 +3000,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		return $content;
 	}
 
-	/**
-	 * Processes socalled "setfixed" commands. These are commands setting a certain field in a certain record to a certain value. Like a link you can click in an email which will unhide a record to enable something. Or likewise a link which can delete a record by a single click.
-	 * The idea is that only some allowed actions like this is allowed depending on the configured TypoScript.
-	 *
-	 * @return	string		HTML content displaying the status of the action
-	 */
-	function procesSetFixed()	{
-		if ($this->conf['setfixed'])	{
-			$theUid = intval($this->recUid);
-			$origArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,  $theUid);
-			if ($this->conf['evalFunc'])	{
-				$origArr = $this->userProcess('evalFunc',$origArr);
-			}
-			$fD = t3lib_div::_GP('fD');
-			$sFK = t3lib_div::_GP('sFK');
-			$fieldArr=array();
-			if (is_array($fD) || $sFK=='DELETE')	{
-				if (is_array($fD))	{
-					reset($fD);
-					while(list($field,$value)=each($fD))	{
-						$origArr[$field]=$value;
-						$fieldArr[]=$field;
-					}
-				}
-
-				$theCode = $this->setfixedHash($origArr,$origArr['_FIELDLIST']);
-				if (!strcmp($this->authCode,$theCode))	{
-					if ($sFK=='DELETE')	{
-						$this->cObj->DBgetDelete($this->theTable, $theUid, TRUE);
-					} else {
-						$newFieldList = implode(',',array_intersect(t3lib_div::trimExplode(',',$this->conf['fieldList']),t3lib_div::trimExplode(',',implode($fieldArr,','),1)));
-						$this->cObj->DBgetUpdate($this->theTable, $theUid, $fD, $newFieldList, TRUE);
-						$this->currentArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$theUid);
-						$this->userProcess_alt($this->conf['setfixed.']['userFunc_afterSave'],$this->conf['setfixed.']['userFunc_afterSave.'],array('rec'=>$this->currentArr, 'origRec'=>$origArr));
-					}
-
-					// Outputting template
-					//$this->markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $origArr, '', TRUE, 'FIELD_', $this->conf['general.']['xhtml']);
-					$this->markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $origArr, '', TRUE, 'FIELD_', FALSE);
-					$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_SETFIXED_OK_'.$sFK.'###');
-					if (!$content)	{$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_SETFIXED_OK###');}
-
-					// Compiling email
-
-					$this->compileMail(
-						'SETFIXED_'.$sFK,
-						array($origArr),
-						$this->getFeuserMail($origArr,$this->conf),
-						$this->conf['setfixed.']
-					);
-						// Clearing cache if set:
-					$this->clearCacheIfSet();
-				} else $content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_SETFIXED_FAILED###');
-			} else $content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_SETFIXED_FAILED###');
-		}
-		return $content;
-	}
-
-
-
 	/*****************************************
 	 *
 	 * Template processing functions
@@ -3037,6 +3055,19 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 								$this->additionalUpdateFields.=','.$theField.'_again';
 							}
 						break;
+						case 'checkArray':
+							//echo "<br>$theField : ".$inputArr[$theField];
+							if ($inputArr[$theField] && !$this->isPreview())	{
+								for($a=0;$a<=30;$a++)	{
+									if ($inputArr[$theField] & pow(2,$a))	{
+										$alt_theField = $theField.']['.$a;
+										$inputArr[$alt_theField] = 1;
+										$this->additionalUpdateFields.=','.$alt_theField;
+									}
+								}
+							}
+						//echo ' modifyDataArrForFormUpdate : '.$theField.','.$this->additionalUpdateFields;
+						break;						
 					}
 				}
 			}
@@ -3086,13 +3117,18 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 *****************************************/
 
 	/**
-	 * Sends info mail to user
+	 * Sends information mail to user
 	 *
 	 * @return	string		HTML content message
 	 * @see init(),compileMail(), sendMail()
 	 */
 	function sendInfoMail()	{
 		if ($this->conf['infomail'] && $this->conf['email.']['field'])	{
+			$recipient='';
+			$emailfields=t3lib_div::trimexplode(',',$this->conf['email.']['field']);				
+			foreach($emailfields as $ef) {
+				$recipient.=$recipient?$Arr[$this->conf['email.']['field']].';'.$recipient:$Arr[$this->conf['email.']['field']];
+			}
 			$fetch = t3lib_div::_GP('fetch');
 			if ($fetch)	{
 					// Getting infomail config.
@@ -3111,7 +3147,10 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				if (t3lib_div::testInt($fetch))	{
 					$DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField($this->theTable,$this->conf['uidField'],$fetch,$pidLock,'','','1');
 				} elseif ($fetch) {	// $this->conf['email.']['field'] must be a valid field in the table!
-					$DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField($this->theTable,$this->conf['email.']['field'],$fetch,$pidLock,'','','100');
+					foreach($emailfields as $ef) {
+						if ($ef) $DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField($this->theTable,$ef,$fetch,$pidLock,'','','100');
+						if (count($DBrows )) break;
+					}
 				}
 
 				// Processing records
@@ -3134,7 +3173,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	}
 
 	/**
-	 * Compiles and sends a mail based on input values + template parts. Looks for a normal and an "-admin" template and may send both kinds of emails. See documentation in TSref.
+	 * Compiles and sends a mail based on input values + template parts. Looks for a normal and an "-admin" template and an eventual data email may send three kinds of emails. See documentation in TSref.
 	 *
 	 * @param	string		A key which together with $this->emailMarkPrefix will identify the part from the template code to use for the email.
 	 * @param	array		An array of records which fields are substituted in the templates
@@ -3142,17 +3181,17 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 * @param	array		Additional fields to set in the markerArray used in the substitution process
 	 * @return	void
 	 */
- 			// Notification Mails
+	
+ 	// Notification Mails
 
-                        // mail admin
-                        // mail feuser
-                        // mail datamail
+    // mail admin
+    // mail feuser
+    // mail datamail
 
-                        // SetFixed Mails (moderation)...
-                        // mail admin
-                        // mail feuser
-                        // mail datamail ?
-
+    // SetFixed Mails (moderation)...
+    // mail admin
+    // mail feuser
+    // mail datamail ?
 
 	function compileMail($key, $DBrows, $recipient, $setFixedConfig=array())	{
 		$GLOBALS['TT']->push('compileMail');
@@ -3167,10 +3206,15 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$adminContent['rec'] = $this->cObj->getSubpart($adminContent['all'], '###SUB_RECORD###');
 		$adminNotifyContent['rec'] = $this->cObj->getSubpart($adminContent['all'], '###SUB_RECORD###');
 		$dataContent['rec'] = $this->cObj->getSubpart($dataContent['all'], '###SUB_RECORD###');
-
+		
+		// We add connected user info
+		
+		$FEUSER=$GLOBALS['TSFE']->fe_user->user;
+		if (!is_array($FEUSER)) $FEUSER=array();
+		$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $FEUSER, '', TRUE, 'FEUSER_FIELD_', 0);
 		reset($DBrows);
 		while(list(,$r)=each($DBrows))	{
-			$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $r,'',0);
+			$markerArray = $this->cObj->fillInMarkerArray($markerArray, $r,'',0);
 			$markerArray = $this->metafeeditlib->setCObjects($this->conf,$this->markerArray,$userContent['rec'].$adminContent['rec'].$dataContent['rec'],$r,$markerArray,'ITEM_');
 			$markerArray['###SYS_AUTHCODE###'] = $this->authCode($r);
 			$markerArray = $this->setfixed($markerArray, $setFixedConfig, $r);
@@ -3183,16 +3227,20 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($userContent['all'])	$userContent['final'] .=$this->cObj->substituteSubpart($userContent['all'], '###SUB_RECORD###', $userContent['accum']);
 		if ($adminContent['all'])	$adminContent['final'].=$this->cObj->substituteSubpart($adminContent['all'], '###SUB_RECORD###', $adminContent['accum']);
 		if ($dataContent['all'])	$dataContent['final'].=$this->cObj->substituteSubpart($dataContent['all'], '###SUB_RECORD###', $dataContent['accum']);
-
+		// if $recipient is an integer it is a uid of a fe_user othersise a string.
 		if (t3lib_div::testInt($recipient))	{
 			$fe_userRec = $GLOBALS['TSFE']->sys_page->getRawRecord('fe_users',$recipient);
 			$recipient=$fe_userRec['email'];
 		}
 
 		$GLOBALS['TT']->setTSlogMessage('Template key: ###'.$key.'###, userContentLength: '.strlen($userContent['final']).', adminContentLength: '.strlen($adminContent['final']));
-		$dataEmail=$DBrows[0][$this->conf['email.']['dataMailField']];
-
-		$this->sendMail($recipient, $this->conf['email.']['admin'],$dataEmail, $userContent['final'], $adminContent['final'],$dataContent['final']);
+		$recipient='';
+		$emailfields=t3lib_div::trimexplode(',',$this->conf['email.']['dataMailField']);				
+		foreach($emailfields as $ef) {
+			$dataEmail=$DBrows[0][$ef];
+			//echo "DTA $dataEmail";
+			if ($dataEmail) $this->sendMail($this->conf['email.']['sendFEUserMail']?$recipient:'', $this->conf['email.']['sendAdminMail']?$this->conf['email.']['admin']:'',$this->conf['email.']['sendDataMail']?$dataEmail:'', $userContent['final'], $adminContent['final'],$dataContent['final']);
+		}
 		$GLOBALS['TT']->pull();
 	}
 
@@ -3208,6 +3256,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 * @see compileMail(), sendInfoMail()
 	 */
 	function sendMail($recipient, $admin, $data,$content='', $adminContent='',$dataContent='')	{
+		if ($this->conf['debug'] && !$recipient) echo 'No recepient for email';
+		if ($this->conf['debug']) echo "<br> Emails : $recipient, $admin, $data : <br/>User : $content=,<br/>Admin : $adminContent,<br/>Data : $dataContent";
 		//dataEmail
 		if ($data && $dataContent && $dataContent!='NOMAIL')	{
 			if (!$this->isHTMLContent($dataContent))	{
@@ -3251,14 +3301,14 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		}
 
 		//user mail:
-		if ($content!='NOMAIL') {
+		if ($recipient && $content!='NOMAIL') {
 			if (!$this->isHTMLContent($content))	{
 				$this->cObj->sendNotifyEmail($content,
 									$recipient,
 									'',			// ($admMail ? '' : $admin), 		// If the special administration mail was not found and send, the regular is...
 									$this->conf['email.']['from'],
 									$this->conf['email.']['fromName'],
-									$admin				//modif by CMD - add return path information
+									$admin
 							);
 			} else {
 				$this->sendHTMLMail($content,
@@ -3266,7 +3316,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 									'',			// ($admMail ? '' : $admin), 		// If the special administration mail was not found and send, the regular is...
 									$this->conf['email.']['from'],
 									$this->conf['email.']['fromName'],
-									$admin 				//modif by CMD - add return path information
+									$admin
 							);
 			}
 		}
@@ -3392,7 +3442,71 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			return substr(md5($value), 0,$l);
 		}
 	}
+	
+	/**
+	 * Processes socalled "setfixed" commands. These are commands setting a certain field in a certain record to a certain value. Like a link you can click in an email which will unhide a record to enable something. Or likewise a link which can delete a record by a single click.
+	 * The idea is that only some allowed actions like this is allowed depending on the configured TypoScript.
+	 *
+	 * @return	string		HTML content displaying the status of the action
+	 */
+	 
+	function procesSetFixed()	{
+		if ($this->conf['setfixed'])	{
+			$theUid = intval($this->recUid);
+			$origArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,  $theUid);
+			if ($this->conf['evalFunc'])	{
+				$origArr = $this->userProcess('evalFunc',$origArr);
+			}
+			$fD = t3lib_div::_GP('fD');
+			$sFK = t3lib_div::_GP('sFK');
+			$fieldArr=array();
 
+			if (is_array($fD) || $sFK=='DELETE')	{
+				if (is_array($fD))	{
+					$theCode = $this->setfixedHash($origArr,$fD['_FIELDLIST']);
+
+					reset($fD);
+					while(list($field,$value)=each($fD))	{
+						//@todo we have two arrays  : one before update and one after update (before is used to calculate hash, after should be transferred to mails)
+						$origArr[$field]=$value;
+						$fieldArr[]=$field;
+					}
+				} else {
+					$theCode = $this->setfixedHash($origArr,array());
+				}
+				if (!strcmp($this->authCode,$theCode))	{
+					if ($sFK=='DELETE')	{
+						$this->cObj->DBgetDelete($this->theTable, $theUid, TRUE);
+					} else {
+						$newFieldList = implode(',',array_intersect(t3lib_div::trimExplode(',',$this->conf['fieldList']),t3lib_div::trimExplode(',',implode($fieldArr,','),1)));
+						$this->cObj->DBgetUpdate($this->theTable, $theUid, $fD, $newFieldList, TRUE);
+						$this->currentArr = $GLOBALS['TSFE']->sys_page->getRawRecord($this->theTable,$theUid);
+						$this->userProcess_alt($this->conf['setfixed.']['userFunc_afterSave'],$this->conf['setfixed.']['userFunc_afterSave.'],array('rec'=>$this->currentArr, 'origRec'=>$origArr));
+					}
+
+					// Outputting template
+
+					$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_SETFIXED_OK_'.$sFK.'###',$origArr);
+					if (!$content)	{$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_SETFIXED_OK###',$origArr);}
+
+					// Compiling email
+
+					$this->compileMail(
+						'SETFIXED_'.$sFK,
+						array($origArr),
+						$this->getFeuserMail($origArr,$this->conf),
+						$this->conf['setfixed.']
+					);
+					
+					// Clearing cache if set:
+					$this->clearCacheIfSet(); 
+					
+				} else $content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_SETFIXED_FAILED###',$origArr);
+			} else $content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_SETFIXED_FAILED###',$origArr);
+		}
+		return $content;
+	}
+	
 	/**
 	 * Adding keys to the marker array with "setfixed" GET parameters
 	 *
@@ -3407,14 +3521,16 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if (is_array($setfixed))	{
 			reset($setfixed);
 			while(list($theKey,$data)=each($setfixed))	{
-				if (!strcmp($theKey,'DELETE'))	{
+			
+				/*if (!strcmp($theKey,'DELETE'))	{
 					$recCopy = $r;
 					$string='&cmd['.$pluginId.']=setfixed&sFK='.rawurlencode($theKey).'&rU['.$pluginId.']='.$r[$this->conf['uidField']];
 
 					$string.='&aC='.$this->setfixedHash($recCopy,$data['_FIELDLIST']);
 					$markerArray['###SYS_SETFIXED_DELETE###'] = $string;
 					$markerArray['###SYS_SETFIXED_HSC_DELETE###'] = htmlspecialchars($string);
-				} elseif (strstr($theKey,'.'))	{
+				} else*/
+				if (strstr($theKey,'.'))	{
 					$theKey = substr($theKey,0,-1);
 					if (is_array($data))	{
 						reset($data);
@@ -3422,7 +3538,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						$string='&cmd['.$pluginId.']=setfixed&sFK='.rawurlencode($theKey).'&rU['.$pluginId.']='.$r[$this->conf['uidField']];
 						while(list($fieldName,$fieldValue)=each($data))	{
 							$string.='&fD['.$fieldName.']='.rawurlencode($fieldValue);
-							$recCopy[$fieldName]=$fieldValue;
+							//$recCopy[$fieldName]=$fieldValue;
 						}
 						$string.='&aC='.$this->setfixedHash($recCopy,$data['_FIELDLIST']);
 						$markerArray['###SYS_SETFIXED_'.$theKey.'###'] = $string;

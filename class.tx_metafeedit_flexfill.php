@@ -86,7 +86,6 @@ class tx_metafeedit_flexfill {
 			}		
 		}
 		$this->clearTCA($table);
-		//print_r($GLOBALS["TCA"][$table]);
 	}
 	function clearTCA($table) {
 		global $TCA;

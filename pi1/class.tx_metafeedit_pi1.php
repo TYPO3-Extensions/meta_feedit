@@ -175,6 +175,11 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 
 		}
 				
+		// We handle cookies !		
+		if (is_array($this->piVars['cookies'])) foreach($this->piVars['cookies'] as $key=>$value) {
+			setcookie($key,$value, time()+3600*24*100,'/');
+			//echo "$key => $value";
+		}
 		// Config priorities :
 		/*		
 		
@@ -266,11 +271,12 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['general.']['xhtml']=$lconf['xhtml'];
 		$mfconf['general.']['labels.']=$this->metafeeditlib->getMetaFeeditVar2($mfconf,'labels.');		
 		$mfconf['general.']['tsOverride.']=$conf['tsOverride.'];
+		$mfconf['general.']['useDistinct']=$lconf['useDistinct'];
+		// Ajax settings
 		$mfconf['ajax.']['ajaxOn']=$lconf['ajaxOn'];
 		$mfconf['ajax.']['jqueryCompatMode']=$lconf['jqueryCompatMode'];
-
-
-
+		$mfconf['ajax.']['domReady']=$lconf['ajaxDomReady'];
+		$mfconf['ajax.']['libs.']=t3lib_div::trimexplode(chr(10),$lconf['ajaxLibs']);
 		// Must handle date formats according to editmode and pluginId
 		$mfconf['dateformat']=$conf['dateformat']?$conf['dateformat']:($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?"%m-%d-%Y":"%d-%m-%Y");
 		$mfconf['timeformat']=$conf['timeformat']?$conf['timeformat']:"%H:%M";
@@ -497,7 +503,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['email.']['from']=$lconf['emailFrom'];
 		$mfconf['email.']['fromName']=$lconf['emailFromName'];
 		$mfconf['email.']['admin']=$lconf['emailAdmin'];
-		$mfconf['email.']['field']=$lconf['emailAdmin'];
+		$mfconf['email.']['field']=$lconf['dataMailField'];
 		$mfconf['email.']['sendAdminMail']=$lconf['sendAdminMail'];
 		$mfconf['email.']['sendDataMail']=$lconf['sendDataMail'];
 		$mfconf['email.']['dataMailField']=$lconf['dataMailField'];
@@ -508,8 +514,16 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['setfixed.']['approve.']['_FIELDLIST']=$lconf['feapprovefields']?$lconf['feapprovefields']:'uid,pid';
 		$mfconf['setfixed.']['DELETE.']['_FIELDLIST']=$lconf['fedeletefields']?$lconf['fedeletefields']:'uid,pid';
 		$mfconf['setfixed']=1;
-		$mfconf['setfixed.']['approve.']['hidden']=0;
-		$mfconf['setfixed.']['approve.']['_FIELDLIST']='uid,pid';
+		$setfixOverrides=t3lib_div::trimexplode(chr(10),$lconf['fesetfixoverridevalues']);
+		foreach($setfixOverrides as $setfixOverride) {
+			$setfixOverrideVals=t3lib_div::trimexplode('=',$setfixOverride);
+			if (count($setfixOverrideVals)==2) {
+			
+				$mfconf['setfixed.']['approve.'][$setfixOverrideVals[0]]=$setfixOverrideVals[1];
+			}
+		}
+		//$mfconf['setfixed.']['approve.']['hidden']=0;
+		//$mfconf['setfixed.']['approve.']['_FIELDLIST']='uid,pid';
 		$mfconf['setfixed.']['DELETE']=1;
 		$mfconf['setfixed.']['DELETE.']['_FIELDLIST']='uid,pid';
 		if ($conf['setfixed.']) $mfconf['setfixed.']=$conf['setfixed.'];
@@ -938,12 +952,18 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		//==================================================================================
 		// JAVASCRIPT LIBRARIES ...
 		if ($mfconf['ajax.']['ajaxOn'] && !t3lib_div::_GP('ajx')) {
-			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jquery'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jquery.js"></script>';
-			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jqmodal'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jqModal.js"></script>';
-			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_ajax'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/meta_feedit_ajax.js"></script>';
-			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jqDnR'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jqDnR.js"></script>';
-			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_AC_RunActiveContent'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/AC_RunActiveContent.js"></script>';
-			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'prototype'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/prototype.js"></script>';
+			$GLOBALS['TSFE']->pSetup['headerData.']=array('1'=>'TEXT','1.'=>array('value'=>'<script type="text/javascript" src="/'.t3lib_extMgm::siteRelPath($this->extKey).'res/jquery.js"></script>'))+$GLOBALS['TSFE']->pSetup['headerData.'];
+			//$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jquery'] = '<script type="text/javascript" src="/'.t3lib_extMgm::siteRelPath($this->extKey).'res/jquery.js"></script>';
+			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jqmodal'] = '<script type="text/javascript" src="/'.t3lib_extMgm::siteRelPath($this->extKey).'res/jqModal.js"></script>';
+			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_ajax'] = '<script type="text/javascript" src="/'.t3lib_extMgm::siteRelPath($this->extKey).'res/meta_feedit_ajax.js"></script>';
+			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jqDnR'] = '<script type="text/javascript" src="/'.t3lib_extMgm::siteRelPath($this->extKey).'res/jqDnR.js"></script>';
+			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_AC_RunActiveContent'] = '<script type="text/javascript" src="/'.t3lib_extMgm::siteRelPath($this->extKey).'res/AC_RunActiveContent.js"></script>';
+			if ($mfconf['ajax.']['domReady']) $GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jQueryDomReady_'.$pluginId] = "<script type='text/javascript' >jQuery().ready(function() {".$mfconf['ajax.']['domReady']."});</script>";		
+			if (is_array($mfconf['ajax.']['libs.'])) {
+				foreach($mfconf['ajax.']['libs.'] as $lib) {
+					$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_libs'] .='<script type="text/javascript" src="'.$lib.'"></script>';
+				}
+			}
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'windows'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/window.js"></script>';
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'effects'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/effects.js"></script>';
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'debug'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/debug.js"></script>';
@@ -980,8 +1000,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$content=$mthfeedit->init($this,$mfconf);
 		// Performance audit
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 End ']=$this->metafeeditlib->displaytime(); 
-		
-		return $this->pi_wrapInBaseClass($content);
+		$mfconf['disablePrefixComment']=$GLOBALS['TSFE']->config['config']['disablePrefixComment'];
+		return $this->metafeeditlib->pi_wrapInBaseClass($content,$mfconf);
 	}
 
 	//MODIF CBY

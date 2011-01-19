@@ -7,6 +7,24 @@ var requiredMajorVersion = 8;
 var requiredMinorVersion = 0;
 var requiredRevision = 0;
 
+function metaFeeditLoadHourGlass() {
+		 jQuery("#ardhourglass").remove();
+		 jQuery("#ardoverlay").remove();
+		 jQuery("body").append('<div id="ardhourglass">&nbsp;</div>');
+		 jQuery("body").append('<div id="ardoverlay">&nbsp;</div>');
+		 jQuery("#ardoverlay").height(jQuery(document).height());
+		 jQuery("#ardhourglass").css('top',jQuery(document).scrollTop());
+		 jQuery("#ardoverlay").width(jQuery(document).width());
+		 jQuery("#ardhourglass").click(function () {metaFeeditUnloadHourGlass();});
+		 jQuery("#ardoverlay").click(function () {metaFeeditUnloadHourGlass();});
+}
+
+function metaFeeditUnloadHourGlass() {
+ jQuery("#ardhourglass").remove();
+ jQuery("#ardoverlay").remove();
+ //jQuery("body").click(function() {alert('u');});
+} 
+
 function cbywebcamUpdateImage(id,fileName,thumb) {
 	jQuery('#sel_'+id).append('<option value="'+fileName+'">'+fileName+'</option>');
 	var val=jQuery('#selh_'+id).attr('value');

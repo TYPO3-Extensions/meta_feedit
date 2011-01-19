@@ -449,7 +449,7 @@ class tx_metafeedit_sqlengine {
 	function getMMUids(&$conf,$table,$fN,$dataArr=0) {
 		$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]["config"]["MM"], 'uid_local=\''.$dataArr[$conf['uidField']].'\'', '');
 		if (mysql_error()) debug(array(mysql_error(), $query), 'processDataArray()::field='.$fN);
-		if (mysql_num_rows($MMres) != $dataArr[$fN]) debug("Wrong number of selections reached");
+		if ($conf['debug'] && mysql_num_rows($MMres) != $dataArr[$fN]) debug("Wrong number of selections reached");
 		while ($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
 		return $uids;
 	}
@@ -681,7 +681,6 @@ class tx_metafeedit_sqlengine {
 	    // get fields shown in list mode ...
     	if ($conf['list.']['show_fields']) {
             $FTA=t3lib_div::trimexplode(',',$conf['list.']['show_fields']);
-            //print_r($FTA);
         	foreach($FTA as $FTi) {
         	    // check if field is a user calc field, if so it will be handled later ...
         	    if (@array_key_exists($FTi,$conf['list.']['sqlcalcfields.'])) continue;
@@ -717,8 +716,7 @@ class tx_metafeedit_sqlengine {
 		   
 
         }
-        //print_r($sql['fields.']);
-    }
+     }
 
 
     /**

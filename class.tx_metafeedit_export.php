@@ -100,10 +100,11 @@ class tx_metafeedit_export {
 	 */
 	//------------------------------------------------------- PDF / CSV / EXCEL Buttons (should be in template generating File) ------------------------------------------------ //
 	function CreatePDFButton(&$conf,&$caller,$form=true,$id='') {
+		$href=$caller->metafeeditlib->hsc($conf,$caller->pi_linkTP_keepPIvars_url(array(),1));
 		// traitement du champ PDF
 		$onclick=($form?'':' onclick="document.'.$conf['table'].'_form.tx_metafeedit_exporttype.value=\'PDF\'"');
 			return '<div class="'.$caller->pi_getClassName('action').' '.$caller->pi_getClassName('action-pdf').'">'.
-			($form?'<form action="'.$GLOBALS['TSFE']->id.'.html?###GLOBALPARAMS###" method="post" target="_blank">
+			($form?'<form action="'.$href.'?###GLOBALPARAMS###" method="post" target="_blank">
 				<input type="hidden" name="no_cache" value="1"/>
 				<input type="hidden" id="PDF'.$id.'" name="tx_metafeedit[exporttype]" value="PDF"/>':'').
 				'<input type="submit" class="btnPDF" name="'.$this->prefixId.'[submit_button]"'.$onclick.' value="Impression PDF" id="submitPDF'.$id.'" title="Impression PDF"/><br/>'.
@@ -112,10 +113,11 @@ class tx_metafeedit_export {
 	}
 	
 	function CreatePDFButtonDetail(&$conf,&$caller,$form=true,$id='') {
+		$href=$caller->metafeeditlib->hsc($conf,$caller->pi_linkTP_keepPIvars_url(array(),1));
 		// traitement du champ PDF
 			$onclick=($form?'':' onclick="document.'.$this->pluginId.'_form.PDF'.$this->pluginId.'_rU.value='.$id.';document.'.$this->pluginId.'_form.submit();return false;"');
 			return '<div class="'.$caller->pi_getClassName('action').' '.$caller->pi_getClassName('action-pdf').'">'.
-			($form?'<form action="'.$GLOBALS['TSFE']->id.'.html?###GLOBALPARAMS###" method="post" target="_blank">
+			($form?'<form action="'.$href.'?###GLOBALPARAMS###" method="post" target="_blank">
 				<input type="hidden" name="no_cache" value="1"/>
 				<input type="hidden" id="PDF'.$this->pluginId.'_et" name="tx_metafeedit[exporttype]" value="PDF"/>'.
 				'<input type="hidden" id="PDF'.$this->pluginId.'_cmd" name="cmd['.$this->pluginId.']" value="edit"/>'.
@@ -127,9 +129,11 @@ class tx_metafeedit_export {
 	//cmd[spectateurs]=edit&rU[spectateurs]=43105
 	
 	function CreateCSVButton(&$conf,&$caller,$form=true,$id='') {	
+		$href=$caller->metafeeditlib->hsc($conf,$caller->pi_linkTP_keepPIvars_url(array(),1));
+
 		$onclick=($form?'':' onclick="document.'.$conf['table'].'_form.tx_metafeedit_exporttype.value=\'CSV\'"');
 			return '<div class="'.$caller->pi_getClassName('action').' '.$caller->pi_getClassName('action-csv').'">'.
-			($form?'<form action="'.$GLOBALS['TSFE']->id.'.html?###GLOBALPARAMS###" method="post">
+			($form?'<form action="'.$href.'?###GLOBALPARAMS###" method="post">
 				<input type="hidden" name="no_cache" value="1"/>
 				<input type="hidden" id="CSV'.$id.'" name="tx_metafeedit[exporttype]" value="CSV"/>':'').
 				'<input type="submit" class="btnCSV" name="'.$this->prefixId.'[submit_button]"'.$onclick.' value="Export CSV" id="submitCSV'.$id.'" title="Export CSV"/><br/>'.
@@ -138,9 +142,10 @@ class tx_metafeedit_export {
 	}
 	
 	function CreateExcelButton(&$conf,&$caller,$form=true,$id='') {	
+		$href=$caller->metafeeditlib->hsc($conf,$caller->pi_linkTP_keepPIvars_url(array(),1));
 		$onclick=($form?'':' onclick="document.'.$conf['table'].'_form.tx_metafeedit_exporttype.value=\'EXCEL\'"');
 		return '<div class="'.$caller->pi_getClassName('action').' '.$caller->pi_getClassName('action-excel').'">'.
-		($form?'<form action="'.$GLOBALS['TSFE']->id.'.html?###GLOBALPARAMS###" method="post">
+		($form?'<form action="'.$href.'?###GLOBALPARAMS###" method="post">
 			<input type="hidden" name="no_cache" value="1"/>
 			<input type="hidden" id="XLS'.$id.'" name="tx_metafeedit[exporttype]" value="EXCEL"/>':'').
 			'<input type="submit" class="btnXLS" name="'.$this->prefixId.'[submit_button]"'.$onclick.' value="Export Excel" id="submitXLS'.$id.'" title="Export Excel"/><br/>'.
@@ -228,7 +233,6 @@ class tx_metafeedit_export {
 		$pdf->leftmargin=$marginleft?$marginleft:8;
 		$pdf->rightmargin=$marginright?$marginright:8;
 		$pdf->topmargin=$margintop?$margintop:8;
-		//print_r($marginbottom);print_r($pdf->bottommargin);die(i);
 		$this->footercellsize=7;
 		$this->headercellsize=7;
 		$this->cellsize=7;
@@ -678,7 +682,6 @@ class tx_metafeedit_export {
 		
 	// We handle here excel file generation
 /*	function getEXCEL(&$content,&$caller) {
-		//print_r($_SERVER);die(i);
 		//[HTTP_REFERER] => http://cric.ard.fr/44.0.html
 		header("Content-Type: apllication/xls");
 		header('Content-disposition: filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.xls"');

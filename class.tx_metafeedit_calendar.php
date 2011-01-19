@@ -108,7 +108,6 @@ class tx_metafeedit_calendar extends tslib_pibase {
 	 */
 	function init(&$conf,&$sql,&$metafeeditlib,&$cObj) {
 		$this->metafeeditlib=&$metafeeditlib;
-		print_r($cObj);
 		$this->cObj=$GLOBALS['TSFE']->cObj;
 		$this->conf=$conf;
 		if (!$conf['list.']['beginDateField']) die ("Plugin Meta Feedit, Calendar Mode and no begin date set !");
@@ -119,8 +118,6 @@ class tx_metafeedit_calendar extends tslib_pibase {
 		$cePidList = $this->cObj->data['pages']; //ce = Content Element
 		$pidList=$cePidList?$cePidList:trim($this->cObj->stdWrap($this->conf['pid_list'], $this->conf['pid_list.']));
 		$this->enableFields=$sql['DBSELECT'].$sql['lockPidWhere'];
-//if ($_GET['test']=='test') { echo chr(10).chr(13)."<br> --> ".$this->enableFields;}
-
 		 unset($this->conf['pid_list']);
 	}
 
@@ -202,8 +199,8 @@ class tx_metafeedit_calendar extends tslib_pibase {
 				1
 			);
 			if ($_GET['test']=='test') {
-			echo "<br> Next : ";
-			print_r($next);
+				echo "<br> Next : ";
+				print_r($next);
 			}
 			if(!empty($next)) {
 				$next = $next[0][$conf['list.']['beginDateField']];
@@ -223,7 +220,6 @@ echo "<br> Next est vide. ";
 				$nextForNav = $next;
 				
 			}
-			//print_r($this->getDaysWithPosts($conf,$unixMonth));
 			if (sizeof($this->getDaysWithPosts($conf,$unixMonth))==0){
 				continue;
 			}
@@ -633,10 +629,11 @@ echo "<br> Next est vide. ";
         //-- end page calculations		
 		// This counts the number of lines ...
 
-		//TODO add distinct or not through flexform ...
-
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']);
-	  if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList row count ',$GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']),$DEBUG);
+		
+		$distinct=$conf['general.']['useDistinct']?" distinct ":"";
+		
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']);
+	  if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList row count ',$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']),$DEBUG);
 		$num=$GLOBALS['TYPO3_DB']->sql_num_rows($res);	// If there are menu-items ...
 
 		$NBSup=0; // Number of empty elements for page breaks and group by breaks;
@@ -656,8 +653,8 @@ echo "<br> Next est vide. ";
 
 		// List SQL REQUEST with limitations, pagination, etc ...
 		
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT));
-	   if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList rows',$GLOBALS['TYPO3_DB']->SELECTquery(" distinct ".$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT)),$DEBUG);
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT));
+	   if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList rows',$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT)),$DEBUG);
 
  		$tpl=$this->prepareCalendarTemplates($conf,$markerArray,$exporttype);
 		// process variables

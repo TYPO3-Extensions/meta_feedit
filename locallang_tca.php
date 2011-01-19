@@ -140,6 +140,7 @@ $LOCAL_LANG = Array (
 		'meta_feedit.pi_flexform.sendAdminInfoMail' => 'Send Admin Info Mail',
 		'meta_feedit.pi_flexform.sendFEUserInfoMail' => 'Send FE User Info Mail',
 		'meta_feedit.pi_flexform.sendDataInfoMail' => 'Send Data Info Mail',
+		'meta_feedit.pi_flexform.fesetfixoverridevalues' => 'Setfix override values ',
 		'meta_feedit.pi_flexform.emailFromName' => 'From Mail Name',
 		'meta_feedit.pi_flexform.emailAdmin' => 'Admin Mail',
 		'meta_feedit.pi_flexform.menuLockPid' => 'List lock pid',

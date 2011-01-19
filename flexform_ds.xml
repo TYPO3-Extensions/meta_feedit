@@ -395,6 +395,15 @@
 				</config>
 			</TCEforms>
 		</clearCacheOfPages>
+		<useDistinct>
+			<TCEforms>
+				<label>LLL:EXT:meta_feedit/locallang_tca.xml:meta_feedit.pi_flexform.useDistinct</label>
+				<config>
+					<type>check</type>
+					<default>1</default>					
+				</config>
+			</TCEforms>		 
+		</useDistinct>
 	    </el>
 	  </ROOT>
     </sDEF>
@@ -2819,8 +2828,8 @@
                                                 <n0></n0>
                                         </items>
                                         <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
+                                        <maxitems>10</maxitems>
+                                        <size>5</size>
                                         <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
@@ -2890,7 +2899,17 @@
 				</config>
 			</TCEforms>		 
 		</feapprovefields>
-            </el>
+		<fesetfixoverridevalues>
+			<TCEforms>
+				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fesetfixoverridevalues</label>
+				<config>
+	    				<type>text</type>
+	    				<size>500</size>
+	    				<allowed>fe_users</allowed>    
+				</config>
+			</TCEforms>		 
+		</fesetfixoverridevalues>
+	            </el>
           </ROOT>
     </sSetFixed>
 
@@ -2956,6 +2975,30 @@
 				</config>
 			</TCEforms>		 
 		</jqueryCompatMode>
+		<ajaxDomReady>
+			<TCEforms>
+				<label>LLL:EXT:meta_feedit/locallang_tca.xml:meta_feedit.pi_flexform.ajaxDomReady</label>
+				<config>
+	    				<type>text</type>
+	    				<size>10000</size>
+	    				<rows>500</rows>
+	    				<cols>100</cols>
+
+				</config>
+			</TCEforms>		 
+		</ajaxDomReady>
+		<ajaxLibs>
+			<TCEforms>
+				<label>LLL:EXT:meta_feedit/locallang_tca.xml:meta_feedit.pi_flexform.ajaxLibs</label>
+				<config>
+	    				<type>text</type>
+	    				<size>10000</size>
+	    				<rows>500</rows>
+	    				<cols>100</cols>
+
+				</config>
+			</TCEforms>		 
+		</ajaxLibs>
 	    </el>
 	  </ROOT>
     </sAjax>

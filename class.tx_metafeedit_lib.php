@@ -342,11 +342,11 @@ class tx_metafeedit_lib {
 	*/
 	function makeBackURLTypoLink(&$conf,&$referer) {
 		switch ($conf['inputvar.']['cmd']) {
-			case 'create' :		
+			case 'create' :	
 				if ($conf['defaultCmd']=='create') { 					
 					$referer[$conf['pageType']]=$this->makeFormTypoLink($conf,'&BACK['.$conf[pluginId].']=1&cmd['.$conf[pluginId].']=create',false);
 					break;
-				}					
+				}
 				//if($conf['create'] && !$conf['disableCreate'] && !$conf['create.']['hide']) {
 				//$backurl=$this->makeFormTypoLink($conf,"&cmd[$pluginId]=edit".$conf['GLOBALPARAMS']);
 			case 'delete' :			
@@ -858,7 +858,7 @@ class tx_metafeedit_lib {
     * Ex : if editing table fe_users, for relation usergroups.uid this function would return :
     * $ret['table']='fe_groups'
     * $ret['relTable']='fe_users'
-    * $ret['relTableAlias']='???'
+    * $ret['relTableAlias']='fe_groups_usergroups'
     * $ret['tableAlias']='fe_groups_usergroups'
     * $ret['fieldLabel']='??'
     * $ret['fieldAlias']='????'
@@ -1413,8 +1413,6 @@ class tx_metafeedit_lib {
 	function user_processDataArray($content, &$inconf,$intable='',$forceInConf=FALSE) {
 		
 		$fe_adminLib = &$inconf['parentObj'];
-		//echo $forceInConf;
-		//krumo($fe_adminLib);
 		$conf = $forceInConf?$inconf:$fe_adminLib->conf;
 		
 		$dataArr = $content;
@@ -1428,6 +1426,7 @@ class tx_metafeedit_lib {
 			//special fields not to handle 
 		    if ($fN=='tx_metafeedit_dont_ctrl_checkboxes') continue;
 			//ugly hack by CMD
+			//if ($fN=='sorting') continue;
 		    if ($GLOBALS['TCA'][$FTable]['ctrl']['sortby'] && $fN==$GLOBALS['TCA'][$FTable]['ctrl']['sortby']) {
 		    	$fe_adminLib->markerArray['###EVAL_ERROR_FIELD_'.$GLOBALS['TCA'][$FTable]['ctrl']['sortby'].'###'] = '';
 		    	continue;
@@ -1492,16 +1491,24 @@ class tx_metafeedit_lib {
     				$dataArr['EVAL_'.$_fN] = $this->getLLFromLabel($items[$dataArr[$fN]][0],$conf);
     				break;
 				case 'check':
-    				$invert = 0;    
-    				if ($value === 'on' || $value === 1 || $value === '1') {
-    					$dataArr[$_fN] = 1;
-    					$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png" alt="checked"/>':$this->getLLFromLabel('check_yes',$conf);
-    				} else {
-    					// No value, what should we do ?
-    
-    					$dataArr[$_fN] = 0;
-    					$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list')?'':$this->getLLFromLabel('check_no',$conf);
-    				}
+					$cols=count($conf['TCAN'][$table]['columns'][$fNiD]['config']['items'])>0;
+					//echo "<br>$cols, $fNiD, $_fN, $value";
+    				$invert = 0;   
+    				if ($cols) {
+							//echo "==============pk";
+							$dataArr[$_fN] = (int)$value;
+							$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list')?'':(int)$value;
+					} else {
+						if ($value === 'on' || $value === 1 || $value === '1') {
+							$dataArr[$_fN] = 1;
+							$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png" alt="checked"/>':$this->getLLFromLabel('check_yes',$conf);
+						} else {
+							// No value, what should we do ?
+		
+							$dataArr[$_fN] = 0;
+							$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list')?'':$this->getLLFromLabel('check_no',$conf);
+						}
+					}
     				break;
 				case 'group':
     				if ($conf['TCAN'][$table]['columns'][$fNiD]['config']['internal_type'] == 'file') {
@@ -1627,7 +1634,7 @@ class tx_metafeedit_lib {
 							// from mm-relation
 							$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"], 'uid_local=\''.$dataArr[$conf['uidField']].'\'', '');
 							if (mysql_error()) debug(array(mysql_error(), $query), 'processDataArray()::field='.$fN);
-								if (mysql_num_rows($MMres) != $dataArr[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_processDataArray(): Wrong number ($cnt<>".$dataArr[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+								if ($conf['debug'] && mysql_num_rows($MMres) != $dataArr[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_processDataArray(): Wrong number ($cnt<>".$dataArr[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
 							while ($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
 						} else {
 							// clean from DB
@@ -1742,7 +1749,7 @@ class tx_metafeedit_lib {
 							// from mm-relation
 							$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"], 'uid_local=\''.$dataArr[$conf['uidField']].'\'', '');
 							if (mysql_error()) debug(array(mysql_error(), $query), 'processDataArray()::field='.$fN);
-								if (mysql_num_rows($MMres) != $dataArr[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_processDataArray(): Wrong number ($cnt<>".$dataArr[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+								if ($conf['debug'] && mysql_num_rows($MMres) != $dataArr[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_processDataArray(): Wrong number ($cnt<>".$dataArr[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
 							while ($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
 						} else {
 							// clean from DB
@@ -1867,20 +1874,23 @@ class tx_metafeedit_lib {
 
 			foreach ($fieldArray as $F) {
 				switch((string)$conf['TCAN'][$table]['columns'][$F]['config']['type']) {
-					case 'check':
+				case 'check':
 					$invert = 0;
 					//if (in_array('invert',t3lib_div::trimexplode(',',$conf[$fe_adminLib->cmd."."]['evalValues.'][$F]))) $invert=1;
-					if ($dataArr[$F] != 1) {
-						$dataArr[$F] = 0;
-    					$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'':$this->getLLFromLabel('check_no',$conf);
-						if ($invert) {
-							$dataArr[$F] = 1;
-							$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png" alt="checked" />':$this->getLLFromLabel('check_yes',$conf);
-						}
+					if (count($conf['TCAN'][$table]['columns'][$F]['config']['items'])) {
 					} else {
-						if ($invert) {
+						if ($dataArr[$F] != 1) {
 							$dataArr[$F] = 0;
 							$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'':$this->getLLFromLabel('check_no',$conf);
+							if ($invert) {
+								$dataArr[$F] = 1;
+								$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png" alt="checked" />':$this->getLLFromLabel('check_yes',$conf);
+							}
+						} else {
+							if ($invert) {
+								$dataArr[$F] = 0;
+								$dataArr['EVAL_'.$F] = ($conf['cmdmode']=='list')?'':$this->getLLFromLabel('check_no',$conf);
+							}
 						}
 					}
 					break;
@@ -1935,7 +1945,7 @@ class tx_metafeedit_lib {
 							$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $mmTable, $mmTable.'.uid_local=\''.$uid.'\'', '', ' '.$mmTable.'.sorting ');
 							if (mysql_error()) debug(array(mysql_error(), $query), 'getFormFieldCode()::field='.$fN);
 							$cnt=mysql_num_rows($MMres);
-							if ($cnt!= $rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_updateArray(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+							if ($conf['debug'] && $cnt!= $rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_updateArray(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
 							while ($MMrow = mysql_fetch_assoc($MMres)) {
 								if ($uids) {
 									$uids .= ','. $MMrow["uid_foreign"];
@@ -1984,8 +1994,9 @@ class tx_metafeedit_lib {
 	    				// here we can invert boolean functionnality on screen...
 	    				$invert = 0;
 	    				if (in_array('invert', t3lib_div::trimexplode(',', $fe_adminLib->conf[$fe_adminLib->cmd."."]['evalValues.'][$fN]))) $invert = 1;
-	    				if ($invert) $dataArr[$fN] = $dataArr[$fN]?0:
-	    				1;
+	    				if ($invert) $dataArr[$fN] = $dataArr[$fN]?0:1;
+						break;
+					case 'radio':
 						break;
 					case 'text':
 						//$dataArr = $this->rteProcessDataArr($dataArr, $table, $fN, 'rte',$conf,'user_updateArray');
@@ -2169,53 +2180,53 @@ class tx_metafeedit_lib {
  
  }*/
  
- function getMetaFeeditGetPluginArrayVar(&$conf,&$var,$name,&$res){
- 	$pluginId=$conf['pluginId'].'.';
-	$return = false;
+	 function getMetaFeeditGetPluginArrayVar(&$conf,&$var,$name,&$res){
+		$pluginId=$conf['pluginId'].'.';
+		$return = false;
 
- 	if (is_array($var) && array_key_exists($pluginId,$var) && array_key_exists($name,$var[$pluginId])) {
- 		$plugidRes=$var[$pluginId][$name];
- 		$return = true;
- 	}
- 	
- 	if (is_array($var) && array_key_exists('default.',$var) && array_key_exists($name,$var['default.'])) {
- 		$defRes=$var['default.'][$name];
- 		$return = true;
- 	}
-	
-	if ($return) $res = $this->ts_array_merge($defRes, $plugidRes);
- 	return $return;
- }
- 
-/**
- * Cette fonction merge les 2 tableau de typoscript en prenant soins de supprimer les clef qui ont un '.'
- * pour les userFunc par exemple: 
- * pluginid.champ = blablabla
- * default.champ.userfunc = bliblibli
- * supprime la valeur par defaut (car surclasse dans le pluginid)
- * marche aussi dans l'autre sens
- *
- * @param arr	premier tableau (dans lequel on supprime les doublons
- * @param arr	second tableau (dans lequel on trouve les valeur a chercher)
- * @return arr	tableau fusionne des 2 autres
- **/
- function ts_array_merge($arr1, $arr2) {
-	//on test si on a bien des tableaux
-	if (is_array($arr1) && is_array($arr2)) {
-		//tableau des clef par default, necessaire a la comparaison avec le tableau du plugid
-		$defClef = array_keys($arr1);
-
-		//on parcour les tableaux afin de faire le trie des clef existant
-		foreach ($arr2 as $key => $value) {
-			$chaine = (strpos($key, '.')===false)?$key:substr($key, 0, -1); // on recupere la chaine a comparer dans l'autre tableau sans le point final
-			if (in_array($chaine, $defClef)) unset($arr1[$chaine]);
-			elseif(in_array($chaine.'.', $defClef)) unset($arr1[$chaine.'.']);
+		if (is_array($var) && array_key_exists($pluginId,$var) && array_key_exists($name,$var[$pluginId])) {
+			$plugidRes=$var[$pluginId][$name];
+			$return = true;
 		}
 		
-		// on assemble les 2 tableaux obtenu
-		return array_merge($arr1, $arr2);
-	}else return is_array($arr1)?$arr1:$arr2;
- }
+		if (is_array($var) && array_key_exists('default.',$var) && array_key_exists($name,$var['default.'])) {
+			$defRes=$var['default.'][$name];
+			$return = true;
+		}
+		
+		if ($return) $res = $this->ts_array_merge($defRes, $plugidRes);
+		return $return;
+	 }
+ 
+	/**
+	 * Cette fonction merge les 2 tableau de typoscript en prenant soins de supprimer les clef qui ont un '.'
+	 * pour les userFunc par exemple: 
+	 * pluginid.champ = blablabla
+	 * default.champ.userfunc = bliblibli
+	 * supprime la valeur par defaut (car surclasse dans le pluginid)
+	 * marche aussi dans l'autre sens
+	 *
+	 * @param arr	premier tableau (dans lequel on supprime les doublons
+	 * @param arr	second tableau (dans lequel on trouve les valeur a chercher)
+	 * @return arr	tableau fusionne des 2 autres
+	 **/
+	 function ts_array_merge($arr1, $arr2) {
+		//on test si on a bien des tableaux
+		if (is_array($arr1) && is_array($arr2)) {
+			//tableau des clef par default, necessaire a la comparaison avec le tableau du plugid
+			$defClef = array_keys($arr1);
+
+			//on parcour les tableaux afin de faire le trie des clef existant
+			foreach ($arr2 as $key => $value) {
+				$chaine = (strpos($key, '.')===false)?$key:substr($key, 0, -1); // on recupere la chaine a comparer dans l'autre tableau sans le point final
+				if (in_array($chaine, $defClef)) unset($arr1[$chaine]);
+				elseif(in_array($chaine.'.', $defClef)) unset($arr1[$chaine.'.']);
+			}
+			
+			// on assemble les 2 tableaux obtenu
+			return array_merge($arr1, $arr2);
+		}else return is_array($arr1)?$arr1:$arr2;
+	}
 
 	function getMetaFeeditVar2(&$conf,$varname,$keepvar=false) {
 		$pluginId=$conf['pluginId'];
@@ -2709,7 +2720,7 @@ class tx_metafeedit_lib {
 		        		$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'','', ' '.$mmTable.'.sorting ');
 		        		if (mysql_error())    debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
 						$cnt=mysql_num_rows($MMres);
-		          		if($cnt!=$rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->getSelectOptions(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+		          		if($conf['debug'] && $cnt!=$rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->getSelectOptions(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
 		          		while($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
 		        		} else {                                                        // clean from DB
 		          			$uids = explode(",",$rec[$fN]);
@@ -3461,7 +3472,7 @@ class tx_metafeedit_lib {
 		$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"], 'uid_local=\''.$dataArr[$conf['uidField']].'\'', '');
 		if (mysql_error()) debug(array(mysql_error(), $query), 'processDataArray()::field='.$fN);
 		$cnt=mysql_num_rows($MMres) ;
-		if ($cnt!= $dataArr[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->getMMUids(): Wrong number ($cnt<>".$dataArr[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+		if ($conf['debug'] && $cnt!= $dataArr[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->getMMUids(): Wrong number ($cnt<>".$dataArr[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
 		while ($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
 		return $uids;
 	}
@@ -4797,7 +4808,6 @@ class tx_metafeedit_lib {
 			$FT=$conf['TCAN'][$table]['columns'][$lField]['config']['foreign_table'];
 			if ($FT) {
 				$mmTable=$this->conf['TCAN'][$table]['columns'][$lField]['config']['MM'];
-				//echo $mmTable.' - '.$conf['TCAN'][$table]['columns'][$lField]['config']['size'];
 				/*if ($mmTable || ($conf['TCAN'][$table]['columns'][$lField]['config']['size']>1)) {								
 					$data = $GLOBALS['TSFE']->sys_page->getRawRecord($table,$lV);
 				} 
@@ -4841,6 +4851,15 @@ class tx_metafeedit_lib {
 		return $title;
 
 	}
+	
+	function pi_wrapInBaseClass($str,$conf)       {
+		$content = '<div id="'.str_replace('_','-',$this->prefixId).'-'.$conf['pluginId'].'" class="'.str_replace('_','-',$this->prefixId).'">'.$str.'</div>';
+		if($conf['disablePrefixComment']) {
+			$content = '<!--BEGIN: Content of extension "'.$this->extKey.'", plugin "'.$this->prefixId.'"-->'.$content.'<!-- END: Content of extension "'.$this->extKey.'", plugin "'.$this->prefixId.'" -->';
+		}
+		return $content;
+	}
+
 }
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/meta_feedit/class.tx_metafeedit_lib.php']) {

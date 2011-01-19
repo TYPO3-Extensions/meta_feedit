@@ -312,7 +312,7 @@ class tx_metafeedit extends  tslib_pibase {
 		    $this->metafeeditlib->makeTypo3TCAForTable($conf['TCAN'],$FTable);
 		}
 		//We get related foreign tables if necessary
-    foreach ($lfields as $lf) {
+    	foreach ($lfields as $lf) {
         	if ($lf) $r=$this->metafeeditlib->getForeignTableFromField2($lf,$conf['table'],$conf['TCAN']);
         }		
 	    // Set private TCA var
@@ -657,7 +657,8 @@ class tx_metafeedit extends  tslib_pibase {
 				  }
 			
 				  if (in_array($fN,$reqFields)) {                                  // No evalValues, but field listed in required list.
-				    	$msg .= '<!--###SUB_REQUIRED_FIELD_'.$fN.'###--><div'.$this->caller->pi_classParam('form-required-message').'>'.($conf['evalErrors.'][$fN.'.']['required']?$conf['evalErrors.'][$fN.'.']['required']:$this->metafeeditlib->getLL("required_message",$conf)).'</div><!--###SUB_REQUIRED_FIELD_'.$fN.'###-->';
+				    	$msg .= '<!--###SUB_REQUIRED_FIELD_'.$fN.'###--><div class="'.$this->caller->pi_getClassName('form-error-field').' '.$this->caller->pi_getClassName('form-required-message').'">'.($conf['evalErrors.'][$fN.'.']['required']?$conf['evalErrors.'][$fN.'.']['required']:$this->metafeeditlib->getLL("required_message",$conf)).'</div><!--###SUB_REQUIRED_FIELD_'.$fN.'###-->';
+				    	//$msg .= '<!--###SUB_REQUIRED_FIELD_'.$fN.'###--><div'.$this->caller->pi_classParam('form-required-message').'>'.($conf['evalErrors.'][$fN.'.']['required']?$conf['evalErrors.'][$fN.'.']['required']:$this->metafeeditlib->getLL("required_message",$conf)).'</div><!--###SUB_REQUIRED_FIELD_'.$fN.'###-->';
 				    	$reqMarker = $conf['required_marker'];
 				  }
 			
@@ -679,7 +680,8 @@ class tx_metafeedit extends  tslib_pibase {
                     '.$label. '
                     '.$helpIcon.'
                     </div>
-                    <div class="'.$this->caller->pi_getClassName($fsc?'fsf':'form-field').$evclasses.'">'.$fieldCode.'</div>'.$msg.'</div>';
+                    <div class="###CSS_ERROR_FIELD_'.$fN.'###'.$this->caller->pi_getClassName($fsc?'fsf':'form-field').$evclasses.'">'.$fieldCode.'</div>'.$msg.'</div>';
+                    
 				}
             }
         }
@@ -892,14 +894,17 @@ class tx_metafeedit extends  tslib_pibase {
       foreach((array)$evalValuesArr as $eval) {
 				switch((string)$eval) {
 					case 'twice':
-	  				$displayTwice = true;
-	  				break;
+						$displayTwice = true;
+						break;
+					case 'email':
+						$email = true;
+						break;
 					case 'password':
-	  				$isPassword = true;
-	  				break;
+						$isPassword = true;
+						break;
 					case 'md5':
-	  				$isMD5 = true;
-	  			break;
+						$isMD5 = true;
+						break;
 				}
       }
       $values = '###FIELD_'.$fN.'###';
@@ -912,7 +917,10 @@ class tx_metafeedit extends  tslib_pibase {
       if(in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) $values = '###FIELD_EVAL_'.$fN.'###';
       if (in_array('wwwURL',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
       if (in_array('email',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
-      
+      /**
+       * @todo Get FE values from input vars in conf !!
+       *
+       */
       $feData = t3lib_div::_POST("FE");
 
       // Format the values.                
@@ -947,8 +955,6 @@ class tx_metafeedit extends  tslib_pibase {
       break;
     case 'group':
       if($conf['TCAN'][$table]['columns'][$fNiD]['config']["internal_type"]=='file') {
-      	//echo '<br>'.$feData[$masterTable][$fN].' ==== '.$fN.' ---- '.$conf['TCAN'][$table]['columns'][$fNiD]['config']["eval"];     	
-      	//print_r($feData[$masterTable]);
       	return $withHTML?'<input type="hidden" name="'.$fieldName.'" value="###FIELD_'.$fN.'_file_file###" /><input type="hidden" name="FE['.$masterTable.']['.$fN.'_file]" value="###FIELD_'.$fN.'_file_file###"/>###FIELD_EVAL_'.$fN.'###'.$EVAL_ERROR_FIELD:'###FIELD_'.$fN.'###'.$EVAL_ERROR_FIELD;
       } else {  // we assume internal_type = db
       	$values = '###FIELD_EVAL_'.$fN.'###';
@@ -1080,8 +1086,9 @@ class tx_metafeedit extends  tslib_pibase {
 			$evclasses.=' '.$this->caller->pi_getClassName('form-data-'.$ev);
 		}
 
-
         $class='class="'.$this->caller->pi_getClassName('form-data').' '.$this->caller->pi_getClassName('form-data-'.$fN).$evclasses.'" ';
+
+        //$class='class="###CSS_ERROR_FIELD_'.$fN.'###'.$this->caller->pi_getClassName('form-data').' '.$this->caller->pi_getClassName('form-data-'.$fN).$evclasses.'" ';
         $defaultParams = ' name="'.$fieldName.'"'.$class;
         $EVAL_ERROR_FIELD=$bgrid?'':'<div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'###</div>';
         $onchange = 'onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';
@@ -1096,28 +1103,34 @@ class tx_metafeedit extends  tslib_pibase {
                 $displayTwice = false;
                 $isPassword = false;
                 $isMD5 = false;
+				$email = false;
                 foreach((array)$evalValuesArr as $eval) {
                 	switch((string)$eval) {
                 		case 'twice':
-                		$displayTwice = true;
-                		break;
+							$displayTwice = true;
+							break;
                 		case 'password':
-                		$isPassword = true;
-                		break;
+							$isPassword = true;
+							break;
                 		case 'md5':
-                		$isMD5 = true;
-                		break;
+							$isMD5 = true;
+							break;
+						case 'email':
+							$email = true;
+
                 	}
                 }  
-                $type = 'text';
+				//@todo only do this if iphone?
+                $type = $email?'email':'text';
                 if($isPassword) $type = 'password';
                 if($displayTwice) {
+					$classagain='class="'.$this->caller->pi_getClassName('form-data').' '.$this->caller->pi_getClassName('form-data-again').' '.$this->caller->pi_getClassName('form-data-'.$fN).' '.$this->caller->pi_getClassName('form-data-'.$fN.'-again').$evclasses.'" ';
                 	$fieldName_again = 'FE['.$masterTable.']'.$gridMark.'['.$fN.'_again]';
                 	$onchange_again = 'onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName_again."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';   
                 	$conf['additionalJS_end']['feedit_'.$fN.'_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
                 	$conf['additionalJS_end']['feedit_'.$fN.'_again_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName_again."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
                 	return '<input alt="'.$gridMarkAlt.'" title="'.$gridMarkAlt.'" type="'.$type.'" name="'.$fieldName.'_feVal" '.$class.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange.' />
-                		<input type="hidden" name="'.$fieldName.'" /><br/>Confirmation<br/><input type="'.$type.'" name="'.$fieldName_again.'_feVal" '.$class.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange_again.' />
+                		<input type="hidden" name="'.$fieldName.'" /><br/>'.$this->metafeeditlib->getLL("fieldconfirmation",$conf).strtolower($Lib).'<br/><input type="'.$type.'" name="'.$fieldName_again.'_feVal" '.$classagain.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange_again.' />
                 		<input type="hidden" name="'.$fieldName_again.'" />'.$EVAL_ERROR_FIELD;
                 } else {
                 	$conf['additionalJS_end']['feedit_'.$fN.'_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
@@ -1163,9 +1176,23 @@ class tx_metafeedit extends  tslib_pibase {
                 }
                 break;
             case 'check':
-                if($conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']>1) debug("getFormFieldCode():: WARNING, checkbox have more cols, not implemented yet.");
+                if($conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']>1 || count($conf['TCAN'][$masterTable]['columns'][$fN]['config']['items'])) {
+					$cols=$conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']?$conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']:1;
+					$i=0;
+					$ret='';
+					foreach ($conf['TCAN'][$masterTable]['columns'][$fN]['config']['items'] as $item) {	
+						//$ret.=$i.'%'.$cols.'='.($i%$cols);
+											
+						if (($i%$cols)==0) $ret.='<div class="checkrow">';					
+						$ret.='<input id="'. $this->caller->pi_getClassName($fN) . '-' . $i.'" type="checkbox" '.' name="'.$fieldName.'['.$i.']"'.$class.' />'.'<label for="' . $this->caller->pi_getClassName($fN) . '-' . $i . '">' . $this->metafeeditlib->getLLFromLabel($item[0],$conf) . '</label>';
+						if (($i%$cols)==($cols-1)) $ret.='</div>';
+						$i++;
+					}
+				 } else {
+					$ret='<input type="checkbox" '.$defaultParams.' />';
+				 }
                 #return '<input type="hidden" '.$defaultParams.' ><input type="checkbox" '.$defaultParams_feVal.' >';
-                return '<input type="checkbox" '.$defaultParams.' />'.$EVAL_ERROR_FIELD;
+                return $ret.$EVAL_ERROR_FIELD;
                 break;
             case 'group':
                 if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["internal_type"]=='file')	{
@@ -1258,8 +1285,7 @@ class tx_metafeedit extends  tslib_pibase {
                         $MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'',$mmTable.'.sorting');
                         if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
                         $cnt=mysql_num_rows($MMres);
-                        if($cnt!=$rec[$fN]);
-                        debug("class.tx_metafeedit.php::tx_metafeedit->getFormFieldCode(): Wrong number ($MMres<>$cnt) of selections reached for  field $fN of table $masterTable, mm:  $mmTable");
+                        if($conf['debug'] && $cnt!=$rec[$fN]) debug("class.tx_metafeedit.php::tx_metafeedit->getFormFieldCode(): Wrong number ($MMres<>$cnt) of selections reached for  field $fN of table $masterTable, mm:  $mmTable");
                         while($MMrow = mysql_fetch_assoc($MMres))
                         $uids[] = $MMrow["uid_foreign"];
                     } else {                                                        // clean from DB
@@ -1367,8 +1393,7 @@ class tx_metafeedit extends  tslib_pibase {
                         $MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'',$mmTable.'.sorting');
                         if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
                         $cnt=mysql_num_rows($MMres);
-                        if($cnt!=$rec[$fN]);
-                        debug("class.tx_metafeedit.php::tx_metafeedit->getFormFieldCode(): Wrong number ($MMres<>$cnt) of selections reached for  field $fN of table $masterTable, mm:  $mmTable");
+                        if($conf['debug'] && $cnt!=$rec[$fN]) debug("class.tx_metafeedit.php::tx_metafeedit->getFormFieldCode(): Wrong number ($MMres<>$cnt) of selections reached for  field $fN of table $masterTable, mm:  $mmTable");
                         while($MMrow = mysql_fetch_assoc($MMres))
                         $uids[] = $MMrow["uid_foreign"];
                     } else {                                                        // clean from DB
@@ -1455,10 +1480,10 @@ class tx_metafeedit extends  tslib_pibase {
                 break;
             case 'radio':
                 if($conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']>1) debug("getFormFieldCode():: WARNING, checkbox have more cols, not implemented yet.");
-        
-            	for ($i = 0; $i < count ($conf['TCAN'][$masterTable]['columns'][$fN]['config']['items']); ++$i) {
+				$items=$conf['TCAN'][$masterTable]['columns'][$fN]['config']['items'];
+            	for ($i = 0; $i < count ($items); ++$i) {
                     	$row .= '<input type="radio"' . $this->caller->pi_classParam('radio') . 'id="'. $this->caller->pi_getClassName($fN) . '-' . $i . '" name="FE['.$masterTable.']'.$gridMark.'['.$fN.']"'.
-                            'value="'.$i.'" '.($i==0?'checked="checked"':'').' />' .
+                            'value="'.$items[$i][1].'" '.($i==0?'checked="checked"':'').' />' .
                             '<label for="' . $this->caller->pi_getClassName($fN) . '-' . $i . '">' . $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$masterTable]['columns'][$fN]['config']['items'][$i][0],$conf) . '</label>';
                 }
             	return $row.$EVAL_ERROR_FIELD;
@@ -1812,7 +1837,8 @@ class tx_metafeedit extends  tslib_pibase {
 			}
 		}			
 		return $ret;
-	}  
+	} 
+	
 	/**
 	 * getSumFields : generates template fields for all sums even of undisplayed columns ....
 	 *
@@ -1822,27 +1848,28 @@ class tx_metafeedit extends  tslib_pibase {
 	 * @return	[type]		...
 	 */
   
- function getSumFields(&$conf, $textmode=false, $type=''){
-	$ret = '';
-	$fields=$conf['list.']['sumFields'];
-	$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
-	foreach($fieldArray as $FN) {
- 		$params=t3lib_div::trimExplode(';',$FN);
-		if ($params[0]!='--div--') {
-			$Lib=$this->metafeeditlib->getLLFromLabel('total',$conf).' '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][trim($FN)]['label'],$conf).':';
-			if(!$textmode) {
-				$ret.='<td>'.$Lib.'###SUM_FIELD_'.$FN.'###</td>';
-			} else if ($type) {
-				$masterTable = $conf['table'];
-				$size = $this->getSize($conf, $FN, $masterTable);
-				$ret.='<td><data>'.$Lib.'###SUM_FIELD_'.$FN.'###</data><size>'.$size.'</size></td>';	
-			} else {
-				  $ret.=$Lib.'###SUM_FIELD_'.$FN.'###;';	
+	 function getSumFields(&$conf, $textmode=false, $type=''){
+		$ret = '';
+		$fields=$conf['list.']['sumFields'];
+		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
+		foreach($fieldArray as $FN) {
+	 		$params=t3lib_div::trimExplode(';',$FN);
+			if ($params[0]!='--div--') {
+				$Lib=$this->metafeeditlib->getLLFromLabel('total',$conf).' '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][trim($FN)]['label'],$conf).':';
+				if(!$textmode) {
+					$ret.='<td>'.$Lib.'###SUM_FIELD_'.$FN.'###</td>';
+				} else if ($type) {
+					$masterTable = $conf['table'];
+					$size = $this->getSize($conf, $FN, $masterTable);
+					$ret.='<td><data>'.$Lib.'###SUM_FIELD_'.$FN.'###</data><size>'.$size.'</size></td>';	
+				} else {
+					  $ret.=$Lib.'###SUM_FIELD_'.$FN.'###;';	
+				}
 			}
 		}
-	}
-	return $ret;
-  }
+		return $ret;
+	  }
+	  
 	/**
 	 * getGridDataFields
 	 *
@@ -1850,7 +1877,7 @@ class tx_metafeedit extends  tslib_pibase {
 	 * @return	[type]		...
 	 */
  
-  function getGridDataFields (&$conf, $textmode=false, $type='') {
+  	function getGridDataFields (&$conf, $textmode=false, $type='') {
 		$fields=$conf['grid.']['show_fields']?$conf['grid.']['show_fields']:$this->id_field;
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
 		$masterTable = $conf['table'];
@@ -1880,19 +1907,19 @@ class tx_metafeedit extends  tslib_pibase {
 	 * @return	[type]		...
 	 */
 
-  function getBlogDataFields(&$conf) {
-	$fields=$conf['blog.']['show_fields']?$conf['blog.']['show_fields']:'firstname,surname,email,homepage,place,crdate,entry,entrycomment';
-	$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
-	$ret='<tr><td><fieldset class="tx-metafeedit-blog-comment"><legend>Comm</legend>';
-	foreach($fieldArray as $FN) {
-		$params=explode(';',$FN);
-		$FCode=$this->getPreviewFieldCode('blog',$conf,$FN,0);
-		$Lib=$this->metafeeditlib->getLLFromLabel($conf['TCAN']['tx_metafeedit_comments']['columns'][trim($FN)]['label'],$conf);
-		$ret.='<div class="'.$this->caller->pi_getClassName('blog_field').' '.$this->caller->pi_getClassName('blog_field_'.$FN).'"><div class="'.$this->caller->pi_getClassName('blog_label').'">'.$Lib.'</div>'.$FCode.'</div>';
-	}
-	$ret.='</fieldset></td></tr>';
-	return $ret;
-  }
+	  function getBlogDataFields(&$conf) {
+		$fields=$conf['blog.']['show_fields']?$conf['blog.']['show_fields']:'firstname,surname,email,homepage,place,crdate,entry,entrycomment';
+		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
+		$ret='<tr><td><fieldset class="tx-metafeedit-blog-comment"><legend>Comm</legend>';
+		foreach($fieldArray as $FN) {
+			$params=explode(';',$FN);
+			$FCode=$this->getPreviewFieldCode('blog',$conf,$FN,0);
+			$Lib=$this->metafeeditlib->getLLFromLabel($conf['TCAN']['tx_metafeedit_comments']['columns'][trim($FN)]['label'],$conf);
+			$ret.='<div class="'.$this->caller->pi_getClassName('blog_field').' '.$this->caller->pi_getClassName('blog_field_'.$FN).'"><div class="'.$this->caller->pi_getClassName('blog_label').'">'.$Lib.'</div>'.$FCode.'</div>';
+		}
+		$ret.='</fieldset></td></tr>';
+		return $ret;
+	  }
 
     /**
     * getBlogFormFields :
@@ -1979,48 +2006,48 @@ class tx_metafeedit extends  tslib_pibase {
 	 * @return	[type]		...
 	 */
 	 
-  function getGroupByFooterFields(&$conf,$textmode=false,$exporttype='') {
-	$GROUPBYFIELDS='';
-  	if ($conf['list.']['groupByFieldBreaks']) {
-  		$GROUPBYFIELDS='';
-		$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
-		$nbf=1;
-		$hasActions=($exporttype?0:$this->metafeeditlib->hasListActions($conf));
-		$nbf=count(t3lib_div::trimExplode(",",$fields))+$hasActions;
-
-		if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="<tr><td>";
-	    $fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
-	    $tab="";
-		$lvl=0;
-	    foreach($fNA as $fN) {
-			$fN2=t3lib_div::trimexplode(':',$fN);
-			$fN=$fN2[0];
-			if ($conf['list.']['hiddenGroupByField.'][$fN] || $conf['list.']['groupby.'][$fN.'.']['footer.']['hide']) continue;
-			//Class name correction
-			$classFn = str_replace('.', '_', $fN);
-			// Total processing 
-			$size = $this->getSize($conf, $fN, $conf['table']);
-			$div=($textmode?'':'<div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.( $conf['list.']['groupby.'][$fN.'.']['footer']?$conf['list.']['groupby.'][$fN.'.']['footer']:$this->metafeeditlib->getLLFromLabel('total',$conf).' ###GROUPBYFOOTER_'.$fN.'###'.(($conf['list.']['groupByCount']||$conf['list.']['groupby.'][$fN.'.']['footer.']['showcount'])?'(###FOOTERSUM_'.$fN.'_FIELD_metafeeditnbelts###)':'')).($textmode?'':'</div>');
-			if ($conf['list.']['sumFields']) {
-				$sum='<!--###FOOTERSUM_FIELDS### begin -->'.$this->getEditSumFields('FOOTERSUM_'.$fN,$conf,$count, $textmode, $exporttype,$hasActions);
-				$sum.='<!--###FOOTERSUM_FIELDS### end -->';
-				$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$div);
-
-				$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'">').$sum.($textmode?($exporttype?'</tr>':chr(10)):'</tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
-			} else {
-				$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?($conf['list.']['nbCols']+$hasActions):$nbf).'" >').$div.($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</td></tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
+  	function getGroupByFooterFields(&$conf,$textmode=false,$exporttype='') {
+		$GROUPBYFIELDS='';
+	  	if ($conf['list.']['groupByFieldBreaks']) {
+	  		$GROUPBYFIELDS='';
+			$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
+			$nbf=1;
+			$hasActions=($exporttype?0:$this->metafeeditlib->hasListActions($conf));
+			$nbf=count(t3lib_div::trimExplode(",",$fields))+$hasActions;
+	
+			if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="<tr><td>";
+		    $fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
+		    $tab="";
+			$lvl=0;
+		    foreach($fNA as $fN) {
+				$fN2=t3lib_div::trimexplode(':',$fN);
+				$fN=$fN2[0];
+				if ($conf['list.']['hiddenGroupByField.'][$fN] || $conf['list.']['groupby.'][$fN.'.']['footer.']['hide']) continue;
+				//Class name correction
+				$classFn = str_replace('.', '_', $fN);
+				// Total processing 
+				$size = $this->getSize($conf, $fN, $conf['table']);
+				$div=($textmode?'':'<div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.( $conf['list.']['groupby.'][$fN.'.']['footer']?$conf['list.']['groupby.'][$fN.'.']['footer']:$this->metafeeditlib->getLLFromLabel('total',$conf).' ###GROUPBYFOOTER_'.$fN.'###'.(($conf['list.']['groupByCount']||$conf['list.']['groupby.'][$fN.'.']['footer.']['showcount'])?'(###FOOTERSUM_'.$fN.'_FIELD_metafeeditnbelts###)':'')).($textmode?'':'</div>');
+				if ($conf['list.']['sumFields']) {
+					$sum='<!--###FOOTERSUM_FIELDS### begin -->'.$this->getEditSumFields('FOOTERSUM_'.$fN,$conf,$count, $textmode, $exporttype,$hasActions);
+					$sum.='<!--###FOOTERSUM_FIELDS### end -->';
+					$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$div);
+	
+					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'">').$sum.($textmode?($exporttype?'</tr>':chr(10)):'</tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
+				} else {
+					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?($conf['list.']['nbCols']+$hasActions):$nbf).'" >').$div.($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</td></tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
+				}
+				$tab.="";//&nbsp;>&nbsp;";
+				$lvl++;
 			}
-			$tab.="";//&nbsp;>&nbsp;";
-			$lvl++;
-		}
-		if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="</td></tr>";
-		$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELDS### begin -->'.$GROUPBYFIELDS.'<!-- ###GROUPBYFOOTERFIELDS### end -->';
-    }
+			if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="</td></tr>";
+			$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELDS### begin -->'.$GROUPBYFIELDS.'<!-- ###GROUPBYFOOTERFIELDS### end -->';
+	    }
 		return $GROUPBYFIELDS;
 	}
 	
     /**
-    * getListItemTemplate : generates template for  lists , grids and calendars ...
+    * getListItemTemplate : generates template for lists , grids and calendars ...
     *
     * @param	[array]		$conf: configuration array.
     * @return	[string]	$content : template to show.
@@ -2094,7 +2121,7 @@ class tx_metafeedit extends  tslib_pibase {
         </div>
         <iframe id="jqmContent" class="jqmContent">
         </iframe>
-        <img src="typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
+        <img src="/typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
     </div>'.'<div id="modalDelWindow" class="jqmWindow">
         <div id="jqmDelTitle" class="jqmTitle jqDrag">
             <button class="jqmClose mfdClose">
@@ -2104,7 +2131,7 @@ class tx_metafeedit extends  tslib_pibase {
         </div>
         <div id="jqmDelContent" class="jqmContent">
         </div>
-        <img src="typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
+        <img src="/typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
     </div>'.
     '<div id="modalImgWindow" class="jqmWindow">
         <div id="jqmImgTitle" class="jqmTitle jqDrag">
@@ -2112,7 +2139,7 @@ class tx_metafeedit extends  tslib_pibase {
            <span id="jqmImgTitleText" class="jqmTitleText" >Title of image window</span>
         </div>
         <div id="jqmImgContent" class="jqmContent"></div>
-        <img src="typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
+        <img src="/typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
     </div>';
 
     	$tmp.='<!-- ###TEMPLATE_EDITMENU### end -->';
@@ -2508,7 +2535,6 @@ function getCalendarTemplate(&$conf) {
 	$tmp.='</div>
 	</form>
 	</div>
-	</div>
 	<!-- ###TEMPLATE_CREATE### end-->';
 	return $tmp;
 }
@@ -2611,8 +2637,8 @@ function getCalendarTemplate(&$conf) {
 	/**
 	 * [Describe function...]
 	 *
-	 * @param	[type]		$$conf: ...
-	 * @return	[type]		...
+	 * @param	array	$conf: configuration array
+	 * @return	string	template
 	 */
   function getSetfixedOkTemplate(&$conf) {
     if ($conf['setfixed.']['setFixedOkTemplate']) return '<!-- ###TEMPLATE_SETFIXED_OK### -->'.$conf['setfixed.']['setFixedOkTemplate'].'<!-- ###TEMPLATE_SETFIXED_OK### end-->';
@@ -2633,15 +2659,15 @@ function getSetfixedOkDeleteTemplate(&$conf) {
     if ($conf['setfixed.']['setFixedOkDeleteTemplate']) return '<!-- ###TEMPLATE_SETFIXED_OK_DELETE### -->'.$conf['setfixed.']['setFixedOkDeleteTemplate'].'<!-- ###TEMPLATE_SETFIXED_OK_DELETE### end-->';
  return '<!-- ###TEMPLATE_SETFIXED_OK_DELETE### -->
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-setfixed-ok-delete').'">Setfixed delete record "###FIELD_uid###"</h1>').'
-<div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-setfixed-ok').'">Record uid; ###FIELD_uid###</div>
+<div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-setfixed-ok').'">Record uid; ###FIELD_uid### has been deleted !</div>
 <!-- ###TEMPLATE_SETFIXED_OK_DELETE### end-->';
 }
 
 	/**
-	 * [Describe function...]
+	 * Setfix failed template 
 	 *
-	 * @param	[type]		$$conf: ...
-	 * @return	[type]		...
+	 * @param	array $conf: configuration array.
+	 * @return	string	desired template
 	 */
   function getSetfixedFailedTemplate(&$conf) {
     if ($conf['setfixed.']['setFixedFailedTemplate']) return '<!-- ###TEMPLATE_SETFIXED_FAILED### -->'.$conf['setfixed.']['setFixedFailedTemplate'].'<!-- ###TEMPLATE_SETFIXED_FAILED### end-->';
@@ -2658,9 +2684,9 @@ function getSetfixedOkDeleteTemplate(&$conf) {
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
 	 */
-function getEmailTemplate(&$conf) {
-    return $this->getCreateEmailTemplate($conf).$this->getEditEmailTemplate($conf);
-}
+	function getEmailTemplate(&$conf) {
+		return $this->getCreateEmailTemplate($conf).$this->getEditEmailTemplate($conf);
+	}
 
 	/**
 	 * [Describe function...]
@@ -2668,9 +2694,9 @@ function getEmailTemplate(&$conf) {
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
 	 */
-function getCreateEmailTemplate(&$conf) {
-    return $this->getCreateUserEmailTemplate($conf).$this->getCreateAdminNotifyEmailTemplate($conf).$this->getCreateDataNotifyEmailTemplate($conf).$this->getCreateAdminEmailTemplate($conf).$this->getCreateSetFixedEmailTemplate($conf);
-}
+	function getCreateEmailTemplate(&$conf) {
+		return $this->getCreateUserEmailTemplate($conf).$this->getCreateAdminNotifyEmailTemplate($conf).$this->getCreateDataNotifyEmailTemplate($conf).$this->getCreateAdminEmailTemplate($conf).$this->getCreateSetFixedEmailTemplate($conf);
+	}
 
 	/**
 	 * [Describe function...]
@@ -2678,35 +2704,17 @@ function getCreateEmailTemplate(&$conf) {
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
 	 */
-function getCreateUserEmailTemplate(&$conf) {
-    if ($conf['create.']['userNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED### begin -->'.$conf['create.']['userNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED### end-->';
-	return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED### begin -->
-[Auto Generated Message] Your information has been saved.
+	function getCreateUserEmailTemplate(&$conf) {
+		if ($conf['create.']['userNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED### begin -->'.$conf['create.']['userNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED### end-->';
+		return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED### begin -->
+	[Auto Generated Message] Your information has been saved.
 
-        <!--###SUB_RECORD###-->
-        You have submitted the following informations at '.t3lib_div::getIndpEnv('TYPO3_SITE_URL').':'.chr(10).'
-        '.$this->makeTEXTPreview('all',$conf).'
-        <!--###SUB_RECORD###-->
-<!-- ###EMAIL_TEMPLATE_CREATE_SAVED### end-->';
-}
-
-	/**
-	 * [Describe function...]
-	 *
-	 * @param	[type]		$$conf: ...
-	 * @return	[type]		...
-	 */
-function getCreateAdminNotifyEmailTemplate(&$conf) {
-    if ($conf['create.']['adminNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN_NOTIFY### begin -->'.$conf['create.']['adminNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN_NOTIFY### end-->';
-	return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN_NOTIFY### begin -->
-[Auto Generated Message] New record created.
-
-        <!--###SUB_RECORD###-->
-        '.$this->makeTEXTPreview('all',$conf).'
-
-        <!--###SUB_RECORD###-->
-<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN_NOTIFY### end-->';
-}
+			<!--###SUB_RECORD###-->
+			You have submitted the following informations at '.t3lib_div::getIndpEnv('TYPO3_SITE_URL').':'.chr(10).'
+			'.$this->makeTEXTPreview('all',$conf).'
+			<!--###SUB_RECORD###-->
+	<!-- ###EMAIL_TEMPLATE_CREATE_SAVED### end-->';
+	}
 
 	/**
 	 * [Describe function...]
@@ -2714,17 +2722,41 @@ function getCreateAdminNotifyEmailTemplate(&$conf) {
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
 	 */
-function getCreateDataNotifyEmailTemplate(&$conf) {
-    if ($conf['create.']['dataNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### begin -->'.$conf['create.']['dataNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### end-->';
-	return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### begin -->
-[Auto Generated Message] You have been invited.
+	function getCreateAdminNotifyEmailTemplate(&$conf) {
+		if ($conf['create.']['adminNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN_NOTIFY### begin -->'.$conf['create.']['adminNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN_NOTIFY### end-->';
+		return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN_NOTIFY### begin -->
+	[Auto Generated Message] New record created.
 
-        <!--###SUB_RECORD###-->
-        '.$this->makeTEXTPreview('all',$conf).'
+			<!--###SUB_RECORD###-->
+			'.$this->makeTEXTPreview('all',$conf).'
 
-        <!--###SUB_RECORD###-->
-<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### end-->';
-}
+			<!--###SUB_RECORD###-->
+	<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN_NOTIFY### end-->';
+	}
+
+	/**
+	 * Email template for email upon record creation to an email stored in created record.
+	 *
+	 * @param	array $conf: configuration array
+	 * @return	string	email template
+	 */
+
+	function getCreateDataNotifyEmailTemplate(&$conf) {
+	    if ($conf['create.']['dataNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### begin -->'.$conf['create.']['dataNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### end-->';
+		$ret= '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### begin -->';
+		$ret.='[Auto Generated Message] You have been invited.'.chr(10);
+	    $ret.='<!--###SUB_RECORD###-->';
+	    $ret.=$this->makeTEXTPreview('all',$conf).chr(10);
+		// if email recipent can validate data through setfix parameter we do it here ..
+	    $setfix=1;
+		if ($setfix) {
+	    	$ret.='Approve: ###THIS_URL######FORM_URL######SYS_SETFIXED_approve###'.chr(10);
+			$ret.='Delete: ###THIS_URL######FORM_URL######SYS_SETFIXED_DELETE###'.chr(10);
+	    }
+	    $ret.='<!--###SUB_RECORD###-->';
+		$ret.='<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### end-->';
+		return $ret;
+	}
 
 	/**
 	 * [Describe function...]
@@ -2732,22 +2764,32 @@ function getCreateDataNotifyEmailTemplate(&$conf) {
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
 	 */
-function getCreateAdminEmailTemplate(&$conf) {
-    if ($conf['create.']['adminValidTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### begin -->'.$conf['create.']['adminValidTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### end-->';
-	return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### begin -->
-[Auto Generated Message] New record created.
+	function getCreateAdminEmailTemplate(&$conf) {
+	    if ($conf['create.']['adminValidTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### begin -->'.$conf['create.']['adminValidTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### end-->';
+		return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### begin -->
+	[Auto Generated Message] New record created.
+	
+	        <!--###SUB_RECORD###-->
+	        '.$this->makeTEXTPreview('all',$conf).'
+	
+	        Approve:
+	        ###THIS_URL######FORM_URL######SYS_SETFIXED_approve###
+	
+	        Delete:
+	        ###THIS_URL######FORM_URL######SYS_SETFIXED_DELETE###
+	        <!--###SUB_RECORD###-->
+	<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### end-->';
+	}
 
-        <!--###SUB_RECORD###-->
-        '.$this->makeTEXTPreview('all',$conf).'
-
-        Approve:
-        ###THIS_URL######FORM_URL######SYS_SETFIXED_approve###
-
-        Delete:
-        ###THIS_URL######FORM_URL######SYS_SETFIXED_DELETE###
-        <!--###SUB_RECORD###-->
-<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### end-->';
-}
+	/**
+	 * Get's templates for setfixed emails in creation mode
+	 *
+	 * @param	array		$conf: configuration array
+	 * @return	string		template
+	 */
+	function getCreateSetFixedEmailTemplate(&$conf) {
+	    return $this->getCreateSetFixedKOEmailTemplate($conf).$this->getCreateSetFixedKODataEmailTemplate($conf).$this->getCreateSetFixedOKEmailTemplate($conf).$this->getCreateSetFixedOKDataEmailTemplate($conf);
+	}
 
 	/**
 	 * [Describe function...]
@@ -2755,9 +2797,95 @@ function getCreateAdminEmailTemplate(&$conf) {
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
 	 */
-function getCreateSetFixedEmailTemplate(&$conf) {
-    return $this->getCreateSetFixedKOEmailTemplate($conf).$this->getCreateSetFixedOKEmailTemplate($conf);
-}
+	function getCreateSetFixedKOEmailTemplate(&$conf) {
+	if ($conf['create.']['userSetFixedNotifyKoTpl']) return '<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### begin -->'.$conf['create.']['userSetFixedNotifyKoTpl'].'<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### end -->';
+		return '<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### begin -->
+	Record not DELETED!
+
+	<!--###SUB_RECORD###-->
+	Record name: ###FIELD_'.$this->id_field.'###
+
+	Your entry has not  been deleted for some reason.
+
+	- kind regards.
+	<!--###SUB_RECORD###-->
+	<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### end -->';
+	}
+	/**
+	 * [Describe function...]
+	 *
+	 * @param	[type]		$$conf: ...
+	 * @return	[type]		...
+	 */
+	function getCreateSetFixedKODataEmailTemplate(&$conf) {
+	if ($conf['create.']['userSetFixedDataNotifyKoTpl']) return '<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE-DATA### begin -->'.$conf['create.']['userSetFixedDataNotifyKoTpl'].'<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE-DATA### end -->';
+		return '<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE-DATA### begin -->
+	Record has been deleted!
+	
+	<!--###SUB_RECORD###-->
+	Record '.$this->id_field.'name: ###FIELD_'.$this->id_field.'###
+	
+	Your entry has been deleted.
+	
+	- kind regards.
+	<!--###SUB_RECORD###-->
+	<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE-DATA### end -->';
+	}
+	
+	/**
+	 * [Describe function...]
+	 *
+	 * @param	[type]		$$conf: ...
+	 * @return	[type]		...
+	 */
+	function getCreateSetFixedOKEmailTemplate(&$conf) {
+		if ($conf['create.']['userSetFixedNotifyOkTpl']) return '<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### begin -->'.$conf['create.']['userSetFixedNotifyOkTpl'].'<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### end -->';
+		return '<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### begin -->
+	Update approved
+
+	<!--###SUB_RECORD###-->
+
+	Record name: ###FIELD_'.$this->id_field.'###
+
+	Your entry has been approved!
+
+	- kind regards.
+	<!--###SUB_RECORD###-->
+	<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### end -->
+	';
+	}
+	/**
+	 * Setfixed approved data template for Data based emails
+	 *
+	 * @param	array 		$conf: configuration array
+	 * @return	string 		Setfixed approved data template for Data based emails
+	 */
+	function getCreateSetFixedOKDataEmailTemplate(&$conf) {
+		if ($conf['create.']['dataSetFixedNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_SETFIXED_approve-DATA### begin -->'.$conf['create.']['dataSetFixedNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_SETFIXED_approve-DATA### end -->';
+		return '<!-- ###EMAIL_TEMPLATE_SETFIXED_approve-DATA### begin -->
+	Data Update approved
+
+	<!--###SUB_RECORD###-->
+
+	Record name: ###FIELD_'.$this->id_field.'###
+
+	Your entry has been approved!
+
+	- kind regards.
+	<!--###SUB_RECORD###-->
+	<!-- ###EMAIL_TEMPLATE_SETFIXED_approve-DATA### end -->
+	';
+	}
+	
+	/**
+	 * [Describe function...]
+	 *
+	 * @param	[type]		$$conf: ...
+	 * @return	[type]		...
+	 */
+	function getEditEmailTemplate(&$conf) {
+	        return $this->getEditUserEmailTemplate($conf).$this->getEditAdminNotifyEmailTemplate($conf).$this->getEditDataNotifyEmailTemplate($conf).$this->getEditAdminEmailTemplate($conf).$this->getEditSetFixedEmailTemplate($conf);
+	}
 
 	/**
 	 * [Describe function...]
@@ -2765,20 +2893,17 @@ function getCreateSetFixedEmailTemplate(&$conf) {
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
 	 */
-function getCreateSetFixedKOEmailTemplate(&$conf) {
-if ($conf['create.']['userNotifyKoTpl']) return '<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### begin -->'.$conf['create.']['userNotifyKoTpl'].'<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### end -->';
-	return '<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### begin -->
-Consultancy DELETED!
-
-<!--###SUB_RECORD###-->
-Record name: ###FIELD_'.$this->id_field.'###
-
-Your entry has been deleted by the admin for some reason.
-
-- kind regards.
-<!--###SUB_RECORD###-->
-<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### end -->';
-}
+	function getEditUserEmailTemplate(&$conf) {
+	    if ($conf['edit.']['userNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### begin -->'.$conf['edit.']['userNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### end-->';
+		return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### begin -->
+	[Auto Generated Message] Your information has been saved.
+	
+	        <!--###SUB_RECORD###-->
+	        You have submitted the following information at '.t3lib_div::getIndpEnv('TYPO3_SITE_URL').':'.chr(10).'
+	        '.$this->makeTEXTPreview('all',$conf).'
+	        <!--###SUB_RECORD###-->
+	<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### end-->';
+	}
 
 	/**
 	 * [Describe function...]
@@ -2786,22 +2911,17 @@ Your entry has been deleted by the admin for some reason.
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
 	 */
-function getCreateSetFixedOKEmailTemplate(&$conf) {
-    if ($conf['create.']['userNotifyOkTpl']) return '<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### begin -->'.$conf['create.']['userNotifyOkTpl'].'<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### end -->';
-	return '<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### begin -->
-Update approved
-
-<!--###SUB_RECORD###-->
-
-Record name: ###FIELD_'.$this->id_field.'###
-
-Your entry has been approved!
-
-- kind regards.
-<!--###SUB_RECORD###-->
-<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### end -->
-';
-}
+	function getEditAdminNotifyEmailTemplate(&$conf) {
+	    if ($conf['edit.']['adminNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### begin -->'.$conf['edit.']['adminNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### end-->';
+		return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### begin -->
+	[Auto Generated Message] Consultancy record edited.
+	
+	        <!--###SUB_RECORD###-->
+	        '.$this->makeTEXTPreview('all',$conf).'
+	
+	        <!--###SUB_RECORD###-->
+	<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### end-->';
+	}
 
 	/**
 	 * [Describe function...]
@@ -2809,9 +2929,16 @@ Your entry has been approved!
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
 	 */
-function getEditEmailTemplate(&$conf) {
-        return $this->getEditUserEmailTemplate($conf).$this->getEditAdminNotifyEmailTemplate($conf).$this->getEditDataNotifyEmailTemplate($conf).$this->getEditAdminEmailTemplate($conf).$this->getEditSetFixedEmailTemplate($conf);
-}
+	function getEditDataNotifyEmailTemplate(&$conf) {
+	    if ($conf['edit.']['dataNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### begin -->'.$conf['edit.']['dataNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### end-->';
+		return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### begin -->
+	[Auto Generated Message] Consultancy record edited.
+	        <!--###SUB_RECORD###-->
+	        '.$this->makeTEXTPreview('all',$conf).'
+	
+	        <!--###SUB_RECORD###-->
+	<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### end-->';
+	}
 
 	/**
 	 * [Describe function...]
@@ -2819,75 +2946,22 @@ function getEditEmailTemplate(&$conf) {
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
 	 */
-function getEditUserEmailTemplate(&$conf) {
-    if ($conf['edit.']['userNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### begin -->'.$conf['edit.']['userNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### end-->';
-	return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### begin -->
-[Auto Generated Message] Your information has been saved.
-
-        <!--###SUB_RECORD###-->
-        You have submitted the following information at '.t3lib_div::getIndpEnv('TYPO3_SITE_URL').':'.chr(10).'
-        '.$this->makeTEXTPreview('all',$conf).'
-        <!--###SUB_RECORD###-->
-<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### end-->';
-}
-
-	/**
-	 * [Describe function...]
-	 *
-	 * @param	[type]		$$conf: ...
-	 * @return	[type]		...
-	 */
-function getEditAdminNotifyEmailTemplate(&$conf) {
-    if ($conf['edit.']['adminNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### begin -->'.$conf['edit.']['adminNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### end-->';
-	return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### begin -->
-[Auto Generated Message] Consultancy record edited.
-
-        <!--###SUB_RECORD###-->
-        '.$this->makeTEXTPreview('all',$conf).'
-
-        <!--###SUB_RECORD###-->
-<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### end-->';
-}
-
-	/**
-	 * [Describe function...]
-	 *
-	 * @param	[type]		$$conf: ...
-	 * @return	[type]		...
-	 */
-function getEditDataNotifyEmailTemplate(&$conf) {
-    if ($conf['edit.']['dataNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### begin -->'.$conf['edit.']['dataNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### end-->';
-	return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### begin -->
-[Auto Generated Message] Consultancy record edited.
-        <!--###SUB_RECORD###-->
-        '.$this->makeTEXTPreview('all',$conf).'
-
-        <!--###SUB_RECORD###-->
-<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### end-->';
-}
-
-	/**
-	 * [Describe function...]
-	 *
-	 * @param	[type]		$$conf: ...
-	 * @return	[type]		...
-	 */
-function getEditAdminEmailTemplate(&$conf) {
-    if ($conf['edit.']['adminValidTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### begin -->'.$conf['edit.']['adminValidTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### end-->';
-	return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### begin -->
-[Auto Generated Message] Consultancy record edited.
-
-        <!--###SUB_RECORD###-->
-        '.$this->makeTEXTPreview('all',$conf).'
-
-        Approve:
-        ###THIS_URL######FORM_URL######SYS_SETFIXED_approve###
-
-        Delete:
-        ###THIS_URL######FORM_URL######SYS_SETFIXED_DELETE###
-        <!--###SUB_RECORD###-->
-<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### end-->';
-}
+	function getEditAdminEmailTemplate(&$conf) {
+	    if ($conf['edit.']['adminValidTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### begin -->'.$conf['edit.']['adminValidTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### end-->';
+		return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### begin -->
+	[Auto Generated Message] Consultancy record edited.
+	
+	        <!--###SUB_RECORD###-->
+	        '.$this->makeTEXTPreview('all',$conf).'
+	
+	        Approve:
+	        ###THIS_URL######FORM_URL######SYS_SETFIXED_approve###
+	
+	        Delete:
+	        ###THIS_URL######FORM_URL######SYS_SETFIXED_DELETE###
+	        <!--###SUB_RECORD###-->
+	<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### end-->';
+	}
 
 	/**
 	 * [Describe function...]
@@ -2908,7 +2982,7 @@ function getEditSetFixedEmailTemplate(&$conf) {
 function getEditSetFixedKOEmailTemplate(&$conf) {
     if ($conf['edit.']['userNotifyKoTpl']) return '<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### begin -->'.$conf['edit.']['userNotifyKoTpl'].'<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### end -->';
 	return '<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### begin -->
-Consultancy DELETED!
+Record DELETED!
 
 <!--###SUB_RECORD###-->
 Record name: ###FIELD_'.$this->id_field.'###
@@ -3002,8 +3076,7 @@ function getMediaPlayerTemplate(&$conf) {
   return $tmp;
 }
 
-
- //----------------------------------------------------------------------------------------------------------------------------------------------------------//
+//----------------------------------------------------------------------------------------------------------------------------------------------------------//
   
 function getPDFTemplate(&$conf)
 {
@@ -3345,6 +3418,19 @@ function getGridExcelTemplate(&$conf){
 	 */
 function getFormJs($formName,&$conf) {
 	$result.='
+	
+	// add timezone offset from client to a UTC-timestamp to get timestamp to be sent to client
+	function evalFunc_convertClientUTCToTimestamp(utc, timeonly)	{
+		var timeObj = new Date(utc*1000);
+		timeObj.setTime((utc + timeObj.getTimezoneOffset()*60)*1000);
+		if (timeonly)	{
+				// only seconds since midnight
+			return this.getTime(timeObj);
+		} else	{
+				// seconds since the "unix-epoch"
+			return this.getTimestamp(timeObj);
+		}
+	}
 	function feedit_'.$formName.'Set(theField, evallist, is_in, checkbox, checkboxValue,checkbox_off){
 		var theFObj = new evalFunc_dummy (evallist,is_in, checkbox, checkboxValue);
         var feValField = theField+"_feVal";
@@ -3352,6 +3438,23 @@ function getFormJs($formName,&$conf) {
 		evalFunc.USmode ='.($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?'1':'0').';
 		if(!(document.'.$formName.' && document.'.$formName.'[theField] && document.'.$formName.'[feValField])) return;
 		var theValue = document.'.$formName.'[theField].value;
+		var evallist = theFObj.evallist;
+		var index=1;
+		var theEvalType = evalFunc.split(evallist, ",", index);
+		while (theEvalType) {
+			switch (theEvalType)	{
+				case "date":
+				case "datetime":
+				case "time":
+				case "timesec":
+					theValue=evalFunc.convertClientTimestampToUTC(theValue, 0);
+					break;
+				default:
+			}
+			index++;
+			theEvalType = evalFunc.split(evallist, ",", index);
+		}
+		
 		document.'.$formName.'[feValField].value = evalFunc.outputObjValue(theFObj, theValue);
 	}
 
@@ -3362,7 +3465,25 @@ function getFormJs($formName,&$conf) {
 		if (checkbox_off){
 			document.'.$formName.'[theField].value=checkboxValue;
 	    }else{
-			document.'.$formName.'[theField].value = evalFunc.evalObjValue(theFObj, document.'.$formName.'[theField+"_feVal"].value);
+		    var theValue=evalFunc.evalObjValue(theFObj, document.'.$formName.'[theField+"_feVal"].value);
+			var evallist = theFObj.evallist;
+			var index=1;
+			var theEvalType = evalFunc.split(evallist, ",", index);
+			while (theEvalType) {
+				switch (theEvalType)	{
+					case "date":
+					case "datetime":
+					case "time":
+					case "timesec":
+						evalFunc.convertClientUTCToTimestamp=evalFunc_convertClientUTCToTimestamp;
+						theValue=evalFunc.convertClientUTCToTimestamp(parseInt(theValue), 0);
+						break;
+					default:
+				}
+				index++;
+				theEvalType = evalFunc.split(evallist, ",", index);
+			}
+			document.'.$formName.'[theField].value = theValue;
 	     }
 	    feedit_'.$formName.'Set(theField, evallist, is_in, checkbox, checkboxValue,checkbox_off);
 	}';
@@ -3376,10 +3497,10 @@ function getFormJs($formName,&$conf) {
 	 * @return	[type]		...
 	 */
   function getJSBefore(&$conf) {
-	if (t3lib_extMgm::isLoaded('kb_md5fepw') && !t3lib_div::_GP('ajx')) $GLOBALS['TSFE']->additionalHeaderData['MD5_script'] = '<script type="text/javascript" src="typo3/md5.js"></script>';
-	$GLOBALS['TSFE']->additionalHeaderData['t3lib_jsfunc']='<script type="text/javascript" src="t3lib/jsfunc.evalfield.js"></script>';
+	if (t3lib_extMgm::isLoaded('kb_md5fepw') && !t3lib_div::_GP('ajx')) $GLOBALS['TSFE']->additionalHeaderData['MD5_script'] = '<script type="text/javascript" src="/typo3/md5.js"></script>';
+	$GLOBALS['TSFE']->additionalHeaderData['t3lib_jsfunc']='<script type="text/javascript" src="/t3lib/jsfunc.evalfield.js"></script>';
 	$filepath=PATH_site.TYPO3_mainDir.'/js/tabmenu.js';
-	if (file_exists($filepath)) $GLOBALS['TSFE']->additionalHeaderData['typo3_js_tabmenu']='<script type="text/javascript" src="typo3/js/tabmenu.js"></script>';
+	if (file_exists($filepath)) $GLOBALS['TSFE']->additionalHeaderData['typo3_js_tabmenu']='<script type="text/javascript" src="/typo3/js/tabmenu.js"></script>';
     $formName = $this->table.'_form';
 /*<![CDATA[*/
 		$script='	
@@ -3994,12 +4115,12 @@ function getFormJs($formName,&$conf) {
 					case 'inline':
 						// For select fields we either draw  ajax selection widget or we relace with getselectoptions ...
 						if ($TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['foreign_table'] && $TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']==1 && ($conf['list.']['advancedSearchAjaxSelector'] || $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector.'][$FN])) {
-							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'widgets'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/widgets.js"></script>';
+							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'widgets'] = '<script type="text/javascript" src="/'.t3lib_extMgm::siteRelPath($this->extKey).'res/widgets.js"></script>';
 							$ajaxWidgets = t3lib_div::makeInstance('tx_metafeedit_widgets');
 							$ajaxWidgets->init($this->prefixId,$this->metafeeditlib);
 							$ret.=$div.$ajaxWidgets->comboList('','','','handleData','setData','',15,$TConf,$FN,$conf['list.']['advancedSearchAjaxSelector.'][$FN.'.']['userFunc_alterRow']).'</div>';
 						} else {
-							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
+							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="/'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
 							//$selectSize=is_array($conf['typoscript.'][$pluginId.'.']['advancedSearch.'][$FN]['forceConfig.'])?$conf['typoscript.'][$pluginId.'.']['forceConfig.'][$FN]['forceSize']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
 							$selectSize=$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']?$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
 							$name = ' name="'.($selectSize>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple="multiple"':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
