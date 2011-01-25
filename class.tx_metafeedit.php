@@ -1130,6 +1130,7 @@ class tx_metafeedit extends  tslib_pibase {
                 	$conf['additionalJS_end']['feedit_'.$fN.'_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
                 	$conf['additionalJS_end']['feedit_'.$fN.'_again_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName_again."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
                 	return '<input alt="'.$gridMarkAlt.'" title="'.$gridMarkAlt.'" type="'.$type.'" name="'.$fieldName.'_feVal" '.$class.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange.' />
+
                 		<input type="hidden" name="'.$fieldName.'" /><br/>'.$this->metafeeditlib->getLL("fieldconfirmation",$conf).strtolower($Lib).'<br/><input type="'.$type.'" name="'.$fieldName_again.'_feVal" '.$classagain.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange_again.' />
                 		<input type="hidden" name="'.$fieldName_again.'" />'.$EVAL_ERROR_FIELD;
                 } else {
