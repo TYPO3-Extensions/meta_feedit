@@ -48,7 +48,6 @@ jQuery().ready(function() {
 	jQuery().mousedown(mDown);
 	jQuery().mouseup(mUp);
 });
-
 var initCal = function() {
 	jQuery.each(jQuery('div.tx-metafeedit-cal-hour-1'),function () {
 	jQuery(this).bind('mouseover',mClick);
