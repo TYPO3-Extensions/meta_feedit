@@ -964,6 +964,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 					$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_libs'] .='<script type="text/javascript" src="'.$lib.'"></script>';
 				}
 			}
+
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'windows'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/window.js"></script>';
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'effects'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/effects.js"></script>';
 			//$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'debug'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/debug.js"></script>';
