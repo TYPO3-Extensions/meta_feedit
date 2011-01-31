@@ -124,6 +124,7 @@ var initCal = function() {
 				jQuery('div.tx-metafeedit-as').hide();
 				id="#"+id.substr(0,id.length-2);
 				jQuery(id).show();
+				return false;
 			});
 		});
 }
