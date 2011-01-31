@@ -317,7 +317,7 @@
             <label index="move_delete">Supprimer les &amp;eacute;l&amp;eacute;ments s&amp;eacute;lectionn&amp;eacute;s</label>
             <label index="printedby">Imprim&amp;eacute; par : </label>
             <label index="nbpages">Nb pages : </label>
-            <label index="gotopage">Aller &amp;agrave;la page : </label>
+            <label index="gotopage">Aller &amp;agrave; la page : </label>
             <label index="nbrows">Nb &amp;eacute;l&amp;eacute;ments : </label>
         </languageKey>
     </data>
