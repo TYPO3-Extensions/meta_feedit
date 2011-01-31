@@ -181,7 +181,7 @@ class tx_metafeedit_export {
 			echo "============================<br>";
 			echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
 			echo "============================<br>";
-    	die();
+    	    die();
 		};
 		$count = 0;
 		$taille = 0;
@@ -469,7 +469,6 @@ class tx_metafeedit_export {
 		// We handle the header here 
 		//
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
-
 		if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 
 		$pdf->SetFont('Arial','B',11);
