@@ -43,7 +43,7 @@ class tx_metafeedit_lib {
 	var $t3lib_TCEforms;
 
     /**
-    * iniatialising Lib Object
+    * debug
     *
     * @param	[type]		$title: ...
     * @param	[type]		$content: ...
@@ -65,14 +65,14 @@ class tx_metafeedit_lib {
 	}
 
     /**
-    * [Describe function...]
+    * iniatialising Lib Object
     *
     * @return	[type]		...
     */
     function tx_metafeedit_lib() {
     
     	$this->cObj = &$GLOBALS['TSFE']->cObj;
-    	if (t3lib_extMgm::isLoaded('sr_freecap')) { // CBY TODO  addd check if captcha requested in flexform
+    	if (t3lib_extMgm::isLoaded('sr_freecap')) { //@todo  addd check if captcha requested in flexform
     		require_once(t3lib_extMgm::extPath('sr_freecap').'pi2/class.tx_srfreecap_pi2.php');
     		$this->freeCap = t3lib_div::makeInstance('tx_srfreecap_pi2');
         }
@@ -285,7 +285,7 @@ class tx_metafeedit_lib {
 							return $retVal;
 							break;
 						//We get data from session array
-						//si type session alors on retourne la clef trouv� dans la session
+						//si type session alors on retourne la clef trouvï¿½ dans la session
 						case 'ses':
 							list($pluginId, $field) = t3lib_div::trimExplode('|', $key);
 							if ($field=='') {
@@ -410,8 +410,8 @@ class tx_metafeedit_lib {
 		}
 
 		Function enleveaccents($chaine) {
-			$string = strtr($chaine, "�����������������������������������������������������", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");
-			//$string = strtr($chaine, "�����������������������������������������������������',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
+			$string = strtr($chaine, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");
+			//$string = strtr($chaine, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
 			return $string;
 		}
 
@@ -1394,7 +1394,21 @@ class tx_metafeedit_lib {
 		}
 		return $ret;
 	}
-
+	/**
+	* getItemLabelFromValue($items,$val)
+	**/
+	public function getItemLabelFromValue($items,$val,$conf) {
+			foreach($items as $item) {
+				
+				if (count($item)==2){
+					if ($val==$item[1]) {
+						$lib=$this->getLLFromLabel($item[0],$conf);
+						return $lib;
+					}
+				}
+			}
+			return '';
+	}
 	/**
 	* *******************************************************************************************
 	* FUNCTIONS CALLED FROM fe_adminLib
@@ -1488,14 +1502,14 @@ class tx_metafeedit_lib {
     				break;
 				case 'radio' :
     				$items = $conf['TCAN'][$table]['columns'][$fNiD]['config']["items"];
-    				$dataArr['EVAL_'.$_fN] = $this->getLLFromLabel($items[$dataArr[$fN]][0],$conf);
+    				$dataArr['EVAL_'.$_fN] = $this->getItemLabelFromValue($items,$dataArr[$fN],$conf);
     				break;
 				case 'check':
 					$cols=count($conf['TCAN'][$table]['columns'][$fNiD]['config']['items'])>0;
 					//echo "<br>$cols, $fNiD, $_fN, $value";
     				$invert = 0;   
     				if ($cols) {
-							//echo "==============pk";
+							
 							$dataArr[$_fN] = (int)$value;
 							$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list')?'':(int)$value;
 					} else {
@@ -2743,7 +2757,7 @@ class tx_metafeedit_lib {
 			// ajouter filtres sur relation
 			// ajouter gestion des donnees liees...
 			//$ef=$this->cObj->enableFields($foreignTable);
-			//Modif by CMD - parametrage manuelle des champ g�r� par la r�cup�ration des MM
+			//Modif by CMD - parametrage manuelle des champ gï¿½rï¿½ par la rï¿½cupï¿½ration des MM
 			$ignorArr = array();
 			if ($conf['edit.']['dontUseHidden']) {
 				$show_hidden = 1;
@@ -3436,8 +3450,12 @@ class tx_metafeedit_lib {
 		$tmp.='</tr></table></div>';
 		return $tmp;
 	}
+	/**
+	* Page selector
+	**/
 	function pageSelector($nbpages,$conf)	{
-		$ret='<form method="post" action="#"><input type="submit" value="'.$this->getLL('gotopage',$conf).'"/><select name="'.$this->prefixId.'[pointer]">';
+		$href=$this->hsc($conf,$this->feadminlib->pi_linkTP_keepPIvars_url(array(),1));
+		$ret='<form method="post" action="'.$href.'"><input type="submit" value="'.$this->getLL('gotopage',$conf).'"/><select name="'.$this->prefixId.'[pointer]">';
 		for($i=1;$i<=$nbpages;$i++) {
 			$select=$conf['piVars']['pointer']==($i-1)?'selected="selected"':'';
 			$ret.="<option $select value=\"".($i-1)."\">$i</option>";
@@ -3446,6 +3464,7 @@ class tx_metafeedit_lib {
 		
 		return $ret;
 	}
+	
     /**
     * [Describe function...]
     *
@@ -4790,7 +4809,10 @@ class tx_metafeedit_lib {
 	 
 	function getHeader(&$title, &$recherche, &$conf,$data=array()) {
 		if($conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre']) $title = $conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre'];
-		If (!isset($title)) $title = $GLOBALS['TSFE']->page['title'];
+		//print_r($this->feadminlib->piVars);
+		if  (!isset($title) && $this->feadminlib->piVars['title']) $title=$this->feadminlib->piVars['title'];
+		//print_r($this->piVars);
+		if (!isset($title)) $title = $GLOBALS['TSFE']->page['title'];
 		$markerArray=array();
 
 		
@@ -4865,5 +4887,4 @@ class tx_metafeedit_lib {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/meta_feedit/class.tx_metafeedit_lib.php']) {
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/meta_feedit/class.tx_metafeedit_lib.php']);
 }
-
 ?>
