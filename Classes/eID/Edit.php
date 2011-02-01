@@ -8,11 +8,12 @@
 require_once(t3lib_extMgm::extPath('meta_feedit').'pi1/class.tx_metafeedit_pi1.php');
 require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/eID/Tools.php');
 ob_end_flush();
+if (!$GLOBALS['g_TT']) $GLOBALS['g_TT']=microtime(true);
 $TTA=array();
 $TTA[]="<br/>eID Elapsed Time :".(microtime(true)-$GLOBALS['g_TT']).' s';
 // We call script
 // we initialize page id from calling page.
-$TTA=microtime(true);		
+//$TTA=microtime(true);		
 $GLOBALS['TSFE']->id=0;
 // we create front end....
 $TTA[]="<br/>eID before TSFE creation :".(microtime(true)-$GLOBALS['g_TT']).' s';
