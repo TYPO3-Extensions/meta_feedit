@@ -56,6 +56,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 	*/
 	
 	function main($content='',$conf='',$configurationFile=''){
+		$TTA[]=  "<br/>main Elapsed Time :".(microtime(true)-$GLOBALS['g_TT']).' s';
 		$DEBUG='';
 		//global $PAGES_TYPES;		
 		if (!defined ('PATH_typo3conf')) die ('Could not access this script directly!');	 
@@ -962,7 +963,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			if ($mfconf['ajax.']['domReady']) $GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jQueryDomReady_'.$pluginId] = "<script type='text/javascript' >jQuery().ready(function() {".$mfconf['ajax.']['domReady']."});</script>";		
 			if (is_array($mfconf['ajax.']['libs.'])) {
 				foreach($mfconf['ajax.']['libs.'] as $lib) {
-					$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_libs'] .='<script type="text/javascript" src="'.$lib.'"></script>';
+					if ($lib) $GLOBALS['TSFE']->additionalHeaderData['meta_feedit_libs'] .='<script type="text/javascript" src="'.$lib.'"></script>';
 				}
 			}
 
