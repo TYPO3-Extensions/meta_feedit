@@ -1502,7 +1502,8 @@ class tx_metafeedit_lib {
     				break;
 				case 'radio' :
     				$items = $conf['TCAN'][$table]['columns'][$fNiD]['config']["items"];
-    				$dataArr['EVAL_'.$_fN] = $this->getItemLabelFromValue($items,$dataArr[$fN],$conf);
+					$dataArr['EVAL_'.$_fN] = $this->getLLFromLabel($items[$dataArr[$fN]][0],$conf);
+    				//$dataArr['EVAL_'.$_fN] = $this->getItemLabelFromValue($items,$dataArr[$fN],$conf);
     				break;
 				case 'check':
 					$cols=count($conf['TCAN'][$table]['columns'][$fNiD]['config']['items'])>0;
@@ -2745,9 +2746,10 @@ class tx_metafeedit_lib {
 				$overrideuids=$this->getOverrideValue($fN,$conf['inputvar.']['cmd'],$conf,$this->cObj);
 			}
 			if ($overrideuids) $uids=$this->array_merge_recursive2($uids,t3lib_div::trimexplode(",",$overrideuids));
+			
+			$options=$conf['TCAN'][$table]['columns'][$fN]['config']['emptylabel']?'<option value="" '.($conf['TCAN'][$table]['columns'][$fN]['config']['emptylabeldisabled']?'disabled="disabled"':'').'>'.$this->getLLFromLabel($conf['TCAN'][$table]['columns'][$fN]['config']['emptylabel']).'</option>':'';
 
-
-			if (($conf['TCAN'][$table]['columns'][$fN]['config']["minitems"]==0 && $conf['TCAN'][$table]['columns'][$fN]['config']["maxitems"]<2) || $forceEmptyOption) $options='<option value="" >&nbsp;</option>';
+			if (($conf['TCAN'][$table]['columns'][$fN]['config']["minitems"]==0 && $conf['TCAN'][$table]['columns'][$fN]['config']["maxitems"]<2) || $forceEmptyOption) $options.='<option value="">&nbsp;</option>';
 
 			$statictable=0;
                 	if (strpos($foreignTable,'static_')===0) {
@@ -3036,7 +3038,8 @@ class tx_metafeedit_lib {
 		if (isset($conf['LOCAL_LANG'][$conf['LLkey']][$label2])) {
 			return $conf['LOCAL_LANG'][$conf['LLkey']][$label2];
 		}
-		$ret=$GLOBALS['TSFE']->sL($label)?$GLOBALS['TSFE']->sL($label):"$label";
+		$ret=$GLOBALS['TSFE']->sL($label);
+		$ret=$ret?$ret:"$label";
 		if ($ret==$label) {
 			// We didn't find label...
 			$labela=explode('.',$label);
