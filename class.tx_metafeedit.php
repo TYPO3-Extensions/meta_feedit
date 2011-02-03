@@ -117,40 +117,42 @@ class tx_metafeedit extends  tslib_pibase {
         $conf['caller_additionalJS_end']=$this->additionalJS_end;
 		
         if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf before USER_INT call size ']=strlen(serialize($conf))." Bytes"; 
-				// In No Cache or Mixt Cache We call USER_INT object
-				if ($conf['cacheMode']<2) {
-				    $content = $this->cObj->cObjGetSingle('USER_INT',$conf);
-				} else {
-					// In Full cache mode we use user object and count on cHASH to renew cache ..
-					$feAdm=t3lib_div::makeInstance('tx_metafeedit_user_feAdmin');
-					$content=$feAdm->user_init("",$conf);
-				}
+		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit before USER_INT call  :']=$this->metafeeditlib->displaytime()." Seconds"; 
+		// In No Cache or Mixt Cache We call USER_INT object
+		if ($conf['cacheMode']<2) {
+			$content = $this->cObj->cObjGetSingle('USER_INT',$conf);
+		} else {
+			// In Full cache mode we use user object and count on cHASH to renew cache ..
+			$feAdm=t3lib_div::makeInstance('tx_metafeedit_user_feAdmin');
+			$content='';
+			$content=$feAdm->user_init("",$conf);
+		}
 
-		    if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit USER_INT call done :']=$this->metafeeditlib->displaytime()." Seconds"; 
-		
-				/**** ADDS THE REQUIRED JAVASCRIPTS ****/
-				$content = $this->getJSBefore($conf).$content;
-		    // XAJAX form handler. Must not be generated if we are in an ajax call.
-		    $onSubmit = ' onsubmit="return false;" ';
-		    $form=t3lib_div::_GP('ajx')?'':'<form style="display:inline;height:10px;padding:0px;margin:0px;" '.$onSubmit.' action="#" method="post" enctype="multipart/form-data" id="xfm" name="xfm">'.
-    		'<input type="hidden" id="mfdt_cmd" name="'.$this->prefixId.'[cmd]" value="" />'.
-    		'<input type="hidden" id="mfdt_code" name="'.$this->prefixId.'[code]" value="" />'.
-    		'<input type="hidden" id="mfdt_prefix" name="'.$this->prefixId.'[prefix]" value="" />'.
-    		'<input type="hidden" id="mfdt_mode" name="'.$this->prefixId.'[mode]" value="" />'.
-    		'<input type="hidden" id="mfdt_data" name="'.$this->prefixId.'[data]" value="" />'.
-    		'<input type="hidden" id="mfdt_tdata" name="'.$this->prefixId.'[tdata]" value="" />'.
-    		'<input type="hidden" id="mfdt_page" name="'.$this->prefixId.'[page]" value="" />'.
-    		'<input type="hidden" id="mfdt_pagesize" name="'.$this->prefixId.'[pagesize]" value="" />'.
-    		'<input type="hidden" id="mfdt_callbacks" name="'.$this->prefixId.'[callbacks]" value="" />'.
-    		'<input type="hidden" id="mfdt_eventdata" name="'.$this->prefixId.'[eventdata]" value="" />'.
-    		'<input type="hidden" id="mfdt_table" name="'.$this->prefixId.'[table]" value="" />'.
-    		'<input type="hidden" id="mfdt_labelField" name="'.$this->prefixId.'[labelField]" value="" />'.
-    		'<input type="hidden" id="mfdt_numField" name="'.$this->prefixId.'[numField]" value="" />'.
-    		'<input type="hidden" id="mfdt_fields" name="'.$this->prefixId.'[fields]" value="" />'.
-    		'<input type="hidden" id="mfdt_whereField" name="'.$this->prefixId.'[whereField]" value="" />'.
-    		'<input type="hidden" id="mfdt_labels" name="'.$this->prefixId.'[labels]" value="" />'.
-    		'<input type="hidden" id="mfdt_orderBy" name="'.$this->prefixId.'[orderBy]" value="" />'.
-				'</form>';
+		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit USER_INT call done :']=$this->metafeeditlib->displaytime()." Seconds"; 
+	
+		/**** ADDS THE REQUIRED JAVASCRIPTS ****/
+		$content = $this->getJSBefore($conf).$content;
+		// XAJAX form handler. Must not be generated if we are in an ajax call.
+		$onSubmit = ' onsubmit="return false;" ';
+		$form=t3lib_div::_GP('ajx')?'':'<form style="display:inline;height:10px;padding:0px;margin:0px;" '.$onSubmit.' action="#" method="post" enctype="multipart/form-data" id="xfm" name="xfm">'.
+		'<input type="hidden" id="mfdt_cmd" name="'.$this->prefixId.'[cmd]" value="" />'.
+		'<input type="hidden" id="mfdt_code" name="'.$this->prefixId.'[code]" value="" />'.
+		'<input type="hidden" id="mfdt_prefix" name="'.$this->prefixId.'[prefix]" value="" />'.
+		'<input type="hidden" id="mfdt_mode" name="'.$this->prefixId.'[mode]" value="" />'.
+		'<input type="hidden" id="mfdt_data" name="'.$this->prefixId.'[data]" value="" />'.
+		'<input type="hidden" id="mfdt_tdata" name="'.$this->prefixId.'[tdata]" value="" />'.
+		'<input type="hidden" id="mfdt_page" name="'.$this->prefixId.'[page]" value="" />'.
+		'<input type="hidden" id="mfdt_pagesize" name="'.$this->prefixId.'[pagesize]" value="" />'.
+		'<input type="hidden" id="mfdt_callbacks" name="'.$this->prefixId.'[callbacks]" value="" />'.
+		'<input type="hidden" id="mfdt_eventdata" name="'.$this->prefixId.'[eventdata]" value="" />'.
+		'<input type="hidden" id="mfdt_table" name="'.$this->prefixId.'[table]" value="" />'.
+		'<input type="hidden" id="mfdt_labelField" name="'.$this->prefixId.'[labelField]" value="" />'.
+		'<input type="hidden" id="mfdt_numField" name="'.$this->prefixId.'[numField]" value="" />'.
+		'<input type="hidden" id="mfdt_fields" name="'.$this->prefixId.'[fields]" value="" />'.
+		'<input type="hidden" id="mfdt_whereField" name="'.$this->prefixId.'[whereField]" value="" />'.
+		'<input type="hidden" id="mfdt_labels" name="'.$this->prefixId.'[labels]" value="" />'.
+		'<input type="hidden" id="mfdt_orderBy" name="'.$this->prefixId.'[orderBy]" value="" />'.
+		'</form>';
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf size ']=strlen(serialize($conf))." Bytes"; 
 		    /**** ADDS THE REQUIRED JAVASCRIPTS ****/    
 
@@ -158,7 +160,7 @@ class tx_metafeedit extends  tslib_pibase {
 		return ($conf['performanceaudit']?t3lib_div::view_array($this->caller->perfArray):'').$form.$content;
   	}    
 
-		// for template wizards
+	// for template wizards
 		
   	function initTpl(&$caller,&$conf)	{      			
         //$this->initialize($caller,$conf);
@@ -2242,7 +2244,6 @@ class tx_metafeedit extends  tslib_pibase {
    		*/
 		$searchFlag=((boolean)$conf['list.']['searchBox'] || (boolean)$conf['list.']['alphabeticalSearch'] || (bool)$conf['list.']['advancedSearch'] || (bool)$conf['list.']['calendarSearch']);
 		$ret=($searchFlag?'<fieldset class="tx-metafeedit-fs-searchbox"><legend>'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</legend><span class="tx-metafeedit-sb-filter">'.implode(', ',$filterArray).'</span>'.$this->cObj->stdWrap($this->advancedSearch($conf,$filter,$filtercnt),$conf['list.']['advancedSearch.']).'</fieldset>':'');
-		//die($ret);
 		return $ret;
 	}
 	
@@ -3132,7 +3133,6 @@ function getPDFDETTemplate(&$conf)
 	$tmp.='<!-- ###ALLITEMS### end -->';
 	//$tmp.='<!-- ###ALLITEMS### end -->';	
 	$tmp.='</table><!-- ###TEMPLATE_EDIT_PDFDET### end -->';
-	//die($tmp);
 	return $tmp;
 }
 function getPDFTABTemplate(&$conf)
@@ -3502,21 +3502,20 @@ function getFormJs($formName,&$conf) {
 	$filepath=PATH_site.TYPO3_mainDir.'/js/tabmenu.js';
 	if (file_exists($filepath)) $GLOBALS['TSFE']->additionalHeaderData['typo3_js_tabmenu']='<script type="text/javascript" src="/typo3/js/tabmenu.js"></script>';
     $formName = $this->table.'_form';
-/*<![CDATA[*/
-		$script='	
-		var DTM_array = new Array();
-		var DTM_currentTabs = new Array();
-	    function typoSetup() {
-			this.passwordDummy = "********";
-			this.decimalSign = ".";
-		}
-		var TS = new typoSetup();
-	    var evalFunc = new evalFunc();';
+	/*<![CDATA[*/
+	$script='var DTM_array = new Array();
+	var DTM_currentTabs = new Array();
+	function typoSetup() {
+		this.passwordDummy = "********";
+		this.decimalSign = ".";
+	}
+	var TS = new typoSetup();
+	var evalFunc = new evalFunc();';
 	$script.=$this->getFormJs($formName,$conf);
 	$script.=$this->getFormJs('tx_metafeedit_comments_form',$conf);
 	$script.='
 	/**
-	 * [Describe function...]
+	 * feedit_manipulateMultipleSelect
 	 *
 	 * @param	[type]		$theField: ...
 	 * @return	[type]		...
@@ -3538,7 +3537,7 @@ function getFormJs($formName,&$conf) {
             }
 
 	/**
-	 * [Describe function...]
+	 * feedit_manipulateGroup
 	 *
 	 * @param	[type]		$theField: ...
 	 * @return	[type]		...
@@ -3563,7 +3562,7 @@ function getFormJs($formName,&$conf) {
             }
 
 	/**
-	 * [Describe function...]
+	 * feedit_split
 	 *
 	 * @param	[type]		$theStr1, delim, index: ...
 	 * @return	[type]		...
@@ -3953,24 +3952,25 @@ function getFormJs($formName,&$conf) {
 	}
 
     /**
-    * [Describe function...]
+    * calendarSearch
     *
-    * @return	[type]		...
+    * @return	string		...
     */
+	
     function calendarSearch() {
 		$ret='<div'.$this->caller->pi_classParam('calendarSearch').'>###CALENDAR_SEARCH###';
 		$ret.='</div>';
 		return $ret;
 	}
 
-  /**
-  * advancedSearch : displays advanced search fields in list mode.
-  *
-  * @param	array :		config array....
-  * @param	string $filter :	filter content....
-  * @param	int $filtercnt :	Number of filters set....
-  * @return	string : 	html of advanced search area.
-  */
+	/**
+	* advancedSearch : displays advanced search fields in list mode.
+	*
+	* @param	array :		config array....
+	* @param	string $filter :	filter content....
+	* @param	int $filtercnt :	Number of filters set....
+	* @return	string : 	html of advanced search area.
+	*/
 	 
 	function advancedSearch(&$conf,$filter,$filtercnt) {
 		$table = $conf['table'];
