@@ -2212,7 +2212,15 @@ class tx_metafeedit extends  tslib_pibase {
 								}
 								break;
 							case 'radio' :
-								$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
+								$items=$conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'];
+								$index=-1;
+								for ($i = 0; $i < count ($items); ++$i) {
+									if ($items[$i][1]==$val) {
+										$index=$i;
+										break;
+									}
+								}
+								$val = ($index===-1)?'':$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$index][0], $conf);
 								break;
 
 							case 'check' :
@@ -3956,7 +3964,6 @@ function getFormJs($formName,&$conf) {
     *
     * @return	string		...
     */
-	
     function calendarSearch() {
 		$ret='<div'.$this->caller->pi_classParam('calendarSearch').'>###CALENDAR_SEARCH###';
 		$ret.='</div>';
@@ -4068,10 +4075,11 @@ function getFormJs($formName,&$conf) {
 						$ret.=$div;
 						for ($i = 0; $i < count ($TConf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items']); ++$i) {
 							$checked='';
+							$v=$TConf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items'][$i][1];
 							if ($this->metafeeditlib->is_extent($val)) {
-								$checked=($i==$val)?'checked="checked"':'';
+								$checked=($v==$val)?'checked="checked"':'';
 							}
-							$ret.='<input type="radio"'.$this->caller->pi_classParam('radio').'id="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']'.'-'.$i.'" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']" value="'.$i.'" '.$checked.' /><label for="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']'.'-'.$i.'">'.$this->metafeeditlib->getLLFromLabel($TConf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items'][$i][0],$conf).'</label>';
+							$ret.='<input type="radio"'.$this->caller->pi_classParam('radio').'id="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']'.'-'.$i.'" name="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']" value="'.$v.'" '.$checked.' /><label for="'.$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']'.'-'.$i.'">'.$this->metafeeditlib->getLLFromLabel($TConf['TCAN'][$curTable['table']]['columns'][$curTable['fNiD']]['config']['items'][$i][0],$conf).'</label>';
 						}
 						$ret.='</div>';
 						break;

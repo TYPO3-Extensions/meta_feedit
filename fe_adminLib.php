@@ -182,8 +182,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
     * @return	string		HTML content
     * @link http://typo3.org/doc.0.html?&tx_extrepmgm_pi1[extUid]=270&tx_extrepmgm_pi1[tocEl]=396&cHash=d267c36546
     */
-
-	function user_init($content,&$conf)	{
+//function user_init($content,&$conf)	{
+	function user_init($content,$conf)	{
 		$DEBUG='';
 
       	if ( $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector'] || is_array($conf['list.']['advancedSearchAjaxSelector.'])) {

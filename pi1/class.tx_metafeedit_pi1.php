@@ -953,7 +953,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		//==================================================================================
 		// JAVASCRIPT LIBRARIES ...
 		if ($mfconf['ajax.']['ajaxOn'] && !t3lib_div::_GP('ajx')) {
-
 			//$GLOBALS['TSFE']->pSetup['headerData.']=array('1'=>'TEXT','1.'=>array('value'=>'<script type="text/javascript" src="/'.t3lib_extMgm::siteRelPath($this->extKey).'res/jquery.js"></script>'))+$GLOBALS['TSFE']->pSetup['headerData.'];
 			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jquery'] = '<script type="text/javascript" src="/'.t3lib_extMgm::siteRelPath($this->extKey).'res/jquery.js"></script>';
 			$GLOBALS['TSFE']->additionalHeaderData['meta_feedit_jqmodal'] = '<script type="text/javascript" src="/'.t3lib_extMgm::siteRelPath($this->extKey).'res/jqModal.js"></script>';
@@ -1004,6 +1003,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// Performance audit
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 End ']=$this->metafeeditlib->displaytime(); 
 		$mfconf['disablePrefixComment']=$GLOBALS['TSFE']->config['config']['disablePrefixComment'];
+
 		return $this->metafeeditlib->pi_wrapInBaseClass($content,$mfconf);
 	}
 

@@ -285,7 +285,7 @@ class tx_metafeedit_lib {
 							return $retVal;
 							break;
 						//We get data from session array
-						//si type session alors on retourne la clef trouvï¿½ dans la session
+						//si type session alors on retourne la clef trouv� dans la session
 						case 'ses':
 							list($pluginId, $field) = t3lib_div::trimExplode('|', $key);
 							if ($field=='') {
@@ -410,8 +410,8 @@ class tx_metafeedit_lib {
 		}
 
 		Function enleveaccents($chaine) {
-			$string = strtr($chaine, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");
-			//$string = strtr($chaine, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
+			$string = strtr($chaine, "�����������������������������������������������������", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");
+			//$string = strtr($chaine, "�����������������������������������������������������',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
 			return $string;
 		}
 
@@ -1409,8 +1409,8 @@ class tx_metafeedit_lib {
 			}
 			return '';
 	}
-	/**
-	* *******************************************************************************************
+	
+	/* *******************************************************************************************
 	* FUNCTIONS CALLED FROM fe_adminLib
 	* *******************************************************************************************
 	*
@@ -1423,8 +1423,9 @@ class tx_metafeedit_lib {
 	* @param    string      $intable: name of alternate master table (if not using plugin master table), this is mainly used by replaceOptions().
 	* @return	array		processed data array
 	*/
+	//function user_processDataArray($content, &$inconf,$intable='',$forceInConf=FALSE) {
 	
-	function user_processDataArray($content, &$inconf,$intable='',$forceInConf=FALSE) {
+	function user_processDataArray($content, $inconf,$intable='',$forceInConf=FALSE) {
 		
 		$fe_adminLib = &$inconf['parentObj'];
 		$conf = $forceInConf?$inconf:$fe_adminLib->conf;
@@ -1502,8 +1503,15 @@ class tx_metafeedit_lib {
     				break;
 				case 'radio' :
     				$items = $conf['TCAN'][$table]['columns'][$fNiD]['config']["items"];
-					$dataArr['EVAL_'.$_fN] = $this->getLLFromLabel($items[$dataArr[$fN]][0],$conf);
-    				//$dataArr['EVAL_'.$_fN] = $this->getItemLabelFromValue($items,$dataArr[$fN],$conf);
+ 					$index=-1;
+					for ($i = 0; $i < count ($items); ++$i) {
+						if ($items[$i][1]==$dataArr[$fN]) {
+							$index=$i;
+							break;
+						}
+					}
+
+    				$dataArr['EVAL_'.$_fN] = ($index===-1)?'':$this->getLLFromLabel($items[$index][0],$conf);
     				break;
 				case 'check':
 					$cols=count($conf['TCAN'][$table]['columns'][$fNiD]['config']['items'])>0;
@@ -1710,7 +1718,8 @@ class tx_metafeedit_lib {
 							 $v;
 						}
 					}
-				} elseif($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"]) {
+				} elseif(count($conf['TCAN'][$table]['columns'][$fNiD]['config']['items'])) {
+				
 					// fixed items
 					if (isset($dataArr[$fN])) {
 						$vals = t3lib_div::trimExplode(',', $dataArr[$fN]);
@@ -1922,8 +1931,9 @@ class tx_metafeedit_lib {
 		* The function runs through the fields from fe_adminLibs dataArr and does some required stuff for the different fields types
 		*/
 
+		//function user_updateArray($content, &$conf) {
 
-		function user_updateArray($content, &$conf) {
+		function user_updateArray($content, $conf) {
 			$fe_adminLib = &$conf['parentObj'];
 			$conf = $fe_adminLib->conf;
 			$dataArr = $content;
@@ -2273,8 +2283,8 @@ class tx_metafeedit_lib {
 	* This function is called after a record is saved in fe_adminLib.
 	* The function runs through the fields from fe_adminLibs dataArr and does some required stuff for the different fields types
 	*/
-	
-	function user_afterSave($content, &$conf) {
+	//function user_afterSave($content, &$conf) {	
+	function user_afterSave($content, $conf) {
 		$fe_adminLib = &$conf['parentObj'];
 		$conf = $fe_adminLib->conf;
 		$dataArr = &$fe_adminLib->dataArr;
@@ -3467,7 +3477,6 @@ class tx_metafeedit_lib {
 		
 		return $ret;
 	}
-	
     /**
     * [Describe function...]
     *

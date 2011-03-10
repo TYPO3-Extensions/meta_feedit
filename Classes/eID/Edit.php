@@ -56,6 +56,7 @@ $content= $c->main('','',$configFile);
 $TTA[]="<br/>eID after meta call Elapsed Time :".(microtime(true)-$GLOBALS['g_TT']).' s';
 $scripts1=implode(chr(10),$GLOBALS['TSFE']->additionalHeaderData);
 $scripts2="";
+
 // We update  user int scripts here if necessary
 if ($GLOBALS['TSFE']->isINTincScript())	
 {
