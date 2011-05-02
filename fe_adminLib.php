@@ -1459,7 +1459,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					$saveArray['remote_addr'] = $_SERVER['REMOTE_ADDR'];
 					$newFieldList=$conf['blog.']['show_fields']?$conf['blog.']['show_fields']:'firstname,surname,email,homepage,place,entry,entrycomment,linked_row,remote_addr';
 					$res1=$this->cObj->DBgetInsert('tx_metafeedit_comments', $this->thePid, $saveArray, $newFieldList, TRUE);
-					if (!$res1 && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
+					if ($res1===false && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
 					//MODIF CBY
 					if ($conf['debug.']['sql']) 
 							$conf['debug.']['debugString'].="<br/>INSERT SQL <br/>".$this->cObj->DBgetInsert('tx_metafeedit_comments', $this->thePid, $saveArray, $newFieldList, FALSE);
@@ -1476,7 +1476,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 					if ($this->aCAuth($origArr) || $this->metafeeditlib->DBmayFEUserEdit($this->theTable,$origArr,$GLOBALS['TSFE']->fe_user->user,$conf['allowedGroups'],$conf['fe_userEditSelf'],$conf))	{
 						$res1=$this->cObj->DBgetUpdate($this->theTable, $theUid, $saveArray, $newFieldList, TRUE);
-						if (!$res1 && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
+						if ($res1===false && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
 						
 						//MODIF CBY
 						if ($conf['debug.']['sql']) 
@@ -1501,7 +1501,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 					$newFieldList = implode(',',array_intersect(explode(',',$conf['fieldList']),t3lib_div::trimExplode(',',$conf['create.']['fields'],1)));
 					$res1=$this->cObj->DBgetInsert($this->theTable, $this->thePid, $saveArray, $newFieldList, TRUE);
-					if (!$res1 && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
+					if ($res1===false && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
 					//MODIF CBY
 					if ($conf['debug.']['sql']) 
 							$conf['debug.']['debugString'].="<br/>INSERT SQL <br/>".$this->cObj->DBgetInsert($this->theTable, $this->thePid, $saveArray, $newFieldList, FALSE);
@@ -1538,7 +1538,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						if (count($saveArray))	{
 					
 							$res1=$this->cObj->DBgetUpdate($this->theTable, $newId, $saveArray, $extraList, TRUE);
-							if (!$res1 && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
+							if ($res1===false && $this->conf['debug']) echo $GLOBALS['TYPO3_DB']->sql_error();
 							//MODIF CBY
 							if ($conf['debug.']['sql']) 
 								$conf['debug.']['debugString'].="<br/>UPDATE SQL <br/>".$this->cObj->DBgetUpdate($this->theTable, $newId, $saveArray, $extraList, FALSE);

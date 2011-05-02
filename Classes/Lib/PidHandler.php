@@ -42,7 +42,7 @@ class Tx_MetaFeedit_Lib_PidHandler {
 			$where="pid=$rootpid and title='$p' and deleted=0";
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$from, $where);
 			
-			if (!$res){
+			if ($res===false){
 				$err=mysql_error();
 				throw new Exception('getPid :  Sql Error '.$GLOBALS['TYPO3_DB']->SELECTquery($fields,$from, $where,'',$orderby).'--'.$err,404);
 			}
@@ -54,7 +54,7 @@ class Tx_MetaFeedit_Lib_PidHandler {
 				$data['doktype']=254; // we create pages of folder type
 				$data['title']=$p;
 				$res=$GLOBALS['TYPO3_DB']->exec_INSERTquery($from, $data);
-				if (!$res){
+				if ($res===false){
 					$err=mysql_error();
 					throw new Exception('Tx_MetaFeedit_Lib_PidHandler->getPid :  Sql Error '.$GLOBALS['TYPO3_DB']->INSERTquery($from, $data).'--'.$err,404);
 				}
@@ -83,7 +83,7 @@ class Tx_MetaFeedit_Lib_PidHandler {
 		$where="uid=$uid  and deleted=0";
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$from, $where);
 		$path='';
-		if (!$res){
+		if ($res===false){
 			$err=mysql_error();
 			throw new Exception('getPid :  Sql Error '.$GLOBALS['TYPO3_DB']->SELECTquery($fields,$from, $where,'',$orderby).'--'.$err,404);
 		}
@@ -119,7 +119,7 @@ class Tx_MetaFeedit_Lib_PidHandler {
 		$where="pid=$pid and title='$group' and deleted=0";
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$from, $where);
 			
-		if (!$res){
+		if ($res===false){
 			$err=mysql_error();
 			throw new Exception('getGroupUid :  Sql Error '.$GLOBALS['TYPO3_DB']->SELECTquery($fields,$from, $where,'',$orderby).'--'.$err,404);
 		}
@@ -130,7 +130,7 @@ class Tx_MetaFeedit_Lib_PidHandler {
 				$data['pid']=$pid;
 				$data['title']=$group;
 				$res=$GLOBALS['TYPO3_DB']->exec_INSERTquery($from, $data);
-				if (!$res){
+				if ($res===false){
 					$err=mysql_error();
 					throw new Exception('Tx_MetaFeedit_Lib_PidHandler->getGroupUid :  Sql Error '.$GLOBALS['TYPO3_DB']->INSERTquery($from, $data).'--'.$err,404);
 				}
