@@ -3506,7 +3506,8 @@ function getFormJs($formName,&$conf) {
 	 */
   function getJSBefore(&$conf) {
 	if (t3lib_extMgm::isLoaded('kb_md5fepw') && !t3lib_div::_GP('ajx')) $GLOBALS['TSFE']->additionalHeaderData['MD5_script'] = '<script type="text/javascript" src="/typo3/md5.js"></script>';
-	$GLOBALS['TSFE']->additionalHeaderData['t3lib_jsfunc']='<script type="text/javascript" src="/t3lib/jsfunc.evalfield.js"></script>';
+	//$GLOBALS['TSFE']->additionalHeaderData['t3lib_jsfunc']='<script type="text/javascript" src="/t3lib/jsfunc.evalfield.js"></script>';
+	$GLOBALS['TSFE']->additionalHeaderData['t3lib_jsfunc']='<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.evalfield.js"></script>';
 	$filepath=PATH_site.TYPO3_mainDir.'/js/tabmenu.js';
 	if (file_exists($filepath)) $GLOBALS['TSFE']->additionalHeaderData['typo3_js_tabmenu']='<script type="text/javascript" src="/typo3/js/tabmenu.js"></script>';
     $formName = $this->table.'_form';

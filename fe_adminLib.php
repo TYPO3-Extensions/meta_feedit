@@ -368,7 +368,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->markerArray['###AUTH_CODE###'] = $this->authCode;
 		$this->markerArray['###THIS_ID###'] = $GLOBALS['TSFE']->id;
 		$this->markerArray['###THIS_URL###'] = htmlspecialchars(t3lib_div::getIndpEnv('TYPO3_REQUEST_DIR'));
-		
+		$this->markerArray['###HTTP_HOST###'] = $_SERVER["HTTP_HOST"];
 		$FEUSER=$GLOBALS['TSFE']->fe_user->user;
 		if (!is_array($FEUSER)) $FEUSER=array();
 		$this->markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $FEUSER, '', TRUE, 'FEUSER_FIELD_', $this->conf['general.']['xhtml']);
@@ -3262,6 +3262,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($this->conf['debug']) echo "<br> Emails : $recipient, $admin, $data : <br/>User : $content=,<br/>Admin : $adminContent,<br/>Data : $dataContent";
 		//dataEmail
 		if ($data && $dataContent && $dataContent!='NOMAIL')	{
+			$cc=$this->conf['emails']['data']['cc'];
+			$bcc=$this->conf['emails']['data']['bcc'];;
 			if (!$this->isHTMLContent($dataContent))	{
 				$admMail = $this->cObj->sendNotifyEmail($dataContent,
 									$data,
@@ -3276,13 +3278,17 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 									'',
 									$this->conf['email.']['from'],
 									$this->conf['email.']['fromName'],
-									$recipient
+									$recipient,
+									$cc,
+									$bcc
 							);
 			}
 		}
 
 		// Admin mail:
 		if ($admin && $adminContent && $adminContent!='NOMAIL')	{
+			$cc=$this->conf['emails']['admin']['cc'];
+			$bcc=$this->conf['emails']['admin']['bcc'];;
 			if (!$this->isHTMLContent($adminContent))	{
 				$admMail = $this->cObj->sendNotifyEmail($adminContent,
 									$admin,
@@ -3297,13 +3303,17 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 									'',
 									$this->conf['email.']['from'],
 									$this->conf['email.']['fromName'],
-									$recipient
+									$recipient,
+									$cc,
+									$bcc
 							);
 			}
 		}
 
 		//user mail:
 		if ($recipient && $content!='NOMAIL') {
+			$cc=$this->conf['emails']['user']['cc'];
+			$bcc=$this->conf['emails']['user']['bcc'];
 			if (!$this->isHTMLContent($content))	{
 				$this->cObj->sendNotifyEmail($content,
 									$recipient,
@@ -3351,7 +3361,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 * @access private
 	 * @see sendMail(), tslib_cObj::sendNotifyEmail()
 	 */
-	function sendHTMLMail($content,$recipient,$dummy,$fromEmail,$fromName,$replyTo='')	{
+	function sendHTMLMail($content,$recipient,$dummy,$fromEmail,$fromName,$replyTo='',$recepientsCopy='',$recepientsBcc='')	{
 		if (trim($recipient) && trim($content))	{
 			$cls=t3lib_div::makeInstanceClassName('t3lib_htmlmail');
 			if (class_exists($cls))	{	// If htmlmail lib is included, then generate a nice HTML-email
@@ -3389,7 +3399,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				$Typo3_htmlmail->setHeaders();
 				$Typo3_htmlmail->setContent();
 				$Typo3_htmlmail->setRecipient($recipient);
-
+				$Typo3_htmlmail->recipient_copy=$recepientsCopy;
+				$Typo3_htmlmail->recipient_blindcopy=$recepientsBcc;
 		//		debug($Typo3_htmlmail->theParts);
 				$Typo3_htmlmail->sendtheMail();
 			} else {

@@ -557,6 +557,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['debug.']['vars']=$lconf['debugVars'];
 		$mfconf['debug.']['tsfe']=$lconf['debugTSFE'];
 		
+		$mfconf['emails']=$conf['emails'];
+		
 		//$mfconf['cacheMode']=$lconf['cacheMode'];
 		$mfconf['cacheMode']=$lconf['no_cache']?0:($lconf['cacheMode']?$lconf['cacheMode']:0); // No cache by default
 		$mfconf['no_header']=$lconf['noHeader'];
