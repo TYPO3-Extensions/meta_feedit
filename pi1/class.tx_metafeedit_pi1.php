@@ -886,28 +886,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			}
         }
 		
-		// we handle back url here by calculating referer..
-
-		/*if (!$mfconf['inputvar.']['BACK']) {
-			if (!$this->piVars['referer'][$pluginId]) {
-				$backURL=$_SERVER['HTTP_REFERER'];
-				$this->piVars['referer'][$pluginId]=$_SERVER['HTTP_REFERER'];
-			} else {
-				$backURL=$this->piVars['referer'][$pluginId];
-			}
-			$patha=parse_url($backURL);
-			$path=$patha['path'];
-			if (substr($path,0,1)=='/') $path=str_replace('/','',$path);
-			$tlconf['parameter']=$GLOBALS['TSFE']->id;
-			$tl=$this->cObj->typoLink_URL($tlconf);
-			
-			if (trim($tl)!=$path) {
-				$backURL=str_replace("&BACK[".$pluginId."]=1","",$backURL);
-				if (!strpos($backURL,'?')) $backURL.='?';
-				$backURL.="&BACK[".$pluginId."]=1";
-				$mfconf['inputvar.']['backURL']=$backURL;
-			}
-		}*/
         
 		// we handle back url here by calculating referer..
 		//9002 is page type if called through ajax
