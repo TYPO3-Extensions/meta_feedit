@@ -4,9 +4,9 @@
  * @example http://desktop.ard.fr/?eID=tx_metafeedit&tx_metafeedit[exporttype]=PDF&cmd[usagers]=edit&rU[usagers]=2458
  * @example http://desktop.ard.fr/?eID=tx_metafeedit&tx_metafeedit[exporttype]=PDF
  */
-
 require_once(t3lib_extMgm::extPath('meta_feedit').'pi1/class.tx_metafeedit_pi1.php');
 require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/eID/Tools.php');
+
 ob_end_flush();
 if (!$GLOBALS['g_TT']) $GLOBALS['g_TT']=microtime(true);
 $TTA=array();

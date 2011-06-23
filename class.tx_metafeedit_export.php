@@ -321,13 +321,15 @@ class tx_metafeedit_export {
 						$img=PATH_site.($v?$col->img->dir.'/'.$v:'');
 						if ($col->img->attributes()->gh || $col->img->attributes()->gw || $col->img->attributes()->mh || $col->img->attributes()->mw ) {
 						
-							if ($col->img->attributes()->gw ) $fileA['file.']['width']=$col->img->attributes()->gw ;
-							if ($col->img->attributes()->gh ) $fileA['file.']['height']=$col->img->attributes()->gh;
-							if ($col->img->attributes()->mw ) $fileA['file.']['maxW']=$col->img->attributes()->mw ;
-							if ($col->img->attributes()->mh ) $fileA['file.']['maxH']=$col->img->attributes()->mh;
+							if ($col->img->attributes()->gw ) $fileA['file.']['width']=(string)$col->img->attributes()->gw ;
+							if ($col->img->attributes()->gh ) $fileA['file.']['height']=(string)$col->img->attributes()->gh;
+							if ($col->img->attributes()->mw ) $fileA['file.']['maxW']=(string)$col->img->attributes()->mw ;
+							if ($col->img->attributes()->mh ) $fileA['file.']['maxH']=(string)$col->img->attributes()->mh;
 							$imgi=$caller->cObj->getImgResource($col->img->dir.'/'.$v,$fileA['file.']);
 							if ($imgi[3]) $img=$imgi[3];
 						}
+						//if files on linux / nt utf8 encoded 
+						$img=utf8_decode($img);
 						$imginfo=getimagesize($img);
 						if (is_array($imginfo)) {
 							$w=$imginfo[0];
