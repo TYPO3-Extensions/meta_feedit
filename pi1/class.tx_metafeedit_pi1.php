@@ -68,11 +68,11 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$this->pi_loadLL();
 		$this->lconf=array(); // Setup our storage array...
 		// We try by default in fileadmin/reports
-		if ($configurationFile && file_exists('fileadmin/reports/'.$configurationFile)) {
+		if ($configurationFile && file_exists('fileadmin/reports/'.basename($configurationFile))) {
 			
 			if (!class_exists('Tx_MetaFeedit_Lib_PidHandler') )require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/Lib/PidHandler.php');
 			$pidHandler=t3lib_div::makeInstance('Tx_MetaFeedit_Lib_PidHandler');
-			$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents('fileadmin/reports/'.$configurationFile)),true);
+			$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents('fileadmin/reports/'.basename($configurationFile))),true);
 			$conf=$configstore['tsconf'];
 			$piFlexForm=$configstore['flexForm'];
 			$piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF'];
