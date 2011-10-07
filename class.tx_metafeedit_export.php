@@ -42,7 +42,9 @@ class tx_metafeedit_pdf extends FPDF {
 	var $nofooter=false;
 	var $caller;
 	var $conf;
-	
+	var $javascript;
+	var $n_js;
+		
 	function Header()
 	{
 		// Logo - present sur toutes les pages du pdf
@@ -68,6 +70,60 @@ class tx_metafeedit_pdf extends FPDF {
 			//$res = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($GLOBALS['TYPO3_DB']->exec_SELECTquery('ent_nom', 'tx_metabookingdb_entite_juridique', 'uid='.$GLOBALS['TSFE']->fe_user->user[tx_metabookingdbextfeusers_tx_metabookingdb_entite_juridique_uid]));
 			$this->Cell(0,$this->footercellsize, utf8_decode($this->caller->caller->metafeeditlib->getLL('printedby', $this->caller->conf)).$user,0,0,'R');
 		}
+	}
+	
+	function IncludeJS($script) {
+		$this->javascript=$script;
+	}
+	
+	function _putjavascript() {
+		$this->_newobj();
+		$this->n_js=$this->n;
+		$this->_out('<<');
+		$this->_out('/Names [(EmbeddedJS) '.($this->n+1).' 0 R]');
+		$this->_out('>>');
+		$this->_out('endobj');
+		$this->_newobj();
+		$this->_out('<<');
+		$this->_out('/S /JavaScript');
+		$this->_out('/JS '.$this->_textstring($this->javascript));
+		$this->_out('>>');
+		$this->_out('endobj');
+	}
+	
+	function _putresources() {
+		parent::_putresources();
+		if (!empty($this->javascript)) {
+			$this->_putjavascript();
+		}
+	}
+	
+	function _putcatalog() {
+		parent::_putcatalog();
+		if (!empty($this->javascript)) {
+			$this->_out('/Names <</JavaScript '.($this->n_js).' 0 R>>');
+		}
+	}
+
+	function AutoPrint($dialog=false)
+	{
+		//Open the print dialog or start printing immediately on the standard printer
+		$param=($dialog ? 'true' : 'false');
+		$script="print($param);";
+		$this->IncludeJS($script);
+	}
+	
+	function AutoPrintToPrinter($server, $printer, $dialog=false)
+	{
+		//Print on a shared printer (requires at least Acrobat 6)
+		$script = "var pp = getPrintParams();";
+		if($dialog)
+		$script .= "pp.interactive = pp.constants.interactionLevel.full;";
+		else
+		$script .= "pp.interactive = pp.constants.interactionLevel.automatic;";
+		$script .= "pp.printerName = '\\\\\\\\".$server."\\\\".$printer."';";
+		$script .= "print(pp);";
+		$this->IncludeJS($script);
 	}
 }
 
@@ -163,15 +219,19 @@ class tx_metafeedit_export {
 		header("Content-Type: application/csv; charEncoding=utf-8");
 		//header("Content-Encoding:utf-8");
 		//header("Content-Length: ".strlen($content);
-		
-		header('Content-disposition: filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.csv"');
-		echo utf8_decode(str_replace('&euro;','Eur',str_replace('&nbsp;',' ',strip_tags($caller->metafeeditlib->T3StripComments($content)))));
+		//header("Content-type: application/force-download");
+		//header("Content-Transfer-Encoding: Binary");
+		//header("Content-Disposition: attachment; filename=somefilename.extention");
+		$content= utf8_decode(str_replace('&euro;','Eur',str_replace('&nbsp;',' ',strip_tags($caller->metafeeditlib->T3StripComments($content)))));
+		//header("Content-length: ".strlen($content);
+		header('Content-disposition: attachment; filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.csv"');		
+		echo $content;
 		die;
 	}
 
 
 	// We handle here PDF file generation for detail ...
-	function getPDFDET(&$content,&$caller) {
+	function getPDFDET(&$content,&$caller,$print='') {
 		//die($content);
 
 		try {
@@ -416,12 +476,27 @@ class tx_metafeedit_export {
 		}
 		ob_clean();
 		//Convert to PDF
+		//header("Content-type: application/force-download");
+		//header("Content-Transfer-Encoding: Binary");
+		//header("Content-Disposition: attachment; filename=somefilename.extention");
+		//echo "#### $print ==";
+		switch ($print) {
+			case 'print':
+			case 'printnodialog':
+				$pdf->AutoPrint(false);
+				break;
+			case 'printdialog':
+				$pdf->AutoPrint(true);
+				break;
+			default:
+				break;
+		}
 		$pdf->Output($caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf', 'I');
 		die;
 	}	
 	
 	// We handle here PDF file generation for lists ...
-	function getPDF(&$content,&$caller) {
+	function getPDF(&$content,&$caller,$print='') {
 		try {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
@@ -578,6 +653,18 @@ class tx_metafeedit_export {
 		//Convert to PDF
 		$name=$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf';
 		ob_clean();
+		//echo "#### $print";
+		switch ($print) {
+			case 'print':
+			case 'printnodialog':
+				$pdf->AutoPrint(false);
+				break;
+			case 'printdialog':
+				$pdf->AutoPrint(true);
+				break;
+			default:
+				break;
+		}
 		$pdf->Output($name, 'I'); 
 		die;
 
@@ -585,7 +672,7 @@ class tx_metafeedit_export {
 	
 	// tabular presentation for pdf
 	
-	function getPDFTAB(&$content,&$caller) {
+	function getPDFTAB(&$content,&$caller,$print='') {
 		$xml = new SimpleXMLElement($content);
 		$count = 0;
 
@@ -675,7 +762,18 @@ class tx_metafeedit_export {
 		$nbx++;
 		}
 		ob_clean();
-		$pdf->Output();
+		//$pdf->Output();
+		switch ($print) {
+			case 'print':
+			case 'printnodialog':
+				$pdf->AutoPrint(false);
+				break;
+			case 'printdialog':
+				$pdf->AutoPrint(true);
+				break;
+			default:
+				break;
+		}
 		$content = $pdf->Output('test.pdf', 'S');
 		echo $content;
 		die;

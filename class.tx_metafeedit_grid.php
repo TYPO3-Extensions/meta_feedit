@@ -558,8 +558,8 @@ class tx_metafeedit_grid {
 				echo $content;
 				die;
 			}
-			
-			case "EXCEL":
+			case 'XLS':
+			case 'EXCEL':
 			{
 				header("Content-Type: apllication/xls");
 				header("Content-disposition: filename=table.xls");

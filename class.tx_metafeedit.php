@@ -1558,7 +1558,7 @@ class tx_metafeedit extends  tslib_pibase {
 	        	$Lib=$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf);
 	        	$href=$this->metafeeditlib->hsc($conf,$this->pi_linkTP_keepPIvars_url(array('sort' => $FN.':###SORT_DIR_'.$FN.'###'),1));
 	        	if(!$textmode) {
-	        			if ($this->piVars['exporttype']==EXCEL)
+	        			if ($this->piVars['exporttype']=='EXCEL' || $this->piVars['exporttype']=='XLS')
 	        			    $ret.='<th><data>'.$Lib.'</data><size>'.$size.'</size></th>';
 	        			else
 	        			    $ret.=$conf['list.']['sortFields']?'<th><a class="###SORT_CLASS_'.$FN.'###" href="'.$href.'###GLOBALPARAMS###">'.$Lib.'</a></th>':'<th>'.$Lib.'</th>';
@@ -1889,7 +1889,7 @@ class tx_metafeedit extends  tslib_pibase {
 			$FCode=(!$conf['disableEdit'])?$this->getFormFieldCode('edit',$conf,$FN,1,'grid'):$this->getPreviewFieldCode('edit',$conf,$FN,1);
 			$PCode=$this->getPreviewFieldCode('edit',$conf,$FN,$textmode?0:1);
 			if ($params[0]!='--div--') {		
-				if ($this->piVars['exporttype']== 'EXCEL')			// Excel
+				if ($this->piVars['exporttype']== 'EXCEL' || $this->piVars['exporttype']=='XLS')			// Excel
 					$ret.=$PCode;
 				else if($this->piVars['exporttype']== 'PDF') 		// PDF
 						$ret.= $PCode;

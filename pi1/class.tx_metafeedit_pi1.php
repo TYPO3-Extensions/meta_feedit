@@ -833,7 +833,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['inputvar.']['orderDir.']['dir']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'orderDir');
 		$resetsearch=$this->metafeeditlib->getMetaFeeditVar($mfconf,'reset');
 		$resetorderby=$this->metafeeditlib->getMetaFeeditVar($mfconf,'resetorderby');
-				
+		//echo $pluginId;			
 		if ($resetsearch) {
 			  unset ( $mfconf['inputvar.']['advancedSearch']);
 			  unset ( $mfconf['inputvar.']['sword']);

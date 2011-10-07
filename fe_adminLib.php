@@ -141,7 +141,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	var $metafeeditlib;
 	var $metafeeditgrid;
 	var $metafeeditexport;
-
+	var $print='';
 	var $exporttype=0;	
 	var $value =10; // ??? kesako
 
@@ -1970,7 +1970,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		//$pluginId=$conf['pluginId'];
 		//---  Gestion des templates selon exporttype (can't this be done in Pi1 ?)
 		$exporttype=$this->piVars['exporttype'];
-		
+		print_r($this->piVars);
+		$print=$this->piVars['print'];
+		echo "youiyoyioiy";
 		if (($exporttype == 'PDF') && ($conf['list.']['nbCols']))
 		{	$exporttype = "PDFTAB";		}
 		//---
@@ -2424,14 +2426,15 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		    $this->metafeeditexport->getCSV($content,$this);
 		    break;
 		case "PDF": 
-		    $this->metafeeditexport->getPDF($content,$this);
+		    $this->metafeeditexport->getPDF($content,$this,$print);
 		    break;
 		case "PDFTAB": 
-		    $this->metafeeditexport->getPDFTAB($content,$this);
+		    $this->metafeeditexport->getPDFTAB($content,$this,$print);
 		    break;
 		case "PDFDET": 
-		    $this->metafeeditexport->getPDFDET($content,$this);
+		    $this->metafeeditexport->getPDFDET($content,$this,$print);
 		    break;
+		case "XLS":
 		case "EXCEL": 
 		    $this->metafeeditexport->getEXCEL($content,$this);
 		    break;
@@ -2673,7 +2676,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
     	// Edit Mode : User can edit fields
     	// Preview Mode : user can only see fields	
     	if ($this->conf['debug']) echo t3lib_div::view_array(array('displayEditScreen'=>'on'));
-    	$exporttype=$this->piVars['exporttype'];		
+    	$exporttype=$this->piVars['exporttype'];
+    	$print=$this->piVars['print'];
 		if ($exporttype == 'PDF') $exporttype = "PDFDET";
     	$this->conf['cmdmode']='edit';    
     	// We handle here Edit mode or Preview Mode
@@ -2800,7 +2804,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 							$origArr = $this->userProcess('evalFunc',$origArr);
 						}
 						$this->markerArray = $this->setfixed($this->markerArray, $this->conf['setfixed.'], $origArr);
-						$content=$this->displayEditForm($origArr,$this->conf,$exporttype);
+						$content=$this->displayEditForm($origArr,$this->conf,$exporttype,$print);
 					} else {
 						// Else display error, that you could not edit that particular record...	
 						$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_NO_PERMISSIONS###');
@@ -2848,7 +2852,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 * @see displayEditScreen()
 	 */
 	 
-	function displayEditForm($origArr,&$conf,$exporttype='')	{
+	function displayEditForm($origArr,&$conf,$exporttype='',$print='')	{
 		//We merge data with override values and eval values ...
 		$currentArr = array_merge($origArr,(array)$this->dataArr);
 		
@@ -2983,14 +2987,15 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		    $this->metafeeditexport->getCSV($content,$this);
 		    break;
 			case "PDF": 
-		    $this->metafeeditexport->getPDF($content,$this);
+		    $this->metafeeditexport->getPDF($content,$this,$print);
 		    break;
 			case "PDFTAB": 
-		    $this->metafeeditexport->getPDFTAB($content,$this);
+		    $this->metafeeditexport->getPDFTAB($content,$this,$print);
 		    break;
 			case "PDFDET": 
-		    $this->metafeeditexport->getPDFDET($content,$this);
+		    $this->metafeeditexport->getPDFDET($content,$this,$print);
 		    break;
+		    case "XLS":
 			case "EXCEL": 
 		    $this->metafeeditexport->getEXCEL($content,$this);
 		    break;
