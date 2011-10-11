@@ -1970,9 +1970,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		//$pluginId=$conf['pluginId'];
 		//---  Gestion des templates selon exporttype (can't this be done in Pi1 ?)
 		$exporttype=$this->piVars['exporttype'];
-		print_r($this->piVars);
+		//print_r($this->piVars);
 		$print=$this->piVars['print'];
-		echo "youiyoyioiy";
+		//echo "youiyoyioiy";
 		if (($exporttype == 'PDF') && ($conf['list.']['nbCols']))
 		{	$exporttype = "PDFTAB";		}
 		//---
