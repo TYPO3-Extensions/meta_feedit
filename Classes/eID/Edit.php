@@ -48,6 +48,7 @@ $GLOBALS['TSFE']->renderCharset='utf-8';
 $module=t3lib_div::_GP('module');
 // Report path is either in fileadmin/reports or in module Reports path
 $configFile=t3lib_div::_GP('config')?($module?'typo3conf/ext/'.$module.'/Resources/Private/Reports/':'').t3lib_div::_GP('config').'.json':'';
+//echo $configFile;
 $TTA[]="<br/>eID before meta creation Elapsed Time :".(microtime(true)-$GLOBALS['g_TT']).' s';
 $c=new tx_metafeedit_pi1();
 $TTA[]="<br/>eID after meta creation Elapsed Time :".(microtime(true)-$GLOBALS['g_TT']).' s';

@@ -57,18 +57,28 @@ class tx_metafeedit_pdf extends FPDF {
 		if (!$this->nofooter) {
 			$this->SetFont('Arial','',10);
 			$this->setFillColor(200,200,200);
-			$this->SetY(0-$this->bottommargin+3); //TODO		
-			$date=date('d/m/Y');
-			$this->Cell(0,$this->footercellsize, $this->confTS[$this->pluginId.'.']['list.']['footer'], 0,0,'C',1);
+			//$this->SetY(200); //TODO		
+			$this->SetY(-$this->bottommargin); //TODO		
+			$date=date('d/m/Y H:i:s');
 			$this->SetX($this->leftmargin);
+			$this->SetY(-$this->bottommargin-3);
+			$this->Cell(0,1,'','T',0,'C',0);
+			$this->SetY(-$this->bottommargin);
+			$this->SetX($this->leftmargin);
+			//$this->Cell(0,$this->footercellsize,'YOOOO', 0,0,'C',0);
+			$this->Cell(0,$this->footercellsize, $this->confTS[$this->pluginId.'.']['list.']['footer'], 0,0,'C',0);
+			$this->SetX($this->leftmargin);
+			
 			$this->Cell(0,$this->footercellsize, $date, 0,0,'L');
 			$this->SetX($this->leftmargin);
 			$this->Cell(0,$this->footercellsize,'Page '.$this->PageNo().'/{nb}',0,0,'C');
 			$this->SetX($this->leftmargin);			
 			$user = '';
 			$user = $GLOBALS['TSFE']->fe_user->user[username];
-			//$res = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($GLOBALS['TYPO3_DB']->exec_SELECTquery('ent_nom', 'tx_metabookingdb_entite_juridique', 'uid='.$GLOBALS['TSFE']->fe_user->user[tx_metabookingdbextfeusers_tx_metabookingdb_entite_juridique_uid]));
 			$this->Cell(0,$this->footercellsize, utf8_decode($this->caller->caller->metafeeditlib->getLL('printedby', $this->caller->conf)).$user,0,0,'R');
+			//$this->SetLineWidth(0.3);
+			//$this->setDrawColor(200,200,200);
+			//$this->Line($this->leftmargin,100,-$this->rightmargin,200);
 		}
 	}
 	
@@ -125,6 +135,63 @@ class tx_metafeedit_pdf extends FPDF {
 		$script .= "print(pp);";
 		$this->IncludeJS($script);
 	}
+	/**
+	 * 
+	 * Counts line numbers for multi-cell
+	 * @param width $w
+	 * @param string $txt
+	 * @return number
+	 */
+	function NbLines($w,$txt)
+	{
+		//Calcule le nombre de lignes qu'occupe un MultiCell de largeur w
+		$cw=&$this->CurrentFont['cw'];
+		if($w==0)
+		$w=$this->w-$this->rMargin-$this->x;
+		$wmax=($w-2*$this->cMargin)*1000/$this->FontSize;
+		$s=str_replace("\r",'',$txt);
+		$nb=strlen($s);
+		if($nb>0 and $s[$nb-1]=="\n")
+		$nb--;
+		$sep=-1;
+		$i=0;
+		$j=0;
+		$l=0;
+		$nl=1;
+		while($i<$nb)
+		{
+			$c=$s[$i];
+			if($c=="\n")
+			{
+				$i++;
+				$sep=-1;
+				$j=$i;
+				$l=0;
+				$nl++;
+				continue;
+			}
+			if($c==' ')
+			$sep=$i;
+			$l+=$cw[$c];
+			if($l>$wmax)
+			{
+				if($sep==-1)
+				{
+					if($i==$j)
+					$i++;
+				}
+				else
+				$i=$sep+1;
+				$sep=-1;
+				$j=$i;
+				$l=0;
+				$nl++;
+			}
+			else
+			$i++;
+		}
+		return $nl;
+	}	
 }
 
 class tx_metafeedit_export {
@@ -318,11 +385,15 @@ class tx_metafeedit_export {
 			$pdf->Cell(0,$this->headercellsize,utf8_decode($recherche),0,0,'R');
 			$pdf->SetY(5);
 			$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
+			$pdf->SetXY($pdf->leftmargin,6);
+			//$pdf->Ln();
+			$pdf->setFillColor(200,200,200);
+			$pdf->Cell(0,$this->headercellsize,'','T',0,'C');
 			$pdf->Ln(2);	
 		}
 		
 		$fs=9;
-		
+		$cell=false;
 		// We set height and font
 		
 		$this->getPolice($police);
@@ -346,6 +417,7 @@ class tx_metafeedit_export {
 			$alt++;
 			$nbcols=count($row->td);
 			$csize=0;
+			$ey=0;
 			if ($row->gb) {
 				$pdf->SetLineWidth(0.3);
 				$pdf->SetFont('Arial', 'B', 9);
@@ -353,18 +425,33 @@ class tx_metafeedit_export {
 				$pdf->SetLineWidth(0.2);
 				$pdf->SetFont('Arial', '', 9);
 			}
-
-				
+			$ih=0;
+			$nblines=1;
+			//We detect height
+			foreach($row->td as $col) {
+				$val = strip_tags($col->data);
+				if ($col->img==1) {
+					$imgh=30;
+					if (isset($col->img->attributes()->h)) $imgh=(float)$col->img->attributes()->h; //height override
+					$nblines=5;
+				} else {
+					$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule
+					$w=$size=40;
+					if (isset($col->spec->attributes()->h)) $h=$col->spec->attributes()->h;
+					if (isset($col->spec->attributes()->w)) $w=$col->spec->attributes()->w;
+					$nblines=$pdf->NbLines($w, utf8_decode($val));
+				}
+			}
 			// We print row cells ...
 			foreach($row->td as $col) {
+				//print_r($col);
+				
 				$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule 
 				$size=40;
 				$val = strip_tags($col->data);
-
+				$utf8val=utf8_decode($val);
 				$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
-
 				// Affichage du signe Euro sur l'export PDF //CBY nothing to do here !!
-
 				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
 				
 				if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
@@ -375,7 +462,7 @@ class tx_metafeedit_export {
 				 	if (isset($col->spec->attributes()->y)) {				 		
 				 		$pdf->SetY((float)$col->spec->attributes()->y);
 				 	}
-					if (!is_object($col->spec)) $pdf->Cell($taille,$height,'',1,0,'L',1);					
+					if (!is_object($col->spec)) $pdf->Cell($taille,$height,'',1,0,'L',1);
 					$pdf->SetX($myx);
 					foreach($vala as $v) {
 						$img=PATH_site.($v?$col->img->dir.'/'.$v:'');
@@ -394,7 +481,9 @@ class tx_metafeedit_export {
 						if (is_array($imginfo)) {
 							$w=$imginfo[0];
 							$h=$imginfo[1];
-							$imgh=0;
+							//print_r($imginfo);
+							//@todo resize or crop if image too big
+							$imgh=$nblines*$height;
 							$imgw=0;
 							$imgx=$pdf->GetX();
 							$imgy=$pdf->GetY();
@@ -403,13 +492,12 @@ class tx_metafeedit_export {
 							if (isset($col->img->attributes()->x)) $imgx=(float)$col->img->attributes()->x; //x override
 							if (isset($col->img->attributes()->y)) $imgy=(float)$col->img->attributes()->y; //x override
 							$pdf->Image($img,$imgx,$imgy,$imgw,$imgh);
-							//$pdf->Image($img,$pdf->GetX()+0.5,$pdf->GetY()+0.5);
-							$pdf->Rect($imgx, $imgy, ($imgh/$h)*$w+0.1, $imgh );
-							$pdf->SetX($imgx+(($imgh/$h)*$w));
+							$w=$size;
+							if (isset($col->spec->attributes()->w)) $w=$col->spec->attributes()->w;
+							$pdf->Rect($imgx,$imgy,$w,$imgh);
+							$ey = ($imgy+$imgh)>$ey?($imgy+$imgh):$ey;
 						}
 					}
-					$pdf->SetX($size+$pdf->leftmargin);	
-					$pdf->SetY($oldy);								
 				} else {
 					switch($pos[$x]) {
 						case 'left' :
@@ -433,6 +521,8 @@ class tx_metafeedit_export {
 					$b=1;
 					if (isset($col->spec->attributes()->b)) $b=$col->spec->attributes()->b;
 					if (isset($col->spec->attributes()->h)) $h=$col->spec->attributes()->h;
+					//$h=;
+					
 					if (isset($col->spec->attributes()->w)) $w=$col->spec->attributes()->w;
 					
 					if (isset($col->spec->attributes()->bc)) {
@@ -455,31 +545,45 @@ class tx_metafeedit_export {
 					if (isset($col->spec->attributes()->f)) $pdf->SetFont($col->spec->attributes()->f,'',$fs);
 					if (isset($col->spec->attributes()->x) || isset($col->spec->attributes()->y)) {
 						$pdf->SetXY((float)$col->spec->attributes()->x,(float)$col->spec->attributes()->y);
+						//$h=$h*$nblines;
 						if (isset($col->spec->attributes()->b)  || isset($col->spec->attributes()->bc) ) {
-							 $pdf->Cell($w,$h,utf8_decode($val),$b,0,$p,1);
+							 $pdf->Cell($w,$h,$utf8val,$b,0,$p,1);
+							 $cell=true;
 						} else {
-							$pdf->Write($height,utf8_decode($val));
+							$pdf->Write($h,$utf8val);
 						}
 						$newX=(float)$col->spec->attributes()->x+(isset($col->spec->attributes()->w)?(float)$col->spec->attributes()->w:$pdf->GetStringWidth($val));
 						$pdf->SetXY((float)floor($newX),(float)$col->spec->attributes()->y);
 						//$pdf->Text($col->spec->attributes()->x,$col->spec->attributes()->y,utf8_decode($val));
 					} else {
-						$pdf->Cell($w,$h,utf8_decode($val),$b,0,$p,1);
-						//$pdf->setX($myx+$size);
+						$x = $pdf->getX();
+						$y = $pdf->getY();
+						
+						$pdf->MultiCell($w,$h,$utf8val,0,0,$p,1);
+						if ($b) $pdf->Rect($x,$y,$w,$h*$nblines);
+						// We handle bigger cells !!!
+						$ey = $pdf->getY()>$ey?$pdf->getY():$ey;
+						$pdf->SetXY(($x+$w),$y);
+						$cell=true;
 					}
 				}
 				$x++;
 			}
-			$pdf->Ln();
+			if ($cell) {
+				//$pdf->setFillColor(200,200,200);
+				$pdf->setFillColor(255,255,255);
+				//$pdf->Cell(0,$h,'',0,0,'',1);
+				if ($ey) $pdf->SetXY($pdf->leftmargin,$ey);
+				$ey=0;
+				$cell=false;
+			}else {
+				$pdf->Ln();
+			}
 			$pdf->setFillColor(255,255,255);
 			$r++;
 		}
 		ob_clean();
-		//Convert to PDF
-		//header("Content-type: application/force-download");
-		//header("Content-Transfer-Encoding: Binary");
-		//header("Content-Disposition: attachment; filename=somefilename.extention");
-		//echo "#### $print ==";
+		//We add print dialog or not ...
 		switch ($print) {
 			case 'print':
 			case 'printnodialog':
@@ -555,7 +659,12 @@ class tx_metafeedit_export {
 		$pdf->Cell(0,$this->headercellsize,utf8_decode($recherche),0,0,'R');
 		$pdf->SetY(5);
 		$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
-		$pdf->Ln(2);
+		$pdf->SetXY($pdf->leftmargin,6);
+		//$pdf->Ln();
+		$pdf->setFillColor(200,200,200);
+		$pdf->Cell(0,$this->headercellsize,'','T',0,'C');
+		$pdf->Ln(2);	
+		
 		
 		// we set font and size
 		
@@ -563,7 +672,7 @@ class tx_metafeedit_export {
 		$this->getFont($font);
 		$pdf->SetFont($font,'',$police);
 		$alt=1;
-
+		
 		// Content 
 		$pdf->setFillColor(125,125,125);
 		$height = ($this->confTS[$this->pluginId.'.']['list.']['height'])?$this->confTS[$this->pluginId.'.']['list.']['height']:(($this->confTS['default.']['list.']['height'])?$this->confTS['default.']['list.']['height']:($pdf->cellsize?$pdf->cellsize:5)); // hauteur de la ligne pdf
@@ -574,6 +683,7 @@ class tx_metafeedit_export {
 				$alt=0;
 				$pdf->setFillColor(200,200,200);
 			}
+			$cell=false;
 			$alt++;
 			$nbcols=count($row->td);
 			$csize=0;
@@ -634,11 +744,13 @@ class tx_metafeedit_export {
 				 	} else {
 				 		if ($row->gb && $x==0) { 
 							$pdf->Cell($taille,$height,utf8_decode($val),1,0,$p,1);
+							$cell=true;
 							$pdf->setX($myx+$size);
 						} else {
 							$border=1;
 							//if ($row->gb) $border=0;
 							$pdf->Cell($size,$height,utf8_decode($val),1,0,$p,1);
+							$cell=true;
 						}
 					}
 				}
@@ -647,6 +759,16 @@ class tx_metafeedit_export {
 			$pdf->setFillColor(255,255,255);
 			//$pdf->setX($pdf->getX()+0.1);			$pdf->setX(213.33);
 			//$pdf->Cell(100000,$height,'',0,0,'L',1);
+			if ($cell) {
+				//$pdf->setFillColor(200,200,200);
+				$pdf->setFillColor(255,255,255);
+				$pdf->Cell(0,$h,'',0,0,'',1);
+				if ($ey) $pdf->SetXY($pdf->leftmargin,$ey);
+				$ey=0;
+				$cell=false;
+			}else {
+				$pdf->Ln();
+			}
 			$pdf->Ln();
 			$r++;
 		}
