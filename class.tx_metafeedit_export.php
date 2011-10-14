@@ -759,17 +759,17 @@ class tx_metafeedit_export {
 			$pdf->setFillColor(255,255,255);
 			//$pdf->setX($pdf->getX()+0.1);			$pdf->setX(213.33);
 			//$pdf->Cell(100000,$height,'',0,0,'L',1);
-			if ($cell) {
+			/*if ($cell) {
 				//$pdf->setFillColor(200,200,200);
 				$pdf->setFillColor(255,255,255);
 				$pdf->Cell(0,$h,'',0,0,'',1);
 				if ($ey) $pdf->SetXY($pdf->leftmargin,$ey);
 				$ey=0;
 				$cell=false;
-			}else {
+			}else {*/
 				$pdf->Ln();
-			}
-			$pdf->Ln();
+			//}
+			//$pdf->Ln();
 			$r++;
 		}
 		//Convert to PDF
