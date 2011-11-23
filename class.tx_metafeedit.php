@@ -2193,7 +2193,12 @@ class tx_metafeedit extends  tslib_pibase {
 										$val=implode(', ',$vs);
 									}
 								} else if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
-									$val = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
+									foreach($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'] as $item) {
+										if ($item[1]==$val) {
+											$val = $this->metafeeditlib->getLLFromLabel($item[0], $conf);
+											break;
+										}
+									}
 								}
 								break;
 							case 'inline' :

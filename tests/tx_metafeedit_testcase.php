@@ -27,7 +27,7 @@
  */
 require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_lib.php');
 
-class tx_metafeedit_testcase extends tx_t3unit_testcase {
+class tx_metafeedit_testcase extends tx_phpunit_testcase {
 
 	protected $WSDLURI;
 	protected $SOAPServiceURI;

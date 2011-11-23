@@ -426,6 +426,23 @@ var refreshModal = function(hash)
         }
 
     }
+	var onDelete=function() {
+		var hrf=this.href;
+		jQuery.ajax({
+			url: hrf,
+			success: function(){
+				window.location.href = document.location.href;
+			},
+			error : function(){
+				window.location.href = document.location.href;
+			}
+		});
+		//jQuery.get(jQuery('.tx-metafeedit-link-delete-ok a').attr('href'));
+		//window.location.href = document.location.href;
+		//window.location.href = this.href;
+		return false;
+	}
+	
     var openInFrameAjx = function(hash)
     {
     	if (hash.t==undefined) return false;
@@ -439,7 +456,7 @@ var refreshModal = function(hash)
         myUrl=(myUrl.lastIndexOf(".0.html") > -1) ? myUrl.replace(/.0.html/,'.9002.html') : myUrl;
         jQuery('#jqmDelContent').load(myUrl+'&ajx=1',{},function() {
 			//jQuery('#jqmDelContent').load(myUrl+'&ajx=1&eID=tx_metafeedit_pi1&type=9002',{},function() {
-        	jQuery('.tx-metafeedit-link-delete-ok a').click(function() {jQuery.get(jQuery('.tx-metafeedit-link-delete-ok a').attr('href'));window.location.href = document.location.href;return false});
+        	jQuery('.tx-metafeedit-link-delete-ok a').click(onDelete);
         	hash.w.jqmAddClose(jQuery('.tx-metafeedit-link-delete-ok a',hash.w));
         	hash.w.jqmAddClose(jQuery('.tx-metafeedit-link-delete-ko a',hash.w));
 		 	//initDelBtns();

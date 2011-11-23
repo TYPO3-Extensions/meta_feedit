@@ -59,8 +59,9 @@ class tx_metafeedit_flexfill {
 		//$params['items'][]=Array( 'Unique ID','uid');
 		//$params['items'][]=Array('Page ID','pid');
 		$this->getFields($params,$table,'');
-		if ($FTs) {
+		if (count($FTs)) {
 			foreach($FTs as $FTRel) {
+				if (!$FTRel) continue;
 				$FT=@$TCA[$table]['columns'][$FTRel]['config']['foreign_table'];
 				$this->getFields($params,$FT,$FTRel);
 			}
@@ -68,7 +69,7 @@ class tx_metafeedit_flexfill {
 		
 		// We add sql calculated fields added by user in flexform
 		
-		$FTs=explode(chr(10),$flexarr['data']['sList']['lDEF']['listsqlcalcfields']['vDEF']);
+		$FTs=explode(chr(10),@$flexarr['data']['sList']['lDEF']['listsqlcalcfields']['vDEF']);
 		foreach($FTs as $ORV) {
 			$OVs=explode('=',$ORV,2);
 			if (count($OVs)==2) {
@@ -78,15 +79,17 @@ class tx_metafeedit_flexfill {
 
 		// We add php calculated fields added by user in flexform
 
-		$FTs=explode(chr(10),$flexarr['data']['sList']['lDEF']['listphpcalcfields']['vDEF']);
+		$FTs=explode(chr(10),@$flexarr['data']['sList']['lDEF']['listphpcalcfields']['vDEF']);
 		foreach($FTs as $ORV) {
 			$OVs=explode('=',$ORV,2);
 			if (count($OVs)==2) {
 				$params['items'][]=Array($OVs[0], $OVs[0]);
 			}		
 		}
+		
 		$this->clearTCA($table);
 	}
+	
 	function clearTCA($table) {
 		global $TCA;
 		unset($TCA[$table]['columns']['pid']);
@@ -152,7 +155,7 @@ class tx_metafeedit_flexfill {
 		$table=@$flexarr['data']['sQuickStart']['lDEF']['fetable']['vDEF'];
 		if (!$table) return;
 		$this->loadTCA($table);
-		$FTs=explode(",",$flexarr['data']['sDEF']['lDEF']['foreignTables']['vDEF']);
+		$FTs=explode(",",@$flexarr['data']['sDEF']['lDEF']['foreignTables']['vDEF']);
 		$params['items']=array();
 		$params['items'][]=Array('', '');
 		$params['items'][]=Array('[fieldset<]', '--fsb--;FSB');
@@ -160,8 +163,9 @@ class tx_metafeedit_flexfill {
 		//$params['items'][]=Array( 'Unique ID','uid');
 		//$params['items'][]=Array('Page ID','pid');
 		$this->getFields($params,$table,'');
-		if ($FTs) {
+		if (count($FTs)) {
 			foreach($FTs as $FTRel) {
+				if (!$FTRel) continue;
 				$FT=@$TCA[$table]['columns'][$FTRel]['config']['foreign_table'];
 				$this->getFields($params,$FT,$FTRel);
 			}
@@ -169,7 +173,7 @@ class tx_metafeedit_flexfill {
 		
 		// We add sql calculated fields added by user in flexform
 		
-		$FTs=explode(chr(10),$flexarr['data']['sList']['lDEF']['listsqlcalcfields']['vDEF']);
+		$FTs=explode(chr(10),@$flexarr['data']['sList']['lDEF']['listsqlcalcfields']['vDEF']);
 		foreach($FTs as $ORV) {
 			$OVs=explode('=',$ORV,2);
 			if (count($OVs)==2) {
@@ -179,7 +183,7 @@ class tx_metafeedit_flexfill {
 
 		// We add php calculated fields added by user in flexform
 
-		$FTs=explode(chr(10),$flexarr['data']['sList']['lDEF']['listphpcalcfields']['vDEF']);
+		$FTs=explode(chr(10),@$flexarr['data']['sList']['lDEF']['listphpcalcfields']['vDEF']);
 		foreach($FTs as $ORV) {
 			$OVs=explode('=',$ORV,2);
 			if (count($OVs)==2) {
@@ -208,8 +212,9 @@ class tx_metafeedit_flexfill {
 		$params['items']=array();
 		$params['items'][]=Array('', '');
 		$this->getFields_OB($params,$table,'',$flexarr);
-		if ($FTs) {
+		if (count($FTs)) {
 			foreach($FTs as $FTRel) {
+				if (!$FTRel) continue;
 				$FT=@$TCA[$table]['columns'][$FTRel]['config']['foreign_table'];
 				$this->getFields_OB($params,$FT,$FTRel,$flexarr);
 			}
@@ -238,7 +243,8 @@ class tx_metafeedit_flexfill {
 		$this->getFieldsFT($params,$table,'');
 		$foreignTables=@$flexarr['data']['sDEF']['lDEF']['foreignTables']['vDEF'];
 		$fta=explode(',',$foreignTables);
-        foreach($fta as $ft) {
+        if (count($fta)) foreach($fta as $ft) {
+		    if (!$FTRel) continue;
             $ftable=$TCA[$table]['columns'][$ft]['config']['foreign_table'];            
             $this->getFieldsFT($params,$ftable,$ft);
         }    
@@ -287,8 +293,9 @@ class tx_metafeedit_flexfill {
 		//$params['items'][]=Array( 'Unique ID','uid');
 		//$params['items'][]=Array('Page ID','pid');
 		$this->getFields($params,$table,'');
-		if ($FTs) {
+		if (count($FTs)) {
 			foreach($FTs as $FTRel) {
+				if (!$FTRel) continue;
 				$FT=@$TCA[$table]['columns'][$FTRel]['config']['foreign_table'];
 				$this->getFields($params,$FT,$FTRel);
 			}
@@ -318,7 +325,9 @@ class tx_metafeedit_flexfill {
 		if (@$TCA[$table]['ctrl']['tstamp']) $params['items'][]=Array($TCA[$table]['ctrl']['tstamp'].' ('.$prefix.$TCA[$table]['ctrl']['tstamp'].')', $prefix.$TCA[$table]['ctrl']['tstamp']);
 		if (@$TCA[$table]['ctrl']['crdate']) $params['items'][]=Array($TCA[$table]['ctrl']['crdate'].' ('.$prefix.$TCA[$table]['ctrl']['crdate'].')', $prefix.$TCA[$table]['ctrl']['crdate']);
 		if (@$TCA[$table]['ctrl']['cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['cruser_id'].' ('.$prefix.$TCA[$table]['ctrl']['cruser_id'].')',$prefix.$TCA[$table]['ctrl']['cruser_id']);
-		if (@$TCA[$table]['ctrl']['fe_cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['fe_cruser_id'].' ('.$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].')',$prefix.$TCA[$table]['ctrl']['fe_cruser_id']);    
+		if (@$TCA[$table]['ctrl']['fe_cruser_id']){
+			$params['items'][]=Array($TCA[$table]['ctrl']['fe_cruser_id'].' ('.$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].')',$prefix.$TCA[$table]['ctrl']['fe_cruser_id']);    
+		}
 		return $params;
 	}
 
