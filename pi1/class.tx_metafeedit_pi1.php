@@ -198,7 +198,29 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		
 		*/
 		
+		// Handle PidHandler Paths here
 		
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['ARDDESKTOP']['extensionpids']) && t3lib_extmgm::isLoaded('ard_mcm') ) {
+   			require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/Lib/PidHandler.php');
+			$pidHandler=t3lib_div::makeInstance('Tx_MetaFeedit_Lib_PidHandler');
+			
+			foreach($GLOBALS['TYPO3_CONF_VARS']['ARDDESKTOP']['extensionpids'] as $extension=>$extensionconf) {
+				$defaultpid=0;
+				//$root=$extensionconf['rootpid']?$extensionconf['rootpid']:$defaultpid;
+				if (is_array($extensionconf['pidpaths'])) foreach($extensionconf['pidpaths'] as $path) {
+			 		$pid=$pidHandler->getPid($path);
+			 		$pidsearch[]='###gv_'.$extension.'_'.implode('_',explode('/',$path)).'###';
+					$pidreplace[]=intval($pid);
+				}
+				if (is_array($extensionconf['grouppaths'])) foreach($extensionconf['grouppaths'] as $path) {
+					$uid=$pidHandler->getGroupUid($path);
+					$path=str_replace(' ','_',$path);
+					$pidsearch[]='###gv_gr_'.$extension.'_'.implode('_',explode('/',$path)).'###';
+					$pidreplace[]=intval($pid);
+
+				}
+			}
+		}		
 		$lconf['fetable']=trim($lconf['fetable']);
 		if (!$lconf['feeditshowfields']) $lconf['feeditshowfields']=$GLOBALS["TCA"][$lconf['fetable']]["interface"]["showRecordFieldList"];
 		if (!$lconf['feshowfields']) $lconf['feshowfields']=$GLOBALS["TCA"][$lconf['fetable']]["interface"]["showRecordFieldList"];
@@ -325,7 +347,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['langmarks']=$lconf['listlangmarks'];
 		$mfconf['list.']['show_fields']=$lconf['listFields'];
 		$mfconf['list.']['extraFields']=$lconf['listExtraFields'];
-		$mfconf['list.']['whereString']=$lconf['listWhereString'];
+		$mfconf['list.']['whereString']=str_replace($pidsearch,$pidreplace,$lconf['listWhereString']);
 		$mfconf['list.']['orderByString']=$lconf['listOrderByString'];
 		$mfconf['list.']['preOrderByString']=$lconf['listPreOrderByString'];
 		$mfconf['list.']['havingString']=$lconf['listHavingString'];
