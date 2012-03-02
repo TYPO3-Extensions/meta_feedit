@@ -40,34 +40,34 @@ class tx_metafeedit_treecopy {
 
 	// copies Source tree to target
 
-        function copyPages($src_uid,$target_uid,$admin_uid)  {
-								$new_BE_USER = t3lib_div::makeInstance("t3lib_beUserAuth");     // New backend user object
-                $new_BE_USER->OS = TYPO3_OS;
-                $new_BE_USER->setBeUserByUid($admin_uid);
-                $new_BE_USER->fetchGroupData();
+		function copyPages($src_uid,$target_uid,$admin_uid)  {
+				$new_BE_USER = t3lib_div::makeInstance("t3lib_beUserAuth");	 // New backend user object
+				$new_BE_USER->OS = TYPO3_OS;
+				$new_BE_USER->setBeUserByUid($admin_uid);
+				$new_BE_USER->fetchGroupData();
 
-                $tce = t3lib_div::makeInstance("t3lib_TCEmain");
-                $tce->stripslashes_values=0;
-                $tce->copyTree=10;
-                $tce->neverHideAtCopy=1;
+				$tce = t3lib_div::makeInstance("t3lib_TCEmain");
+				$tce->stripslashes_values=0;
+				$tce->copyTree=10;
+				$tce->neverHideAtCopy=1;
 
-                // setting the user to admin rights temporarily during copy. The reason is that everything must be copied fully!
-                $new_BE_USER->user["admin"]=1;
+				// setting the user to admin rights temporarily during copy. The reason is that everything must be copied fully!
+				$new_BE_USER->user["admin"]=1;
 
-                // Making copy-command
-                $cmd=array();
-                $cmd["pages"][$src_uid]["copy"]=$target_uid;
-                $tce->start(array(),$cmd,$new_BE_USER);
-                $tce->process_cmdmap();
+				// Making copy-command
+				$cmd=array();
+				$cmd["pages"][$src_uid]["copy"]=$target_uid;
+				$tce->start(array(),$cmd,$new_BE_USER);
+				$tce->process_cmdmap();
 
-                // Unsetting the user.
-                unset($new_BE_USER);
+				// Unsetting the user.
+				unset($new_BE_USER);
 
-                // Getting the new root page id.
+				// Getting the new root page id.
 		  					$res=array();
-                $res['rootId'] = $tce->copyMappingArray["pages"][$src_uid];
-                return $res;
-        }
+				$res['rootId'] = $tce->copyMappingArray["pages"][$src_uid];
+				return $res;
+		}
 
 	/**
 	 * [Describe function...]
@@ -78,8 +78,8 @@ class tx_metafeedit_treecopy {
 	 */
 	function copyTree($rec,$conf) {
 		$res = $this->copyPages($conf['T3SourceTreePid'],$conf['T3TreeTargetPid'],$conf['T3AdminUid']);
-                if ($res['rootId'])     {
-                      $this->setRootPageProperties($rec,$res,$conf);
+				if ($res['rootId'])	 {
+					  $this->setRootPageProperties($rec,$res,$conf);
 		} else {
 			echo "ERROR META_FEEDIT TREE COPY !!!!!!!!!!!!!!!!";
 		}
@@ -107,12 +107,12 @@ function setRootPageProperties($recordArray,&$res,$conf)  {
 		}
 
 		$pageTitle = $counter?$pageTitle."$counter":$pageTitle;
-                $pageData=array();
-                $pageData["alias"]=$this->enleveaccentsetespaces($pageTitle);
-                $pageData["title"]=$pageTitle;
-                $pageData["perms_userid"]=0;    // The root page should not be owned (and thereby deleteable) by the user
+				$pageData=array();
+				$pageData["alias"]=$this->enleveaccentsetespaces($pageTitle);
+				$pageData["title"]=$pageTitle;
+				$pageData["perms_userid"]=0;	// The root page should not be owned (and thereby deleteable) by the user
 
-                $this->insertInDatabase("pages",$pageData,$root_page_pid);
+				$this->insertInDatabase("pages",$pageData,$root_page_pid);
 
 
 		// we get the template of the copied tree
@@ -140,7 +140,7 @@ function setRootPageProperties($recordArray,&$res,$conf)  {
 		$MarkerArray['###METAFEEDIT_RECUID###']=$recordArray['uid'];
 
 
-		// création du groupe utilisateur
+		// crï¿½ation du groupe utilisateur
 
 		$counter = 0;
 		$DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField('fe_groups', 'title', $recordArray[$reclabel], 'LIMIT 1');
@@ -150,10 +150,10 @@ function setRootPageProperties($recordArray,&$res,$conf)  {
 		}
 
 		$groupname = $this->enleveaccentsetespaces($pageTitle);
-    $update=array();
+	$update=array();
 		$update['pid']=$conf['T3FEGroupsPID'];
 		$update['title']=$groupname;
-    $grp_uid=$this->insertInDatabase("fe_groups",$update);
+	$grp_uid=$this->insertInDatabase("fe_groups",$update);
 		$res['grpId']=$grp_uid;
 		$res['grpName']=$groupname;
 		$MarkerArray['###METAFEEDIT_GRPUID###']=$recordArray['uid'];
@@ -164,7 +164,7 @@ function setRootPageProperties($recordArray,&$res,$conf)  {
 
 		$update=array();
 		$update['constants']=$constants;
-              $this->insertInDatabase("sys_template",$update,$tmpl_uid);
+			  $this->insertInDatabase("sys_template",$update,$tmpl_uid);
 
 		// Mise a jour des droits de la page admin
 		if ($pageAdminPid) {
@@ -172,9 +172,9 @@ function setRootPageProperties($recordArray,&$res,$conf)  {
 			$update['fe_group']=$grp_uid;
 			//echo $conf['T3GroupUids']."##################";
 			if ($conf['T3GroupUids']) $update['fe_group'].=','.$conf['T3GroupUids'];
-                	$this->insertInDatabase("pages",$update,$pageAdminPid);
+					$this->insertInDatabase("pages",$update,$pageAdminPid);
 		}
-        }
+		}
 
 	/**
 	 * [Describe function...]
@@ -184,53 +184,53 @@ function setRootPageProperties($recordArray,&$res,$conf)  {
 	 * @param	[type]		$uid: ...
 	 * @return	[type]		...
 	 */
-        function insertInDatabase($table,$data,$uid=0)  {
-                if ($table && is_array($data))  {
-                        unset($data["uid"]);
+		function insertInDatabase($table,$data,$uid=0)  {
+				if ($table && is_array($data))  {
+						unset($data["uid"]);
 
-                        if (count($data))       {
-                                if ($this->sysConfig["testingOnly"])    {
-                                        debug($table);
-                                        debug($data);
+						if (count($data))	   {
+								if ($this->sysConfig["testingOnly"])	{
+										debug($table);
+										debug($data);
 
-                                        if ($uid)       {
-                                                $query = $GLOBALS['TYPO3_DB']->UPDATEquery($table, 'uid='.intval($uid), $data);
-                                        } else {
-                                                $query = $GLOBALS['TYPO3_DB']->INSERTquery($table, $data);
-                                        }
-                                        debug($query,1);
+										if ($uid)	   {
+												$query = $GLOBALS['TYPO3_DB']->UPDATEquery($table, 'uid='.intval($uid), $data);
+										} else {
+												$query = $GLOBALS['TYPO3_DB']->INSERTquery($table, $data);
+										}
+										debug($query,1);
 
-                                        return "99999";
-                                } else {
-                                        if ($uid)       {
-                                                $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($uid), $data);
-                                        } else {
-                                                $res = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $data);
-                                        }
-                                        $err = $GLOBALS['TYPO3_DB']->sql_error();
-                                        if ($err)       {
-                                                debug($err,1);
-                                                debug($table,1);
-                                                debug($query,1);
+										return "99999";
+								} else {
+										if ($uid)	   {
+												$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($uid), $data);
+										} else {
+												$res = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $data);
+										}
+										$err = $GLOBALS['TYPO3_DB']->sql_error();
+										if ($err)	   {
+												debug($err,1);
+												debug($table,1);
+												debug($query,1);
 
-                                                exit;
-                                        }
-                                        return $GLOBALS['TYPO3_DB']->sql_insert_id();
-                                }
-                        }
-                }
-                die("The record could not be inserted or updated! ".$table);
-        }
+												exit;
+										}
+										return $GLOBALS['TYPO3_DB']->sql_insert_id();
+								}
+						}
+				}
+				die("The record could not be inserted or updated! ".$table);
+		}
 
 	Function enleveaccents($chaine) {
-    		$string= strtr($chaine, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");
-    		return $string;
-    	}
+			$string= strtr($chaine, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");
+			return $string;
+		}
 
 	Function enleveaccentsetespaces($chaine) {
-    		$string= $this->enleveaccents($chaine);
+			$string= $this->enleveaccents($chaine);
 		$string=str_replace(' ','',$string);
-    		return $string;
+			return $string;
 	}
 
 	/**
@@ -248,12 +248,12 @@ function setRootPageProperties($recordArray,&$res,$conf)  {
 		$DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField('pages', '1','1' ,' and uid in ('.$liste_page.')','','uid');
 		*/
 		$DBrows = $GLOBALS['TSFE']->sys_page->getRecordsByField('pages', 'pid', $pid,'','','uid');
-        foreach($DBrows as $row) {
+		foreach($DBrows as $row) {
 			$res[$this->enleveaccentsetespaces($row['title'])]=$row['uid'];
 			$MarkerArray['###METAFEEDIT_PAGE_'.$this->enleveaccentsetespaces($row['title']).'###']=$row['uid'];
 			//echo chr(10).'<br>'.'###METAFEEDIT_PAGE_'.$this->enleveaccentsetespaces($row['title']).'###='.$row['uid'];
 			if (strtoupper($this->enleveaccentsetespaces($row['title']))=='ADMIN') $pageAdminPid=$row['uid'];
-			if ($row['uid'])        $this->getPageIdMarkers($row['uid'],$MarkerArray,$pageAdminPid,$res);
+			if ($row['uid']) $this->getPageIdMarkers($row['uid'],$MarkerArray,$pageAdminPid,$res);
 		}
 	}
 }

@@ -56,67 +56,67 @@ require_once(t3lib_extMgm::extPath('meta_feedit').'fe_adminLib.php');
 // FE editing class
 
 class tx_metafeedit extends  tslib_pibase {
-    // Private fields
-    var $prefixId = 'tx_metafeedit';		// Same as class name
-    var $scriptRelPath = 'class.tx_metafeedit.php';	// Path to this script relative to the extension dir.
-    var $extKey = 'meta_feedit';	// The extension key.
-    var $conf;
-    var $cObj; // contains an initialized cObj, so we can use the cObj functions whenever we want to.
-    var $templateObj; // contains an initialized templateObj, so we can use the template functions whenever we want to.(ex with dynamic tabs)
-    var $caller; // the caller
-    var $table; // the table
-    var $TCA; // contains the complete TCA of the $table
-    var $cmd; // this is 'hopefully' the same value as fe_adminLib's cmd.
-    var $id_field = ''; // the field from a record witch will identify the record.
-    var $additionalJS_end = array(); // JS to be added after the end of the content.
-    // Fields for the RTE API
-    var $strEntryField;
-    var $RTEObj;
-    var $docLarge = 0;
-    var $RTEcounter = 0;
-    var $FCounter=0;
-    var $formName;
-    var $additionalJS_initial = '';// Initial JavaScript to be printed before the form (should be in head, but cannot due to IE6 timing bug)
-    var $additionalJS_pre = array();// Additional JavaScript to be printed before the form (works in Mozilla/Firefox when included in head, but not in IE6)
-    var $additionalJS_post = array();// Additional JavaScript to be printed after the form
-    var $additionalJS_submit = array();// Additional JavaScript to be executed on submit
-    var $PA = array(
-    	  'itemFormElName' =>  '',
-    	  'itemFormElValue' => '',
-    	  );
-    var $specConf = array();
-    var $metafeeditlib;
-    var $thisConfig = array();
-    var $RTEtypeVal = 'text';
-    var $thePidValue;
-    var $TCATables=array();
-    var $performanceaudit; // performance audit flag
-    //var $_LOCAL_LANG = array(); // Language override
+	// Private fields
+	var $prefixId = 'tx_metafeedit';		// Same as class name
+	var $scriptRelPath = 'class.tx_metafeedit.php';	// Path to this script relative to the extension dir.
+	var $extKey = 'meta_feedit';	// The extension key.
+	var $conf;
+	var $cObj; // contains an initialized cObj, so we can use the cObj functions whenever we want to.
+	var $templateObj; // contains an initialized templateObj, so we can use the template functions whenever we want to.(ex with dynamic tabs)
+	var $caller; // the caller
+	var $table; // the table
+	var $TCA; // contains the complete TCA of the $table
+	var $cmd; // this is 'hopefully' the same value as fe_adminLib's cmd.
+	var $id_field = ''; // the field from a record witch will identify the record.
+	var $additionalJS_end = array(); // JS to be added after the end of the content.
+	// Fields for the RTE API
+	var $strEntryField;
+	var $RTEObj;
+	var $docLarge = 0;
+	var $RTEcounter = 0;
+	var $FCounter=0;
+	var $formName;
+	var $additionalJS_initial = '';// Initial JavaScript to be printed before the form (should be in head, but cannot due to IE6 timing bug)
+	var $additionalJS_pre = array();// Additional JavaScript to be printed before the form (works in Mozilla/Firefox when included in head, but not in IE6)
+	var $additionalJS_post = array();// Additional JavaScript to be printed after the form
+	var $additionalJS_submit = array();// Additional JavaScript to be executed on submit
+	var $PA = array(
+		  'itemFormElName' =>  '',
+		  'itemFormElValue' => '',
+		  );
+	var $specConf = array();
+	var $metafeeditlib;
+	var $thisConfig = array();
+	var $RTEtypeVal = 'text';
+	var $thePidValue;
+	var $TCATables=array();
+	var $performanceaudit; // performance audit flag
+	//var $_LOCAL_LANG = array(); // Language override
 
-    /**
-    * init : Main method ...
-    *
-    * @param	[object]    $caller: calaing object (instance of PI1).
-    * @param	[array]		$conf: configuration array
-    * @return	[string]	content to display.
-    */
-    
+	/**
+	* init : Main method ...
+	*
+	* @param	[object]	$caller: calaing object (instance of PI1).
+	* @param	[array]		$conf: configuration array
+	* @return	[string]	content to display.
+	*/
+	
   	function init(&$caller,&$conf)	{
 
-        $this->initialize($caller,$conf);
-         
-        if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init done :']=$this->metafeeditlib->displaytime()." Seconds"; 
-        // command specific initialisation 
-        $this->initCmd($conf);
-        $this->conf=&$conf; // to be removed !!!  Can it be removed ? CBY
-        if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init feAconf done :']=$this->metafeeditlib->displaytime()." Seconds"; 
-        if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after Init feAConf size ']=strlen(serialize($conf))." Bytes"; 
+		$this->initialize($caller,$conf);
+		 
+		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init done :']=$this->metafeeditlib->displaytime()." Seconds"; 
+		// command specific initialisation 
+		$this->initCmd($conf);
+		$this->conf=&$conf; // to be removed !!!  Can it be removed ? CBY
+		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init feAconf done :']=$this->metafeeditlib->displaytime()." Seconds"; 
+		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after Init feAConf size ']=strlen(serialize($conf))." Bytes"; 
 
-        // we call fe_adminLib.php here ...
-        $conf['caller_additionalJS_post']=$this->additionalJS_post;
-        $conf['caller_additionalJS_end']=$this->additionalJS_end;
+		// we call fe_adminLib.php here ...
+		$conf['caller_additionalJS_post']=$this->additionalJS_post;
+		$conf['caller_additionalJS_end']=$this->additionalJS_end;
 		
-        if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf before USER_INT call size ']=strlen(serialize($conf))." Bytes"; 
+		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf before USER_INT call size ']=strlen(serialize($conf))." Bytes"; 
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit before USER_INT call  :']=$this->metafeeditlib->displaytime()." Seconds"; 
 		// In No Cache or Mixt Cache We call USER_INT object
 		if ($conf['cacheMode']<2) {
@@ -154,73 +154,73 @@ class tx_metafeedit extends  tslib_pibase {
 		'<input type="hidden" id="mfdt_orderBy" name="'.$this->prefixId.'[orderBy]" value="" />'.
 		'</form>';
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf size ']=strlen(serialize($conf))." Bytes"; 
-		    /**** ADDS THE REQUIRED JAVASCRIPTS ****/    
+			/**** ADDS THE REQUIRED JAVASCRIPTS ****/	
 
-    	$content .= $this->getJSAfter($conf);
+		$content .= $this->getJSAfter($conf);
 		return ($conf['performanceaudit']?t3lib_div::view_array($this->caller->perfArray):'').$form.$content;
-  	}    
+  	}	
 
 	// for template wizards
 		
-  	function initTpl(&$caller,&$conf)	{      			
-        //$this->initialize($caller,$conf);
-        //if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init done :']=$this->metafeeditlib->displaytime()." Seconds"; 
-        // command specific initialisation 
-        //$this->initCmd($conf);	
-        $this->metafeeditlib=t3lib_div::makeInstance('tx_metafeedit_lib');
-  	}    
+  	function initTpl(&$caller,&$conf)	{	  			
+		//$this->initialize($caller,$conf);
+		//if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init done :']=$this->metafeeditlib->displaytime()." Seconds"; 
+		// command specific initialisation 
+		//$this->initCmd($conf);	
+		$this->metafeeditlib=t3lib_div::makeInstance('tx_metafeedit_lib');
+  	}	
 
-    /**
-    * initialize : initializes object...
-    *
-    * @param	[type]		$caller: ...
-    * @param	[type]		$conf: ...
-    * @return	[type]		...
-    */
-    
-    function initialize(&$caller,&$conf) {
-        $this->caller = $caller;
-        $conf['caller']=&$caller; // 100 K
-        $this->metafeeditlib=$caller->metafeeditlib;
-        if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit cache Mode : '.$conf['cacheMode']]=$this->metafeeditlib->displaytime()." Seconds"; 
-  	    if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf Enter size ']=strlen(serialize($conf))." Bytes"; 
-        $conf['prefixId']= 'tx_metafeedit';
-        $conf['additionalJS_post'] = array();
-        $conf['additionalJS_end'] = array();
+	/**
+	* initialize : initializes object...
+	*
+	* @param	[type]		$caller: ...
+	* @param	[type]		$conf: ...
+	* @return	[type]		...
+	*/
+	
+	function initialize(&$caller,&$conf) {
+		$this->caller = $caller;
+		$conf['caller']=&$caller; // 100 K
+		$this->metafeeditlib=$caller->metafeeditlib;
+		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit cache Mode : '.$conf['cacheMode']]=$this->metafeeditlib->displaytime()." Seconds"; 
+  		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf Enter size ']=strlen(serialize($conf))." Bytes"; 
+		$conf['prefixId']= 'tx_metafeedit';
+		$conf['additionalJS_post'] = array();
+		$conf['additionalJS_end'] = array();
 
-        //$conf['performanceaudit']=$caller->performanceaudit;
-        
-        // Cache ??
-        if ($conf['cacheMode']==0) $GLOBALS['TSFE']->set_no_cache();        
-        $this->cObj=$GLOBALS['TSFE']->cObj;
-        $this->templateObj = t3lib_div::makeInstance('mediumDoc');
-        $this->table = $conf['table'];
-        
-        // we check here editUnique Creation Mode
-                
-        if ($conf['editUnique']) {
-        	//@todo check why I have to do this ?
-        	$conf['inputvar.']['cmd']='edit';
-        	$mmTable='';
-        	$DBSELECT=$this->metafeeditlib->DBmayFEUserEditSelectMM($this->table,$GLOBALS['TSFE']->fe_user->user, $conf['allowedGroups'],$conf['fe_userEditSelf'],$mmTable,$conf).$GLOBALS['TSFE']->sys_page->deleteClause($this->table);
-        	$thePid = intval($conf['pid']) ? intval($conf['pid']) : $GLOBALS['TSFE']->id;
-            $lockPid = $conf['edit.']['menuLockPid'] ? ' AND pid='.intval($thePid) : '';
-            $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $this->table.($mmTable?','.$mmTable:'') , '1 '.$lockPid.$DBSELECT);
-            $resu=$GLOBALS['TYPO3_DB']->sql_num_rows($res);
-        	if ($resu===0 &&  $this->cmd!='setfixed') $conf['inputvar.']['cmd']='create';
-        }
-        
-        if (!$conf['inputvar.']['cmd']) die ("META_FEEDIT ERROR: NO COMMAND SPECIFIED FOR THE SCRIPT");
+		//$conf['performanceaudit']=$caller->performanceaudit;
+		
+		// Cache ??
+		if ($conf['cacheMode']==0) $GLOBALS['TSFE']->set_no_cache();		
+		$this->cObj=$GLOBALS['TSFE']->cObj;
+		$this->templateObj = t3lib_div::makeInstance('mediumDoc');
+		$this->table = $conf['table'];
+		
+		// we check here editUnique Creation Mode
+				
+		if ($conf['editUnique']) {
+			//@todo check why I have to do this ?
+			$conf['inputvar.']['cmd']='edit';
+			$mmTable='';
+			$DBSELECT=$this->metafeeditlib->DBmayFEUserEditSelectMM($this->table,$GLOBALS['TSFE']->fe_user->user, $conf['allowedGroups'],$conf['fe_userEditSelf'],$mmTable,$conf).$GLOBALS['TSFE']->sys_page->deleteClause($this->table);
+			$thePid = intval($conf['pid']) ? intval($conf['pid']) : $GLOBALS['TSFE']->id;
+			$lockPid = $conf['edit.']['menuLockPid'] ? ' AND pid='.intval($thePid) : '';
+			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $this->table.($mmTable?','.$mmTable:'') , '1 '.$lockPid.$DBSELECT);
+			$resu=$GLOBALS['TYPO3_DB']->sql_num_rows($res);
+			if ($resu===0 &&  $this->cmd!='setfixed') $conf['inputvar.']['cmd']='create';
+		}
+		
+		if (!$conf['inputvar.']['cmd']) die ("META_FEEDIT ERROR: NO COMMAND SPECIFIED FOR THE SCRIPT");
 
 		//$conf['inputvar.']['cmd']='edit';
-        //$conf['cmd']=$this->cmd;
-        //	debug("WARNING:: NO COMMAND SPECIFIED FOR THE SCRIPT","NO COMMAND");
-        
-    	$this->id_field = $conf['label.'][$FT]?$conf['label.'][$FT]:($conf['idField']?$conf['idField']:$GLOBALS['TCA'][$this->table]['ctrl']['label']);
-    	if (!$this->id_field) $this->id_field='uid';
-    	$conf["table_label"]=$this->id_field;
-    
-        // TODO : move next lines to pi1 ...
+		//$conf['cmd']=$this->cmd;
+		//	debug("WARNING:: NO COMMAND SPECIFIED FOR THE SCRIPT","NO COMMAND");
+		
+		$this->id_field = $conf['label.'][$FT]?$conf['label.'][$FT]:($conf['idField']?$conf['idField']:$GLOBALS['TCA'][$this->table]['ctrl']['label']);
+		if (!$this->id_field) $this->id_field='uid';
+		$conf["table_label"]=$this->id_field;
+	
+		// TODO : move next lines to pi1 ...
 		if ($conf['list.']['advancedSearch']) {
 			$conf['keep_piVars']= $conf['keep_piVars']? $conf['keep_piVars'].',advancedSearch':'advancedSearch';
 		}
@@ -234,18 +234,18 @@ class tx_metafeedit extends  tslib_pibase {
   	}
   	
   	/**
-    * LoadTCAs : Loads Tabel TCA with user overrides...
-    *
-    * @param	[array]		$conf: configuration array
-    */
-    
-    function LoadTCAs(&$conf) {
-        #    $GLOBALS['TSFE']->includeTCA(); // Uncomment cause extensions using this API should be able to modify TCA array before used here.
-  	    if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf before LoadTCA size ']=strlen(serialize($conf))." Bytes"; 
-        
-        t3lib_div::loadTCA($this->table);
-        //t3lib_div::loadTCA('tx_metafeedit_comments');
-	    $conf['uidField']=$GLOBALS['TCA'][$this->table]['ctrl']['uidField']?$GLOBALS['TCA'][$this->table]['ctrl']['uidField']:'uid';
+	* LoadTCAs : Loads Tabel TCA with user overrides...
+	*
+	* @param	[array]		$conf: configuration array
+	*/
+	
+	function LoadTCAs(&$conf) {
+		#	$GLOBALS['TSFE']->includeTCA(); // Uncomment cause extensions using this API should be able to modify TCA array before used here.
+  		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf before LoadTCA size ']=strlen(serialize($conf))." Bytes"; 
+		
+		t3lib_div::loadTCA($this->table);
+		//t3lib_div::loadTCA('tx_metafeedit_comments');
+		$conf['uidField']=$GLOBALS['TCA'][$this->table]['ctrl']['uidField']?$GLOBALS['TCA'][$this->table]['ctrl']['uidField']:'uid';
    		if ($conf['debug']) echo t3lib_div::view_array(array('UIDFIELD'=>$conf['uidField']));
 		/**** CONFIGURE TCA ****/
 		// here we should calculate fieldList from showFields, evalFields, and override fields..
@@ -255,39 +255,39 @@ class tx_metafeedit extends  tslib_pibase {
 		if($conf['fe_crgroup_id'] && $conf['allowedGroups']) {
   			$GLOBALS['TCA'][$this->table]['ctrl']['fe_crgroup_id'] = $conf['fe_crgroup_id'];
 		}
-        $this->metafeeditlib->makeTypo3TCAForTable($GLOBALS['TCA'],$this->table);
+		$this->metafeeditlib->makeTypo3TCAForTable($GLOBALS['TCA'],$this->table);
 
-        // We handle Foreign Table TCA definitions here ...
-        
-        $FTRels=explode(',',$conf['foreignTables']);
-		$FTs=array();
-        $FTs[$this->table]=$this->table;
+		// We handle Foreign Table TCA definitions here ...
 		
-        foreach ($FTRels as $FTRel) {
-        	if ($FTRel && $GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table'];
-        }
-        
+		$FTRels=explode(',',$conf['foreignTables']);
+		$FTs=array();
+		$FTs[$this->table]=$this->table;
+		
+		foreach ($FTRels as $FTRel) {
+			if ($FTRel && $GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$FTRel]['config']['foreign_table'];
+		}
+		
 		// We handle foreign tables of fields
-        $lfields=t3lib_div::trimexplode(',',$conf['list.']['show_fields']);
-        foreach ($lfields as $lf) {
-        	if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
-        }
-        
-       // We handle foreign tables of exta fields
-        $lfields=t3lib_div::trimexplode(',',$conf['list.']['extraFields']);	
-        foreach ($lfields as $lf) {
-        	if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
-        }
-       // We handle foreign tables of fields
-        $lfields=t3lib_div::trimexplode(',',$conf['list.']['advancedSearchFields']);
-        foreach ($lfields as $lf) {
-         	if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
-        }
-        // We add fe_user table just in case we need feuser join.		
-        if (!in_array('fe_users',$FTs)) $FTs['fe_users']='fe_users';
-        if (!in_array('tx_metafeedit_comments',$FTs)) $FTs['tx_metafeedit_comments']='tx_metafeedit_comments';
-                
-        $conf['TCATables']=$FTs;
+		$lfields=t3lib_div::trimexplode(',',$conf['list.']['show_fields']);
+		foreach ($lfields as $lf) {
+			if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
+		}
+		
+	   // We handle foreign tables of exta fields
+		$lfields=t3lib_div::trimexplode(',',$conf['list.']['extraFields']);	
+		foreach ($lfields as $lf) {
+			if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
+		}
+	   // We handle foreign tables of fields
+		$lfields=t3lib_div::trimexplode(',',$conf['list.']['advancedSearchFields']);
+		foreach ($lfields as $lf) {
+		 	if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
+		}
+		// We add fe_user table just in case we need feuser join.		
+		if (!in_array('fe_users',$FTs)) $FTs['fe_users']='fe_users';
+		if (!in_array('tx_metafeedit_comments',$FTs)) $FTs['tx_metafeedit_comments']='tx_metafeedit_comments';
+				
+		$conf['TCATables']=$FTs;
 		//We handle here tables from other software than T3 !!
 		//TODO : We should do this for every foreign table
 
@@ -298,10 +298,10 @@ class tx_metafeedit extends  tslib_pibase {
 				$procExtKey = explode('->', $GLOBALS['TCA'][$this->table]['columns'][$keyField]["config"]["itemsProcFunc"]);
 				if (is_array($procExtKey) && file_exists($procExt.'class.'.strtolower ($procExtKey[0]).'.php')) include_once($procExt.'class.'.strtolower ($procExtKey[0]).'.php');
 			}
-		}		
+		}
 		if ($conf["extTables"]) {
 			$extKeys=t3lib_div::trimExplode(chr(10),$conf["extTables"]);
-  			$this->mergeExtendingTCAs($extKeys);
+			$this->mergeExtendingTCAs($extKeys);
 		}
 
 		//TODO : allow general TCA override here.
@@ -311,13 +311,13 @@ class tx_metafeedit extends  tslib_pibase {
 		
 		$conf['TCAN'][$this->table]=$GLOBALS['TCA'][$this->table];
 		foreach($FTs as $FTable) {
-		    $this->metafeeditlib->makeTypo3TCAForTable($conf['TCAN'],$FTable);
+			$this->metafeeditlib->makeTypo3TCAForTable($conf['TCAN'],$FTable);
 		}
 		//We get related foreign tables if necessary
-    	foreach ($lfields as $lf) {
-        	if ($lf) $r=$this->metafeeditlib->getForeignTableFromField2($lf,$conf['table'],$conf['TCAN']);
-        }		
-	    // Set private TCA var
+		foreach ($lfields as $lf) {
+			if ($lf) $r=$this->metafeeditlib->getForeignTableFromField2($lf,$conf['table'],$conf['TCAN']);
+		}		
+		// Set private TCA var
 		
 		if (is_array($conf['general.']['tsOverride.'])) {
 			$settings=$this->metafeeditlib->postProcessSettings($conf['general.']['tsOverride.']);
@@ -325,97 +325,97 @@ class tx_metafeedit extends  tslib_pibase {
 		}
 		
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after TCA size 0 ']=strlen(serialize($conf))." Bytes"; 
-	    //$conf['TCAN']=&$GLOBALS['TCA']; // 400 K ...
+		//$conf['TCAN']=&$GLOBALS['TCA']; // 400 K ...
 
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf after LoadTCA size ']=strlen(serialize($conf))." Bytes"; 
-    }
-    
+	}
+	
   	
-    /**
-    * LoadLanguageConf : Loads Language Configuration array for translations ...
-    *
-    * @param	[array]		$conf: configuration array
-    */
-    
-    function LoadLanguageConf(&$conf) {
+	/**
+	* LoadLanguageConf : Loads Language Configuration array for translations ...
+	*
+	* @param	[array]		$conf: configuration array
+	*/
+	
+	function LoadLanguageConf(&$conf) {
   	  if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf before Language size ']=strlen(serialize($conf))." Bytes"; 
-  	    
-    	// loads default locallang
-    	$this->LOCAL_LANG = $GLOBALS['TSFE']->readLLfile(t3lib_extMgm::extPath($this->extKey).'locallang.xml');
-    	// loads callers locallang
-    	$this->LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($this->LOCAL_LANG,$this->caller->LOCAL_LANG);
-        
-        // if we use static info table we must get language file. 
-        // TOCHECK : Do we still need this ?
-        
-        if(t3lib_extmgm::isLoaded('sr_static_info')) {
-        	$filepath=t3lib_extMgm::extPath('sr_static_info').'pi1/locallang.php';
-        	if (file_exists($filepath)) {
-        		$stat_lang=$GLOBALS['TSFE']->readLLfile($filepath);
-        		$this->LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($this->LOCAL_LANG,$stat_lang);
-            }
-        }
-        
-        // get override language data coming from typoscript. Should handle multiple languages ...
-        //@todo : We should only load default and local language translations ... 
-       
-         if (is_array($conf['_LOCAL_LANG.'])){
-            foreach($conf['_LOCAL_LANG.'] as $key=>$valarr) {
+  		
+		// loads default locallang
+		$this->LOCAL_LANG = $GLOBALS['TSFE']->readLLfile(t3lib_extMgm::extPath($this->extKey).'locallang.xml');
+		// loads callers locallang
+		$this->LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($this->LOCAL_LANG,$this->caller->LOCAL_LANG);
+		
+		// if we use static info table we must get language file. 
+		// TOCHECK : Do we still need this ?
+		
+		if(t3lib_extmgm::isLoaded('sr_static_info')) {
+			$filepath=t3lib_extMgm::extPath('sr_static_info').'pi1/locallang.php';
+			if (file_exists($filepath)) {
+				$stat_lang=$GLOBALS['TSFE']->readLLfile($filepath);
+				$this->LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($this->LOCAL_LANG,$stat_lang);
+			}
+		}
+		
+		// get override language data coming from typoscript. Should handle multiple languages ...
+		//@todo : We should only load default and local language translations ... 
+	   
+		 if (is_array($conf['_LOCAL_LANG.'])){
+			foreach($conf['_LOCAL_LANG.'] as $key=>$valarr) {
 				$nkey=substr($key,0,strpos($key,'.')); 
-            	foreach($valarr as $skey=>$sval) {
+				foreach($valarr as $skey=>$sval) {
 					if (is_array($sval)) {
-            	        $svala=$sval;
-            	        foreach($svala as $skey2=>$sval) {
-            	            $skey2=$skey.$skey2;
+						$svala=$sval;
+						foreach($svala as $skey2=>$sval) {
+							$skey2=$skey.$skey2;
 							while (is_array($sval)) {  // if fieldname has several '.' in it we regenerate whole name  here...
-		            	        $svalb=$sval;
-		            	        foreach($svalb as $skey3=>$sval) {
-		            	            $skey2.=$skey3;
-		            	        }
-		            	    }
+								$svalb=$sval;
+								foreach($svalb as $skey3=>$sval) {
+									$skey2.=$skey3;
+								}
+							}
 							$this->LOCAL_LANG[$nkey][$skey2]=$sval;
-            	        }
+						}
 					} else {
 						$this->LOCAL_LANG[$nkey][$skey]=$sval;
 					}
-            	}
-            }
-        }
-        $conf['LLkey']=$this->LLkey;       
-        $conf['LOCAL_LANG']['default']=&$this->LOCAL_LANG['default'];
-        $conf['LOCAL_LANG'][$conf['LLkey']]=&$this->LOCAL_LANG[$conf['LLkey']];
+				}
+			}
+		}
+		$conf['LLkey']=$this->LLkey;	   
+		$conf['LOCAL_LANG']['default']=&$this->LOCAL_LANG['default'];
+		$conf['LOCAL_LANG'][$conf['LLkey']]=&$this->LOCAL_LANG[$conf['LLkey']];
 		unset($conf['_LOCAL_LANG.']);
  		/**** Init language object (used for translation of labels) ****/
 		$GLOBALS['TSFE']->initLLvars();
-    }
+	}
 
-    /**
-    * initFieldsCmd
-    *
-    * @param	[type]		$$conf: ...
-    * @param	[type]		$cmd: ...
-    * @return	[type]		...
-    */
-    
+	/**
+	* initFieldsCmd
+	*
+	* @param	[type]		$$conf: ...
+	* @param	[type]		$cmd: ...
+	* @return	[type]		...
+	*/
+	
 	function initFieldsCmd(&$conf,$cmd) {
 		$table=$conf['table'];
 		/**** DO ADDITIONAL REQUIRED STUFF FOR THE FIELDS ****/
 		if (!$conf[$cmd.'.']['show_fields']) $conf[$cmd.'.']['show_fields']=$conf['TCAN'][$table]["interface"]["showRecordFieldList"];
 		$fieldArray = explode(',',$conf[$cmd.'.']['show_fields']);
-	    $farr=array();
-	    $fieldstoberemoved=array();
+		$farr=array();
+		$fieldstoberemoved=array();
 		foreach((array)$fieldArray as $fN) { //runs through the different fields
-    		$fN=trim($fN);
-    		// make sure --div-- is in allowed fields list
-    		$parts = explode(";",$fN);
-		    if(!($conf['TCAN'][$table]['columns'][$fN]['config']['type']=='group'  && $conf['TCAN'][$table]['columns'][$fN]['config']['internal_type']=='db' && count(t3lib_div::trimexplode(',',$conf['TCAN'][$table]['columns'][$fN]['config']['allowed']))>1)) {
-    			if($parts[0]=='--div--') {
-    	  		    if (trim($parts[1])) {
+			$fN=trim($fN);
+			// make sure --div-- is in allowed fields list
+			$parts = explode(";",$fN);
+			if(!($conf['TCAN'][$table]['columns'][$fN]['config']['type']=='group'  && $conf['TCAN'][$table]['columns'][$fN]['config']['internal_type']=='db' && count(t3lib_div::trimexplode(',',$conf['TCAN'][$table]['columns'][$fN]['config']['allowed']))>1)) {
+				if($parts[0]=='--div--') {
+		  			if (trim($parts[1])) {
 						$conf[$cmd.'.']['fields'] = $conf[$cmd.'.']['fields'] ? $conf[$cmd.'.']['fields'].','.$parts[1] : $parts[1];
 						// CBY $farr[]=$parts[1]; fixes bug on tabs not being shown ...
 						$farr[]=$parts[0].';'.$parts[1];
 					}
-    			} else {
+				} else {
 					if ($fN) {
 						$conf[$cmd.'.']['fields'] = $conf[$cmd.'.']['fields'] ? $conf[$cmd.'.']['fields'].','.$fN : $fN;
 						$farr[]=$fN;
@@ -423,35 +423,35 @@ class tx_metafeedit extends  tslib_pibase {
 				}
 			}
 
-    		// CBY :: here we handle the new evalValues mecanism if empty we take the default config.eval value
+			// CBY :: here we handle the new evalValues mecanism if empty we take the default config.eval value
 		  	// here whe should merge the eval arrays ....
 
-    		if(!$conf[$cmd.'.']['evalValues.'][$fN] && $conf['TCAN'][$table]['columns'][$fN]['config']['eval']) $conf[$cmd.'.']['evalValues.'][$fN]= $conf['TCAN'][$table]['columns'][$fN]['config']['eval'];
+			if(!$conf[$cmd.'.']['evalValues.'][$fN] && $conf['TCAN'][$table]['columns'][$fN]['config']['eval']) $conf[$cmd.'.']['evalValues.'][$fN]= $conf['TCAN'][$table]['columns'][$fN]['config']['eval'];
 
-    		// do stuff according to type from TCA
-    		switch((string)$conf['TCAN'][$table]['columns'][$fN]['config']['type']) {
-    		case 'group':
-    		        if($conf['TCAN'][$table]['columns'][$fN]['config']['internal_type']=='file') {
-    		                // CBY I removed _file handling here...
-    		                //We could add folder specialisation here ...
+			// do stuff according to type from TCA
+			switch((string)$conf['TCAN'][$table]['columns'][$fN]['config']['type']) {
+			case 'group':
+					if($conf['TCAN'][$table]['columns'][$fN]['config']['internal_type']=='file') {
+							// CBY I removed _file handling here...
+							//We could add folder specialisation here ...
 							// modif by CMD - permet d'eviter les message d'errreur suite � la gestion des champs suppl�mentaire sql ou php calcul�
-    		                $conf['TCAN'][$table]['columns'][$fN.'_file'] = $conf['TCAN'][$table]['columns'][$fN]; // the new upload field should have the same upload folder as the original field
-    		                $conf['TCAN'][$table]['columns'][$fN.'_file']['imagealiasfield']=$fN;
-    		                //$conf['TCAN'][$table]['columns'][$fN.'_file']['config']['uploadfolder'] = $conf['TCAN'][$table]['columns'][$fN]['config']['uploadfolder']; // the new upload field should have the same upload folder as the original field
-    		                $conf['parseValues.'][$fN.'_file'] = 'files['.preg_replace('/,/',';',$conf['TCAN'][$table]['columns'][$fN]['config']['allowed']).']['.$conf['TCAN'][$table]['columns'][$fN]['config']['max_size'].']'; // adds the parse options for the new field, so it will be parsed as a file.
-    		        }
-    		}
+							$conf['TCAN'][$table]['columns'][$fN.'_file'] = $conf['TCAN'][$table]['columns'][$fN]; // the new upload field should have the same upload folder as the original field
+							$conf['TCAN'][$table]['columns'][$fN.'_file']['imagealiasfield']=$fN;
+							//$conf['TCAN'][$table]['columns'][$fN.'_file']['config']['uploadfolder'] = $conf['TCAN'][$table]['columns'][$fN]['config']['uploadfolder']; // the new upload field should have the same upload folder as the original field
+							$conf['parseValues.'][$fN.'_file'] = 'files['.preg_replace('/,/',';',$conf['TCAN'][$table]['columns'][$fN]['config']['allowed']).']['.$conf['TCAN'][$table]['columns'][$fN]['config']['max_size'].']'; // adds the parse options for the new field, so it will be parsed as a file.
+					}
+			}
 		}
 		$conf[$cmd.'.']['show_fields']=implode(',',array_unique($farr));
 		$conf[$cmd.'.']['fields']=implode(',',array_unique(t3lib_div::trimExplode(',',$conf[$cmd.'.']['fields']))); // TODO : Why must we clean up here ?
 	}
 
-    /**
-    * initCmd
-    *
-    * @param	[type]		$$conf: ...
-    * @return	[type]		...
-    */
+	/**
+	* initCmd
+	*
+	* @param	[type]		$$conf: ...
+	* @return	[type]		...
+	*/
 	 
 	function initCmd(&$conf) {
 		$cmd=$conf['inputvar.']['cmd'];
@@ -461,69 +461,69 @@ class tx_metafeedit extends  tslib_pibase {
 		$this->initFieldsCmd($conf,'list');
 		$this->metafeeditlib->getFieldList($conf);
 
-        /**** CHECK IF LOGIN IS REQUIRED ****/
-        //CBY: if($conf['requireLogin'] && !$GLOBALS['TSFE']->loginUser) return $this->metafeeditlib->getLL("login_required_message",$conf);
-        /**** FE ADMIN LIB ****/
-       //$conf['parentObj']=&$this;
-       $conf["templateContent"]= $this->getDefaultTemplate($conf); // gets the default template
+		/**** CHECK IF LOGIN IS REQUIRED ****/
+		//CBY: if($conf['requireLogin'] && !$GLOBALS['TSFE']->loginUser) return $this->metafeeditlib->getLL("login_required_message",$conf);
+		/**** FE ADMIN LIB ****/
+	   //$conf['parentObj']=&$this;
+	   $conf["templateContent"]= $this->getDefaultTemplate($conf); // gets the default template
 
-        // generate default template in browser if required to.
-        if ($conf['generateTemplate']){
-            echo  $conf["templateContent"];
-            die();
-        }
-    
-        if ($conf['fetemplate']&& $conf['useTemplate']) {
-          	$conf["templateContent"]=$conf['fetemplate'];
-        }
-        // CBY>
-       	$conf["templateContentOptions"]=$conf['templateContent']; // can this be removed ?
-     
-       	$conf['parentObj']=&$this;
-       	$conf["templateContent"]=$this->metafeeditlib->replaceOptions($conf["templateContent"],$conf,$cmd,$this->table,'');
-       	return $conf;
+		// generate default template in browser if required to.
+		if ($conf['generateTemplate']){
+			echo  $conf["templateContent"];
+			die();
+		}
+	
+		if ($conf['fetemplate']&& $conf['useTemplate']) {
+		  	$conf["templateContent"]=$conf['fetemplate'];
+		}
+		// CBY>
+	   	$conf["templateContentOptions"]=$conf['templateContent']; // can this be removed ?
+	 
+	   	$conf['parentObj']=&$this;
+	   	$conf["templateContent"]=$this->metafeeditlib->replaceOptions($conf["templateContent"],$conf,$cmd,$this->table,'');
+	   	return $conf;
 	  }
-    
-    /* mergeExtendingTCAs($ext_keys)
-    *
-    *  In case you wrote an extension, that extends the table "$table", then
-    *  the TCA information for the additional fields will be merged with the "$table" TCA.
-    *
-    * @param	array		Extension TCA's that should be merged.
-    * @return	[type]		...
-    */
-    
-    function mergeExtendingTCAs($ext_keys){
-        global $_EXTKEY, $TCA;
-        //Merge all ext_keys
-        if (is_array($ext_keys)) {
-            for($i = 0; $i < sizeof($ext_keys); $i++){
-                //Include the ext_table
-                $_EXTKEY = $ext_keys[$i]; // added by F.Rakow
-                if ($_EXTKEY) include(t3lib_extMgm::extPath($ext_keys[$i]).'ext_tables.php');
-            }
-        }
-    }
+	
+	/* mergeExtendingTCAs($ext_keys)
+	*
+	*  In case you wrote an extension, that extends the table "$table", then
+	*  the TCA information for the additional fields will be merged with the "$table" TCA.
+	*
+	* @param	array		Extension TCA's that should be merged.
+	* @return	[type]		...
+	*/
+	
+	function mergeExtendingTCAs($ext_keys){
+		global $_EXTKEY, $TCA;
+		//Merge all ext_keys
+		if (is_array($ext_keys)) {
+			for($i = 0; $i < sizeof($ext_keys); $i++){
+				//Include the ext_table
+				$_EXTKEY = $ext_keys[$i]; // added by F.Rakow
+				if ($_EXTKEY) include(t3lib_extMgm::extPath($ext_keys[$i]).'ext_tables.php');
+			}
+		}
+	}
 
 
-    /**********************************************************************************************
-    * TEMPLATE FUNCTIONS
-    **********************************************************************************************/
-    /**
-    * Gets a default template made from the TCA.
-    * The template there is returned depends on what $this->cmd is.
-    *
-    * @param	[type]		$$conf: ...
-    * @return	[type]		...
-    */
-    
-    function getDefaultTemplate(&$conf)	{
-        $callerMethods = get_class_methods(get_class($this->caller));
-        $template = array_search('getrequiredtemplate',$callerMethods) || array_search('getRequiredTemplate',$callerMethods)?
+	/**********************************************************************************************
+	* TEMPLATE FUNCTIONS
+	**********************************************************************************************/
+	/**
+	* Gets a default template made from the TCA.
+	* The template there is returned depends on what $this->cmd is.
+	*
+	* @param	[type]		$$conf: ...
+	* @return	[type]		...
+	*/
+	
+	function getDefaultTemplate(&$conf)	{
+		$callerMethods = get_class_methods(get_class($this->caller));
+		$template = array_search('getrequiredtemplate',$callerMethods) || array_search('getRequiredTemplate',$callerMethods)?
 		$this->caller->getRequiredTemplate($conf) : $this->getRequiredTemplate($conf);
-        $template .= array_search('getemailtemplate',$callerMethods) || array_search('getEmailTemplate',$callerMethods)?$this->caller->getEmailTemplate($conf) : $this->getEmailTemplate($conf);
-        $nbCols = $this->piVars['nbCols'];
-        
+		$template .= array_search('getemailtemplate',$callerMethods) || array_search('getEmailTemplate',$callerMethods)?$this->caller->getEmailTemplate($conf) : $this->getEmailTemplate($conf);
+		$nbCols = $this->piVars['nbCols'];
+		
 		if ($conf['generateTemplate']){ // We generate all templates
 			$template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
 			$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
@@ -544,7 +544,7 @@ class tx_metafeedit extends  tslib_pibase {
 				case 'edit':
 					$template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
 					if ($conf['list.']['pdf'] || $conf['edit.']['pdf']) {
-						$template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);	          
+						$template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);			  
 						//$template .= array_search('getGridPDFTemplate',$callerMethods) || array_search('getGridPDFTemplate',$callerMethods)?  $this->caller->getGridPDFTemplate($conf) : $this->getGridPDFTemplate($conf);
 					}
 					//$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
@@ -569,7 +569,7 @@ class tx_metafeedit extends  tslib_pibase {
 					$this->caller->getCreateTemplate($conf) : $this->getCreateTemplate($conf);
 					$template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
 					/*if ($conf['list.']['pdf'] || $conf['edit.']['pdf']) {
-						$template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);	          
+						$template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);			  
 					}
 					$template .= array_search('getmediaplayertemplate',$callerMethods) || array_search('getMediaPlayerTemplate',$callerMethods)?  $this->caller->getMediaPlayerTemplate($conf): $this->getMediaPlayerTemplate($conf);
 					*/
@@ -586,82 +586,82 @@ class tx_metafeedit extends  tslib_pibase {
 					debug('meta_feedit->getDefaultTemplate():: No template found for cmd='.$conf['inputvar.']['cmd'],'No Template');
 					$template = '';
 			}
-        }
-        return $template;
-    }
-    
-    /**
-    * Makes the form content from the TCA according to the configuration for the $cmd
-    *
-    * @param	string		The cmd. Should be 'edit' or 'create'.
-    * @param	[type]		$conf: ...
-    * @return	[type]		...
-    */
-    
-    function makeHTMLForm($cmd,&$conf)	{
-        //$fields = array_intersect( array_unique(t3lib_div::trimExplode(",",$conf[$cmd.'.']['show_fields'],1)) , array_unique(t3lib_div::trimExplode(",",$conf[$cmd.'.']['fields'],1)));
-        //$reqFields = array_intersect( array_unique(t3lib_div::trimExplode(",",$conf[$cmd.'.']["required"],1)) , array_unique(t3lib_div::trimExplode(",",$conf[$cmd.'.']['show_fields'],1)));
-        $fields = t3lib_div::trimExplode(",",$conf[$cmd.'.']['show_fields'],1);
-        $reqFields = t3lib_div::trimExplode(",",$conf[$cmd.'.']["required"],1);
-        
-        $out_array = array();
-        $out_sheet = 0;
-        $fsc=0;
-        $fsi=0;
-        $tabLabels=explode(chr(10),$conf["tabLabels"]);
-        
-        // avoid JS conflict errors !!!
-        $this->RTEcounter=0;
-        while(list(,$fN)=each($fields))	{
-            $parts = explode(';',$fN);
-            $fN = $parts[0];     
-            if($fN=='--div--') {
-            	if($conf["divide2tabs"]) {
-				    $out_sheet++;
-				    $out_array[$out_sheet] = array();
-				    $out_array[$out_sheet]['title'] = $this->metafeeditlib->getLL($parts[1]?$parts[1]:'Tab '.$out_sheet,$conf);
+		}
+		return $template;
+	}
+	
+	/**
+	* Makes the form content from the TCA according to the configuration for the $cmd
+	*
+	* @param	string		The cmd. Should be 'edit' or 'create'.
+	* @param	[type]		$conf: ...
+	* @return	[type]		...
+	*/
+	
+	function makeHTMLForm($cmd,&$conf)	{
+		//$fields = array_intersect( array_unique(t3lib_div::trimExplode(",",$conf[$cmd.'.']['show_fields'],1)) , array_unique(t3lib_div::trimExplode(",",$conf[$cmd.'.']['fields'],1)));
+		//$reqFields = array_intersect( array_unique(t3lib_div::trimExplode(",",$conf[$cmd.'.']["required"],1)) , array_unique(t3lib_div::trimExplode(",",$conf[$cmd.'.']['show_fields'],1)));
+		$fields = t3lib_div::trimExplode(",",$conf[$cmd.'.']['show_fields'],1);
+		$reqFields = t3lib_div::trimExplode(",",$conf[$cmd.'.']["required"],1);
+		
+		$out_array = array();
+		$out_sheet = 0;
+		$fsc=0;
+		$fsi=0;
+		$tabLabels=explode(chr(10),$conf["tabLabels"]);
+		
+		// avoid JS conflict errors !!!
+		$this->RTEcounter=0;
+		while(list(,$fN)=each($fields))	{
+			$parts = explode(';',$fN);
+			$fN = $parts[0];	 
+			if($fN=='--div--') {
+				if($conf["divide2tabs"]) {
+					$out_sheet++;
+					$out_array[$out_sheet] = array();
+					$out_array[$out_sheet]['title'] = $this->metafeeditlib->getLL($parts[1]?$parts[1]:'Tab '.$out_sheet,$conf);
 					//$out_array[$out_sheet]['title'] = $tabLabels[$out_sheet]?$tabLabels[$out_sheet]:'Tab '.$out_sheet;
 				}
-             } else {
-                if($fN=='--fse--' && $fsc) {
-                	$out_array[$out_sheet][]='</fieldset></div>';
-                	$fsc--;
-	             }
-                if($fN=='--fsb--') {
-                    if ($fsc) {
-                    	$out_array[$out_sheet][]='</fieldset></div>';
-                    	$fsc--;
-                    }
-    	      		$fsc++;        			
-    	      		$fsclib='';
-    	      		if ($conf['list.']['fieldSetNames.'][$fsi]) $fsclib='<legend>'.$conf['list.']['fieldSetNames.'][$fsi].'</legend>';
+			 } else {
+				if($fN=='--fse--' && $fsc) {
+					$out_array[$out_sheet][]='</fieldset></div>';
+					$fsc--;
+				 }
+				if($fN=='--fsb--') {
+					if ($fsc) {
+						$out_array[$out_sheet][]='</fieldset></div>';
+						$fsc--;
+					}
+			  		$fsc++;					
+			  		$fsclib='';
+			  		if ($conf['list.']['fieldSetNames.'][$fsi]) $fsclib='<legend>'.$conf['list.']['fieldSetNames.'][$fsi].'</legend>';
 					$out_array[$out_sheet][]='<div class="'.$this->caller->pi_getClassName('form-row').'"><fieldset>'.$fsclib;
 					$fsi++;
 				}
 				
 				if ($fN=='--fse--' || $fN=='--fsb--') {
-    				continue;
-			    }
-			    
+					continue;
+				}
+				
 				$fieldCode = $this->getFormFieldCode($cmd,$conf,$fN,0,$cmd);
 				if ($fieldCode)	{
 			
 				  // NOTE: There are two ways to make a field required. The new way is to include 'required' in evalValues for a field. The old one is to have the the field in the required list.
-				  //       The new way take precedence over the old way. So if the new field has some evalValues, it makes no different if the field is in the required list or not.
+				  //	   The new way take precedence over the old way. So if the new field has some evalValues, it makes no different if the field is in the required list or not.
 				  $feData=$conf['inputvar.']['fedata'];
 				  $msg = '';
 				  $reqMarker = '';
 				  
 				  
 				  
-				  if($conf[$cmd.'.']['evalValues.'][$fN]) {        // evalValues defined
+				  if($conf[$cmd.'.']['evalValues.'][$fN]) {		// evalValues defined
 				  	$reqMarker = in_array('required',t3lib_div::trimExplode(',',$conf[$cmd.'.']['evalValues.'][$fN])) ? $conf['required_marker'] : '';
 				  }
 			
-				  if (in_array($fN,$reqFields)) {                                  // No evalValues, but field listed in required list.
-				    	$msg .= '<!--###SUB_REQUIRED_FIELD_'.$fN.'###--><div class="'.$this->caller->pi_getClassName('form-error-field').' '.$this->caller->pi_getClassName('form-required-message').'">'.($conf['evalErrors.'][$fN.'.']['required']?$conf['evalErrors.'][$fN.'.']['required']:$this->metafeeditlib->getLL("required_message",$conf)).'</div><!--###SUB_REQUIRED_FIELD_'.$fN.'###-->';
-				    	//$msg .= '<!--###SUB_REQUIRED_FIELD_'.$fN.'###--><div'.$this->caller->pi_classParam('form-required-message').'>'.($conf['evalErrors.'][$fN.'.']['required']?$conf['evalErrors.'][$fN.'.']['required']:$this->metafeeditlib->getLL("required_message",$conf)).'</div><!--###SUB_REQUIRED_FIELD_'.$fN.'###-->';
-				    	$reqMarker = $conf['required_marker'];
+				  if (in_array($fN,$reqFields)) {								  // No evalValues, but field listed in required list.
+						$msg .= '<!--###SUB_REQUIRED_FIELD_'.$fN.'###--><div class="'.$this->caller->pi_getClassName('form-error-field').' '.$this->caller->pi_getClassName('form-required-message').'">'.($conf['evalErrors.'][$fN.'.']['required']?$conf['evalErrors.'][$fN.'.']['required']:$this->metafeeditlib->getLL("required_message",$conf)).'</div><!--###SUB_REQUIRED_FIELD_'.$fN.'###-->';
+						//$msg .= '<!--###SUB_REQUIRED_FIELD_'.$fN.'###--><div'.$this->caller->pi_classParam('form-required-message').'>'.($conf['evalErrors.'][$fN.'.']['required']?$conf['evalErrors.'][$fN.'.']['required']:$this->metafeeditlib->getLL("required_message",$conf)).'</div><!--###SUB_REQUIRED_FIELD_'.$fN.'###-->';
+						$reqMarker = $conf['required_marker'];
 				  }
 			
 				  $helpIcon = ($conf['show_help_icons'] ? '<div'.$this->caller->pi_classParam('form-help-icon').'>'.$this->helpIcon($fN).'</div>' : '');
@@ -675,135 +675,135 @@ class tx_metafeedit extends  tslib_pibase {
 					foreach($evals as $ev) {
 						$evclasses.=' '.$this->caller->pi_getClassName('form-data-'.$ev);
 					}
-			      $label = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$table]['columns'][$fNiD]['label'],$conf);
+				  $label = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$table]['columns'][$fNiD]['label'],$conf);
 				  $out_array[$out_sheet][]='<div  class="'.$this->caller->pi_getClassName($fsc?'fsc':'form-row').' '.$this->caller->pi_getClassName(($fsc?'fsc-':'form-row-').$fN).'">
-                    <div class="'.$this->caller->pi_getClassName($fsc?'fsl':'form-label').' '.$this->caller->pi_getClassName(($fsc?'fsl-':'form-label-').$fN).'">
-                    <div'.$this->caller->pi_classParam($fsc?'fsrm':'form-required-marker').'>'.$reqMarker.'</div>
-                    '.$label. '
-                    '.$helpIcon.'
-                    </div>
-                    <div class="###CSS_ERROR_FIELD_'.$fN.'###'.$this->caller->pi_getClassName($fsc?'fsf':'form-field').$evclasses.'">'.$fieldCode.'</div>'.$msg.'</div>';
-                    
+					<div class="'.$this->caller->pi_getClassName($fsc?'fsl':'form-label').' '.$this->caller->pi_getClassName(($fsc?'fsl-':'form-label-').$fN).'">
+					<div'.$this->caller->pi_classParam($fsc?'fsrm':'form-required-marker').'>'.$reqMarker.'</div>
+					'.$label. '
+					'.$helpIcon.'
+					</div>
+					<div class="###CSS_ERROR_FIELD_'.$fN.'###'.$this->caller->pi_getClassName($fsc?'fsf':'form-field').$evclasses.'">'.$fieldCode.'</div>'.$msg.'</div>';
+					
 				}
-            }
-        }
-        
-        if ($out_sheet>0) {	 // There were --div-- dividers around. Create parts array for the tab menu:
-            $parts = array();
-            foreach($out_array as $idx => $sheetContent)	{
-                unset($sheetContent['title']);
-                    $parts[] = array(
-            		 'label' => $out_array[$idx]['title'],
-            		 'content' => '<table border="0" cellspacing="0" cellpadding="0" width="100%"><tr><td>'.
-            		 implode(chr(10),$sheetContent).
-            		 '</td></tr></table>'
-        		 );
-            }   
-            $content = $this->addCallersPiVars($this->templateObj->getDynTabMenu($parts, 'TCEforms:'.$table.':'.$row[$conf['uidField']]),$conf);
-        } else {	        // Only one, so just implode:
-            $content = is_array($out_array[$out_sheet]) ? $this->addCallersPiVars(implode(chr(10),$out_array[$out_sheet]),$conf) : 'makeHTMLForm() :: No form generated! (Probably no fields defined in typoscript option show_fields)';
-        }
-        
-        return $content;
-    }
-
-    /**
-    * Returns a help icon for the field
-    *
-    * @param	string		The field to get the help icon for
-    * @param	boolean		The help icon with link to javascript popup, with help in.
-    * @return	[type]		...
-    */
-    
-    function helpIcon($field) {
-        if(!is_array($GLOBALS['TCA_DESCR'][$this->table]['refs'])) return '';
-        foreach($GLOBALS['TCA_DESCR'][$this->table]['refs'] as $ref) {
-          $fieldDescription = $GLOBALS['TSFE']->sL('LLL:'.$ref.':'.$field.'.description') .' ';
-        }
-        if(empty($fieldDescription)) return '';
-        else {
-          //      $aOnClick = 'confirm(\''.$fieldDescription.'\');return false;';
-          $fieldDescription = '<html><head><title>'.$field.'</title><style type="text/css">'.preg_replace("(\r)"," ",preg_replace("(\n)"," ",$conf['help_window_style'])).'</style></head><body'.$this->caller->pi_classParam('help-body').'><div'.$this->caller->pi_classParam('help-text').'>'.$fieldDescription.'</div></body></html>';
-          $aOnClick = 'top.vHWin=window.open(\'\',\'viewFieldHelpFE\',\'height=20,width=300,status=0,menubar=0,scrollbars=1\');top.vHWin.document.writeln(\''.$fieldDescription.'\');top.vHWin.document.close();top.vHWin.focus();return false;';
-        
-          $script ='';
-        
-          require_once(PATH_t3lib . 'class.t3lib_iconworks.php');
-          return
-            '<a href="#" onclick="'.htmlspecialchars($aOnClick).'">'.
-            '<img'.t3lib_iconWorks::skinImg('typo3/','gfx/helpbubble.gif','width="14" height="14"').' hspace="2" border="0" class="absmiddle"'.($GLOBALS['CLIENT']['FORMSTYLE']?' style="cursor:help;"':'').' alt="" />'.
-            '</a>';
-        }
-    }
-  
-    /**
-    * Makes a preview of the form content according to the configuration for the $cmd
-    *
-    * @param	string		The cmd. Should be 'edit' or 'create' or 'all'.
-    * @param	boolean		Should the output be wrapped in html or not.
-    * @param	[type]		$withHTML: ...
-    * @return	[type]		...
-    */
-    
-    function makeHTMLPreview($cmd,&$conf, $withHTML = true) {
-        $fields = (string)$cmd=='all' ? array_unique(t3lib_div::trimExplode(",",($conf['create.']['show_fields'] ? $conf['create.']['show_fields'].($conf['edit.']['show_fields']?','.$conf['edit.']['show_fields']:'') : $conf['edit.']['show_fields']))) : array_unique(t3lib_div::trimExplode(",",$conf[$cmd.'.']['show_fields']));
-        $result = array();
-        $out_array = array();
-        $out_sheet = 0;
-        
-        $hiddenFields = array();
-        foreach((array)$fields as $fN) {
-            $parts = explode(';',$fN);
-            $fN = $parts[0];
-			if ($fN=='--fse--' || $fN=='--fsb--') {
-    				continue;
 			}
-            if($fN=='--div--') {
-                if($conf["divide2tabs"]&&$cmd!='all') {
-                $out_sheet++;
-                $out_array[$out_sheet] = array();
-                //DOESN'T WORK !!
-            //	    $out_array[$out_sheet]['title'] = $this->metafeeditlib->getLL($parts[1],$parts[1]?$parts[1]:'Tab '.$out_sheet,$conf); //OUCH
-            $out_array[$out_sheet]['title'] = $parts[1]?$parts[1]:'Tab '.$out_sheet; //OUCH
-            }
-              } else {
-        	$sql=array();
-        	$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$sql);
-        	$table=$res['relTable'];
-        	$fNiD=$res['fNiD'];
-          	$label = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$table]['columns'][$fNiD]['label'],$conf);
-          	$fieldCode = $this->getPreviewFieldCode($cmd,$conf, $fN, $withHTML);
-        	$reptagbegin='<!-- ###editITEM-'.$fN.'### start -->';
-        	$reptagend='<!-- ###editITEM-'.$fN.'### end -->';
-            if(!$withHTML) {
-                $result[] = $label.chr(10).$fieldCode.chr(10);
-            } else {
-                $result[] = $reptagbegin.'<div class="'.$this->caller->pi_getClassName('preview-row').' '.$this->caller->pi_getClassName('preview-row-'.$fN).'">
-                     <div class="'.$this->caller->pi_getClassName('preview-label').' '.$this->caller->pi_getClassName('preview-label-'.$fN).'">
-                       '.$label.'
-                     </div>
-                     <div class="'.$this->caller->pi_getClassName('preview-value').' '.$this->caller->pi_getClassName('preview-value-'.$fN).'">
-                     '.$fieldCode.'
-                     </div>
-                     </div>'.$reptagend;
-#       $hiddenFields[] = '<input type="hidden" name="FE['.$this->table.']['.$fN.']" />';
+		}
+		
+		if ($out_sheet>0) {	 // There were --div-- dividers around. Create parts array for the tab menu:
+			$parts = array();
+			foreach($out_array as $idx => $sheetContent)	{
+				unset($sheetContent['title']);
+					$parts[] = array(
+					 'label' => $out_array[$idx]['title'],
+					 'content' => '<table border="0" cellspacing="0" cellpadding="0" width="100%"><tr><td>'.
+					 implode(chr(10),$sheetContent).
+					 '</td></tr></table>'
+				 );
+			}   
+			$content = $this->addCallersPiVars($this->templateObj->getDynTabMenu($parts, 'TCEforms:'.$table.':'.$row[$conf['uidField']]),$conf);
+		} else {			// Only one, so just implode:
+			$content = is_array($out_array[$out_sheet]) ? $this->addCallersPiVars(implode(chr(10),$out_array[$out_sheet]),$conf) : 'makeHTMLForm() :: No form generated! (Probably no fields defined in typoscript option show_fields)';
+		}
+		
+		return $content;
+	}
+
+	/**
+	* Returns a help icon for the field
+	*
+	* @param	string		The field to get the help icon for
+	* @param	boolean		The help icon with link to javascript popup, with help in.
+	* @return	[type]		...
+	*/
+	
+	function helpIcon($field) {
+		if(!is_array($GLOBALS['TCA_DESCR'][$this->table]['refs'])) return '';
+		foreach($GLOBALS['TCA_DESCR'][$this->table]['refs'] as $ref) {
+		  $fieldDescription = $GLOBALS['TSFE']->sL('LLL:'.$ref.':'.$field.'.description') .' ';
+		}
+		if(empty($fieldDescription)) return '';
+		else {
+		  //	  $aOnClick = 'confirm(\''.$fieldDescription.'\');return false;';
+		  $fieldDescription = '<html><head><title>'.$field.'</title><style type="text/css">'.preg_replace("(\r)"," ",preg_replace("(\n)"," ",$conf['help_window_style'])).'</style></head><body'.$this->caller->pi_classParam('help-body').'><div'.$this->caller->pi_classParam('help-text').'>'.$fieldDescription.'</div></body></html>';
+		  $aOnClick = 'top.vHWin=window.open(\'\',\'viewFieldHelpFE\',\'height=20,width=300,status=0,menubar=0,scrollbars=1\');top.vHWin.document.writeln(\''.$fieldDescription.'\');top.vHWin.document.close();top.vHWin.focus();return false;';
+		
+		  $script ='';
+		
+		  require_once(PATH_t3lib . 'class.t3lib_iconworks.php');
+		  return
+			'<a href="#" onclick="'.htmlspecialchars($aOnClick).'">'.
+			'<img'.t3lib_iconWorks::skinImg('typo3/','gfx/helpbubble.gif','width="14" height="14"').' hspace="2" border="0" class="absmiddle"'.($GLOBALS['CLIENT']['FORMSTYLE']?' style="cursor:help;"':'').' alt="" />'.
+			'</a>';
+		}
+	}
+  
+	/**
+	* Makes a preview of the form content according to the configuration for the $cmd
+	*
+	* @param	string		The cmd. Should be 'edit' or 'create' or 'all'.
+	* @param	boolean		Should the output be wrapped in html or not.
+	* @param	[type]		$withHTML: ...
+	* @return	[type]		...
+	*/
+	
+	function makeHTMLPreview($cmd,&$conf, $withHTML = true) {
+		$fields = (string)$cmd=='all' ? array_unique(t3lib_div::trimExplode(",",($conf['create.']['show_fields'] ? $conf['create.']['show_fields'].($conf['edit.']['show_fields']?','.$conf['edit.']['show_fields']:'') : $conf['edit.']['show_fields']))) : array_unique(t3lib_div::trimExplode(",",$conf[$cmd.'.']['show_fields']));
+		$result = array();
+		$out_array = array();
+		$out_sheet = 0;
+		
+		$hiddenFields = array();
+		foreach((array)$fields as $fN) {
+			$parts = explode(';',$fN);
+			$fN = $parts[0];
+			if ($fN=='--fse--' || $fN=='--fsb--') {
+					continue;
+			}
+			if($fN=='--div--') {
+				if($conf["divide2tabs"]&&$cmd!='all') {
+				$out_sheet++;
+				$out_array[$out_sheet] = array();
+				//DOESN'T WORK !!
+			//		$out_array[$out_sheet]['title'] = $this->metafeeditlib->getLL($parts[1],$parts[1]?$parts[1]:'Tab '.$out_sheet,$conf); //OUCH
+			$out_array[$out_sheet]['title'] = $parts[1]?$parts[1]:'Tab '.$out_sheet; //OUCH
+			}
+			  } else {
+			$sql=array();
+			$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$sql);
+			$table=$res['relTable'];
+			$fNiD=$res['fNiD'];
+		  	$label = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$table]['columns'][$fNiD]['label'],$conf);
+		  	$fieldCode = $this->getPreviewFieldCode($cmd,$conf, $fN, $withHTML);
+			$reptagbegin='<!-- ###editITEM-'.$fN.'### start -->';
+			$reptagend='<!-- ###editITEM-'.$fN.'### end -->';
+			if(!$withHTML) {
+				$result[] = $label.chr(10).$fieldCode.chr(10);
+			} else {
+				$result[] = $reptagbegin.'<div class="'.$this->caller->pi_getClassName('preview-row').' '.$this->caller->pi_getClassName('preview-row-'.$fN).'">
+					 <div class="'.$this->caller->pi_getClassName('preview-label').' '.$this->caller->pi_getClassName('preview-label-'.$fN).'">
+					   '.$label.'
+					 </div>
+					 <div class="'.$this->caller->pi_getClassName('preview-value').' '.$this->caller->pi_getClassName('preview-value-'.$fN).'">
+					 '.$fieldCode.'
+					 </div>
+					 </div>'.$reptagend;
+#	   $hiddenFields[] = '<input type="hidden" name="FE['.$this->table.']['.$fN.']" />';
 	}
 	$out_array[$out_sheet][]=$reptagbegin.'<div'.$this->caller->pi_classParam('form-row').$this->caller->pi_classParam('form-row-'.$fN).'>
-	             <div class="'.$this->caller->pi_getClassName('form-label').' '.$this->caller->pi_getClassName('form-label-'.$fN).'">
-                       <div'.$this->caller->pi_classParam('form-required-marker').'>'.$reqMarker.'</div>
-                       '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$table]['columns'][$fNiD]['label'],$conf). '
-                       '.$helpIcon.'
-                     </div>
-		     <div'.$this->caller->pi_classParam('form-field').'>'.$fieldCode.'</div>
-                     '.$msg.'
+				 <div class="'.$this->caller->pi_getClassName('form-label').' '.$this->caller->pi_getClassName('form-label-'.$fN).'">
+					   <div'.$this->caller->pi_classParam('form-required-marker').'>'.$reqMarker.'</div>
+					   '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$table]['columns'][$fNiD]['label'],$conf). '
+					   '.$helpIcon.'
+					 </div>
+			 <div'.$this->caller->pi_classParam('form-field').'>'.$fieldCode.'</div>
+					 '.$msg.'
 		   </div>'.$reptagend;
-      }
-    }
+	  }
+	}
 
-#    $result[] = ''.implode(chr(10),$hiddenFields);
-    if ($out_sheet>0) {	 // There were --div-- dividers around. Create parts array for the tab menu:
-      	$parts = array();
-      foreach($out_array as $idx => $sheetContent)	{
+#	$result[] = ''.implode(chr(10),$hiddenFields);
+	if ($out_sheet>0) {	 // There were --div-- dividers around. Create parts array for the tab menu:
+	  	$parts = array();
+	  foreach($out_array as $idx => $sheetContent)	{
 
 	unset($sheetContent['title']);
 	$parts[] = array(
@@ -812,19 +812,19 @@ class tx_metafeedit extends  tslib_pibase {
 			 implode(chr(10),$sheetContent).
 			 '</table>'
 			 );
-      }
-     }
+	  }
+	 }
 
 
-    // Keep callers piVars
-    if($withHTML)
-      $content= $this->addCallersPiVars(implode(chr(10),$result),$conf);
-    else
-      $content= implode(chr(10),$result);
+	// Keep callers piVars
+	if($withHTML)
+	  $content= $this->addCallersPiVars(implode(chr(10),$result),$conf);
+	else
+	  $content= implode(chr(10),$result);
 	if ($out_sheet>0) {
-    		$content = $this->addCallersPiVars($this->templateObj->getDynTabMenu($parts, 'TCEforms:'.$table.':'.$row[$conf['uidField']]),$conf);
+			$content = $this->addCallersPiVars($this->templateObj->getDynTabMenu($parts, 'TCEforms:'.$table.':'.$row[$conf['uidField']]),$conf);
 	}
-    return $content;
+	return $content;
   }
 
   /**
@@ -835,7 +835,7 @@ class tx_metafeedit extends  tslib_pibase {
  * @return	[type]		...
  */
   function makeTEXTPreview($cmd,&$conf) {
-    return $this->makeHTMLPreview($cmd,$conf,false);
+	return $this->makeHTMLPreview($cmd,$conf,false);
   }
 
   /**
@@ -847,18 +847,18 @@ class tx_metafeedit extends  tslib_pibase {
  * @result	string		The result string with added piVars input fields
  */
   function addCallersPiVars($result,&$conf) {
-    $keep_piVars = t3lib_div::trimExplode(',',$conf['keep_piVars']);
-    foreach($keep_piVars as $piVar) {
-      if($piVar &&  is_array($this->piVars[$piVar])) {
+	$keep_piVars = t3lib_div::trimExplode(',',$conf['keep_piVars']);
+	foreach($keep_piVars as $piVar) {
+	  if($piVar &&  is_array($this->piVars[$piVar])) {
 	foreach($this->piVars[$piVar] as $key=>$val) {
 	$result.='<input type="hidden" name="'.$this->prefixId.'['.$piVar.']['.$key.']" value="'.$val.'" />';
 	}
-      }
-      if (!empty($piVar)) {
+	  }
+	  if (!empty($piVar)) {
 	$result.= '<input type="hidden" name="'.$this->caller->prefixId.'['.$piVar.']" value="'.$this->caller->piVars[$piVar].'" />';
 	}
-    }
-    return $result.$res;
+	}
+	return $result.$res;
   }
 
   /**
@@ -871,29 +871,29 @@ class tx_metafeedit extends  tslib_pibase {
  * @param	string		$Lib: By Ref languqge label
  */
   function getPreviewFieldCode($cmd,&$conf,$fN,$withHTML,&$Lib='') {
-    $fN=trim($fN);
-    $masterTable=$cmd=='blog'?'tx_metafeedit_comments':$conf['table'];
-    $tab=array();
-    $res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab);
-    $Lib=$this->metafeeditlib->getLLFromLabel($res['fieldLabel'],$conf);
-    //$fN=str_replace('.','_',$res['fieldAlias']); // is the str_replace necessary ?
+	$fN=trim($fN);
+	$masterTable=$cmd=='blog'?'tx_metafeedit_comments':$conf['table'];
+	$tab=array();
+	$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab);
+	$Lib=$this->metafeeditlib->getLLFromLabel($res['fieldLabel'],$conf);
+	//$fN=str_replace('.','_',$res['fieldAlias']); // is the str_replace necessary ?
 	
 	$fN=$res['fieldAlias'];
 	$_fN=str_replace('.','_',$fN);
-    $table=$res['relTable'];
-    $fNiD=$res['fNiD'];
-    $EVAL_ERROR_FIELD= $withHTML?'<div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'###</div>':'';
-    $fieldName = 'FE['.$masterTable.']['.$fN.']';
-    $type = $conf['TCAN'][$table]["columns"][$fNiD]['config']["type"];
-    $feData = $conf['inputvar.']['fedata'];
-    $std=$conf[$conf['cmdmode'].'.']['stdWrap.']?$conf[$conf['cmdmode'].'.']['stdWrap.']:$conf['stdWrap.'];
-    switch((string)$type) {
-    case "input":
-      $evalValuesArr = t3lib_div::trimExplode(',',$conf[$cmd.'.']['evalValues.'][$fN]);
-      $displayTwice = false;
-      $isPassword = false;
-      $isMD5 = false;
-      foreach((array)$evalValuesArr as $eval) {
+	$table=$res['relTable'];
+	$fNiD=$res['fNiD'];
+	$EVAL_ERROR_FIELD= $withHTML?'<div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'###</div>':'';
+	$fieldName = 'FE['.$masterTable.']['.$fN.']';
+	$type = $conf['TCAN'][$table]["columns"][$fNiD]['config']["type"];
+	$feData = $conf['inputvar.']['fedata'];
+	$std=$conf[$conf['cmdmode'].'.']['stdWrap.']?$conf[$conf['cmdmode'].'.']['stdWrap.']:$conf['stdWrap.'];
+	switch((string)$type) {
+	case "input":
+	  $evalValuesArr = t3lib_div::trimExplode(',',$conf[$cmd.'.']['evalValues.'][$fN]);
+	  $displayTwice = false;
+	  $isPassword = false;
+	  $isMD5 = false;
+	  foreach((array)$evalValuesArr as $eval) {
 				switch((string)$eval) {
 					case 'twice':
 						$displayTwice = true;
@@ -908,59 +908,59 @@ class tx_metafeedit extends  tslib_pibase {
 						$isMD5 = true;
 						break;
 				}
-      }
-      $values = '###FIELD_'.$fN.'###';
-      //if ($std[$fN.'.']) {
-      if ($std[$fNiD.'.'] || $std[$table.'.'][$fNiD.'.'] || $std[$fN.'.'] || $std[$table.'.'][$fN.'.']) {
-      	$values = '###FIELD_EVAL_'.$fN.'###';
-      }
-      // special cases requiring presentation transformation
+	  }
+	  $values = '###FIELD_'.$fN.'###';
+	  //if ($std[$fN.'.']) {
+	  if ($std[$fNiD.'.'] || $std[$table.'.'][$fNiD.'.'] || $std[$fN.'.'] || $std[$table.'.'][$fN.'.']) {
+	  	$values = '###FIELD_EVAL_'.$fN.'###';
+	  }
+	  // special cases requiring presentation transformation
 	  $evals=t3lib_div::trimexplode(',',$conf['TCAN'][$table]['columns'][$fNiD]['config']["eval"]);
-      if(in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) $values = '###FIELD_EVAL_'.$fN.'###';
-      if (in_array('wwwURL',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
-      if (in_array('email',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
-      /**
-       * @todo Get FE values from input vars in conf !!
-       *
-       */
-      $feData = t3lib_div::_POST("FE");
+	  if(in_array('date',$evals) || in_array('datetime',$evals) || in_array('time',$evals)) $values = '###FIELD_EVAL_'.$fN.'###';
+	  if (in_array('wwwURL',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
+	  if (in_array('email',t3lib_div::trimexplode(',',$conf[$conf['inputvar.']['cmd']."."]['evalValues.'][$fN])))  $values = '###FIELD_EVAL_'.$fN.'###';
+	  /**
+	   * @todo Get FE values from input vars in conf !!
+	   *
+	   */
+	  $feData = t3lib_div::_POST("FE");
 
-      // Format the values.                
+	  // Format the values.				
 	  // TODO: This only shows the date on a nice format if it is send to the page, not if it is from an overrideValue.
 	  
-      if($isPassword) $values = '********';
-      /* @todo check if this part is still necessary;
-       * 
-       **/
-       else if(in_array('date',$evals) && !empty($feData[$masterTable][$fN])) {
+	  if($isPassword) $values = '********';
+	  /* @todo check if this part is still necessary;
+	   * 
+	   **/
+	   else if(in_array('date',$evals) && !empty($feData[$masterTable][$fN])) {
 				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%d-%Y' :'%d-%m-%Y'),$feData[$masterTable][$fN]);
-      } else if(in_array('datetime',$evals) && !empty($feData[$masterTable][$fN])) {
+	  } else if(in_array('datetime',$evals) && !empty($feData[$masterTable][$fN])) {
 				$values = strftime(($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%d-%Y' :'%H:%M %d-%m-%Y'),$feData[$masterTable][$fN]);
-      } else if(in_array('time',$evals) && !empty($feData[$masterTable][$fN])) {
+	  } else if(in_array('time',$evals) && !empty($feData[$masterTable][$fN])) {
 				$values = strftime('%H:%M',$feData[$masterTable][$fN]);
-      }
-     
-      if($displayTwice) {
+	  }
+	 
+	  if($displayTwice) {
 				$fieldName_again = 'FE['.$masterTable.']['.$fN.'_again]';
 				return $withHTML?'<input type="hidden" name="'.$fieldName.'" /><input type="hidden" name="'.$fieldName_again.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
-      } else {
+	  } else {
 				return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
-      }
-      break;
-    case 'radio':
-      $values = '###FIELD_EVAL_'.$fN.'###';
-      return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
-      break;
-    case 'check':
-      $values = '###FIELD_EVAL_'.$fN.'###';
-      return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;;
-      break;
-    case 'group':
-      if($conf['TCAN'][$table]['columns'][$fNiD]['config']["internal_type"]=='file') {
-      	return $withHTML?'<input type="hidden" name="'.$fieldName.'" value="###FIELD_'.$fN.'_file_file###" /><input type="hidden" name="FE['.$masterTable.']['.$fN.'_file]" value="###FIELD_'.$fN.'_file_file###"/>###FIELD_EVAL_'.$fN.'###'.$EVAL_ERROR_FIELD:'###FIELD_'.$fN.'###'.$EVAL_ERROR_FIELD;
-      } else {  // we assume internal_type = db
-      	$values = '###FIELD_EVAL_'.$fN.'###';
-        if($conf['TCAN'][$table]['columns'][$fNiD]['config']["allowed"]) {  // reference to elements from another table
+	  }
+	  break;
+	case 'radio':
+	  $values = '###FIELD_EVAL_'.$fN.'###';
+	  return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
+	  break;
+	case 'check':
+	  $values = '###FIELD_EVAL_'.$fN.'###';
+	  return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;;
+	  break;
+	case 'group':
+	  if($conf['TCAN'][$table]['columns'][$fNiD]['config']["internal_type"]=='file') {
+	  	return $withHTML?'<input type="hidden" name="'.$fieldName.'" value="###FIELD_'.$fN.'_file_file###" /><input type="hidden" name="FE['.$masterTable.']['.$fN.'_file]" value="###FIELD_'.$fN.'_file_file###"/>###FIELD_EVAL_'.$fN.'###'.$EVAL_ERROR_FIELD:'###FIELD_'.$fN.'###'.$EVAL_ERROR_FIELD;
+	  } else {  // we assume internal_type = db
+	  	$values = '###FIELD_EVAL_'.$fN.'###';
+		if($conf['TCAN'][$table]['columns'][$fNiD]['config']["allowed"]) {  // reference to elements from another table
 					$FTA=t3lib_div::trimexplode(',',$conf['TCAN'][$table]['columns'][$fNiD]['config']["allowed"]);
 					if (!count($FTA)) die("Bad configuration of field $fN of table ".$masterTable);
 					if (count($FTA)>1) die("We don't handle multi table relations yet on field $fN of table  ".$masterTable);
@@ -973,30 +973,30 @@ class tx_metafeedit extends  tslib_pibase {
 					if ($MMTable && !$Prepend) {
 						if($feData[$masterTable][$fN]) {
 							//$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$MMTable,'uid_local=\''.$uid.'\'','sorting');
-			          		//if(mysql_num_rows($MMres)!=$feData[$masterTable][$fN]) die("Wrong number of selections reached");
+					  		//if(mysql_num_rows($MMres)!=$feData[$masterTable][$fN]) die("Wrong number of selections reached");
 				  			$uids = t3lib_div::trimExplode(',',$feData[$masterTable][$fN]);
 				  			$orClause = '';
 				  			foreach($uids as $uid) $orClause .= $orClause ? 'OR '.$conf['uidField'].' LIKE \''.$uid.'\'' : $conf['uidField'].' = \''.$uid.'\'';
 							$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$ForeignTable,$orClause);
 							$label= $conf['label.'][$ForeignTable]?$conf['label.'][$ForeignTable]:$GLOBALS['TCA'][$ForeignTable]['ctrl']['label'];
-			          			if($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(),'sql error');
-			          			$values = '';
-			          			while($resRow = mysql_fetch_assoc($res)) {
-			            				$values .= $values ? ', ' . $resRow[$label] : $resRow[$label];
-			          			}
+					  			if($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(),'sql error');
+					  			$values = '';
+					  			while($resRow = mysql_fetch_assoc($res)) {
+										$values .= $values ? ', ' . $resRow[$label] : $resRow[$label];
+					  			}
 			 				mysql_free_result($res);
-			        		}                                           // clean from DB
+							}										   // clean from DB
 					}
 					// NoMM
 				}
-        return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
-      }
-      break;
-    case 'select':
-      $values = '###FIELD_EVAL_'.$fN.'###';
-      $FT=$conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'];
-      if($FT) {  // reference to elements from another table
-        $label = $conf['label.'][$FT]?$conf['label.'][$FT]:$GLOBALS['TCA'][$FT]['ctrl']['label'];
+		return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
+	  }
+	  break;
+	case 'select':
+	  $values = '###FIELD_EVAL_'.$fN.'###';
+	  $FT=$conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'];
+	  if($FT) {  // reference to elements from another table
+		$label = $conf['label.'][$FT]?$conf['label.'][$FT]:$GLOBALS['TCA'][$FT]['ctrl']['label'];
 		$feData = $conf['inputvar.']['fedata'];
 	if($feData[$masterTable][$fN]) {
 	  $uids = t3lib_div::trimExplode(',',$feData[$masterTable][$fN]);
@@ -1006,64 +1006,64 @@ class tx_metafeedit extends  tslib_pibase {
 	  if($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(),'sql error');
 	  $values = '';
 	  while($resRow = mysql_fetch_assoc($res)) {
-	    $values .= $values ? ', ' . $resRow[$label] : $resRow[$label];
+		$values .= $values ? ', ' . $resRow[$label] : $resRow[$label];
 	  }
 	   mysql_free_result($res);
 	}
-      } elseif($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"]) {                // fixed items
+	  } elseif($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"]) {				// fixed items
 	$feData = $conf['inputvar.']['fedata'];
 	if($feData[$masterTable][$fN]) {
 	  $vals = t3lib_div::trimExplode(',',$feData[$masterTable][$fN]);
 	  $values = '';
 	  foreach($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"] as $item) {
-	    if(!empty($item)) {
-	      list($label,$val) = $item;
-	      if(in_array($val,$vals)) {
+		if(!empty($item)) {
+		  list($label,$val) = $item;
+		  if(in_array($val,$vals)) {
 			//TODO test Change
-	      	$tmpLL=$this->metafeeditlib->getLLFromLabel($label,$conf);	      
+		  	$tmpLL=$this->metafeeditlib->getLLFromLabel($label,$conf);		  
 			$values .= $values ? ', ' . $tmpLL : $tmpLL;
-	      }
-	    }
+		  }
+		}
 	  }
 	}
-      }
-      return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
-      break;
-    case "text":
-        $values = '###FIELD_'.$fN.'###';
+	  }
+	  return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
+	  break;
+	case "text":
+		$values = '###FIELD_'.$fN.'###';
 		if ($std[$fNiD.'.'] || $std[$table.'.'][$fNiD.'.'] || $std[$fN.'.'] || $std[$table.'.'][$fN.'.']) {
 			$values = '###FIELD_EVAL_'.$fN.'###';
 		}
-        return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
-        break;
-    default:
-    	$values = '###FIELD_'.$fN.'###';
-      if	($std[$fNiD.'.'] || $std[$table.'.'][$fNiD.'.'] || $std[$fN.'.'] || $std[$table.'.'][$fN.'.']) {
-      	$values = '###FIELD_EVAL_'.$fN.'###';
-      }
-      return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
-      break;
-    }
+		return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
+		break;
+	default:
+		$values = '###FIELD_'.$fN.'###';
+	  if	($std[$fNiD.'.'] || $std[$table.'.'][$fNiD.'.'] || $std[$fN.'.'] || $std[$table.'.'][$fN.'.']) {
+	  	$values = '###FIELD_EVAL_'.$fN.'###';
+	  }
+	  return $withHTML?'<input type="hidden" name="'.$fieldName.'" />'.$values.$EVAL_ERROR_FIELD:$values.$EVAL_ERROR_FIELD;
+	  break;
+	}
   }
   
-    /**
-    * Gets the fieldcode for field ($fN) of the form. This depends on the fields type.
-    *
-    * @param	string		The cmd. Should be 'edit' or 'create'.
-    * @param	string		The conf array.
-    * @param	string		The field to get the fieldcode for.
-    * @param	string		boolean, true if we are in grid mode.
-    * @param	int		number of open fieldsets ...
-    * @param	string		cmd mode ...
-    * @return	[type]		...
-    */
-    
-    function getFormFieldCode($cmd,&$conf,$fN,$bgrid,$cmdmode) {
-        // CBY: We handle here Read Only Fields !!!
-        $readOnlyArr = t3lib_div::trimExplode(',',$conf[$cmd.'.']['readonlyFields']);
-        if (($cmd=="edit" || $cmd=='create') && in_array($fN, $readOnlyArr)) {
-        	return $this->getPreviewFieldCode($cmd,$conf,$fN,1);
-        }
+	/**
+	* Gets the fieldcode for field ($fN) of the form. This depends on the fields type.
+	*
+	* @param	string		The cmd. Should be 'edit' or 'create'.
+	* @param	string		The conf array.
+	* @param	string		The field to get the fieldcode for.
+	* @param	string		boolean, true if we are in grid mode.
+	* @param	int		number of open fieldsets ...
+	* @param	string		cmd mode ...
+	* @return	[type]		...
+	*/
+	
+	function getFormFieldCode($cmd,&$conf,$fN,$bgrid,$cmdmode) {
+		// CBY: We handle here Read Only Fields !!!
+		$readOnlyArr = t3lib_div::trimExplode(',',$conf[$cmd.'.']['readonlyFields']);
+		if (($cmd=="edit" || $cmd=='create') && in_array($fN, $readOnlyArr)) {
+			return $this->getPreviewFieldCode($cmd,$conf,$fN,1);
+		}
 		
 		$table=$conf['table'];
 		$tab=array();
@@ -1072,15 +1072,15 @@ class tx_metafeedit extends  tslib_pibase {
 		
 		$ftable=$res['relTable'];
 		$fNiD=$res['fNiD'];
-    
+	
 
-        $masterTable=$cmd=='blog'?'tx_metafeedit_comments':$table;
+		$masterTable=$cmd=='blog'?'tx_metafeedit_comments':$table;
 
 		$type = $conf['TCAN'][$ftable]["columns"][$fNiD]['config']["type"];
 		
-        $gridMark=$bgrid?'###GRIDCELL###':'';
-        $gridMarkAlt=$bgrid?'###GRIDCELLALT###':'';
-        $fieldName = 'FE['.$masterTable.']'.$gridMark.'['.$fN.']';
+		$gridMark=$bgrid?'###GRIDCELL###':'';
+		$gridMarkAlt=$bgrid?'###GRIDCELLALT###':'';
+		$fieldName = 'FE['.$masterTable.']'.$gridMark.'['.$fN.']';
 		$idFieldName = 'FE.'.$masterTable.'.'.$gridMark.'.'.$fN.'.';
 				
 		$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']);
@@ -1088,97 +1088,97 @@ class tx_metafeedit extends  tslib_pibase {
 			$evclasses.=' '.$this->caller->pi_getClassName('form-data-'.$ev);
 		}
 
-        $class='class="'.$this->caller->pi_getClassName('form-data').' '.$this->caller->pi_getClassName('form-data-'.$fN).$evclasses.'" ';
+		$class='class="'.$this->caller->pi_getClassName('form-data').' '.$this->caller->pi_getClassName('form-data-'.$fN).$evclasses.'" ';
 
-        //$class='class="###CSS_ERROR_FIELD_'.$fN.'###'.$this->caller->pi_getClassName('form-data').' '.$this->caller->pi_getClassName('form-data-'.$fN).$evclasses.'" ';
-        $defaultParams = ' name="'.$fieldName.'"'.$class;
-        $EVAL_ERROR_FIELD=$bgrid?'':'<div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'###</div>';
-        $onchange = 'onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';
-        $defaultParams_feVal = ' name="'.$fieldName.'_feVal" '.$onchange.$class;
+		//$class='class="###CSS_ERROR_FIELD_'.$fN.'###'.$this->caller->pi_getClassName('form-data').' '.$this->caller->pi_getClassName('form-data-'.$fN).$evclasses.'" ';
+		$defaultParams = ' name="'.$fieldName.'"'.$class;
+		$EVAL_ERROR_FIELD=$bgrid?'':'<div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'###</div>';
+		$onchange = 'onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';
+		$defaultParams_feVal = ' name="'.$fieldName.'_feVal" '.$onchange.$class;
 		
-        //$type = $conf['TCAN'][$masterTable]["columns"][$fN]['config']["type"];
-        switch((string)$type) {
-            case "input":
+		//$type = $conf['TCAN'][$masterTable]["columns"][$fN]['config']["type"];
+		switch((string)$type) {
+			case "input":
 				//$onchange = 'onblur="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"'.' onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';
 				$onchange = 'onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';
-                $evalValuesArr = t3lib_div::trimExplode(',',$conf[$cmd.'.']['evalValues.'][$fN]);
-                $displayTwice = false;
-                $isPassword = false;
-                $isMD5 = false;
+				$evalValuesArr = t3lib_div::trimExplode(',',$conf[$cmd.'.']['evalValues.'][$fN]);
+				$displayTwice = false;
+				$isPassword = false;
+				$isMD5 = false;
 				$email = false;
-                foreach((array)$evalValuesArr as $eval) {
-                	switch((string)$eval) {
-                		case 'twice':
+				foreach((array)$evalValuesArr as $eval) {
+					switch((string)$eval) {
+						case 'twice':
 							$displayTwice = true;
 							break;
-                		case 'password':
+						case 'password':
 							$isPassword = true;
 							break;
-                		case 'md5':
+						case 'md5':
 							$isMD5 = true;
 							break;
 						case 'email':
 							$email = true;
 
-                	}
-                }  
+					}
+				}  
 				//@todo only do this if iphone?
-                $type = $email?'email':'text';
-                if($isPassword) $type = 'password';
-                if($displayTwice) {
+				$type = $email?'email':'text';
+				if($isPassword) $type = 'password';
+				if($displayTwice) {
 					$classagain='class="'.$this->caller->pi_getClassName('form-data').' '.$this->caller->pi_getClassName('form-data-again').' '.$this->caller->pi_getClassName('form-data-'.$fN).' '.$this->caller->pi_getClassName('form-data-'.$fN.'-again').$evclasses.'" ';
-                	$fieldName_again = 'FE['.$masterTable.']'.$gridMark.'['.$fN.'_again]';
-                	$onchange_again = 'onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName_again."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';   
-                	$conf['additionalJS_end']['feedit_'.$fN.'_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
-                	$conf['additionalJS_end']['feedit_'.$fN.'_again_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName_again."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
-                	return '<input alt="'.$gridMarkAlt.'" title="'.$gridMarkAlt.'" type="'.$type.'" name="'.$fieldName.'_feVal" '.$class.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange.' />
-                		<input type="hidden" name="'.$fieldName.'" /><br/>'.$this->metafeeditlib->getLL("fieldconfirmation",$conf).strtolower($Lib).'<br/><input type="'.$type.'" name="'.$fieldName_again.'_feVal" '.$classagain.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange_again.' />
-                		<input type="hidden" name="'.$fieldName_again.'" />'.$EVAL_ERROR_FIELD;
-                } else {
-                	$conf['additionalJS_end']['feedit_'.$fN.'_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
-                    return
-                		'<input alt="'.$gridMarkAlt.'" title="'.$gridMarkAlt.'" type="'.$type.'" name="'.$fieldName.'_feVal" id="'.$fieldName.'_feVal" '.$class.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange.' />' .
-                		'<input type="hidden" name="'.$fieldName.'" />'.($bgrid?'':'') .
-                    // inserts button for rlmp_dateselectlib
-                    (t3lib_extmgm::isLoaded('rlmp_dateselectlib') && !empty($conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']) ?
-                    (is_int(array_search('date',t3lib_div::trimExplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"])))
-                    ?
-                    tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%d-%Y' :'%d-%m-%Y'))))
-                    :
-                    (is_int(array_search('datetime',t3lib_div::trimExplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval'])))
-                    ?
-                    tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=> ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%d-%Y' :'%H:%M %d-%m-%Y'))))
-                    : ''))
-                    : '').$EVAL_ERROR_FIELD;
-                }
-                break;
-            case "text":
-                // Get the specialConf for the field. Placed in type array.
+					$fieldName_again = 'FE['.$masterTable.']'.$gridMark.'['.$fN.'_again]';
+					$onchange_again = 'onchange="feedit_'.$masterTable.'_formGet('."'".$fieldName_again."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."');".'"';   
+					$conf['additionalJS_end']['feedit_'.$fN.'_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
+					$conf['additionalJS_end']['feedit_'.$fN.'_again_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName_again."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
+					return '<input alt="'.$gridMarkAlt.'" title="'.$gridMarkAlt.'" type="'.$type.'" name="'.$fieldName.'_feVal" '.$class.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange.' />
+						<input type="hidden" name="'.$fieldName.'" /><br/>'.$this->metafeeditlib->getLL("fieldconfirmation",$conf).strtolower($Lib).'<br/><input type="'.$type.'" name="'.$fieldName_again.'_feVal" '.$classagain.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange_again.' />
+						<input type="hidden" name="'.$fieldName_again.'" />'.$EVAL_ERROR_FIELD;
+				} else {
+					$conf['additionalJS_end']['feedit_'.$fN.'_set_data'] = 'feedit_'.$masterTable.'_formSet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox. "','".$checkboxVal."','".$checkbox_off."')".';';
+					return
+						'<input alt="'.$gridMarkAlt.'" title="'.$gridMarkAlt.'" type="'.$type.'" name="'.$fieldName.'_feVal" id="'.$fieldName.'_feVal" '.$class.($conf['TCAN'][$masterTable]['columns'][$fN]['config']['size']?' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['size'].'"':'').' maxlength="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max'].'" '.$onchange.' />' .
+						'<input type="hidden" name="'.$fieldName.'" />'.($bgrid?'':'') .
+					// inserts button for rlmp_dateselectlib
+					(t3lib_extmgm::isLoaded('rlmp_dateselectlib') && !empty($conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval']) ?
+					(is_int(array_search('date',t3lib_div::trimExplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"])))
+					?
+					tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=>($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%d-%Y' :'%d-%m-%Y'))))
+					:
+					(is_int(array_search('datetime',t3lib_div::trimExplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']['eval'])))
+					?
+					tx_rlmpdateselectlib::getInputButton($fieldName.'_feVal',array('calConf.'=>array('inputFieldLabel'=>'&nbsp;','inputFieldDateTimeFormat'=> ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%d-%Y' :'%H:%M %d-%m-%Y'))))
+					: ''))
+					: '').$EVAL_ERROR_FIELD;
+				}
+				break;
+			case "text":
+				// Get the specialConf for the field. Placed in type array.
 				// TODO : how do we get a valid rte type if we don't have uid value of record ? 
 				$specialConf = $this->metafeeditlib->getFieldSpecialConf($masterTable,$fN,$conf,$feData[$masterTable]);
-                /**** USE RTE OR NOT  ****/
-                // TODO transmit record type or record uid to know if RTE is necessary.
-                if(!empty($specialConf) && t3lib_extmgm::isLoaded('rtehtmlarea')) {   // use RTE    
-                	$this->RTEcounter++;
-                 	$this->PA['itemFormElName'] = $fieldName;
-                	$feData = $conf['inputvar.']['fedata'];
-                	$this->PA['itemFormElValue'] = $feData[$masterTable][$fN];
-                	$conf['RTE'][$this->RTEcounter]['spec']=$this->specConf = $specialConf; 
-                	$pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
-                	$this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];
-  		   	        $this->RTEObj = t3lib_div::makeInstance('tx_rtehtmlarea_pi2');//&t3lib_BEfunc::RTEgetObj();
-		    	    $pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
-		            $this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];
-                	$this->thePidValue = $GLOBALS['TSFE']->id;
-               	    $conf['RTE'][$this->RTEcounter]['cmdmode']=$cmdmode;
+				/**** USE RTE OR NOT  ****/
+				// TODO transmit record type or record uid to know if RTE is necessary.
+				if(!empty($specialConf) && t3lib_extmgm::isLoaded('rtehtmlarea')) {   // use RTE	
+					$this->RTEcounter++;
+				 	$this->PA['itemFormElName'] = $fieldName;
+					$feData = $conf['inputvar.']['fedata'];
+					$this->PA['itemFormElValue'] = $feData[$masterTable][$fN];
+					$conf['RTE'][$this->RTEcounter]['spec']=$this->specConf = $specialConf; 
+					$pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
+					$this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];
+  		   			$this->RTEObj = t3lib_div::makeInstance('tx_rtehtmlarea_pi2');//&t3lib_BEfunc::RTEgetObj();
+					$pageTSConfig = $GLOBALS['TSFE']->getPagesTSconfig();
+					$this->thisConfig = $pageTSConfig['RTE.']['default.']['FE.'];
+					$this->thePidValue = $GLOBALS['TSFE']->id;
+			   		$conf['RTE'][$this->RTEcounter]['cmdmode']=$cmdmode;
 					$RTEItem = $this->RTEObj->drawRTE($this,$masterTable,$fN,$row=array(), $this->PA, $this->specConf, $this->thisConfig, $this->RTEtypeVal, '', $this->thePidValue);
 					return $RTEItem . '<div'.$this->caller->pi_classParam('rte-clearer').'></div>'.$EVAL_ERROR_FIELD;
-                } else {                                                                   // dont use RTE
-    	            return '<textarea'.$defaultParams.' cols="'.$conf['TCAN'][$masterTable]["columns"][$fN]['config']["cols"].'" rows="'.$conf['TCAN'][$masterTable]["columns"][$fN]['config']["rows"].'" ></textarea>'.$EVAL_ERROR_FIELD; // removed wrap="VIRTUAL"
-                }
-                break;
-            case 'check':
-                if($conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']>1 || count($conf['TCAN'][$masterTable]['columns'][$fN]['config']['items'])) {
+				} else {																   // dont use RTE
+					return '<textarea'.$defaultParams.' cols="'.$conf['TCAN'][$masterTable]["columns"][$fN]['config']["cols"].'" rows="'.$conf['TCAN'][$masterTable]["columns"][$fN]['config']["rows"].'" ></textarea>'.$EVAL_ERROR_FIELD; // removed wrap="VIRTUAL"
+				}
+				break;
+			case 'check':
+				if($conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']>1 || count($conf['TCAN'][$masterTable]['columns'][$fN]['config']['items'])) {
 					$cols=$conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']?$conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']:1;
 					$i=0;
 					$ret='';
@@ -1193,52 +1193,52 @@ class tx_metafeedit extends  tslib_pibase {
 				 } else {
 					$ret='<input type="checkbox" '.$defaultParams.' />';
 				 }
-                #return '<input type="hidden" '.$defaultParams.' ><input type="checkbox" '.$defaultParams_feVal.' >';
-                return $ret.$EVAL_ERROR_FIELD;
-                break;
-            case 'group':
-                if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["internal_type"]=='file')	{
-                	// fetch data from table
-                	$feData = $conf['inputvar.']['fedata'];
-                	$uid = $feData[$masterTable][$conf['uidField']] ? $feData[$masterTable][$conf['uidField']] : $conf['inputvar.']['rU'];
-                	$uid = $uid ? $uid : (($conf['fe_userEditSelf'] && $masterTable=='fe_users')?$GLOBALS['TSFE']->fe_user->user['uid']:'');// check if fe_userEditSelf ??? Quid if no uid ???
-                	$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($masterTable,$uid);
-                	// make option tags from existing data.
-                	$options = "";
-                	foreach(explode(",",$rec[$fN]) as $opt)
-                	  $options .= '<option value="'.$opt.'">'.$opt.'</option>';
-                
-                	$result .= '<select id="sel_'.$masterTable.'_'.$fN.'_'.$uid.'" size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"].'" name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_select" style="width:250px;">
-                                   ###FIELD_'.$fN.'_OPTIONS###
-                                   </select>
-                                   <input id="selh_'.$masterTable.'_'.$fN.'_'.$uid.'" type="hidden" name="'.$fieldName.'" />';
-                	$size=0;
-                	if ($rec[$fN]) $size=sizeof(explode(",",$rec[$fN]));
-                	//if ($size > 0) $result.='<a onclick="feedit_manipulateGroup(\''.$fieldName.'\');return false;" title="'.$this->metafeeditlib->getLL("delete_image_tooltip",$conf).'"><img border="0" src="typo3/gfx/group_clear.gif" alt="" /></a>';
-                	$result.='<a onclick="feedit_manipulateGroup(\''.$fieldName.'\');return false;" title="'.$this->metafeeditlib->getLL("delete_image_tooltip",$conf).'"><img border="0" src="typo3/gfx/group_clear.gif" alt="" /></a>';
-                	//if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["maxitems"]>$size) {
-                	 // $result .= $conf['TCAN'][$masterTable]['columns'][$fN]['config']["allowed"].', Max file size : '.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max_size'].' Kb<br/><input type="file" name="FE['.$masterTable.']'.$gridMark.'['.$fN.'_file][]" title="'.$this->metafeeditlib->getLL("add_image_tooltip",$conf).'" />';
-                	//}
-                	$filetypes=t3lib_div::trimExplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']["allowed"]);
-                	$filetype='';
-                	// to handle filetype css
-                	foreach ($filetypes as $ft) {
-                		if ($this->metafeeditlib->type_from_file('toto.'.$ft,$conf)=='image1') {
-                			$filetype=" tx_mfedt_ft_img";
-                			break;
-                		}
-                	}
-                	$result .= '<!-- ###FILE_BROWSER_'.$fN.'### -->'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']["allowed"].', Max file size : '.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max_size'].' Kb<br/><input id="'.$masterTable.'$'.$fN.'$'.$uid.'" class="tx_mfedt_file'.$filetype.'" type="file" name="FE['.$masterTable.']'.$gridMark.'['.$fN.'_file][]" title="'.$this->metafeeditlib->getLL("add_image_tooltip",$conf).'" /><!-- ###FILE_BROWSER_'.$fN.'### -->';
-                	$result.='###FIELD_EVAL_'.$fN.'###<br/><div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'######EVAL_ERROR_FIELD_'.$fN.'_file###</div>';                
-                	return $result;
-                } else {
-                	if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["allowed"]) {  // reference to elements from another table
-                		$options="###FIELD_".$fN."_OPTIONS###";
-                		$srow = '<select '.$size.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']">';
-                  		if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"]) {
-                    		$size = ' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"].'" ';
-            
-                    		if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["maxitems"]>1) {
+				#return '<input type="hidden" '.$defaultParams.' ><input type="checkbox" '.$defaultParams_feVal.' >';
+				return $ret.$EVAL_ERROR_FIELD;
+				break;
+			case 'group':
+				if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["internal_type"]=='file')	{
+					// fetch data from table
+					$feData = $conf['inputvar.']['fedata'];
+					$uid = $feData[$masterTable][$conf['uidField']] ? $feData[$masterTable][$conf['uidField']] : $conf['inputvar.']['rU'];
+					$uid = $uid ? $uid : (($conf['fe_userEditSelf'] && $masterTable=='fe_users')?$GLOBALS['TSFE']->fe_user->user['uid']:'');// check if fe_userEditSelf ??? Quid if no uid ???
+					$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($masterTable,$uid);
+					// make option tags from existing data.
+					$options = "";
+					foreach(explode(",",$rec[$fN]) as $opt)
+					  $options .= '<option value="'.$opt.'">'.$opt.'</option>';
+				
+					$result .= '<select id="sel_'.$masterTable.'_'.$fN.'_'.$uid.'" size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"].'" name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_select" style="width:250px;">
+								   ###FIELD_'.$fN.'_OPTIONS###
+								   </select>
+								   <input id="selh_'.$masterTable.'_'.$fN.'_'.$uid.'" type="hidden" name="'.$fieldName.'" />';
+					$size=0;
+					if ($rec[$fN]) $size=sizeof(explode(",",$rec[$fN]));
+					//if ($size > 0) $result.='<a onclick="feedit_manipulateGroup(\''.$fieldName.'\');return false;" title="'.$this->metafeeditlib->getLL("delete_image_tooltip",$conf).'"><img border="0" src="typo3/gfx/group_clear.gif" alt="" /></a>';
+					$result.='<a onclick="feedit_manipulateGroup(\''.$fieldName.'\');return false;" title="'.$this->metafeeditlib->getLL("delete_image_tooltip",$conf).'"><img border="0" src="typo3/gfx/group_clear.gif" alt="" /></a>';
+					//if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["maxitems"]>$size) {
+					 // $result .= $conf['TCAN'][$masterTable]['columns'][$fN]['config']["allowed"].', Max file size : '.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max_size'].' Kb<br/><input type="file" name="FE['.$masterTable.']'.$gridMark.'['.$fN.'_file][]" title="'.$this->metafeeditlib->getLL("add_image_tooltip",$conf).'" />';
+					//}
+					$filetypes=t3lib_div::trimExplode(',',$conf['TCAN'][$masterTable]['columns'][$fN]['config']["allowed"]);
+					$filetype='';
+					// to handle filetype css
+					foreach ($filetypes as $ft) {
+						if ($this->metafeeditlib->type_from_file('toto.'.$ft,$conf)=='image1') {
+							$filetype=" tx_mfedt_ft_img";
+							break;
+						}
+					}
+					$result .= '<!-- ###FILE_BROWSER_'.$fN.'### -->'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']["allowed"].', Max file size : '.$conf['TCAN'][$masterTable]['columns'][$fN]['config']['max_size'].' Kb<br/><input id="'.$masterTable.'$'.$fN.'$'.$uid.'" class="tx_mfedt_file'.$filetype.'" type="file" name="FE['.$masterTable.']'.$gridMark.'['.$fN.'_file][]" title="'.$this->metafeeditlib->getLL("add_image_tooltip",$conf).'" /><!-- ###FILE_BROWSER_'.$fN.'### -->';
+					$result.='###FIELD_EVAL_'.$fN.'###<br/><div '.$this->caller->pi_classParam('form-error-field').'>###EVAL_ERROR_FIELD_'.$fN.'######EVAL_ERROR_FIELD_'.$fN.'_file###</div>';				
+					return $result;
+				} else {
+					if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["allowed"]) {  // reference to elements from another table
+						$options="###FIELD_".$fN."_OPTIONS###";
+						$srow = '<select '.$size.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']">';
+				  		if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"]) {
+							$size = ' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"].'" ';
+			
+							if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["maxitems"]>1) {
 								$double_select=true;
 								if ($double_select){
 									//on vide les options normales qui ne servent pas
@@ -1263,187 +1263,90 @@ class tx_metafeedit extends  tslib_pibase {
 									$srow = '<select '.$size.' '.$onchange.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_select">';
 									$hr = '<input type="hidden" name="'.$fieldName.'" />';
 								}
-                    		}
-                  		}
-                  		$row .= $srow .$options.'</select>'.$hr;
-                  		return $row.$EVAL_ERROR_FIELD;
-                        // NoMM
-                    }
-                    debug("getFormFieldCode()::GROUP TYPE 'DB' NOT SUPPORTED YET");
-                }
-                break;
-            case 'select':
-                $feData = $conf['inputvar.']['fedata'];
-                $uid = $feData[$masterTable][$conf['uidField']] ? $feData[$masterTable][$conf['uidField']] : $conf['inputvar.']['rU'];
-                $rec = $GLOBALS['TSFE']->sys_page->getRawRecord($masterTable,$uid);
-                if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["foreign_table"]) {               // reference to elements from another table
-                    $options="###FIELD_".$fN."_OPTIONS###";
-                    // gets uids of selected records.
-                    $uids = array();
-                    if($feData[$masterTable][$fN]) {                                // from post var
-                        $uids = explode(",",$feData[$masterTable][$fN]);
-                    } elseif($conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"] && $uid) {  // from mm-relation
-                    	$mmTable=$conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"];
-                        $MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'',$mmTable.'.sorting');
-                        if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
-                        $cnt=mysql_num_rows($MMres);
-                        if($conf['debug'] && $cnt!=$rec[$fN]) debug("class.tx_metafeedit.php::tx_metafeedit->getFormFieldCode(): Wrong number ($MMres<>$cnt) of selections reached for  field $fN of table $masterTable, mm:  $mmTable");
-                        while($MMrow = mysql_fetch_assoc($MMres))
-                        $uids[] = $MMrow["uid_foreign"];
-                    } else {                                                        // clean from DB
-                        $uids = explode(",",$rec[$fN]);
-                    }
-                } elseif($conf['TCAN'][$masterTable]['columns'][$fN]['config']["items"]) {   // fixed items            
-                    // Get selected uids.
-                    $uids = array();
-                    if($feData[$masterTable][$fN]) {                                // from post var
-                      $uids = explode(",",$feData[$masterTable][$fN]);
-                    } elseif(!is_null($rec)) {                                      // clean from DB
-                      $uids = explode(",",$rec[$fN]);
-                    } elseif($cmd=='create' && $conf['TCAN'][$masterTable]['columns'][$fN]['config']['default']){
-                      $uids = explode(",",$conf['TCAN'][$masterTable]['columns'][$fN]['config']['default']);
-                    }
-                
-                    $items = $conf['TCAN'][$masterTable]['columns'][$fN]['config']["items"];
-                    //$options = '<option value="0">-----</option>';
-                    
-                    if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["itemsProcFunc"]) {     // if itemsProcFunc is set to fill the select box
-                      $options = '';
-                      $params = $conf['TCAN'][$masterTable]['columns'][$fN];
-                      $params['items'] = &$items;
-                      t3lib_div::callUserFunction($conf['TCAN'][$masterTable]['columns'][$fN]['config']["itemsProcFunc"], $params, $this);
-                    }
-                    // userfunc 
-                    if($conf[$cmd.'.']['itemsProcFunc.'][$fN]) {     // if itemsProcFunc is set to fill the select box
-                      $options = '';
-                      $params = $conf['TCAN'][$masterTable]['columns'][$fN];
-                      $params['items'] = &$items;
-                      t3lib_div::callUserFunction($conf[$cmd.'.']['itemsProcFunc.'][$fN], $params, $this);
-                    } 
-                    
-					$multi_option='';
-					$multi_option_actif='';
-                    foreach((array)$items as $key => $item) {
-                        $selected = in_array($item[1],$uids)?'selected="selected"':"";
-						$disabled=$item[2]?' disabled="disabled"':'';
-                        //if($key!=0)
-                        $options .= '<option value="'.$item[1].'"'.$selected.$disabled.'>'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
-                        $multi_option.='<option value="'.$item[1].'">'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
-						if (in_array($item[1],$uids)){
-							$multi_option_actif.='<option value="'.$item[1].'">'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
-						}
-						
-                    } 
-                } else {
-                    // unknown TCA config
-                	$options = '<option><em>Unknown TCA-configuration</em></option>';
-                }
-            
-                $srow = '<select '.$size.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']">';
-                if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"]) {
-                    $size = ' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"].'" ';
-                    
-                    if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["maxitems"]>1) {
-						$double_select=true;
-						if ($double_select){
-						
-							//on vide les options normales qui ne servent pas
-							//$option='';
-							$srow='<table><tr><td>';
-							$srow.='<select '.$size.' multiple="multiple" name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_list" class="'.$this->caller->pi_getClassName('list_table_field').'_list '.$this->caller->pi_getClassName('list_table_field_'.$fN).'_list">';
-							$srow.=''.$multi_option_actif;
-							$srow.='</select></td>';
-							$srow.='<td><a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Top\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur/group_totop.gif" width="14" height="14" border="0" alt="'.$this->metafeeditlib->getLL("move_top", $conf).'" title="'.$this->metafeeditlib->getLL("move_top", $conf).'" /></a><br />';
-							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Up\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//up.gif" width="14" height="14" border="0"  alt="'.$this->metafeeditlib->getLL("move_up", $conf).'" title="'.$this->metafeeditlib->getLL("move_up", $conf).'" /></a><br />';
-							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Down\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//down.gif" width="14" height="14" border="0"  alt="'.$this->metafeeditlib->getLL("move_bt", $conf).'" title="'.$this->metafeeditlib->getLL("move_bt", $conf).'" /></a><br />';
-							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Bottom\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//group_tobottom.gif" width="14" height="14" border="0"  alt="'.$this->metafeeditlib->getLL("move_down", $conf).'" title="'.$this->metafeeditlib->getLL("move_down", $conf).'" /></a><br />';
-							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Remove\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//group_clear.png" width="18" height="20" border="0"  alt="'.$this->metafeeditlib->getLL("move_delete", $conf).'" title="'.$this->metafeeditlib->getLL("move_delete", $conf).'" /></a><br/></td>';
-							$srow.='<td><select  name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_sel"  '.$size.' onchange="setFormValueFromBrowseWin(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',this.options[this.selectedIndex].value,this.options[this.selectedIndex].text,\'\'); " class="'.$this->caller->pi_getClassName('list_table_field').'_list '.$this->caller->pi_getClassName('list_table_field_'.$fN).'_sel">';
-							$srow.=$multi_option;
-							$srow.='';
-							$hr = '</td></tr></table><input type="hidden" name="'.$fieldName.'" />';
-							
-							
-							//$options="";
+							}
+				  		}
+				  		$row .= $srow .$options.'</select>'.$hr;
+				  		return $row.$EVAL_ERROR_FIELD;
+						// NoMM
+					}
+					debug("getFormFieldCode()::GROUP TYPE 'DB' NOT SUPPORTED YET");
+				}
+				break;
+			case 'select':
+				$feData = $conf['inputvar.']['fedata'];
+				$uid = $feData[$masterTable][$conf['uidField']] ? $feData[$masterTable][$conf['uidField']] : $conf['inputvar.']['rU'];
+				$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($masterTable,$uid);
+				if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["foreign_table"]) {			   // reference to elements from another table
+					$options="###FIELD_".$fN."_OPTIONS###";
+					// gets uids of selected records.
+					$uids = array();
+					if($feData[$masterTable][$fN]) {								// from post var
+						$uids = explode(",",$feData[$masterTable][$fN]);
+					} elseif($conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"] && $uid) {  // from mm-relation
+						$mmTable=$conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"];
+						$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'',$mmTable.'.sorting');
+						if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
+						$cnt=mysql_num_rows($MMres);
+						if($conf['debug'] && $cnt!=$rec[$fN]) debug("class.tx_metafeedit.php::tx_metafeedit->getFormFieldCode(): Wrong number ($MMres<>$cnt) of selections reached for  field $fN of table $masterTable, mm:  $mmTable");
+						while($MMrow = mysql_fetch_assoc($MMres))
+						$uids[] = $MMrow["uid_foreign"];
+					} else {														// clean from DB
+						$uids = explode(",",$rec[$fN]);
+					}
+				} elseif($conf['TCAN'][$masterTable]['columns'][$fN]['config']["items"]) {   // fixed items			
+					// Get selected uids.
+					$uids = array();
+					if($feData[$masterTable][$fN]) {								// from post var
+					  $uids = explode(",",$feData[$masterTable][$fN]);
+					} elseif(!is_null($rec)) {									  // clean from DB
+					  $uids = explode(",",$rec[$fN]);
+					} elseif($cmd=='create' && $conf['TCAN'][$masterTable]['columns'][$fN]['config']['default']){
+					  $uids = explode(",",$conf['TCAN'][$masterTable]['columns'][$fN]['config']['default']);
+					}
 				
-							$conf['additionalJS_end']['feedit_'.$fN.'_again_set_data'] = 'setFormRegenerer(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']'.'\');';
-						}else{
-						
-							$size .= ' multiple="multiple" ';
-							$onchange = ' onchange="feedit_manipulateMultipleSelect(\''.$fieldName.'\')" ';
-							$srow = '<select '.$size.' '.$onchange.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_select">';
-							$hr = '<input type="hidden" name="'.$fieldName.'" />';
-						}
-						
-                    }
-                }
-                $row .= $srow .$options.'</select>'.$hr;
-                return $row.$EVAL_ERROR_FIELD;
-                break;
-            case 'inline':
-                $feData = $conf['inputvar.']['fedata'];
-                $uid = $feData[$masterTable][$conf['uidField']] ? $feData[$masterTable][$conf['uidField']] : $conf['inputvar.']['rU'];
-                $rec = $GLOBALS['TSFE']->sys_page->getRawRecord($masterTable,$uid);
-                if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["foreign_table"]) {               // reference to elements from another table
-                    $options="###FIELD_".$fN."_OPTIONS###";
-                    // gets uids of selected records.
-                    $uids = array();
-                    if($feData[$masterTable][$fN]) {                                // from post var
-                        $uids = explode(",",$feData[$masterTable][$fN]);
-                    } elseif($conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"] && $uid) {  // from mm-relation
-                    	$mmTable=$conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"];
-                        $MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'',$mmTable.'.sorting');
-                        if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
-                        $cnt=mysql_num_rows($MMres);
-                        if($conf['debug'] && $cnt!=$rec[$fN]) debug("class.tx_metafeedit.php::tx_metafeedit->getFormFieldCode(): Wrong number ($MMres<>$cnt) of selections reached for  field $fN of table $masterTable, mm:  $mmTable");
-                        while($MMrow = mysql_fetch_assoc($MMres))
-                        $uids[] = $MMrow["uid_foreign"];
-                    } else {                                                        // clean from DB
-                        $uids = explode(",",$rec[$fN]);
-                    }
-                } elseif($conf['TCAN'][$masterTable]['columns'][$fN]['config']["items"]) {   // fixed items            
-                    // Get selected uids.
-                    $uids = array();
-                    if($feData[$masterTable][$fN]) {                                // from post var
-                      $uids = explode(",",$feData[$masterTable][$fN]);
-                    } elseif(!is_null($rec)) {                                      // clean from DB
-                      $uids = explode(",",$rec[$fN]);
-                    } elseif($cmd=='create' && $conf['TCAN'][$masterTable]['columns'][$fN]['config']['default']){
-                      $uids = explode(",",$conf['TCAN'][$masterTable]['columns'][$fN]['config']['default']);
-                    }
-                
-                    $items = $conf['TCAN'][$masterTable]['columns'][$fN]['config']["items"];
-                    //$options = '<option value="0">-----</option>';
-                    
-                    if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["itemsProcFunc"]) {     // if itemsProcFunc is set to fill the select box
-                      $options = '';
-                      $params = $conf['TCAN'][$masterTable]['columns'][$fN];
-                      $params['items'] = &$items;
-                      t3lib_div::callUserFunction($conf['TCAN'][$masterTable]['columns'][$fN]['config']["itemsProcFunc"], $params, $this);
-                    }
-                
+					$items = $conf['TCAN'][$masterTable]['columns'][$fN]['config']["items"];
+					//$options = '<option value="0">-----</option>';
+					
+					if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["itemsProcFunc"]) {	 // if itemsProcFunc is set to fill the select box
+					  $options = '';
+					  $params = $conf['TCAN'][$masterTable]['columns'][$fN];
+					  $params['items'] = &$items;
+					  t3lib_div::callUserFunction($conf['TCAN'][$masterTable]['columns'][$fN]['config']["itemsProcFunc"], $params, $this);
+					}
+					// userfunc 
+					if($conf[$cmd.'.']['itemsProcFunc.'][$fN]) {	 // if itemsProcFunc is set to fill the select box
+					  $options = '';
+					  $params = $conf['TCAN'][$masterTable]['columns'][$fN];
+					  $params['items'] = &$items;
+					  $params['uids']=$uids;
+					  $params['feData']=$feData[$masterTable];
+					  $params['rec']=$rec;
+					  t3lib_div::callUserFunction($conf[$cmd.'.']['itemsProcFunc.'][$fN], $params, $this);
+					} 
+					
 					$multi_option='';
 					$multi_option_actif='';
-                    foreach((array)$items as $key => $item) {
-                        $selected = in_array($item[1],$uids)?'selected="selected"':"";
-                        //if($key!=0)
-                        $options .= '<option value="'.$item[1].'"'.$selected.'>'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
+					foreach((array)$items as $key => $item) {
+						$selected = in_array($item[1],$uids)?'selected="selected"':"";
+						$disabled=$item[2]?' disabled="disabled"':'';
+						//if($key!=0)
+						$options .= '<option value="'.$item[1].'"'.$selected.$disabled.'>'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
 						$multi_option.='<option value="'.$item[1].'">'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
 						if (in_array($item[1],$uids)){
 							$multi_option_actif.='<option value="'.$item[1].'">'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
 						}
 						
-                    } 
-                } else {
-                    // unknown TCA config
-                	$options = '<option><em>Unknown TCA-configuration</em></option>';
-                }
-            
-                $srow = '<select '.$size.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']">';
-                if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"]) {
-                    $size = ' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"].'" ';
-                    
-                    if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["maxitems"]>1) {
+					} 
+				} else {
+					// unknown TCA config
+					$options = '<option><em>Unknown TCA-configuration</em></option>';
+				}
+			
+				$srow = '<select '.$size.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']">';
+				if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"]) {
+					$size = ' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"].'" ';
+					
+					if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["maxitems"]>1) {
 						$double_select=true;
 						if ($double_select){
 						
@@ -1475,22 +1378,122 @@ class tx_metafeedit extends  tslib_pibase {
 							$hr = '<input type="hidden" name="'.$fieldName.'" />';
 						}
 						
-                    }
-                }
-                $row .= $srow .$options.'</select>'.$hr;
-                return $row.$EVAL_ERROR_FIELD;
-                break;
-            case 'radio':
-                if($conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']>1) debug("getFormFieldCode():: WARNING, checkbox have more cols, not implemented yet.");
+					}
+				}
+				$row .= $srow .$options.'</select>'.$hr;
+				return $row.$EVAL_ERROR_FIELD;
+				break;
+			case 'inline':
+				$feData = $conf['inputvar.']['fedata'];
+				$uid = $feData[$masterTable][$conf['uidField']] ? $feData[$masterTable][$conf['uidField']] : $conf['inputvar.']['rU'];
+				$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($masterTable,$uid);
+				if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["foreign_table"]) {			   // reference to elements from another table
+					$options="###FIELD_".$fN."_OPTIONS###";
+					// gets uids of selected records.
+					$uids = array();
+					if($feData[$masterTable][$fN]) {								// from post var
+						$uids = explode(",",$feData[$masterTable][$fN]);
+					} elseif($conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"] && $uid) {  // from mm-relation
+						$mmTable=$conf['TCAN'][$masterTable]['columns'][$fN]['config']["MM"];
+						$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'',$mmTable.'.sorting');
+						if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
+						$cnt=mysql_num_rows($MMres);
+						if($conf['debug'] && $cnt!=$rec[$fN]) debug("class.tx_metafeedit.php::tx_metafeedit->getFormFieldCode(): Wrong number ($MMres<>$cnt) of selections reached for  field $fN of table $masterTable, mm:  $mmTable");
+						while($MMrow = mysql_fetch_assoc($MMres))
+						$uids[] = $MMrow["uid_foreign"];
+					} else {														// clean from DB
+						$uids = explode(",",$rec[$fN]);
+					}
+				} elseif($conf['TCAN'][$masterTable]['columns'][$fN]['config']["items"]) {   // fixed items			
+					// Get selected uids.
+					$uids = array();
+					if($feData[$masterTable][$fN]) {								// from post var
+					  $uids = explode(",",$feData[$masterTable][$fN]);
+					} elseif(!is_null($rec)) {									  // clean from DB
+					  $uids = explode(",",$rec[$fN]);
+					} elseif($cmd=='create' && $conf['TCAN'][$masterTable]['columns'][$fN]['config']['default']){
+					  $uids = explode(",",$conf['TCAN'][$masterTable]['columns'][$fN]['config']['default']);
+					}
+				
+					$items = $conf['TCAN'][$masterTable]['columns'][$fN]['config']["items"];
+					//$options = '<option value="0">-----</option>';
+					
+					if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["itemsProcFunc"]) {	 // if itemsProcFunc is set to fill the select box
+					  $options = '';
+					  $params = $conf['TCAN'][$masterTable]['columns'][$fN];
+					  $params['items'] = &$items;
+					  t3lib_div::callUserFunction($conf['TCAN'][$masterTable]['columns'][$fN]['config']["itemsProcFunc"], $params, $this);
+					}
+				
+					$multi_option='';
+					$multi_option_actif='';
+					foreach((array)$items as $key => $item) {
+						$selected = in_array($item[1],$uids)?'selected="selected"':"";
+						//if($key!=0)
+						$options .= '<option value="'.$item[1].'"'.$selected.'>'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
+						$multi_option.='<option value="'.$item[1].'">'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
+						if (in_array($item[1],$uids)){
+							$multi_option_actif.='<option value="'.$item[1].'">'.$this->metafeeditlib->getLLFromLabel($item[0],$conf).'</option>';
+						}
+						
+					} 
+				} else {
+					// unknown TCA config
+					$options = '<option><em>Unknown TCA-configuration</em></option>';
+				}
+			
+				$srow = '<select '.$size.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']">';
+				if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"]) {
+					$size = ' size="'.$conf['TCAN'][$masterTable]['columns'][$fN]['config']["size"].'" ';
+					
+					if($conf['TCAN'][$masterTable]['columns'][$fN]['config']["maxitems"]>1) {
+						$double_select=true;
+						if ($double_select){
+						
+							//on vide les options normales qui ne servent pas
+							//$option='';
+							$srow='<table><tr><td>';
+							$srow.='<select '.$size.' multiple="multiple" name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_list" class="'.$this->caller->pi_getClassName('list_table_field').'_list '.$this->caller->pi_getClassName('list_table_field_'.$fN).'_list">';
+							$srow.=''.$multi_option_actif;
+							$srow.='</select></td>';
+							$srow.='<td><a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Top\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur/group_totop.gif" width="14" height="14" border="0" alt="'.$this->metafeeditlib->getLL("move_top", $conf).'" title="'.$this->metafeeditlib->getLL("move_top", $conf).'" /></a><br />';
+							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Up\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//up.gif" width="14" height="14" border="0"  alt="'.$this->metafeeditlib->getLL("move_up", $conf).'" title="'.$this->metafeeditlib->getLL("move_up", $conf).'" /></a><br />';
+							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Down\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//down.gif" width="14" height="14" border="0"  alt="'.$this->metafeeditlib->getLL("move_bt", $conf).'" title="'.$this->metafeeditlib->getLL("move_bt", $conf).'" /></a><br />';
+							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Bottom\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//group_tobottom.gif" width="14" height="14" border="0"  alt="'.$this->metafeeditlib->getLL("move_down", $conf).'" title="'.$this->metafeeditlib->getLL("move_down", $conf).'" /></a><br />';
+							$srow.='<a href="#" onclick="setFormValueManipulate(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',\'Remove\'); return false;"><img src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/selecteur//group_clear.png" width="18" height="20" border="0"  alt="'.$this->metafeeditlib->getLL("move_delete", $conf).'" title="'.$this->metafeeditlib->getLL("move_delete", $conf).'" /></a><br/></td>';
+							$srow.='<td><select  name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_sel"  '.$size.' onchange="setFormValueFromBrowseWin(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']\',this.options[this.selectedIndex].value,this.options[this.selectedIndex].text,\'\'); " class="'.$this->caller->pi_getClassName('list_table_field').'_list '.$this->caller->pi_getClassName('list_table_field_'.$fN).'_sel">';
+							$srow.=$multi_option;
+							$srow.='';
+							$hr = '</td></tr></table><input type="hidden" name="'.$fieldName.'" />';
+							
+							
+							//$options="";
+				
+							$conf['additionalJS_end']['feedit_'.$fN.'_again_set_data'] = 'setFormRegenerer(\'FE['.$masterTable.']'.$gridMark.'['.$fN.']'.'\');';
+						}else{
+						
+							$size .= ' multiple="multiple" ';
+							$onchange = ' onchange="feedit_manipulateMultipleSelect(\''.$fieldName.'\')" ';
+							$srow = '<select '.$size.' '.$onchange.' name="FE['.$masterTable.']'.$gridMark.'['.$fN.']_select">';
+							$hr = '<input type="hidden" name="'.$fieldName.'" />';
+						}
+						
+					}
+				}
+				$row .= $srow .$options.'</select>'.$hr;
+				return $row.$EVAL_ERROR_FIELD;
+				break;
+			case 'radio':
+				if($conf['TCAN'][$masterTable]['columns'][$fN]['config']['cols']>1) debug("getFormFieldCode():: WARNING, checkbox have more cols, not implemented yet.");
 				$items=$conf['TCAN'][$masterTable]['columns'][$fN]['config']['items'];
-            	for ($i = 0; $i < count ($items); ++$i) {
-                    	$row .= '<input type="radio"' . $this->caller->pi_classParam('radio') . 'id="'. $this->caller->pi_getClassName($fN) . '-' . $i . '" name="FE['.$masterTable.']'.$gridMark.'['.$fN.']"'.
-                            'value="'.$items[$i][1].'" '.($i==0?'checked="checked"':'').' />' .
-                            '<label for="' . $this->caller->pi_getClassName($fN) . '-' . $i . '">' . $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$masterTable]['columns'][$fN]['config']['items'][$i][0],$conf) . '</label>';
-                }
-            	return $row.$EVAL_ERROR_FIELD;
-                break;
-            case 'user':
+				for ($i = 0; $i < count ($items); ++$i) {
+						$row .= '<input type="radio"' . $this->caller->pi_classParam('radio') . 'id="'. $this->caller->pi_getClassName($fN) . '-' . $i . '" name="FE['.$masterTable.']'.$gridMark.'['.$fN.']"'.
+							'value="'.$items[$i][1].'" '.($i==0?'checked="checked"':'').' />' .
+							'<label for="' . $this->caller->pi_getClassName($fN) . '-' . $i . '">' . $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$masterTable]['columns'][$fN]['config']['items'][$i][0],$conf) . '</label>';
+				}
+				return $row.$EVAL_ERROR_FIELD;
+				break;
+			case 'user':
 				$subType = ($conf['TCAN'][$masterTable]['columns'][$fN]['config']['subType'] && $conf['TCAN'][$masterTable]['columns'][$fN]['config']['subType'] == 'file')?true:false;
 				$PA['itemFormElName']=$subType?'FE['.$masterTable.']'.$gridMark.'['.$fN.'_file][]':'FE['.$masterTable.']['.$fN.']';
 				$PA['fieldChangeFunc']=$subType?array(''=>''):array(0 => 'feedit_'.$masterTable.'_formGet('."'".$fieldName."','".$conf['TCAN'][$masterTable]['columns'][$fN]['config']["eval"]."','".$is_in."','".$checkbox."','".$checkboxVal."','".$checkbox_off."')");
@@ -1500,18 +1503,18 @@ class tx_metafeedit extends  tslib_pibase {
 				$PA['pObj']=&$this;
 				return t3lib_div::callUserFunction($conf['TCAN'][$masterTable]['columns'][$fN]['config']['userFunc'], $PA, $this);
 				break;
-            case 'flex':
-                debug("getFormFieldCode():: flex fields not implemented yet.");
-                break;
-            case 'passthrough':
-                debug("getFormFieldCode():: passthrough fields not implemented yet.");
-                break;
-            default:
-                debug("getFormFieldCode():: Unknown type (".$type.") with field ".$fN);
-                return '<input type="text"'.$defaultParams.' />';
-                break;
-        }
-    }
+			case 'flex':
+				debug("getFormFieldCode():: flex fields not implemented yet.");
+				break;
+			case 'passthrough':
+				debug("getFormFieldCode():: passthrough fields not implemented yet.");
+				break;
+			default:
+				debug("getFormFieldCode():: Unknown type (".$type.") with field ".$fN);
+				return '<input type="text"'.$defaultParams.' />';
+				break;
+		}
+	}
 
 
   function getSize(&$conf, $fN, $masterTable)
@@ -1536,33 +1539,33 @@ class tx_metafeedit extends  tslib_pibase {
   }
   
   
-    /**
-    * getListFields : gets fields for list mode ...
-    * @param	[array]		$conf: Configuration array
-    * @param	[booelan]   $textmode	: if true we output only text mode data (no input fields)....
-    * @param	[string]    $type: export type ...
-    * @return	[string]	$content :
-    */
-    
-    function getListFields(&$conf,$textmode=false,$type='') {
-        $fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
-        $fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
-        foreach($fieldArray as $FN) {
-        	$params=t3lib_div::trimExplode(';',$FN);
+	/**
+	* getListFields : gets fields for list mode ...
+	* @param	[array]		$conf: Configuration array
+	* @param	[booelan]   $textmode	: if true we output only text mode data (no input fields)....
+	* @param	[string]	$type: export type ...
+	* @return	[string]	$content :
+	*/
+	
+	function getListFields(&$conf,$textmode=false,$type='') {
+		$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
+		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
+		foreach($fieldArray as $FN) {
+			$params=t3lib_div::trimExplode(';',$FN);
 
-	        if ($params[0]!='--div--'  && $params[0]!='--fse--' && $params[0]!='--fsb--') {
-        		$masterTable = $conf['table'];
+			if ($params[0]!='--div--'  && $params[0]!='--fse--' && $params[0]!='--fsb--') {
+				$masterTable = $conf['table'];
 				$size = $this->getSize($conf, $FN, $masterTable);
 				$tab=array();
-				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',$tab);     
-	        	$Lib=$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf);
-	        	$href=$this->metafeeditlib->hsc($conf,$this->pi_linkTP_keepPIvars_url(array('sort' => $FN.':###SORT_DIR_'.$FN.'###'),1));
-	        	if(!$textmode) {
-	        			if ($this->piVars['exporttype']=='EXCEL' || $this->piVars['exporttype']=='XLS')
-	        			    $ret.='<th><data>'.$Lib.'</data><size>'.$size.'</size></th>';
-	        			else
-	        			    $ret.=$conf['list.']['sortFields']?'<th><a class="###SORT_CLASS_'.$FN.'###" href="'.$href.'###GLOBALPARAMS###">'.$Lib.'</a></th>':'<th>'.$Lib.'</th>';
-	        	} else if ($type) {
+				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',$tab);	 
+				$Lib=$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf);
+				$href=$this->metafeeditlib->hsc($conf,$this->pi_linkTP_keepPIvars_url(array('sort' => $FN.':###SORT_DIR_'.$FN.'###'),1));
+				if(!$textmode) {
+						if ($this->piVars['exporttype']=='EXCEL' || $this->piVars['exporttype']=='XLS')
+							$ret.='<th><data>'.$Lib.'</data><size>'.$size.'</size></th>';
+						else
+							$ret.=$conf['list.']['sortFields']?'<th><a class="###SORT_CLASS_'.$FN.'###" href="'.$href.'###GLOBALPARAMS###">'.$Lib.'</a></th>':'<th>'.$Lib.'</th>';
+				} else if ($type) {
 							//$img=0;
 							//if( $conf['TCAN'][$masterTable]['columns'][$FN]['config']['type']== 'group' &&  $conf['TCAN'][$masterTable]['columns'][$FN]['config']['internal_type']=='file') $img=1;
 							//$img=0 bug ??;
@@ -1571,33 +1574,33 @@ class tx_metafeedit extends  tslib_pibase {
 						} else {
 						  $ret.=$Lib.';';	
 						}
-    			}
-    		}	
-        return $ret;
-    }
+				}
+			}	
+		return $ret;
+	}
 
-    /**
-    * getListDataFields : Creates template for list row according to type (html,pdf,xls,cvs...).
-    *
-    * @param	array		$conf: Configuration array();
-    * @param	boolean     $textmode	: true we output only text mode data (no input fields), will be transmitted to getPreviewField....
-    * @param    string		$type: export type : html,csv or empty ... if html no exotic tags. If csv (fields seprated by ';')
-    * @return	string		$ret : html code
-    */
-     
-    function getListDataFields(&$conf,$textmode=false,$type='',$rawimage=false) {
-    	$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
-    	$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
-    	$cols=$conf['list.']['nbCols'];
+	/**
+	* getListDataFields : Creates template for list row according to type (html,pdf,xls,cvs...).
+	*
+	* @param	array		$conf: Configuration array();
+	* @param	boolean	 $textmode	: true we output only text mode data (no input fields), will be transmitted to getPreviewField....
+	* @param	string		$type: export type : html,csv or empty ... if html no exotic tags. If csv (fields seprated by ';')
+	* @return	string		$ret : html code
+	*/
+	 
+	function getListDataFields(&$conf,$textmode=false,$type='',$rawimage=false) {
+		$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
+		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
+		$cols=$conf['list.']['nbCols'];
 			$masterTable = $conf['table'];
-    	foreach($fieldArray as $FN) {
-    		$params=explode(';',$FN);
-    		if ($params[0]!='--div--'&&$params[0]!='--fse--'&&$params[0]!='--fsb--') {
-     			$FCode=$this->getPreviewFieldCode('edit',$conf,$FN,$textmode?0:1);
-    			$FN=str_replace('.','_',$FN);
-    			// do we ask for field value only ?
-    			switch ($type) {
-    				case 'html' : 
+		foreach($fieldArray as $FN) {
+			$params=explode(';',$FN);
+			if ($params[0]!='--div--'&&$params[0]!='--fse--'&&$params[0]!='--fsb--') {
+	 			$FCode=$this->getPreviewFieldCode('edit',$conf,$FN,$textmode?0:1);
+				$FN=str_replace('.','_',$FN);
+				// do we ask for field value only ?
+				switch ($type) {
+					case 'html' : 
  						// html presentation
 						$size = $this->getSize($conf, $FN, $masterTable);
 						if(!$this->piVars['nbCols']) {
@@ -1613,11 +1616,11 @@ class tx_metafeedit extends  tslib_pibase {
 							$ret.='<td><data>'.$FCode.'</data><size>'.$size.'</size></td>';	
 						}
 						break;
-    				case 'csv' :
+					case 'csv' :
 						// No presentation data
 						$ret.='"'.str_replace('"','""',$FCode).'";';	
 						break;
-    				case 'xls' :
+					case 'xls' :
 						
 						if( $conf['TCAN'][$masterTable]['columns'][$FN]['config']['type']== 'group' &&  $conf['TCAN'][$masterTable]['columns'][$FN]['config']['internal_type']=='file') {
 									//$dir=$conf['TCAN'][$masterTable]['columns'][$FN]['config']['uploadfolder'];
@@ -1628,111 +1631,111 @@ class tx_metafeedit extends  tslib_pibase {
 							$ret.=$type?$FCode:'<div class="'.$this->caller->pi_getClassName('list_table_field').' '.$this->caller->pi_getClassName('list_table_field_'.$FN).'">'.$FCode.'</div>';
 						} else {
 							$ret.='<td '.($conf['list.']['align.'][$FN]?'align="'.$conf['list.']['align.'][$FN].'"':'').'>'.($textmode?'':'<div class="'.$this->caller->pi_getClassName('list_field').' '.$this->caller->pi_getClassName('list_field_'.$FN).'">').$FCode.($textmode?'':'</div>').'</td>';
-						}   			        
+						}   					
 						break;
 					default:
 						if ($cols) {
 							$ret.=$type?$FCode:'<div class="'.$this->caller->pi_getClassName('list_table_field').' '.$this->caller->pi_getClassName('list_table_field_'.$FN).'">'.$FCode.'</div>';
 						} else {
 							$ret.='<td '.($conf['list.']['align.'][$FN]?'align="'.$conf['list.']['align.'][$FN].'"':'').'>'.($textmode?'':'<div class="'.$this->caller->pi_getClassName('list_field').' '.$this->caller->pi_getClassName('list_field_'.$FN).'">').$FCode.($textmode?'':'</div>').'</td>';
-						}   			        
+						}   					
 					  }
-    		  /*
-    			if ($textmode) {
-    				if ($cols) {
-    					$ret.=$FCode.';'; // ; for csv 
-    				} else {
-    					if ($type) {
-    						// html presentation
-    						$masterTable = $conf['table'];
-    						$size = $this->getSize($conf, $FN, $masterTable);
-    						if(!$this->piVars['nbCols']) {
-    							$img=0;
-    							$dir='';
-    							if( $conf['TCAN'][$masterTable]['columns'][$FN]['config']['type']== 'group' &&  $conf['TCAN'][$masterTable]['columns'][$FN]['config']['internal_type']=='file') {
-    								$img=1;
-    								$dir=$conf['TCAN'][$masterTable]['columns'][$FN]['config']['uploadfolder'];
-    							}
-    							
-    							$ret.='<td><data>'.$FCode.'</data><size>'.$size.'</size><img>'.$img.($dir?'<dir>'.$dir.'</dir>':'').'</img></td>';	
-    							}
-    						else {
-    							// Pdf presentation ???
-    							$ret.='<td><data>'.$FCode.'</data><size>'.$size.'</size></td>';	
-    						}
-    					} else {
-    							// No presentation data
-    						  $ret.=$FCode.';';	
-    					}
-    				}
-    			} else {
-    				if ($cols) {
-    					$ret.=$type?$FCode:'<div class="'.$this->caller->pi_getClassName('list_table_field').' '.$this->caller->pi_getClassName('list_table_field_'.$FN).'">'.$FCode.'</div>';
-    				} else {
-    					$ret.='<td '.($conf['list.']['align.'][$FN]?'align="'.$conf['list.']['align.'][$FN].'"':'').'>'.($type?'':'<div class="'.$this->caller->pi_getClassName('list_field').' '.$this->caller->pi_getClassName('list_field_'.$FN).'">').$FCode.($type?'':'</div>').'</td>';
-    				}
-    			}*/
-    		}
-    
-    	}
-    	return $ret;
-    }
-    /**
-    * getListDataFields : Creates template for list row according to type (html,pdf,xls,cvs...).
-    *
-    * @param	array		$conf: Configuration array();
-    * @param	boolean     $textmode	: true we output only text mode data (no input fields), will be transmitted to getPreviewField....
-    * @param    string		$type: export type : html,csv or empty ... if html no exotic tags. If csv (fields seprated by ';')
-    * @return	string		$ret : html code
-    */
-     
-    function getEditDataFields(&$conf,$textmode=false,$type='') {
-    	$fields=$conf['edit.']['show_fields']?$conf['edit.']['show_fields']:$this->id_field;
-    	$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
-    	$cols=$conf['list.']['nbCols'];
-    	
-    	$rowcount=0;
-    	$fscount=0;
-    	
-    	foreach($fieldArray as $FN) {
-    		$params=explode(';',$FN);
-    		// If we meet tab delimiter
-    		if ($params[0]=='--div--') {
-    			if ($rowcount) {
-    				$ret.="</tr><tr>";
-    			} else {
-    				$ret.="<tr>";
-    				$rowcount=1;
-    			}		
-    		}
-    		
-    		// If we meet fieldset delimiter
+			  /*
+				if ($textmode) {
+					if ($cols) {
+						$ret.=$FCode.';'; // ; for csv 
+					} else {
+						if ($type) {
+							// html presentation
+							$masterTable = $conf['table'];
+							$size = $this->getSize($conf, $FN, $masterTable);
+							if(!$this->piVars['nbCols']) {
+								$img=0;
+								$dir='';
+								if( $conf['TCAN'][$masterTable]['columns'][$FN]['config']['type']== 'group' &&  $conf['TCAN'][$masterTable]['columns'][$FN]['config']['internal_type']=='file') {
+									$img=1;
+									$dir=$conf['TCAN'][$masterTable]['columns'][$FN]['config']['uploadfolder'];
+								}
+								
+								$ret.='<td><data>'.$FCode.'</data><size>'.$size.'</size><img>'.$img.($dir?'<dir>'.$dir.'</dir>':'').'</img></td>';	
+								}
+							else {
+								// Pdf presentation ???
+								$ret.='<td><data>'.$FCode.'</data><size>'.$size.'</size></td>';	
+							}
+						} else {
+								// No presentation data
+							  $ret.=$FCode.';';	
+						}
+					}
+				} else {
+					if ($cols) {
+						$ret.=$type?$FCode:'<div class="'.$this->caller->pi_getClassName('list_table_field').' '.$this->caller->pi_getClassName('list_table_field_'.$FN).'">'.$FCode.'</div>';
+					} else {
+						$ret.='<td '.($conf['list.']['align.'][$FN]?'align="'.$conf['list.']['align.'][$FN].'"':'').'>'.($type?'':'<div class="'.$this->caller->pi_getClassName('list_field').' '.$this->caller->pi_getClassName('list_field_'.$FN).'">').$FCode.($type?'':'</div>').'</td>';
+					}
+				}*/
+			}
+	
+		}
+		return $ret;
+	}
+	/**
+	* getListDataFields : Creates template for list row according to type (html,pdf,xls,cvs...).
+	*
+	* @param	array		$conf: Configuration array();
+	* @param	boolean	 $textmode	: true we output only text mode data (no input fields), will be transmitted to getPreviewField....
+	* @param	string		$type: export type : html,csv or empty ... if html no exotic tags. If csv (fields seprated by ';')
+	* @return	string		$ret : html code
+	*/
+	 
+	function getEditDataFields(&$conf,$textmode=false,$type='') {
+		$fields=$conf['edit.']['show_fields']?$conf['edit.']['show_fields']:$this->id_field;
+		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
+		$cols=$conf['list.']['nbCols'];
+		
+		$rowcount=0;
+		$fscount=0;
+		
+		foreach($fieldArray as $FN) {
+			$params=explode(';',$FN);
+			// If we meet tab delimiter
+			if ($params[0]=='--div--') {
+				if ($rowcount) {
+					$ret.="</tr><tr>";
+				} else {
+					$ret.="<tr>";
+					$rowcount=1;
+				}		
+			}
+			
+			// If we meet fieldset delimiter
 
-    		if ($params[0]=='--fsb--') {
-    			if ($rowcount) {
-    				$ret.="</tr>";
-    			} else {
-    				$rowcount=1;
-    			}		
-    			$ret.='<tr><td><data>'.$conf['list.']['fieldSetNames.'][$fscount].'</data></td></tr><tr>'; 
-    			$fscount++;
-    		}
-    		if ($params[0]=='--fse--') {
-    			if ($rowcount) {
-    				$ret.="</tr>";
-    				$rowcount=0;
-    			}	
-    		}
-    		if ($params[0]!='--div--' && $params[0]!='--fse--' && $params[0]!='--fsb--') {
-    			if (!$rowcount){
-    				$ret.="<tr>";
-    				$rowcount=1;
-    			}
-     			$FCode=$this->getPreviewFieldCode('edit',$conf,$FN,$textmode?0:1,$Lib);
-    			$FN=str_replace('.','_',$FN);
-    			// do we ask for field value only ?
-    			switch ($type) {
-    				case 'html' : 
+			if ($params[0]=='--fsb--') {
+				if ($rowcount) {
+					$ret.="</tr>";
+				} else {
+					$rowcount=1;
+				}		
+				$ret.='<tr><td><data>'.$conf['list.']['fieldSetNames.'][$fscount].'</data></td></tr><tr>'; 
+				$fscount++;
+			}
+			if ($params[0]=='--fse--') {
+				if ($rowcount) {
+					$ret.="</tr>";
+					$rowcount=0;
+				}	
+			}
+			if ($params[0]!='--div--' && $params[0]!='--fse--' && $params[0]!='--fsb--') {
+				if (!$rowcount){
+					$ret.="<tr>";
+					$rowcount=1;
+				}
+	 			$FCode=$this->getPreviewFieldCode('edit',$conf,$FN,$textmode?0:1,$Lib);
+				$FN=str_replace('.','_',$FN);
+				// do we ask for field value only ?
+				switch ($type) {
+					case 'html' : 
  							// html presentation
 							$masterTable = $conf['table'];
 							$size = $this->getSize($conf, $FN, $masterTable);
@@ -1749,38 +1752,38 @@ class tx_metafeedit extends  tslib_pibase {
 								// Pdf presentation ???
 								$ret.='<td><data>'.$Lib.'</data><size>'.$sizeLib.'</size></td><td><data>'.$FCode.'</data><size>'.$size.'</size></td>';	
 							}
-    			    break;
-    			  case 'csv' :
-    					// No presentation data
-    				  $ret.='"'.str_replace('"','""',$FCode).'";';	
-    			    break;
-    			  default:
-        			if ($cols) {
-        				$ret.=$type?$FCode:'<div class="'.$this->caller->pi_getClassName('list_table_field').' '.$this->caller->pi_getClassName('list_table_field_'.$FN).'">'.$FCode.'</div>';
-        			} else {
-        				$ret.='<td '.($conf['list.']['align.'][$FN]?'align="'.$conf['list.']['align.'][$FN].'"':'').'>'.($textmode?'':'<div class="'.$this->caller->pi_getClassName('list_field').' '.$this->caller->pi_getClassName('list_field_'.$FN).'">').$FCode.($textmode?'':'</div>').'</td>';
-        			}    
-    			}
-    		    
-    		}
-    		if ($rowcount) {
-    				$ret.="</tr>";
-    				$rowcount=0;
-    		}	
-    
-    	}
-    	return $ret;
-    }
+					break;
+				  case 'csv' :
+						// No presentation data
+					  $ret.='"'.str_replace('"','""',$FCode).'";';	
+					break;
+				  default:
+					if ($cols) {
+						$ret.=$type?$FCode:'<div class="'.$this->caller->pi_getClassName('list_table_field').' '.$this->caller->pi_getClassName('list_table_field_'.$FN).'">'.$FCode.'</div>';
+					} else {
+						$ret.='<td '.($conf['list.']['align.'][$FN]?'align="'.$conf['list.']['align.'][$FN].'"':'').'>'.($textmode?'':'<div class="'.$this->caller->pi_getClassName('list_field').' '.$this->caller->pi_getClassName('list_field_'.$FN).'">').$FCode.($textmode?'':'</div>').'</td>';
+					}	
+				}
+				
+			}
+			if ($rowcount) {
+					$ret.="</tr>";
+					$rowcount=0;
+			}	
+	
+		}
+		return $ret;
+	}
 	/**
 	* getEditSumFields : generates template field cells (<td>) for sums of displayed columns ....
 	*
-    * @param	string     	$prefix	: true we output only text mode data (no input fields)....
+	* @param	string	 	$prefix	: true we output only text mode data (no input fields)....
 	* @param	array		$conf: Configuration array();
-    * @param    integer		$count: by reference, nb fields
-	* @param	boolean     $textmode	: true we output only text mode data (no input fields)....
-    * @param	string     	$type	: true we output only text mode data (no input fields)....
- 	* @param	boolean     $actFlag	: Wether to show actions or group by label in first cell...
-    * @return	string		$ret : html code
+	* @param	integer		$count: by reference, nb fields
+	* @param	boolean	 $textmode	: true we output only text mode data (no input fields)....
+	* @param	string	 	$type	: true we output only text mode data (no input fields)....
+ 	* @param	boolean	 $actFlag	: Wether to show actions or group by label in first cell...
+	* @return	string		$ret : html code
 	*/
 
 	function getEditSumFields($prefix,&$conf,&$count, $textmode=false, $type='',$actFlag=FALSE)
@@ -1789,6 +1792,7 @@ class tx_metafeedit extends  tslib_pibase {
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
 		$firstemptycell='###FIRSTEMPTYCELL###';
 		$count=0;
+		$total=0;
 		$ret=$type=='PDF'?'<gb>1</gb>':'';
 		//$ret.=$actFlag?'<td>###FIRSTEMPTYCELL###</td>':'';
 		$fc=0;
@@ -1799,10 +1803,10 @@ class tx_metafeedit extends  tslib_pibase {
 				$masterTable = $conf['table'];
 				$sumarray=t3lib_div::trimexplode(',',$conf['list.']['sumFields']);
 				$tab=array();
-				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',$tab);               
+				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',$tab);			   
  				$Lib=$this->metafeeditlib->getLLFromLabel('total',$conf).' '.$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf).':';
 				$size = $this->getSize($conf, $_FN, $masterTable);
-				
+				$total++;
 				if (!in_array($_FN,$sumarray) && !in_array($FN,$sumarray)) {			// If field is not a sum field ...
 					if ($textmode){
 						$ret.=($actFlag&&$firstemptycell)?'<td>###FIRSTEMPTYCELL###</td>':'';
@@ -1811,20 +1815,17 @@ class tx_metafeedit extends  tslib_pibase {
 						else 								// Empty cell for CSV
 							$ret.= ($firstemptycell?$firstemptycell:'').';';
 						if ($firstemptycell) $firstemptycell='';
-
 					} else	{							// Empty cell for html
 						$fc++;
-						//$ret.='<td>'.($firstemptycell?$firstemptycell:'').'</td>';	
 					}					
-				} else {   						// Field is a sum field
-					
-					
-					$count++;
+				} else {// Field is a sum field
 					$mfn=in_array($FN,$sumarray)?$FN:$_FN;
-					if (!$textmode)	{		// Not text mode only
+					if (!$textmode)	{// Not text mode only
 						if ($fc) {
+							$count+=$fc+$actFlag;
 							$ret.='<td colspan="'.($fc+$actFlag).'">'.($firstemptycell?$firstemptycell:'').'</td>';
 						}
+						$count++;
 						if ($firstemptycell) $firstemptycell='';
 						$ret.='<td '.($conf['list.']['align.'][$mfn]?'align="'.$conf['list.']['align.'][$mfn].'"':'').'>'.'###'.$prefix.'_FIELD_'.$mfn.'###</td>';
 					} else  {
@@ -1837,7 +1838,9 @@ class tx_metafeedit extends  tslib_pibase {
 					$fc=0;
 				}
 			}
-		}			
+		}	
+		$total+=$actFlag;
+		if ($count <$total) $ret.='<td colspan="'.($total-$count).'"/>';
 		return $ret;
 	} 
 	
@@ -1923,83 +1926,83 @@ class tx_metafeedit extends  tslib_pibase {
 		return $ret;
 	  }
 
-    /**
-    * getBlogFormFields :
-    *
-    * @param	[type]		$$conf: ...
-    * @return	[type]		...
-    */
+	/**
+	* getBlogFormFields :
+	*
+	* @param	[type]		$$conf: ...
+	* @return	[type]		...
+	*/
 	 
-    function getBlogFormFields(&$conf) {
-        $fields=$conf['blog.']['show_fields']?$conf['blog.']['show_fields']:'firstname,surname,email,homepage,place,entry,entrycomment';
-        $reqfields='email,entry,entrycomment';
-        $reqfieldArray=array_unique(t3lib_div::trimExplode(",",$reqfields));
-        $fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
-        $ret="<table><tr><td>";
-        foreach($fieldArray as $FN) {
-        	$params=explode(';',$FN);
-        		$FCode=$this->getFormFieldCode('blog',$conf,$FN,0,'edit');
+	function getBlogFormFields(&$conf) {
+		$fields=$conf['blog.']['show_fields']?$conf['blog.']['show_fields']:'firstname,surname,email,homepage,place,entry,entrycomment';
+		$reqfields='email,entry,entrycomment';
+		$reqfieldArray=array_unique(t3lib_div::trimExplode(",",$reqfields));
+		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
+		$ret="<table><tr><td>";
+		foreach($fieldArray as $FN) {
+			$params=explode(';',$FN);
+				$FCode=$this->getFormFieldCode('blog',$conf,$FN,0,'edit');
 					  $reqMarker = in_array($FN,$reqfieldArray) ? $conf['required_marker'] : '';
-        		$Lib=$this->metafeeditlib->getLLFromLabel($conf['TCAN']['tx_metafeedit_comments']['columns'][trim($FN)]['label'],$conf);
-        		$ret.='<div class="'.$this->caller->pi_getClassName('blog_field').' '.$this->caller->pi_getClassName('blog_field_'.$FN).'"><div class="'.$this->caller->pi_getClassName('blog_label').'"><div'.$this->caller->pi_classParam($fsc?'fsrm':'form-required-marker').'>'.$reqMarker.'</div>'.$Lib.'</div>'.$FCode.'</div>';
-        }
-        $ret.="</td></tr></table>";
-        
-        return $ret;
-    }
-    
-    /**
-    * getListTemplate : get List view templates 
-    *
-    * @param	[type]		$$conf: ...
-    * @return	[type]		...
-    */
-    
-    function getListTemplate(&$conf) {
-        $ret=$this->getListItemTemplate($conf);
-        $ret.=$this->getListNoItemTemplate($conf);
-        return ($ret);
-    }
+				$Lib=$this->metafeeditlib->getLLFromLabel($conf['TCAN']['tx_metafeedit_comments']['columns'][trim($FN)]['label'],$conf);
+				$ret.='<div class="'.$this->caller->pi_getClassName('blog_field').' '.$this->caller->pi_getClassName('blog_field_'.$FN).'"><div class="'.$this->caller->pi_getClassName('blog_label').'"><div'.$this->caller->pi_classParam($fsc?'fsrm':'form-required-marker').'>'.$reqMarker.'</div>'.$Lib.'</div>'.$FCode.'</div>';
+		}
+		$ret.="</td></tr></table>";
+		
+		return $ret;
+	}
+	
+	/**
+	* getListTemplate : get List view templates 
+	*
+	* @param	[type]		$$conf: ...
+	* @return	[type]		...
+	*/
+	
+	function getListTemplate(&$conf) {
+		$ret=$this->getListItemTemplate($conf);
+		$ret.=$this->getListNoItemTemplate($conf);
+		return ($ret);
+	}
 
-    /**
-    * getGroupByFields : Gets Group By Header Field Break templates
-    *
-    * @param	[type]		$$conf: ...
-    * @return	[type]		...
-    */
-    
-    function getGroupByFields(&$conf,$textmode=false,$exporttype='') {
+	/**
+	* getGroupByFields : Gets Group By Header Field Break templates
+	*
+	* @param	[type]		$$conf: ...
+	* @return	[type]		...
+	*/
+	
+	function getGroupByFields(&$conf,$textmode=false,$exporttype='') {
 		$GROUPBYFIELDS='';
-        if ($conf['list.']['groupByFieldBreaks']) {
+		if ($conf['list.']['groupByFieldBreaks']) {
 			$hasActions=($exporttype?0:$this->metafeeditlib->hasListActions($conf));
-        	$GROUPBYFIELDS='<!-- ###GROUPBYFIELDS### begin -->';
-        	$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
-        	$nbf=1;
-        	$nbf=count(t3lib_div::trimExplode(",",$fields))+$hasActions;
-        
-        	if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="<tr><td>";
-            $fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
-            $tab="";
+			$GROUPBYFIELDS='<!-- ###GROUPBYFIELDS### begin -->';
+			$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
+			$nbf=1;
+			$nbf=count(t3lib_div::trimExplode(",",$fields))+$hasActions;
+		
+			if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="<tr><td>";
+			$fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
+			$tab="";
 			$lvl=0;
-            foreach($fNA as $fN) {
-        		$fN2=t3lib_div::trimexplode(':',$fN);
-        		$fN=$fN2[0];
-        		if ($conf['list.']['hiddenGroupByField.'][$fN] || $conf['list.']['groupby.'][$fN.'.']['header.']['hide']) continue;
-        
-        		//Class name correction
-        		$classFn = str_replace('.', '_', $fN);
-        		
-        		$size = $this->getSize($conf, $fN, $conf['table']);
-            
-                $GROUPBYFIELDS.='<!-- ###GROUPBYFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?$conf['list.']['nbCols']+$hasActions:$nbf).'"><div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.( $conf['list.']['groupby.'][$fN.'.']['header']?$conf['list.']['groupby.'][$fN.'.']['header']:'###GROUPBY_'.$fN.'###').($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</div></td></tr>').'<!-- ###GROUPBYFIELD_'.$fN.'### end -->';
-        		$tab.="";//&nbsp;>&nbsp;";
+			foreach($fNA as $fN) {
+				$fN2=t3lib_div::trimexplode(':',$fN);
+				$fN=$fN2[0];
+				if ($conf['list.']['hiddenGroupByField.'][$fN] || $conf['list.']['groupby.'][$fN.'.']['header.']['hide']) continue;
+		
+				//Class name correction
+				$classFn = str_replace('.', '_', $fN);
+				
+				$size = $this->getSize($conf, $fN, $conf['table']);
+			
+				$GROUPBYFIELDS.='<!-- ###GROUPBYFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?$conf['list.']['nbCols']+$hasActions:$nbf).'"><div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.( $conf['list.']['groupby.'][$fN.'.']['header']?$conf['list.']['groupby.'][$fN.'.']['header']:'###GROUPBY_'.$fN.'###').($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</div></td></tr>').'<!-- ###GROUPBYFIELD_'.$fN.'### end -->';
+				$tab.="";//&nbsp;>&nbsp;";
 				$lvl++;
-            }
-        	if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="</td></tr>";
-        	$GROUPBYFIELDS.='<!-- ###GROUPBYFIELDS### end -->';
-        }
-        return $GROUPBYFIELDS;
-    }
+			}
+			if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="</td></tr>";
+			$GROUPBYFIELDS.='<!-- ###GROUPBYFIELDS### end -->';
+		}
+		return $GROUPBYFIELDS;
+	}
 	
 	/**
 	 * getGroupByFooterFields : Gets Group By Footer Field Break templates
@@ -2018,10 +2021,10 @@ class tx_metafeedit extends  tslib_pibase {
 			$nbf=count(t3lib_div::trimExplode(",",$fields))+$hasActions;
 	
 			if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="<tr><td>";
-		    $fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
-		    $tab="";
+			$fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
+			$tab="";
 			$lvl=0;
-		    foreach($fNA as $fN) {
+			foreach($fNA as $fN) {
 				$fN2=t3lib_div::trimexplode(':',$fN);
 				$fN=$fN2[0];
 				if ($conf['list.']['hiddenGroupByField.'][$fN] || $conf['list.']['groupby.'][$fN.'.']['footer.']['hide']) continue;
@@ -2034,7 +2037,6 @@ class tx_metafeedit extends  tslib_pibase {
 					$sum='<!--###FOOTERSUM_FIELDS### begin -->'.$this->getEditSumFields('FOOTERSUM_'.$fN,$conf,$count, $textmode, $exporttype,$hasActions);
 					$sum.='<!--###FOOTERSUM_FIELDS### end -->';
 					$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$div);
-	
 					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'">').$sum.($textmode?($exporttype?'</tr>':chr(10)):'</tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
 				} else {
 					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?($conf['list.']['nbCols']+$hasActions):$nbf).'" >').$div.($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</td></tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
@@ -2044,126 +2046,152 @@ class tx_metafeedit extends  tslib_pibase {
 			}
 			if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="</td></tr>";
 			$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELDS### begin -->'.$GROUPBYFIELDS.'<!-- ###GROUPBYFOOTERFIELDS### end -->';
-	    }
+		}
 		return $GROUPBYFIELDS;
 	}
 	
-    /**
-    * getListItemTemplate : generates template for lists , grids and calendars ...
-    *
-    * @param	[array]		$conf: configuration array.
-    * @return	[string]	$content : template to show.
-    * 
-    * ACTIONS : Basically Buttons or links :
-    * - Top Actions
-    * - Bottom Actions ( Same as top)
-    * - Navigation Actions
-    * - Element Actions	 ()
-    *
-    * MEDIA PLAYER
-    */
-    
-    function getListItemTemplate(&$conf) {
-    	if ($conf['general.']['listMode']==1) return $this->getCalendarTemplate($conf);
-    	if ($conf['general.']['listMode']==2) return $this->getGridTemplate($conf);
-     	// If template is set by user in flexform get it
-     	if ($conf['list.']['itemTpl']) return '<!-- ###TEMPLATE_EDITMENU### begin -->'.$conf['list.']['itemTpl'].'<!-- ###TEMPLATE_EDITMENU### end -->';
-    	$actions='###ACTIONS-LIST-ELEMENT###';
-    	// Begin...
-    	$tmp='<!-- ###TEMPLATE_EDITMENU### begin -->';
-    	// TOP ACTIONS TAG	
-    	$tmp.= '<table  class="tx-metafeedit-top-actions" style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-TOP###</td></tr></table>';
-    	
-       	$tmp.='<div'.$this->caller->pi_classParam('editmenu').'>'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-editmenu').'">'.$this->metafeeditlib->getHeader($this->metafeeditlib->getLL("edit_menu_header",$conf),$rech,$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_description",$conf).'</div>').' 
-    	<div'.$this->caller->pi_classParam('error').'>###EVAL_ERROR###</div>
-    	<div'.$this->caller->pi_classParam('editmenu-list').'>'.$this->getSearchBox($conf);
-    
-    	$tmp.='<table '.$this->caller->pi_classParam('editmenu-list-table').' style="width: 100%;">'.($conf['list.']['nbCols']?'':'<tr'.$this->caller->pi_classParam('editmenu-list-table-header').'>###ACTIONS-LIST-LIB###'.$this->getListFields($conf).'</tr>').'<!-- ###ALLITEMS### begin -->';
-    	// Group By processing
-    	$GROUPBYFIELDS=$this->getGroupByFields($conf);
-    	//$hasActions=($exporttype?0:$this->metafeeditlib->hasListActions($conf));
-   		$hasActions=$this->metafeeditlib->hasListActions($conf);
-    	
-    	if ($conf['list.']['displayDirection']=='Down') {
-    		$tmp.=$GROUPBYFIELDS;
-    		//MODIF CBY
-    		$tmp.='<tr><!-- ###ITEM-COL### begin --><td style="width: '.floor(100/$conf['list.']['nbCols']).'%;" valign="top"><table style="width: 100%;"><tr><td>';
-    		$tmp.='<!-- ###ITEM### begin --><tr><td '.$this->caller->pi_classParam('list-row-###LIST-ROW-ALT###').' style="width: '.floor(100/$conf['list.']['nbCols']).'%;"><!-- ###ITEM-EL### begin -->'.$this->getListDataFields($conf).'<!-- ###ITEM-EL### end -->'.$actions.'</td></tr><!-- ###ITEM### end -->';
-    		$tmp.='</td></tr></table></td><!-- ###ITEM-COL### end --></tr>';
-    	}
-    	else
-    	{
-    		$tmp.=$GROUPBYFIELDS.'<!-- ###ITEM### begin -->'.($conf['list.']['nbCols']?'###OPENROW###<td '.$this->caller->pi_classParam('list-row-###LIST-ROW-ALT###').' style="width: '.floor(100/$conf['list.']['nbCols']).'%;"><!-- ###ITEM-EL### begin -->'.$this->getListDataFields($conf).'<!-- ###ITEM-EL### end -->'.$actions.'</td>###CLOSEROW###':'<tr '.$this->caller->pi_classParam('list-row-###LIST-ROW-ALT###').'>'.$actions.$this->getListDataFields($conf).'</tr>').'<!-- ###ITEM### end -->';
-    	}
-    	$GROUPBYFOOTERFIELDS=$this->getGroupByFooterFields($conf);
-    	$tmp.=$GROUPBYFOOTERFIELDS.'<!-- ###ALLITEMS### end -->';
-    
- 		$actFlag=(!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions']));
+	/**
+	* getListItemTemplate : generates template for lists , grids and calendars ...
+	*
+	* @param	[array]		$conf: configuration array.
+	* @return	[string]	$content : template to show.
+	* 
+	* ACTIONS : Basically Buttons or links :
+	* - Top Actions
+	* - Bottom Actions ( Same as top)
+	* - Navigation Actions
+	* - Element Actions	 ()
+	*
+	* MEDIA PLAYER
+	*/
+	
+	function getListItemTemplate(&$conf) {
+		if ($conf['general.']['listMode']==1) return $this->getCalendarTemplate($conf);
+		if ($conf['general.']['listMode']==2) return $this->getGridTemplate($conf);
+	 	// If template is set by user in flexform get it
+	 	if ($conf['list.']['itemTpl']) return '<!-- ###TEMPLATE_EDITMENU### begin -->'.$conf['list.']['itemTpl'].'<!-- ###TEMPLATE_EDITMENU### end -->';
+		$actions='###ACTIONS-LIST-ELEMENT###';
+		// Begin...
+		$tmp='<!-- ###TEMPLATE_EDITMENU### begin -->';
+		// TOP ACTIONS TAG	
+		$tmp.= '<table  class="tx-metafeedit-top-actions" style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-TOP###</td></tr></table>';
+		
+	   	$tmp.='<div'.$this->caller->pi_classParam('editmenu').'>'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-editmenu').'">'.$this->metafeeditlib->getHeader($this->metafeeditlib->getLL("edit_menu_header",$conf),$rech,$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_description",$conf).'</div>').' 
+		<div'.$this->caller->pi_classParam('error').'>###EVAL_ERROR###</div>
+		<div'.$this->caller->pi_classParam('editmenu-list').'>'.$this->getSearchBox($conf);
+		// We open batchmode form
+		if ($conf['list.']['batchactions']) {
+			//onsubmit="return false;"
+	   		$tmp.='<form action="#" method="post" enctype="multipart/form-data" id="mf-'.$conf['pluginId'].'" name="mf-'.$conf['pluginId'].'">';
+	   	}
+		$tmp.='<table '.$this->caller->pi_classParam('editmenu-list-table').' style="width: 100%;">'.($conf['list.']['nbCols']?'':'<tr'.$this->caller->pi_classParam('editmenu-list-table-header').'>###ACTIONS-LIST-LIB###'.$this->getListFields($conf).'</tr>').'<!-- ###ALLITEMS### begin -->';
+		// Group By processing
+		$GROUPBYFIELDS=$this->getGroupByFields($conf);
+		//$hasActions=($exporttype?0:$this->metafeeditlib->hasListActions($conf));
+		$hasActions=$this->metafeeditlib->hasListActions($conf);
+		
+		if ($conf['list.']['displayDirection']=='Down') {
+			$tmp.=$GROUPBYFIELDS;
+			//MODIF CBY
+			$tmp.='<tr><!-- ###ITEM-COL### begin --><td style="width: '.floor(100/$conf['list.']['nbCols']).'%;" valign="top"><table style="width: 100%;"><tr><td>';
+			$tmp.='<!-- ###ITEM### begin --><tr><td '.$this->caller->pi_classParam('list-row-###LIST-ROW-ALT###').' style="width: '.floor(100/$conf['list.']['nbCols']).'%;"><!-- ###ITEM-EL### begin -->'.$this->getListDataFields($conf).'<!-- ###ITEM-EL### end -->'.$actions.'</td></tr><!-- ###ITEM### end -->';
+			$tmp.='</td></tr></table></td><!-- ###ITEM-COL### end --></tr>';
+		}
+		else
+		{
+			$tmp.=$GROUPBYFIELDS.'<!-- ###ITEM### begin -->'.($conf['list.']['nbCols']?'###OPENROW###<td '.$this->caller->pi_classParam('list-row-###LIST-ROW-ALT###').' style="width: '.floor(100/$conf['list.']['nbCols']).'%;"><!-- ###ITEM-EL### begin -->'.$this->getListDataFields($conf).'<!-- ###ITEM-EL### end -->'.$actions.'</td>###CLOSEROW###':'<tr '.$this->caller->pi_classParam('list-row-###LIST-ROW-ALT###').'>'.$actions.$this->getListDataFields($conf).'</tr>').'<!-- ###ITEM### end -->';
+		}
+		$GROUPBYFOOTERFIELDS=$this->getGroupByFooterFields($conf);
+		$tmp.=$GROUPBYFOOTERFIELDS.'<!-- ###ALLITEMS### end -->';
+	
+ 		$actFlag=(!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions'] || $conf['list.']['batchactions']));
 		// Total processing 
-    	if ($conf['list.']['sumFields']) {
-    		$sum='<!--###SUM_FIELDS### begin---><tr>'.$this->getEditSumFields('SUM',$conf, $count,false, 'html',$actFlag).'</tr>';   
-    		$sum.='<!--###SUM_FIELDS### end--->';
-    		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$this->metafeeditlib->getLLFromLabel('total',$conf).($conf['list.']['totalCount']?' (###SUM_FIELD_metafeeditnbelts###)':''));
-    		$tmp.=$sum;
-    	}
-        $fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
-        
-        $nbf=$conf['list.']['nbCols']?$conf['list.']['nbCols']+$hasActions:(count(t3lib_div::trimExplode(",",$fields))+$hasActions);
-
-    	// MEDIAPLAYER TAGS
-    	$tmp.='<tr class="mfeblog"><td colspan="'.$nbf.'">###MEDIAPLAYER###</td></tr>'.($conf['blog.']['showComments']?'<tr class="mfeblog"><td colspan="'.$nbf.'">###MEDIA_ACTION_BLOG###</td></tr>':'').'<tr class="mfepagenav"><td colspan="'.$nbf.'">###PAGENAV######METAFEEDITNBPAGES######METAFEEDITNBROWS###</td></tr></table>';
-    	// BOTTOM ACTION TAGS
-    	$tmp.= '</div></div><table class="tx-metafeedit-bottom-actions" style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-BOTTOM###</td></tr></table>';
+		if ($conf['list.']['sumFields']) {
+			$sum='<!--###SUM_FIELDS### begin---><tr>'.$this->getEditSumFields('SUM',$conf, $count,false, 'html',$actFlag).'</tr>';   
+			$sum.='<!--###SUM_FIELDS### end--->';
+			$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$this->metafeeditlib->getLLFromLabel('total',$conf).($conf['list.']['totalCount']?' (###SUM_FIELD_metafeeditnbelts###)':''));
+			$tmp.=$sum;
+		}
+		$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
+		$nbf=$conf['list.']['nbCols']?$conf['list.']['nbCols']+$hasActions:(count(t3lib_div::trimExplode(",",$fields))+$hasActions);
+		// MEDIAPLAYER TAGS
+		$tmp.='<tr class="mfeblog"><td colspan="'.$nbf.'">###MEDIAPLAYER###</td></tr>'.($conf['blog.']['showComments']?'<tr class="mfeblog"><td colspan="'.$nbf.'">###MEDIA_ACTION_BLOG###</td></tr>':'').'<tr class="mfepagenav"><td colspan="'.$nbf.'">###PAGENAV######METAFEEDITNBPAGES######METAFEEDITNBROWS###</td></tr></table>';
+		// we close batchmode form
+		if ($conf['list.']['batchactions']) {
+			$ActionArr=t3lib_div::trimexplode(chr(10),$conf['list.']['batchactions']);
+			foreach($ActionArr as $action) {
+				$cmdarr=t3lib_div::trimexplode('|',$action);
+				$actionLib=$cmdarr[0];
+				$actionUrl=$cmdarr[1];
+				$extraParams='';
+				if (isset($cmdarr[2])) {
+					$extraParams=$cmdarr[2];
+				}
+			
+				/*$astdconf=$conf[$conf['cmdmode'].'.']['actionStdWrap.'][$cmdarr[0].'.'];
+				$act='<a href="'.$actionUrl.'" '.$extraParams.'>'.$this->getLL($actionLib,$conf).'</a>';
+				if (is_array($astdconf)) $act=$this->cObj->stdWrap($this->getLL($actionLib,$conf), $astdconf);
+				//$act='<br/><div  class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-'.$actionLib).' '.$caller->pi_getClassName('link-'.$actionLib.'-list').'"><a href="'.$actionUrl.'">'.$this->getLL($actionLib,$conf).$actionLib.'</a></div>';
+				$act='<div  class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-'.$actionLib).' '.$caller->pi_getClassName('link-'.$actionLib.'-list').'">'.$act.'</div>';
+				$markerArray['###ACTION_'.$actionLib.'###']=$act;
+				$ret.=$act;*/
+				$tmp.='<button name="mfbmaction['.$conf['pluginId'].']" type="submit" value="'.$actionLib.'" title="'.$this->metafeeditlib->getLL($actionLib,$conf).'">'.$this->metafeeditlib->getLL($actionLib,$conf).'</button>';
+			}
+			$tmp.='</form>';
+		}
+		
+		// BOTTOM ACTION TAGS
+		$tmp.= '</div></div><table class="tx-metafeedit-bottom-actions" style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-BOTTOM###</td></tr></table>';
 		if ($conf['ajax.']['ajaxOn']) $tmp.= '<div id="modalWindow" class="jqmWindow">
-        <div id="jqmTitle" class="jqmTitle jqDrag">
-            <button class="jqmClose mfdClose">
-               X
-            </button>
-            <span id="jqmTitleText" class="jqmTitleText">Title of modal window</span>
-        </div>
-        <iframe id="jqmContent" class="jqmContent">
-        </iframe>
-        <img src="/typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
-    </div>'.'<div id="modalDelWindow" class="jqmWindow">
-        <div id="jqmDelTitle" class="jqmTitle jqDrag">
-            <button class="jqmClose mfdClose">
-               X
-            </button>
-            <span id="jqmDelTitleText" class="jqmTitleText" >Title of modal window</span>
-        </div>
-        <div id="jqmDelContent" class="jqmContent">
-        </div>
-        <img src="/typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
-    </div>'.
-    '<div id="modalImgWindow" class="jqmWindow">
-        <div id="jqmImgTitle" class="jqmTitle jqDrag">
-        	<button class="jqmClose mfdClose">X</button>
-           <span id="jqmImgTitleText" class="jqmTitleText" >Title of image window</span>
-        </div>
-        <div id="jqmImgContent" class="jqmContent"></div>
-        <img src="/typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
-    </div>';
+		<div id="jqmTitle" class="jqmTitle jqDrag">
+			<button class="jqmClose mfdClose">
+			   X
+			</button>
+			<span id="jqmTitleText" class="jqmTitleText">Title of modal window</span>
+		</div>
+		<iframe id="jqmContent" class="jqmContent">
+		</iframe>
+		<img src="/typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
+	</div>'.'<div id="modalDelWindow" class="jqmWindow">
+		<div id="jqmDelTitle" class="jqmTitle jqDrag">
+			<button class="jqmClose mfdClose">
+			   X
+			</button>
+			<span id="jqmDelTitleText" class="jqmTitleText" >Title of modal window</span>
+		</div>
+		<div id="jqmDelContent" class="jqmContent">
+		</div>
+		<img src="/typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
+	</div>'.
+	'<div id="modalImgWindow" class="jqmWindow">
+		<div id="jqmImgTitle" class="jqmTitle jqDrag">
+			<button class="jqmClose mfdClose">X</button>
+		   <span id="jqmImgTitleText" class="jqmTitleText" >Title of image window</span>
+		</div>
+		<div id="jqmImgContent" class="jqmContent"></div>
+		<img src="/typo3conf/ext/meta_feedit/res/resize.gif" alt="resize" class="jqResize" />
+	</div>';
 
-    	$tmp.='<!-- ###TEMPLATE_EDITMENU### end -->';
-    	return $tmp;
-    }
+		$tmp.='<!-- ###TEMPLATE_EDITMENU### end -->';
+		return $tmp;
+	}
 	
 	function getSearchBox(&$conf) {	
 	   	// TODO  We get Search Filter here (MUST BE REPLACED by tag !!!!!)....
-    	// TODO Put all this in function getSearchFilter ..
-        //-- Should be put in fe_adminLib
+		// TODO Put all this in function getSearchFilter ..
+		//-- Should be put in fe_adminLib
 		$fulltext=$conf['inputvar.']['sword']?$this->metafeeditlib->getLL("fulltext_search",$conf).' = "'.$conf['inputvar.']['sword'].'"':'';
 		$obs=t3lib_div::trimexplode(':',$conf['inputvar.']['sort']);
 		$orderby=$obs[0]?$this->metafeeditlib->getLL("order_by",$conf).' '.$this->metafeeditlib->getLL($obs[0],$conf).' '.($obs[1]?$this->metafeeditlib->getLL("ascending",$conf):$this->metafeeditlib->getLL("descending",$conf)):'';
 		$filterArray=array();
-    	$recherche='';
+		$recherche='';
  		if ($fulltext) $filterArray[]=$fulltext;
 		if ($conf['inputvar.']['sortLetter'])  $filterArray[]=$this->metafeeditlib->getLL("filtre_lettre",$conf).' = "'.$conf['inputvar.']['sortLetter'].'"';
 		if (is_array($conf['inputvar.']['advancedSearch'])) {
-    		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
-    			if($this->metafeeditlib->is_extent($val)) {
-    				$tab=array();
-     			    $ftA=$this->metafeeditlib->getForeignTableFromField($key,$conf,'',$tab);
+			foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
+				if($this->metafeeditlib->is_extent($val)) {
+					$tab=array();
+	 				$ftA=$this->metafeeditlib->getForeignTableFromField($key,$conf,'',$tab);
 					$recherche='';
    					if (is_array($val)) {
 						$isset=($this->metafeeditlib->is_extent($val['op']) && ($this->metafeeditlib->is_extent($val['val'])||$this->metafeeditlib->is_extent($val['valsup'])));				
@@ -2240,42 +2268,42 @@ class tx_metafeedit extends  tslib_pibase {
 					}
  					if ($recherche) $filterArray[]=$recherche;
 				}
-    		}
-    	}
+			}
+		}
 		$filtercnt=count($filterArray);
 		if ($orderby) $filterArray[]=$orderby;
 
 		// Should all be replaceD by marker and evaluation should be done in metafeedit_lib called from feadminlib.php
-    	/*$filter='<div id="blockfiltre">';
-    	$filter2=$this->metafeeditlib->getLL("filtre_recherche",$conf).'<br />';
+		/*$filter='<div id="blockfiltre">';
+		$filter2=$this->metafeeditlib->getLL("filtre_recherche",$conf).'<br />';
 		if ($fulltext) $filter2.= '<tr><td class="searchf">'.$fulltext.' </td></tr>';
 		if($conf['inputvar.']['advancedSearch']) $filter2.='<tr><td class="searchf">'.($recherche? $recherche : $this->metafeeditlib->getLL("search_nothing",$conf)).'</td></tr>';
-    	if ($conf['inputvar.']['sortLetter']) $filter2.= '<tr><td class="searchf">'.$this->metafeeditlib->getLL("filtre_lettre",$conf).$conf['inputvar.']['sortLetter'].' </td></tr>';
-     	if ($this->piVars['sort']) $filter2.= '<tr><td class="searchf">'.$orderby.' </td></tr>';
+		if ($conf['inputvar.']['sortLetter']) $filter2.= '<tr><td class="searchf">'.$this->metafeeditlib->getLL("filtre_lettre",$conf).$conf['inputvar.']['sortLetter'].' </td></tr>';
+	 	if ($this->piVars['sort']) $filter2.= '<tr><td class="searchf">'.$orderby.' </td></tr>';
 		if ($filter2) $filter.='<table>'.$filter2.'</table>';
-    	$filter .= '</div>';
+		$filter .= '</div>';
    		*/
 		$searchFlag=((boolean)$conf['list.']['searchBox'] || (boolean)$conf['list.']['alphabeticalSearch'] || (bool)$conf['list.']['advancedSearch'] || (bool)$conf['list.']['calendarSearch']);
 		$ret=($searchFlag?'<fieldset class="tx-metafeedit-fs-searchbox"><legend>'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</legend><span class="tx-metafeedit-sb-filter">'.implode(', ',$filterArray).'</span>'.$this->cObj->stdWrap($this->advancedSearch($conf,$filter,$filtercnt),$conf['list.']['advancedSearch.']).'</fieldset>':'');
 		return $ret;
 	}
 	
-    /**
-    * getListNoItemTemplate : generates template for empty lists ...
-    *
-    * @param	[array]		$conf: configuration array.
-    * @return	[string]	$content : template to show.
-    */
+	/**
+	* getListNoItemTemplate : generates template for empty lists ...
+	*
+	* @param	[array]		$conf: configuration array.
+	* @return	[string]	$content : template to show.
+	*/
 	 
-    function getListNoItemTemplate(&$conf) {
-        $pluginId=$conf['pluginId'];
-        if ($conf['list.']['noItemTpl']) return '<!-- ###TEMPLATE_EDITMENU_NOITEMS### begin -->'.$conf['list.']['noItemTpl'].'<!-- ###TEMPLATE_EDITMENU_NOITEMS### end -->';
-        return '<!-- ###TEMPLATE_EDITMENU_NOITEMS### begin -->
-            '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-editmenu-noitems').'">'.$this->metafeeditlib->getLL("edit_menu_noitems_header",$conf).'</h1>').'
-            <div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-editmenu-noitems').'">'.$this->metafeeditlib->getLL("edit_menu_noitems_description",$conf).'</div>
-            '.($conf['disableCreate']?'':($conf['noitemcreate']?'<div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-create').' '.$this->caller->pi_getClassName('link-editmenu-noitems').'"><div><a href="###FORM_URL###&amp;cmd['.$pluginId.']=create&amp;backURL['.$pluginId.']=###FORM_URL_ENC###%26cmd['.$pluginId.']=edit">'.$this->metafeeditlib->getLL("edit_menu_createnew_label",$conf).'</a></div></div>':'')).'
-        <!-- ###TEMPLATE_EDITMENU_NOITEMS### -->';
-    }
+	function getListNoItemTemplate(&$conf) {
+		$pluginId=$conf['pluginId'];
+		if ($conf['list.']['noItemTpl']) return '<!-- ###TEMPLATE_EDITMENU_NOITEMS### begin -->'.$conf['list.']['noItemTpl'].'<!-- ###TEMPLATE_EDITMENU_NOITEMS### end -->';
+		return '<!-- ###TEMPLATE_EDITMENU_NOITEMS### begin -->
+			'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-editmenu-noitems').'">'.$this->metafeeditlib->getLL("edit_menu_noitems_header",$conf).'</h1>').'
+			<div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-editmenu-noitems').'">'.$this->metafeeditlib->getLL("edit_menu_noitems_description",$conf).'</div>
+			'.($conf['disableCreate']?'':($conf['noitemcreate']?'<div class="'.$this->caller->pi_getClassName('link').' '.$this->caller->pi_getClassName('link-create').' '.$this->caller->pi_getClassName('link-editmenu-noitems').'"><div><a href="###FORM_URL###&amp;cmd['.$pluginId.']=create&amp;backURL['.$pluginId.']=###FORM_URL_ENC###%26cmd['.$pluginId.']=edit">'.$this->metafeeditlib->getLL("edit_menu_createnew_label",$conf).'</a></div></div>':'')).'
+		<!-- ###TEMPLATE_EDITMENU_NOITEMS### -->';
+	}
 
 	/**
 	 * [Describe function...]
@@ -2336,21 +2364,21 @@ function getCalendarTemplate(&$conf) {
 	return $tmp;
 }
 
-    /**
-    * getEditTemplate : Generates edit screen template
-    *
-    * @param    array		$conf: configuration array.
-    * @return   string		$tmpl : $html template
-    */
-     
-    function getEditTemplate(&$conf) {
-        if(!$conf['disableEdit']) $this->HTMLFormEdit = $this->makeHTMLForm('edit',$conf);
-        if($conf['edit.']['preview'] || $conf['blogData']) $this->HTMLPreviewEdit = $this->makeHTMLPreview('edit',$conf);        
+	/**
+	* getEditTemplate : Generates edit screen template
+	*
+	* @param	array		$conf: configuration array.
+	* @return   string		$tmpl : $html template
+	*/
+	 
+	function getEditTemplate(&$conf) {
+		if(!$conf['disableEdit']) $this->HTMLFormEdit = $this->makeHTMLForm('edit',$conf);
+		if($conf['edit.']['preview'] || $conf['blogData']) $this->HTMLPreviewEdit = $this->makeHTMLPreview('edit',$conf);		
 		$tmpl= $this->getEditScreenTemplate($conf);
-        $tmpl.= $this->getEditPreviewTemplate($conf);
-        $tmpl.= $this->getEditSavedTemplate($conf);
-        return $tmpl;
-    }
+		$tmpl.= $this->getEditPreviewTemplate($conf);
+		$tmpl.= $this->getEditSavedTemplate($conf);
+		return $tmpl;
+	}
 
 	/**
 	* getEditScreenTemplate :
@@ -2472,9 +2500,9 @@ function getCalendarTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
   function getCreateTemplate(&$conf) {
-    $this->HTMLFormCreate = $this->makeHTMLForm('create',$conf);
-    $this->HTMLPreviewCreate = $this->makeHTMLPreview('create',$conf);
-    return $this->getCreateSavedTemplate($conf).$this->getCreateScreenLoginTemplate($conf).$this->getCreatePreviewLoginTemplate($conf).$this->getCreateScreenTemplate($conf).$this->getCreatePreviewTemplate($conf);
+	$this->HTMLFormCreate = $this->makeHTMLForm('create',$conf);
+	$this->HTMLPreviewCreate = $this->makeHTMLPreview('create',$conf);
+	return $this->getCreateSavedTemplate($conf).$this->getCreateScreenLoginTemplate($conf).$this->getCreatePreviewLoginTemplate($conf).$this->getCreateScreenTemplate($conf).$this->getCreatePreviewTemplate($conf);
 }
 
 	/**
@@ -2485,7 +2513,7 @@ function getCalendarTemplate(&$conf) {
 	 */
   function getCreateScreenLoginTemplate(&$conf) {
   	$pluginId=$conf['pluginId'];
-    if ($conf['create.']['screenLoginTpl']) return '<!-- ###TEMPLATE_CREATE_LOGIN### -->'.$conf['create.']['screenLoginTpl'].'<!-- ###TEMPLATE_CREATE_LOGIN### end-->';
+	if ($conf['create.']['screenLoginTpl']) return '<!-- ###TEMPLATE_CREATE_LOGIN### -->'.$conf['create.']['screenLoginTpl'].'<!-- ###TEMPLATE_CREATE_LOGIN### end-->';
 	$tmp= '<!-- ###TEMPLATE_CREATE_LOGIN### -->
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-create-login').'">'.$this->metafeeditlib->getLL("create_header_prefix",$conf).' '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]["ctrl"]["title"],$conf).'</h1>').'
 '.($conf['text_in_top_of_form']?'<div'.$this->caller->pi_classParam('form-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_form'],$conf['text_in_top_of_form.']).'</div>':'').'
@@ -2513,7 +2541,7 @@ function getCalendarTemplate(&$conf) {
 	 */
   function getCreatePreviewLoginTemplate(&$conf) {
   	$pluginId=$conf['pluginId'];
-    if ($conf['create.']['previewLoginTpl']) return '<!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### begin-->'.$conf['create.']['previewLoginTpl'].'<!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### end-->';
+	if ($conf['create.']['previewLoginTpl']) return '<!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### begin-->'.$conf['create.']['previewLoginTpl'].'<!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### end-->';
 	$tmp= '<!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### begin-->
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-create-login-preview').'">'.$this->metafeeditlib->getLL("create_header_prefix",$conf).' '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]["ctrl"]["title"],$conf).'</h1>').'
 '.($conf['text_in_top_of_preview']?'<div'.$this->caller->pi_classParam('preview-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_preview'],$conf['text_in_top_of_preview.']).'</div>':'').'
@@ -2521,7 +2549,7 @@ function getCalendarTemplate(&$conf) {
 <form name="'.$this->table.'_form" method="post" action="###FORM_URL###" enctype="'.$GLOBALS["TYPO3_CONF_VARS"]["SYS"]["form_enctype"].'">
 '.$this->HTMLPreviewCreate.'
 <div'.$this->caller->pi_classParam('preview-row').'>
-    ###HIDDENFIELDS###';
+	###HIDDENFIELDS###';
 	$tmp.=$this->metafeeditlib->getCreatePreviewActions($conf,$this);
 	$tmp.='</div></form></div><!-- ###TEMPLATE_CREATE_LOGIN_PREVIEW### end-->';
 	return $tmp;
@@ -2535,7 +2563,7 @@ function getCalendarTemplate(&$conf) {
 	 */
   function getCreateScreenTemplate(&$conf) {
   	$pluginId=$conf['pluginId'];
-    if ($conf['create.']['screenTpl']) return '<!-- ###TEMPLATE_CREATE### begin -->'.$conf['create.']['screenTpl'].'<!-- ###TEMPLATE_CREATE### end-->';
+	if ($conf['create.']['screenTpl']) return '<!-- ###TEMPLATE_CREATE### begin -->'.$conf['create.']['screenTpl'].'<!-- ###TEMPLATE_CREATE### end-->';
 	$tmp='<!-- ###TEMPLATE_CREATE### begin -->
 	'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-create').'">'.$this->metafeeditlib->getLL("create_header_prefix",$conf).' '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]["ctrl"]["title"],$conf).'</h1>').'
 	'.($conf['text_in_top_of_form']?'<div'.$this->caller->pi_classParam('form-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_form'],$conf['text_in_top_of_form.']).'</div>':'').'
@@ -2561,7 +2589,7 @@ function getCalendarTemplate(&$conf) {
 	 */
   function getCreatePreviewTemplate(&$conf) {
   	$pluginID=$conf['pluginId'];
-    if ($conf['create.']['previewTpl']) return '<!-- ###TEMPLATE_CREATE_PREVIEW### begin-->'.$conf['create.']['previewTpl'].'<!-- ###TEMPLATE_CREATE_PREVIEW### end-->';
+	if ($conf['create.']['previewTpl']) return '<!-- ###TEMPLATE_CREATE_PREVIEW### begin-->'.$conf['create.']['previewTpl'].'<!-- ###TEMPLATE_CREATE_PREVIEW### end-->';
 	return '<!-- ###TEMPLATE_CREATE_PREVIEW### begin-->
 	'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-create-preview').'">'.$this->metafeeditlib->getLL("create_header_prefix",$conf).' '.$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]["ctrl"]["title"],$conf).'</h1>').'
 	'.($conf['text_in_top_of_preview']?'<div'.$this->caller->pi_classParam('preview-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_preview'],$conf['text_in_top_of_preview.']).'</div>':'').'
@@ -2585,7 +2613,7 @@ function getCalendarTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
   function getCreateSavedTemplate(&$conf) {
-    if ($conf['create.']['savedTpl']) return '<!-- ###TEMPLATE_CREATE_SAVED### begin-->'.$conf['create.']['savedTpl'].'<!-- ###TEMPLATE_CREATE_SAVED### end-->';
+	if ($conf['create.']['savedTpl']) return '<!-- ###TEMPLATE_CREATE_SAVED### begin-->'.$conf['create.']['savedTpl'].'<!-- ###TEMPLATE_CREATE_SAVED### end-->';
 	return '<!-- ###TEMPLATE_CREATE_SAVED### begin-->
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-create-saved').'">'.$this->metafeeditlib->getLL("create_saved_header",$conf).'</h1>').'
 <div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-create-saved').'">'.$this->metafeeditlib->getLL("create_saved_message",$conf).'</div>
@@ -2600,7 +2628,7 @@ function getCalendarTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
   function getDeleteTemplate(&$conf) {
-    return $this->getDeletePreviewTemplate($conf).$this->getDeleteSavedTemplate($conf);
+	return $this->getDeletePreviewTemplate($conf).$this->getDeleteSavedTemplate($conf);
 }
 
 	/**
@@ -2611,7 +2639,7 @@ function getCalendarTemplate(&$conf) {
 	 */
   function getDeletePreviewTemplate(&$conf) {
   	$pluginId=$conf['pluginId'];
-    if ($conf['delete.']['previewTpl']) return '<!-- ###TEMPLATE_DELETE_PREVIEW### begin-->'.$conf['delete.']['previewTpl'].'<!-- ###TEMPLATE_DELETE_PREVIEW### end-->';
+	if ($conf['delete.']['previewTpl']) return '<!-- ###TEMPLATE_DELETE_PREVIEW### begin-->'.$conf['delete.']['previewTpl'].'<!-- ###TEMPLATE_DELETE_PREVIEW### end-->';
 	return '<!-- ###TEMPLATE_DELETE_PREVIEW### begin-->
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-delete-preview').'">'.$this->metafeeditlib->getLL("delete_preview_header",$conf).'</h1>').'
 <div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-delete-preview').'">'.$this->metafeeditlib->getLL("delete_preview_message",$conf).'</div>
@@ -2630,7 +2658,7 @@ function getCalendarTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
   function getDeleteSavedTemplate(&$conf) {
-    if ($conf['delete.']['savedTpl']) return '<!-- ###TEMPLATE_DELETE_SAVED### begin-->'.$conf['delete.']['savedTpl'].'<!-- ###TEMPLATE_DELETE_SAVED### end-->';
+	if ($conf['delete.']['savedTpl']) return '<!-- ###TEMPLATE_DELETE_SAVED### begin-->'.$conf['delete.']['savedTpl'].'<!-- ###TEMPLATE_DELETE_SAVED### end-->';
 	return '<!-- ###TEMPLATE_DELETE_SAVED### begin-->
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-delete-saved').'">'.$this->metafeeditlib->getLL("delete_saved_header",$conf).'</h1>').'
 <div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-delete-saved').'">'.$this->metafeeditlib->getLL("delete_saved_message",$conf).'</div>
@@ -2655,8 +2683,8 @@ function getCalendarTemplate(&$conf) {
 	 * @return	string	template
 	 */
   function getSetfixedOkTemplate(&$conf) {
-    if ($conf['setfixed.']['setFixedOkTemplate']) return '<!-- ###TEMPLATE_SETFIXED_OK### -->'.$conf['setfixed.']['setFixedOkTemplate'].'<!-- ###TEMPLATE_SETFIXED_OK### end-->';
-    return '
+	if ($conf['setfixed.']['setFixedOkTemplate']) return '<!-- ###TEMPLATE_SETFIXED_OK### -->'.$conf['setfixed.']['setFixedOkTemplate'].'<!-- ###TEMPLATE_SETFIXED_OK### end-->';
+	return '
 <!-- ###TEMPLATE_SETFIXED_OK### -->
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-setfixed-ok').'">Setfixed succeeded</h1>').'
 <div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-setfixed-ok').'">Record uid; ###FIELD_uid###</div>
@@ -2670,7 +2698,7 @@ function getCalendarTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
 function getSetfixedOkDeleteTemplate(&$conf) {
-    if ($conf['setfixed.']['setFixedOkDeleteTemplate']) return '<!-- ###TEMPLATE_SETFIXED_OK_DELETE### -->'.$conf['setfixed.']['setFixedOkDeleteTemplate'].'<!-- ###TEMPLATE_SETFIXED_OK_DELETE### end-->';
+	if ($conf['setfixed.']['setFixedOkDeleteTemplate']) return '<!-- ###TEMPLATE_SETFIXED_OK_DELETE### -->'.$conf['setfixed.']['setFixedOkDeleteTemplate'].'<!-- ###TEMPLATE_SETFIXED_OK_DELETE### end-->';
  return '<!-- ###TEMPLATE_SETFIXED_OK_DELETE### -->
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-setfixed-ok-delete').'">Setfixed delete record "###FIELD_uid###"</h1>').'
 <div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-setfixed-ok').'">Record uid; ###FIELD_uid### has been deleted !</div>
@@ -2684,7 +2712,7 @@ function getSetfixedOkDeleteTemplate(&$conf) {
 	 * @return	string	desired template
 	 */
   function getSetfixedFailedTemplate(&$conf) {
-    if ($conf['setfixed.']['setFixedFailedTemplate']) return '<!-- ###TEMPLATE_SETFIXED_FAILED### -->'.$conf['setfixed.']['setFixedFailedTemplate'].'<!-- ###TEMPLATE_SETFIXED_FAILED### end-->';
+	if ($conf['setfixed.']['setFixedFailedTemplate']) return '<!-- ###TEMPLATE_SETFIXED_FAILED### -->'.$conf['setfixed.']['setFixedFailedTemplate'].'<!-- ###TEMPLATE_SETFIXED_FAILED### end-->';
 	return '<!-- ###TEMPLATE_SETFIXED_FAILED### -->
 '.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-setfixed-failed').'">Setfixed failed!</h1>').'
 <div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-setfixed-failed').'">May happen if you click the setfixed link a second time (if the record has changed since the setfixed link was generated this error will happen!)</div>
@@ -2756,18 +2784,18 @@ function getSetfixedOkDeleteTemplate(&$conf) {
 	 */
 
 	function getCreateDataNotifyEmailTemplate(&$conf) {
-	    if ($conf['create.']['dataNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### begin -->'.$conf['create.']['dataNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### end-->';
+		if ($conf['create.']['dataNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### begin -->'.$conf['create.']['dataNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### end-->';
 		$ret= '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### begin -->';
 		$ret.='[Auto Generated Message] You have been invited.'.chr(10);
-	    $ret.='<!--###SUB_RECORD###-->';
-	    $ret.=$this->makeTEXTPreview('all',$conf).chr(10);
+		$ret.='<!--###SUB_RECORD###-->';
+		$ret.=$this->makeTEXTPreview('all',$conf).chr(10);
 		// if email recipent can validate data through setfix parameter we do it here ..
-	    $setfix=1;
+		$setfix=1;
 		if ($setfix) {
-	    	$ret.='Approve: ###THIS_URL######FORM_URL######SYS_SETFIXED_approve###'.chr(10);
+			$ret.='Approve: ###THIS_URL######FORM_URL######SYS_SETFIXED_approve###'.chr(10);
 			$ret.='Delete: ###THIS_URL######FORM_URL######SYS_SETFIXED_DELETE###'.chr(10);
-	    }
-	    $ret.='<!--###SUB_RECORD###-->';
+		}
+		$ret.='<!--###SUB_RECORD###-->';
 		$ret.='<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-DATA### end-->';
 		return $ret;
 	}
@@ -2779,19 +2807,19 @@ function getSetfixedOkDeleteTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
 	function getCreateAdminEmailTemplate(&$conf) {
-	    if ($conf['create.']['adminValidTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### begin -->'.$conf['create.']['adminValidTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### end-->';
+		if ($conf['create.']['adminValidTpl']) return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### begin -->'.$conf['create.']['adminValidTpl'].'<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### end-->';
 		return '<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### begin -->
 	[Auto Generated Message] New record created.
 	
-	        <!--###SUB_RECORD###-->
-	        '.$this->makeTEXTPreview('all',$conf).'
+			<!--###SUB_RECORD###-->
+			'.$this->makeTEXTPreview('all',$conf).'
 	
-	        Approve:
-	        ###THIS_URL######FORM_URL######SYS_SETFIXED_approve###
+			Approve:
+			###THIS_URL######FORM_URL######SYS_SETFIXED_approve###
 	
-	        Delete:
-	        ###THIS_URL######FORM_URL######SYS_SETFIXED_DELETE###
-	        <!--###SUB_RECORD###-->
+			Delete:
+			###THIS_URL######FORM_URL######SYS_SETFIXED_DELETE###
+			<!--###SUB_RECORD###-->
 	<!-- ###EMAIL_TEMPLATE_CREATE_SAVED-ADMIN### end-->';
 	}
 
@@ -2802,7 +2830,7 @@ function getSetfixedOkDeleteTemplate(&$conf) {
 	 * @return	string		template
 	 */
 	function getCreateSetFixedEmailTemplate(&$conf) {
-	    return $this->getCreateSetFixedKOEmailTemplate($conf).$this->getCreateSetFixedKODataEmailTemplate($conf).$this->getCreateSetFixedOKEmailTemplate($conf).$this->getCreateSetFixedOKDataEmailTemplate($conf);
+		return $this->getCreateSetFixedKOEmailTemplate($conf).$this->getCreateSetFixedKODataEmailTemplate($conf).$this->getCreateSetFixedOKEmailTemplate($conf).$this->getCreateSetFixedOKDataEmailTemplate($conf);
 	}
 
 	/**
@@ -2898,7 +2926,7 @@ function getSetfixedOkDeleteTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
 	function getEditEmailTemplate(&$conf) {
-	        return $this->getEditUserEmailTemplate($conf).$this->getEditAdminNotifyEmailTemplate($conf).$this->getEditDataNotifyEmailTemplate($conf).$this->getEditAdminEmailTemplate($conf).$this->getEditSetFixedEmailTemplate($conf);
+			return $this->getEditUserEmailTemplate($conf).$this->getEditAdminNotifyEmailTemplate($conf).$this->getEditDataNotifyEmailTemplate($conf).$this->getEditAdminEmailTemplate($conf).$this->getEditSetFixedEmailTemplate($conf);
 	}
 
 	/**
@@ -2908,14 +2936,14 @@ function getSetfixedOkDeleteTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
 	function getEditUserEmailTemplate(&$conf) {
-	    if ($conf['edit.']['userNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### begin -->'.$conf['edit.']['userNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### end-->';
+		if ($conf['edit.']['userNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### begin -->'.$conf['edit.']['userNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### end-->';
 		return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### begin -->
 	[Auto Generated Message] Your information has been saved.
 	
-	        <!--###SUB_RECORD###-->
-	        You have submitted the following information at '.t3lib_div::getIndpEnv('TYPO3_SITE_URL').':'.chr(10).'
-	        '.$this->makeTEXTPreview('all',$conf).'
-	        <!--###SUB_RECORD###-->
+			<!--###SUB_RECORD###-->
+			You have submitted the following information at '.t3lib_div::getIndpEnv('TYPO3_SITE_URL').':'.chr(10).'
+			'.$this->makeTEXTPreview('all',$conf).'
+			<!--###SUB_RECORD###-->
 	<!-- ###EMAIL_TEMPLATE_EDIT_SAVED### end-->';
 	}
 
@@ -2926,14 +2954,14 @@ function getSetfixedOkDeleteTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
 	function getEditAdminNotifyEmailTemplate(&$conf) {
-	    if ($conf['edit.']['adminNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### begin -->'.$conf['edit.']['adminNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### end-->';
+		if ($conf['edit.']['adminNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### begin -->'.$conf['edit.']['adminNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### end-->';
 		return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### begin -->
 	[Auto Generated Message] Consultancy record edited.
 	
-	        <!--###SUB_RECORD###-->
-	        '.$this->makeTEXTPreview('all',$conf).'
+			<!--###SUB_RECORD###-->
+			'.$this->makeTEXTPreview('all',$conf).'
 	
-	        <!--###SUB_RECORD###-->
+			<!--###SUB_RECORD###-->
 	<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN_NOTIFY### end-->';
 	}
 
@@ -2944,13 +2972,13 @@ function getSetfixedOkDeleteTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
 	function getEditDataNotifyEmailTemplate(&$conf) {
-	    if ($conf['edit.']['dataNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### begin -->'.$conf['edit.']['dataNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### end-->';
+		if ($conf['edit.']['dataNotifyTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### begin -->'.$conf['edit.']['dataNotifyTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### end-->';
 		return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### begin -->
 	[Auto Generated Message] Consultancy record edited.
-	        <!--###SUB_RECORD###-->
-	        '.$this->makeTEXTPreview('all',$conf).'
+			<!--###SUB_RECORD###-->
+			'.$this->makeTEXTPreview('all',$conf).'
 	
-	        <!--###SUB_RECORD###-->
+			<!--###SUB_RECORD###-->
 	<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-DATA### end-->';
 	}
 
@@ -2961,19 +2989,19 @@ function getSetfixedOkDeleteTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
 	function getEditAdminEmailTemplate(&$conf) {
-	    if ($conf['edit.']['adminValidTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### begin -->'.$conf['edit.']['adminValidTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### end-->';
+		if ($conf['edit.']['adminValidTpl']) return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### begin -->'.$conf['edit.']['adminValidTpl'].'<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### end-->';
 		return '<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### begin -->
 	[Auto Generated Message] Consultancy record edited.
 	
-	        <!--###SUB_RECORD###-->
-	        '.$this->makeTEXTPreview('all',$conf).'
+			<!--###SUB_RECORD###-->
+			'.$this->makeTEXTPreview('all',$conf).'
 	
-	        Approve:
-	        ###THIS_URL######FORM_URL######SYS_SETFIXED_approve###
+			Approve:
+			###THIS_URL######FORM_URL######SYS_SETFIXED_approve###
 	
-	        Delete:
-	        ###THIS_URL######FORM_URL######SYS_SETFIXED_DELETE###
-	        <!--###SUB_RECORD###-->
+			Delete:
+			###THIS_URL######FORM_URL######SYS_SETFIXED_DELETE###
+			<!--###SUB_RECORD###-->
 	<!-- ###EMAIL_TEMPLATE_EDIT_SAVED-ADMIN### end-->';
 	}
 
@@ -2984,7 +3012,7 @@ function getSetfixedOkDeleteTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
 function getEditSetFixedEmailTemplate(&$conf) {
-    return $this->getEditSetFixedKOEmailTemplate($conf).$this->getEditSetFixedOKEmailTemplate($conf);
+	return $this->getEditSetFixedKOEmailTemplate($conf).$this->getEditSetFixedOKEmailTemplate($conf);
 }
 
 	/**
@@ -2994,7 +3022,7 @@ function getEditSetFixedEmailTemplate(&$conf) {
 	 * @return	[type]		...
 	 */
 function getEditSetFixedKOEmailTemplate(&$conf) {
-    if ($conf['edit.']['userNotifyKoTpl']) return '<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### begin -->'.$conf['edit.']['userNotifyKoTpl'].'<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### end -->';
+	if ($conf['edit.']['userNotifyKoTpl']) return '<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### begin -->'.$conf['edit.']['userNotifyKoTpl'].'<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### end -->';
 	return '<!-- ###EMAIL_TEMPLATE_SETFIXED_DELETE### begin -->
 Record DELETED!
 
@@ -3015,7 +3043,7 @@ Your entry has been deleted by the admin for some reason.
 	 * @return	[type]		...
 	 */
 function getEditSetFixedOKEmailTemplate(&$conf) {
-    if ($conf['edit.']['userNotifyOkTpl']) return '<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### begin -->'.$conf['edit.']['userNotifyOkTpl'].'<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### end -->';
+	if ($conf['edit.']['userNotifyOkTpl']) return '<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### begin -->'.$conf['edit.']['userNotifyOkTpl'].'<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### end -->';
 	return '<!-- ###EMAIL_TEMPLATE_SETFIXED_approve### begin -->
 Consultancy approved
 
@@ -3038,7 +3066,7 @@ Your consultancy entry has been approved!
 	 * @return	[type]		...
 	 */
   function getRequiredTemplate(&$conf) {
-    return $this->getRequiredAuthTemplate($conf).$this->getRequiredNoPermTemplate($conf);
+	return $this->getRequiredAuthTemplate($conf).$this->getRequiredNoPermTemplate($conf);
   }
 
 	/**
@@ -3048,7 +3076,7 @@ Your consultancy entry has been approved!
 	 * @return	[type]		...
 	 */
   function getRequiredAuthTemplate(&$conf) {
-    if ($conf['general.']['authTpl']) return '<!-- ###TEMPLATE_AUTH### begin -->'.$conf['general.']['authTpl'].'<!-- ###TEMPLATE_AUTH### end-->';
+	if ($conf['general.']['authTpl']) return '<!-- ###TEMPLATE_AUTH### begin -->'.$conf['general.']['authTpl'].'<!-- ###TEMPLATE_AUTH### end-->';
 	return '<!-- ###TEMPLATE_AUTH### begin -->
 	'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-auth').'">Authentification failed</h1>').'
 	<div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-auth').'">For some reason the authentication failed. </div>
@@ -3062,7 +3090,7 @@ Your consultancy entry has been approved!
 	 * @return	[type]		...
 	 */
   function getRequiredNoPermTemplate(&$conf) {
-    if ($conf['general.']['noPermTpl']) return '<!-- ###TEMPLATE_NO_PERMISSIONS### begin -->'.$conf['general.']['noPermTpl'].'<!-- ###TEMPLATE_NO_PERMISSIONS### end-->';
+	if ($conf['general.']['noPermTpl']) return '<!-- ###TEMPLATE_NO_PERMISSIONS### begin -->'.$conf['general.']['noPermTpl'].'<!-- ###TEMPLATE_NO_PERMISSIONS### end-->';
 	return '<!-- ###TEMPLATE_NO_PERMISSIONS### begin -->
 	'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-no-permissions').'">No permissions to edit record</h3>').'
 	<div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-no-permissions').'">Sorry, you did not have permissions to edit the record.</div>
@@ -3077,7 +3105,7 @@ Your consultancy entry has been approved!
 	 */
 function getMediaPlayerTemplate(&$conf) {
    return '<!-- ###TEMPLATE_MEDIAPLAYER### begin -->'.$conf['edit.']['mediaPlayerTpl'].'<!-- ###TEMPLATE_MEDIAPLAYER### end-->';
-    $tmp= '<!-- ###TEMPLATE_MEDIAPLAYER### begin -->'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-edit').'">'.$this->metafeeditlib->getLL("edit_header_prefix",$conf).' "###FIELD_'.strtolower($this->id_field).'###"</h1>').'
+	$tmp= '<!-- ###TEMPLATE_MEDIAPLAYER### begin -->'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-edit').'">'.$this->metafeeditlib->getLL("edit_header_prefix",$conf).' "###FIELD_'.strtolower($this->id_field).'###"</h1>').'
 	'.($conf['text_in_top_of_form']?'<div'.$this->caller->pi_classParam('form-text').'>'.$this->cObj->stdWrap($conf['text_in_top_of_form'],$conf['text_in_top_of_form.']).'</div>':'').'
 	<div'.$this->caller->pi_classParam('error').'><!-- -->###EVAL_ERROR###</div>
 	<div'.$this->caller->pi_classParam('mediaplayer-wrap').'>
@@ -3378,49 +3406,49 @@ function getGridExcelTemplate(&$conf){
   * @param	[type]		$cmd: ...
   * @return	[type]		...
   */
-               function getMD5Submit($cmd) {
-                        $JSPart = '
-                                ';
-                        if ($cmd == 'edit') {
-                                $JSPart .= "var pw_change = 0;
-                                ";
-                        }
-                        $JSPart .= "function enc_form(form) {
-                                        var pass = form['FE[" . $this->theTable . "][password]'].value;
-                                        var pass_again = form['FE[" . $this->theTable . "][password_again]'].value;
-                                        ";
-                        if ($cmd != 'edit') {
-                                $JSPart .= "if (pass == '') {
-                                                alert('" . $this->pi_getLL('missing_password','',$this->conf['LOCAL_LANG']) . "');
-                                                form['FE[" . $this->theTable . "][password]'].select();
-                                                form['FE[" . $this->theTable . "][password]'].focus();
-                                                return false;
-                                        }
-                                        ";
-                        }
-                        $JSPart .= "if (pass != pass_again) {
-                                                alert('" . $this->pi_getLL('evalErrors_twice_password','',$this->conf['LOCAL_LANG']) . "');
-                                                form['FE[" . $this->theTable . "][password]'].select();
-                                                form['FE[" . $this->theTable . "][password]'].focus();
-                                                return false;
-                                        }
-                                        ";
-                        if ($cmd == 'edit') {
-                                $JSPart .= "if (pw_change) {
-                                                ";
-                        }
-                        $JSPart .= "var enc_pass = MD5(pass);
-                                                form['FE[" . $this->theTable . "][password]'].value = enc_pass;
-                                                form['FE[" . $this->theTable . "][password_again]'].value = enc_pass;
-                                        ";
-                        if ($cmd == 'edit') {
-                                $JSPart .= "}
-                                        ";
-                        }
-                        $JSPart .= "return true;
-                                }";
-                        return $JSPart;
-                }
+			   function getMD5Submit($cmd) {
+						$JSPart = '
+								';
+						if ($cmd == 'edit') {
+								$JSPart .= "var pw_change = 0;
+								";
+						}
+						$JSPart .= "function enc_form(form) {
+										var pass = form['FE[" . $this->theTable . "][password]'].value;
+										var pass_again = form['FE[" . $this->theTable . "][password_again]'].value;
+										";
+						if ($cmd != 'edit') {
+								$JSPart .= "if (pass == '') {
+												alert('" . $this->pi_getLL('missing_password','',$this->conf['LOCAL_LANG']) . "');
+												form['FE[" . $this->theTable . "][password]'].select();
+												form['FE[" . $this->theTable . "][password]'].focus();
+												return false;
+										}
+										";
+						}
+						$JSPart .= "if (pass != pass_again) {
+												alert('" . $this->pi_getLL('evalErrors_twice_password','',$this->conf['LOCAL_LANG']) . "');
+												form['FE[" . $this->theTable . "][password]'].select();
+												form['FE[" . $this->theTable . "][password]'].focus();
+												return false;
+										}
+										";
+						if ($cmd == 'edit') {
+								$JSPart .= "if (pw_change) {
+												";
+						}
+						$JSPart .= "var enc_pass = MD5(pass);
+												form['FE[" . $this->theTable . "][password]'].value = enc_pass;
+												form['FE[" . $this->theTable . "][password_again]'].value = enc_pass;
+										";
+						if ($cmd == 'edit') {
+								$JSPart .= "}
+										";
+						}
+						$JSPart .= "return true;
+								}";
+						return $JSPart;
+				}
 
 	/**
 	 * [Describe function...]
@@ -3446,7 +3474,7 @@ function getFormJs($formName,&$conf) {
 	}
 	function feedit_'.$formName.'Set(theField, evallist, is_in, checkbox, checkboxValue,checkbox_off){
 		var theFObj = new evalFunc_dummy (evallist,is_in, checkbox, checkboxValue);
-        var feValField = theField+"_feVal";
+		var feValField = theField+"_feVal";
 		evalFunc.respectTimeZones ='.($GLOBALS['TYPO3_CONF_VARS']['SYS']['respectTimeZones']?'1':'0').';
 		evalFunc.USmode ='.($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?'1':'0').';
 		if(!(document.'.$formName.' && document.'.$formName.'[theField] && document.'.$formName.'[feValField])) return;
@@ -3477,8 +3505,8 @@ function getFormJs($formName,&$conf) {
 		evalFunc.USmode ='.($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']?'1':'0').';		
 		if (checkbox_off){
 			document.'.$formName.'[theField].value=checkboxValue;
-	    }else{
-		    var theValue=evalFunc.evalObjValue(theFObj, document.'.$formName.'[theField+"_feVal"].value);
+		}else{
+			var theValue=evalFunc.evalObjValue(theFObj, document.'.$formName.'[theField+"_feVal"].value);
 			var evallist = theFObj.evallist;
 			var index=1;
 			var theEvalType = evalFunc.split(evallist, ",", index);
@@ -3497,8 +3525,8 @@ function getFormJs($formName,&$conf) {
 				theEvalType = evalFunc.split(evallist, ",", index);
 			}
 			document.'.$formName.'[theField].value = theValue;
-	     }
-	    feedit_'.$formName.'Set(theField, evallist, is_in, checkbox, checkboxValue,checkbox_off);
+		 }
+		feedit_'.$formName.'Set(theField, evallist, is_in, checkbox, checkboxValue,checkbox_off);
 	}';
 	return $result;
 }
@@ -3515,7 +3543,7 @@ function getFormJs($formName,&$conf) {
 	//$GLOBALS['TSFE']->additionalHeaderData['t3lib_jsfunc']='<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.evalfield.js"></script>';
 	$filepath=PATH_site.TYPO3_mainDir.'/js/tabmenu.js';
 	if (file_exists($filepath)) $GLOBALS['TSFE']->additionalHeaderData['typo3_js_tabmenu']='<script type="text/javascript" src="/typo3/js/tabmenu.js"></script>';
-    $formName = $this->table.'_form';
+	$formName = $this->table.'_form';
 	/*<![CDATA[*/
 	$script='var DTM_array = new Array();
 	var DTM_currentTabs = new Array();
@@ -3534,21 +3562,21 @@ function getFormJs($formName,&$conf) {
 	 * @param	[type]		$theField: ...
 	 * @return	[type]		...
 	 */
-            function feedit_manipulateMultipleSelect(theField) {
-               selObj = document.'.$formName.'[theField+"_select"];
-               val = selObj.value;
-               list = document.'.$formName.'[theField].value;
-               newList = "";
-               for(i=0;i<selObj.length;i++) {
-                  if(selObj.options[i].selected == true) {
-                     newList += selObj.options[i].value+",";
-                  }
-               }
-               if(newList.length!=0)
-                 newList = newList.substring(0,newList.length-1);
-               document.'.$formName.'[theField].value = newList;
+			function feedit_manipulateMultipleSelect(theField) {
+			   selObj = document.'.$formName.'[theField+"_select"];
+			   val = selObj.value;
+			   list = document.'.$formName.'[theField].value;
+			   newList = "";
+			   for(i=0;i<selObj.length;i++) {
+				  if(selObj.options[i].selected == true) {
+					 newList += selObj.options[i].value+",";
+				  }
+			   }
+			   if(newList.length!=0)
+				 newList = newList.substring(0,newList.length-1);
+			   document.'.$formName.'[theField].value = newList;
 
-            }
+			}
 
 	/**
 	 * feedit_manipulateGroup
@@ -3556,24 +3584,24 @@ function getFormJs($formName,&$conf) {
 	 * @param	[type]		$theField: ...
 	 * @return	[type]		...
 	 */
-            function feedit_manipulateGroup(theField) {
-               selObj = document.'.$formName.'[theField+"_select"];
-               val = selObj.value;
-               list = document.'.$formName.'[theField].value;
-               newList = "";
-               for(i=0;i<selObj.length;i++) {
-                  if(selObj.options[i].selected == false) {
-                     newList += selObj.options[i].value+",";
-                  } else {
-                     rem_i = i;
-                  }
-               }
-               if(newList.length!=0)
-                 newList = newList.substring(0,newList.length-1);
-               document.'.$formName.'[theField].value = newList;
-               selObj.options[rem_i] = null;
+			function feedit_manipulateGroup(theField) {
+			   selObj = document.'.$formName.'[theField+"_select"];
+			   val = selObj.value;
+			   list = document.'.$formName.'[theField].value;
+			   newList = "";
+			   for(i=0;i<selObj.length;i++) {
+				  if(selObj.options[i].selected == false) {
+					 newList += selObj.options[i].value+",";
+				  } else {
+					 rem_i = i;
+				  }
+			   }
+			   if(newList.length!=0)
+				 newList = newList.substring(0,newList.length-1);
+			   document.'.$formName.'[theField].value = newList;
+			   selObj.options[rem_i] = null;
 
-            }
+			}
 
 	/**
 	 * feedit_split
@@ -3581,19 +3609,19 @@ function getFormJs($formName,&$conf) {
 	 * @param	[type]		$theStr1, delim, index: ...
 	 * @return	[type]		...
 	 */
-            function feedit_split(theStr1, delim, index) {
-               var theStr = ""+theStr1;
-               var lengthOfDelim = delim.length;
-               sPos = -lengthOfDelim;
-               if (index<1) {index=1;}
-               for (var a=1; a < index; a++){
-                   sPos = theStr.indexOf(delim, sPos+lengthOfDelim);
-                   if (sPos==-1){return null;}
-               }
-               ePos = theStr.indexOf(delim, sPos+lengthOfDelim);
-               if(ePos == -1) {ePos = theStr.length;}
-               return (theStr.substring(sPos+lengthOfDelim,ePos));
-            }
+			function feedit_split(theStr1, delim, index) {
+			   var theStr = ""+theStr1;
+			   var lengthOfDelim = delim.length;
+			   sPos = -lengthOfDelim;
+			   if (index<1) {index=1;}
+			   for (var a=1; a < index; a++){
+				   sPos = theStr.indexOf(delim, sPos+lengthOfDelim);
+				   if (sPos==-1){return null;}
+			   }
+			   ePos = theStr.indexOf(delim, sPos+lengthOfDelim);
+			   if(ePos == -1) {ePos = theStr.length;}
+			   return (theStr.substring(sPos+lengthOfDelim,ePos));
+			}
 	 
 	 
 	 var browserWin="";
@@ -3850,13 +3878,13 @@ function getFormJs($formName,&$conf) {
    	if (false && !$GLOBALS['TSFE']->config['config']['removeDefaultJS']) {
   		$result.='<script type="text/javascript" >/*<![CDATA[*/'.$script.']]>*/</script>';
    		$result .= $this->additionalJS_initial;
-    	if ($this->additionalJS_pre) $result.(count($this->additionalJS_pre)?'<script type="text/javascript">'. implode('', $this->additionalJS_pre).'</script>':'');
+		if ($this->additionalJS_pre) $result.(count($this->additionalJS_pre)?'<script type="text/javascript">'. implode('', $this->additionalJS_pre).'</script>':'');
    	} else {
   	 	$result.=$this->metafeeditlib->inline2TempFile($script,'js');
    		$result.= $this->additionalJS_initial;
-    	if ($this->additionalJS_pre) $result.=$this->metafeeditlib->inline2TempFile(implode('', $this->additionalJS_pre),'js');
+		if ($this->additionalJS_pre) $result.=$this->metafeeditlib->inline2TempFile(implode('', $this->additionalJS_pre),'js');
   	}
-    if($conf['divide2tabs'])
+	if($conf['divide2tabs'])
 		$result .= $this->templateObj->getDynTabMenuJScode();
 		return $result;
 	}
@@ -3886,14 +3914,14 @@ function getFormJs($formName,&$conf) {
  * @return	array
  */
   function array_merge_recursive2($paArray1, $paArray2) {
-    if (!is_array($paArray1) or !is_array($paArray2)) {
-      return is_null($paArray2)?$paArray1:$paArray2;
-    }
-    foreach ($paArray2 AS $sKey2 => $sValue2) {
-      $paArray1[$sKey2] = $this->array_merge_recursive2(@$paArray1[$sKey2],
+	if (!is_array($paArray1) or !is_array($paArray2)) {
+	  return is_null($paArray2)?$paArray1:$paArray2;
+	}
+	foreach ($paArray2 AS $sKey2 => $sValue2) {
+	  $paArray1[$sKey2] = $this->array_merge_recursive2(@$paArray1[$sKey2],
 							$sValue2);
-    }
-    return $paArray1;
+	}
+	return $paArray1;
   }
 
 	/**
@@ -3904,30 +3932,30 @@ function getFormJs($formName,&$conf) {
 	 */
   function pi_loadLL($conf) {
    // flatten the structure of labels overrides
-                        if (is_array($conf)) {
-                                $done = false;
-                                $i = 0;
-                                while(!$done && $i < 10) {
-                                        $done = true;
-                                        reset($conf);
-                                        while(list($k,$lA)=each($conf)) {
-                                                if (is_array($lA)) {
-                                                        foreach($lA as $llK => $llV)    {
-                                                                if (is_array($llV))    {
-                                                                        foreach ($llV as $llK2 => $llV2) {
-                                                                                $conf[$k][$llK . $llK2] = $llV2;
-                                                                        }
-                                                                        unset($conf[$k][$llK]);
-                                                                        $done = false;
-                                                                        ++$i;
-                                                                }
-                                                        }
-                                                }
-                                        }
-                                }
-                        }
+						if (is_array($conf)) {
+								$done = false;
+								$i = 0;
+								while(!$done && $i < 10) {
+										$done = true;
+										reset($conf);
+										while(list($k,$lA)=each($conf)) {
+												if (is_array($lA)) {
+														foreach($lA as $llK => $llV)	{
+																if (is_array($llV))	{
+																		foreach ($llV as $llK2 => $llV2) {
+																				$conf[$k][$llK . $llK2] = $llV2;
+																		}
+																		unset($conf[$k][$llK]);
+																		$done = false;
+																		++$i;
+																}
+														}
+												}
+										}
+								}
+						}
 			return $conf;
-                }
+				}
 
 	/**
 	 * [Describe function...]
@@ -3965,12 +3993,12 @@ function getFormJs($formName,&$conf) {
 		return $ret;
 	}
 
-    /**
-    * calendarSearch
-    *
-    * @return	string		...
-    */
-    function calendarSearch() {
+	/**
+	* calendarSearch
+	*
+	* @return	string		...
+	*/
+	function calendarSearch() {
 		$ret='<div'.$this->caller->pi_classParam('calendarSearch').'>###CALENDAR_SEARCH###';
 		$ret.='</div>';
 		return $ret;
@@ -4007,17 +4035,17 @@ function getFormJs($formName,&$conf) {
 		if ($conf['list.']['searchBox']) {
 			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($conf['inputvar.']['sword']?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_searchbox_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'">'.$this->metafeeditlib->getLL('fulltext_search',$conf).'</a></li>';
 			$ret.='<div id="'.$this->caller->pi_getClassName('as').'_searchbox_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-searchbox').'">'.$this->cObj->stdWrap($this->searchBox($conf),$conf['list.']['searchBox.']).'</div>';					
-		    $first=false;
+			$first=false;
 		}
 		if ($conf['list.']['alphabeticalSearch']) {
 			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li class="'.($conf['inputvar.']['sortLetter']?'set':'').($first?' active':'').'"><a id="'.$this->caller->pi_getClassName('as').'_alphabeticalsearch_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'">'.$this->metafeeditlib->getLL('alphabetical_search',$conf).'</a></li>';
 			$ret.='<div id="'.$this->caller->pi_getClassName('as').'_alphabeticalsearch_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-alphabeticalsearch').'">'.$this->cObj->stdWrap($this->alphabeticalSearch($conf),$conf['list.']['alphabeticalSearch.']).'</div>';					
-		    $first=false;
+			$first=false;
 		}
 		if ($conf['list.']['calendarSearch']) {
 			if ($conf['ajax.']['ajaxOn']) $searchTabs[]='<li><a id="'.$this->caller->pi_getClassName('as').'_calendarsearch_'.$conf['pluginId'].'_a" href="#c'.$conf['general.']['pluginUid'].'">'.$this->metafeeditlib->getLL('calendar_search',$conf).'</a></li>';
 			$ret.='<div id="'.$this->caller->pi_getClassName('as').'_calendarsearch_'.$conf['pluginId'].'" '. (($conf['ajax.']['ajaxOn']&&!$first)? 'style="display:none;" ' : '').' class="'.$this->caller->pi_getClassName('as').' '.$this->caller->pi_getClassName('advancedSearch-alphabeticalsearch').'">'.$this->cObj->stdWrap($this->calendarSearch(),$conf['list.']['calendarSearch.']).'</div>';					
-		    $first=false;
+			$first=false;
 		}
 		
 		if ($conf['list.']['advancedSearch']) {

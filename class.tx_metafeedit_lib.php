@@ -3113,7 +3113,7 @@ class tx_metafeedit_lib {
 	 * @return	boolean		...
 	 */	
 	function hasListActions($conf) {
-		return (!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions']));
+		return (!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions'] || $conf['list.']['batchactions']));
 	}
     //ACTIONS-LIST-LIB
 	/**
@@ -3132,6 +3132,7 @@ class tx_metafeedit_lib {
 		}
 		return $ret;
 	}
+	
 	/**
 	 * getASResetAction
 	 *
@@ -3158,6 +3159,10 @@ class tx_metafeedit_lib {
 		$editLinkId="link-edit";
 		// General ACTION FLAG
 		if (!$conf['no_action']) {
+			// Check boxes for batch mode
+			if ($conf['list.']['batchactions']) {
+				$ret.='<input type="checkbox" title="'.$this->getLL('listBatchSel',$conf).'" name="mfcheck['.$pluginId.'][]" value="'.$conf['recUid'].'" />';
+			}
 			// DELETE ACTION
 			if (!$conf['disableDelete'] && !$conf['disableEditDelete'] && !$conf['delete.']['hide']) {
 				//$backurl=$this->makeFormTypoLink($conf,"&rU[$pluginId]=".$conf['recUid']);

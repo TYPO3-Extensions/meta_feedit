@@ -186,6 +186,7 @@ $LOCAL_LANG = Array (
 		'meta_feedit.pi_flexform.listItemTemplate' => 'Item template',
 		'meta_feedit.pi_flexform.listNoItemTemplate' => 'No item template',
 		'meta_feedit.pi_flexform.listrecordactions' => 'List record actions',
+		'meta_feedit.pi_flexform.batchactions' => 'Batch record actions',
 		'meta_feedit.pi_flexform.listJumpPageOnGroupBy' => 'Jump page on group by',
 		'meta_feedit.pi_flexform.listWhereString' => 'Where String',
 		'meta_feedit.pi_flexform.listOrderByString' => 'Post Order By String',
@@ -299,7 +300,7 @@ $LOCAL_LANG = Array (
 	'it' => Array (
 	),
 	'fr' => Array (
-   	'meta_feedit.pi_flexform.gridAjax' => 'Grille',
+		'meta_feedit.pi_flexform.gridAjax' => 'Grille',
 		'meta_feedit.pi_flexform.gridEdit' => 'Edition',
 		'meta_feedit.pi_flexform.sheet_general' => 'Configuration g�n�rale',
 		'meta_feedit.pi_flexform.sheet_create' => 'Cr�ation',

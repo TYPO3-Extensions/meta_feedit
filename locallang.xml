@@ -208,9 +208,8 @@
             <label index="nbpages">Nb pages : </label>
             <label index="gotopage">Gehe zur Seite : </label>
             <label index="nbrows">Nb rows : </label>
+            <label index="listBatchSel">Select this row for batch action</label>
         </languageKey>
-        
-        
         <languageKey index="fr" type="array">
             <label index="total">Total</label>
             <label index="crdate">Date de création</label>
@@ -319,6 +318,7 @@
             <label index="nbpages">Nb pages : </label>
             <label index="gotopage">Aller &amp;agrave; la page : </label>
             <label index="nbrows">Nb éléments : </label>
+            <label index="listBatchSel">Sélectionner cette ligne pour le traitement par lot</label>
         </languageKey>
     </data>
     <orig_hash type="array">

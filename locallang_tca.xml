@@ -179,6 +179,7 @@
             <label index="meta_feedit.pi_flexform.listItemTemplate">Item template</label>
             <label index="meta_feedit.pi_flexform.listNoItemTemplate">No item template</label>
             <label index="meta_feedit.pi_flexform.listrecordactions">List record actions</label>
+            <label index="meta_feedit.pi_flexform.batchactions">Batch record actions</label>
             <label index="meta_feedit.pi_flexform.listJumpPageOnGroupBy">Jump page on group by</label>
             <label index="meta_feedit.pi_flexform.listWhereString">Where String</label>
             <label index="meta_feedit.pi_flexform.listOrderByString">Post Order By String</label>

@@ -866,6 +866,16 @@
 				</config>
 			</TCEforms>		 
 		</listrecordactions>
+		<batchactions>
+			<TCEforms>
+				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.batchactions</label>
+				<config>
+	    				<type>text</type>
+	    				<size>500</size>
+	    				<allowed>fe_users</allowed>    
+				</config>
+			</TCEforms>		 
+		</batchactions>
 		<rUJoinField>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.rUJoinField</label>
@@ -954,7 +964,6 @@
 									<tableStyle>solid 1px #000000; margin-left: 20px;</tableStyle>
 									<JSopenParams>width=365,height=550,status=0,menubar=0,scrollbars=1</JSopenParams>
                 </getTemplate>
-
                 <clearTemplate>
 									<type>popup</type>
 									<title>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listItemTemplate</title>
@@ -965,7 +974,7 @@
                 </clearTemplate>
               </wizards>
 				</config>
-			</TCEforms>		 
+			</TCEforms>
 		</listItemTemplate>
 		<listNoItemTemplate>
 			<TCEforms>
