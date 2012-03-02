@@ -47,7 +47,7 @@ class LMQuadTest {
      
      if (count($a) != 3) die ("Wrong number of elements in array a");
      if (count($x) != 2) die ("Wrong number of elements in array x");
-     if ($a_k < 3) die ("a_k=".$a_k;);
+     if ($a_k < 3) die ("a_k=".$a_k);
 
      $ox = $a[0];
      $oy = $a[1];
