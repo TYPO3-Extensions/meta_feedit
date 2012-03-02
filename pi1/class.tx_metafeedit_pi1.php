@@ -357,6 +357,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['groupByFieldBreaks']=$lconf['groupByFieldBreaks'];
 		$mfconf['list.']['hiddenGroupByField.']=$conf['list.']['hiddenGroupByField.'];
 		$mfconf['list.']['recordactions']=$lconf['listrecordactions'];
+		$mfconf['list.']['batchactions']=$lconf['batchactions'];
 		$mfconf['list.']['orderByFields']=$lconf['orderByFields'];
 		$mfconf['list.']['showResultCount']=$this->metafeeditlib->is_extent($conf['showResultCount'])?$conf['showResultCount']:$lconf['showResultCount'];
 		$mfconf['list.']['pagefloat']=$this->metafeeditlib->is_extent($conf['pagefloat'])?$conf['pagefloat']:$lconf['pagefloat'];
@@ -411,7 +412,26 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['TemplatePDFTab']=$lconf['TemplatePDFTab'];
 		$mfconf['list.']['TemplateCSV']=$lconf['TemplateCSV'];
 		$mfconf['list.']['TemplateExcel']=$lconf['TemplateExcel'];
-		$mfconf['edit.']['pdf']=$lconf['editpdf']?$lconf['editpdf']:0;			// R�cup�re l'info de si la case est coch�e		
+		$mfconf['edit.']['pdf']=$lconf['editpdf']?$lconf['editpdf']:0;			// Récupère l'info de si la case est cochée
+		
+		
+		if($mfconf['list.']['TemplatePDFDet']) {
+			try {
+				$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($mfconf['list.']['TemplatePDFDet']))))));
+			} catch (Exception $e) {
+				echo 'PDF Detail Template error : '.$e->getMessage().'<br>';
+				echo "============================<br>";
+				echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
+				echo "============================<br>";
+				die();
+			};
+			$mfconf['list.']['nbpdfs']=count($xml->templates);
+			foreach($xml->templates as $template) {
+				$mfconf['list.']['TemplatePDFDets'][$template->attributes()->id]=$template;
+			}
+			error_log($mfconf['list.']['TemplatePDFDets']);
+		}
+		
 		
 		// --------------------------------------------------------------------------------------------------------------------- //
 
@@ -663,11 +683,11 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['evalErrors.']=$conf['evalErrors.'];
 		$mfconf['_LOCAL_LANG.']=$conf['_LOCAL_LANG.'];
 		$mfconf['imgConf.']=$conf['imgConf.'];
-	 	$mfconf['mediaImgConf.']=$conf['mediaImgConf.'];
-	 	$mfconf['text_in_top_of_form']=$conf['text_in_top_of_form'];
+		$mfconf['mediaImgConf.']=$conf['mediaImgConf.'];
+		$mfconf['text_in_top_of_form']=$conf['text_in_top_of_form'];
 
 		// CBY special functions
-		   
+		
 		// Must rename this one or put in backward compatibility!!!
 		$mfconf['userFunc_afterSave']=$conf[$pluginId.'.']['userFunc_afterSave']; // Ok
 		$mfconf['userFunc_afterSaveAndBeforeStatus']=$conf[$pluginId.'.']['userFunc_afterSaveAndBeforeStatus']; // Ok
@@ -679,6 +699,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['edit.']['userFunc_afterOverride']=$conf[$pluginId.'.']['edit.']['userFunc_afterOverride']?$conf[$pluginId.'.']['edit.']['userFunc_afterOverride']:$conf['default.']['edit.']['userFunc_afterOverride']; // Ok
 		$mfconf['userFunc_afterEval']=$conf[$pluginId.'.']['userFunc_afterEval']; // Ok		
 		$mfconf['list.']['userFunc_afterWhere']=$conf[$pluginId.'.']['list.']['userFunc_afterWhere'];
+		$mfconf['list.']['userFunc_batchAction']=$conf[$pluginId.'.']['list.']['userFunc_batchAction'];
 		$mfconf['list.']['userFunc_afterMark']=$conf[$pluginId.'.']['list.']['userFunc_afterMark'];
 		$mfconf['list.']['userFunc_afterItemMark']=$conf[$pluginId.'.']['list.']['userFunc_afterItemMark'];
 		$mfconf['list.']['userFunc_alterSortTabs']=$conf[$pluginId.'.']['list.']['userFunc_alterSortTabs'];
@@ -686,12 +707,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['grid.']['userFunc_afterRowWhere']=$conf[$pluginId.'.']['grid.']['userFunc_afterRowWhere']; 
 		$mfconf['grid.']['userFunc_afterColWhere']=$conf[$pluginId.'.']['grid.']['userFunc_afterColWhere']; 
 		$mfconf['grid.']['userFunc_afterSecondaryColWhere']=$conf[$pluginId.'.']['grid.']['userFunc_afterSecondaryColWhere']; 
-
 		$mfconf['list.']['sqlcalcfieldstransforms.']=$conf[$pluginId.'.']['list.']['sqlcalcfieldstransforms.']?$conf[$pluginId.'.']['list.']['sqlcalcfieldstransforms.']:$conf['list.']['sqlcalcfieldstransforms.'];
 		$mfconf['create.']['itemsProcFunc.']=$conf[$pluginId.'.']['create.']['itemsProcFunc.'];
 		$mfconf['edit.']['itemsProcFunc.']=$conf[$pluginId.'.']['edit.']['itemsProcFunc.'];
-		
-		
 		// We handle override values here
 
 		$OArr=t3lib_div::trimExplode(chr(10),$lconf['listsqlcalcfields']);
@@ -826,6 +844,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
     	// We should handle keep var ...
 		$mfconf['inputvar.']=array();
 		$mfconf['inputvar.']['fedata']=t3lib_div::_GP('FE');
+		$mfconf['inputvar.']['mfbmuids']=t3lib_div::_GP('mfcheck');
+		$mfconf['inputvar.']['mfbmaction']=t3lib_div::_GP('mfbmaction');
 		$mfconf['inputvar.']['BACK']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'BACK');
 		$mfconf['inputvar.']['ajx']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'ajx');
 		$mfconf['inputvar.']['cameFromBlog']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'cameFromBlog');
@@ -987,6 +1007,16 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowPrereservations('".addslashes($this->ajaxWidgets->comboList('seance','','','handleSeanceData','setSelectedSeance','Recherche S&eacute;ance',20))."<a href=\'#\' ".addslashes($selectAllPrereservationsClick).">&nbsp;Tout S�lectionner</a><a href=\'#\' ".addslashes($deselectAllPrereservationsClick).">&nbsp;Tout d�selectionner</a><a href=\'#\' ".addslashes($emptyPrereservationsClick).">&nbsp;Vider la liste</a><a href=\'#\' ".addslashes($refreshPrereservationsClick).">&nbsp;Actualiser</a><div id=\'selectedPlaces\' class=\'selectedplaces\'>".addslashes($this->metabookinglib->getSelectablePlaces())."</div>');";
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowSeances('<div id=\'planSeance\' class=\'planseance\'></div>');";
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowCaisse('<div id=\'billetterie\' class=\'billetterie\'></div>');";
+	 	}
+	 	// we handle batchmode actions here
+	 	//error_log(print_r($mfconf['inputvar.']['mfbmaction'],true).' -'.print_r($mfconf['inputvar.']['mfbmuids'],true));
+	 	if ($mfconf['inputvar.']['mfbmaction'][$pluginId]) {
+	 		if (!$mfconf['list.']['userFunc_batchAction']) {
+	 			echo "No userFunc_batchAction defined !!";
+	 		} else {
+	 			t3lib_div::callUserFunction($mfconf['list.']['userFunc_batchAction'],$mfconf,$this);
+	 		}
+	 		
 	 	}
 	 	//CBY
 		$mfconf['parentObj']=&$this;
