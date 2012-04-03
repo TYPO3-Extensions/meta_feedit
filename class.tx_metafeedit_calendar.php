@@ -356,7 +356,7 @@ echo "<br> Next est vide. ";
 		$monthEnd = $monthBeginn + ((int)date('t', $monthBeginn) * 24 * 3600);
 
 		$userAgent = t3lib_div::getIndpEnv('HTTP_USER_AGENT');
-		if (strstr($userAgent, 'MSIE') || strstr(strtolower($userAgent), 'camino') || strstr(strtolower($userAgent), 'safari')) {
+		if ((strpos($userAgent, 'MSIE')!==false) || (strpos(strtolower($userAgent), 'camino')!==false) || (strpos(strtolower($userAgent), 'safari')!==false)) {
 			//IE, Camino, Safari
 			$titleSeparator = "\n";
 		} else {

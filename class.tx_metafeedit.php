@@ -2135,6 +2135,7 @@ class tx_metafeedit extends  tslib_pibase {
 				$act='<div  class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-'.$actionLib).' '.$caller->pi_getClassName('link-'.$actionLib.'-list').'">'.$act.'</div>';
 				$markerArray['###ACTION_'.$actionLib.'###']=$act;
 				$ret.=$act;*/
+				$tmp.='<button name="mfbmaction['.$conf['pluginId'].']" type="submit" value="toggleselection" title="'.$this->metafeeditlib->getLL(toggleselection,$conf).'">'.$this->metafeeditlib->getLL(toggleselection,$conf).'</button>';
 				$tmp.='<button name="mfbmaction['.$conf['pluginId'].']" type="submit" value="'.$actionLib.'" title="'.$this->metafeeditlib->getLL($actionLib,$conf).'">'.$this->metafeeditlib->getLL($actionLib,$conf).'</button>';
 			}
 			$tmp.='</form>';

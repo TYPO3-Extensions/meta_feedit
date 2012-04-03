@@ -3548,7 +3548,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					$markerArray['###SYS_SETFIXED_DELETE###'] = $string;
 					$markerArray['###SYS_SETFIXED_HSC_DELETE###'] = htmlspecialchars($string);
 				} else*/
-				if (strstr($theKey,'.'))	{
+				if (strpos($theKey,'.')!==false)	{
 					$theKey = substr($theKey,0,-1);
 					if (is_array($data))	{
 						reset($data);

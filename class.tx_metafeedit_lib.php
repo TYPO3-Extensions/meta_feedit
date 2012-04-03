@@ -800,8 +800,8 @@ class tx_metafeedit_lib {
 			reset($conf['cObjects.']);
 
 			while(list($theKey,$theConf)=each($conf['cObjects.']))	{
-				if (!strstr($theKey,'.'))	{
-					if (strstr($templateCode,'###'.$specialPrefix.'CE_'.$theKey.'###'))	{
+				if (strpos($theKey,'.')===false)	{
+					if (strpos($templateCode,'###'.$specialPrefix.'CE_'.$theKey.'###')!==false)	{
 						$cObjCode = $this->cObj->cObjGetSingle($conf['cObjects.'][$theKey], $conf['cObjects.'][$theKey.'.'], 'cObjects.'.$theKey);
 
 						if (!is_array($rmarkerArray))	{
@@ -810,7 +810,7 @@ class tx_metafeedit_lib {
 							$rmarkerArray['###'.$specialPrefix.'CE_'.$theKey.'###'] = $cObjCode;
 						}
 					}
-					if (strstr($templateCode,'###'.$specialPrefix.'PCE_'.$theKey.'###'))	{
+					if (strpos($templateCode,'###'.$specialPrefix.'PCE_'.$theKey.'###')!==false)	{
 						$local_cObj =t3lib_div::makeInstance('tslib_cObj');
 						$local_cObj->start(count($currentArr)?$currentArr:$conf['dataArr'],$conf['table']);
 						$cObjCode = $local_cObj->cObjGetSingle($conf['cObjects.'][$theKey], $conf['cObjects.'][$theKey.'.'], 'cObjects.'.$theKey);
@@ -873,8 +873,8 @@ class tx_metafeedit_lib {
 		$ftable = $table?$table:$conf['table'];
 		$relTable=$ftable;
 		foreach ($fNA as $f) {
-        	if (strstr($f,'--fse--') || strstr($f,'--fsb--'))     continue;
-		    $relTable=$ftable;
+			if ((strpos($f,'--fse--')!==false) || (strpos($f,'--fsb--')!==false)) continue;
+		$relTable=$ftable;
 			//ugly hack by CMD
 			if ($f!="sorting") {
 				if (!is_array($conf['TCAN'][$ftable]['columns'][$f]) && !$conf['list.']['sqlcalcfields.'][$fN] ) {
@@ -916,9 +916,8 @@ class tx_metafeedit_lib {
 		//$ftable = $conf['table'];
 		$relTable=$ftable;
 		foreach ($fNA as $f) {
-        	if (strstr($f,'--fse--') || strstr($f,'--fsb--'))     continue;
-		    $relTable=$ftable;
-		    
+		if ((strpos($f,'--fse--')!==false) || (strpos($f,'--fsb--')!==false)) continue;
+			$relTable=$ftable;
 			if ($f!="sorting") {
 				if (!is_array($confTcan[$ftable])) {
 					$this->makeTypo3TCAForTable($confTcan,$ftable);
