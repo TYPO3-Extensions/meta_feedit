@@ -867,7 +867,7 @@ class tx_metafeedit extends  tslib_pibase {
  * @param	string		The field to get the fieldcode for.
  * @param	boolean		Should the output be with html (input fields) or not.
  * @param	string		$FN: fieldName
- * @param	boolean		$withHTML: wether to use html dispay or plain text
+ * @param	boolean		$withHTML: whether to use html dispay or plain text
  * @param	string		$Lib: By Ref languqge label
  */
   function getPreviewFieldCode($cmd,&$conf,$fN,$withHTML,&$Lib='') {
@@ -1780,9 +1780,9 @@ class tx_metafeedit extends  tslib_pibase {
 	* @param	string	 	$prefix	: true we output only text mode data (no input fields)....
 	* @param	array		$conf: Configuration array();
 	* @param	integer		$count: by reference, nb fields
-	* @param	boolean	 $textmode	: true we output only text mode data (no input fields)....
+	* @param	boolean	 	$textmode	: true we output only text mode data (no input fields)....
 	* @param	string	 	$type	: true we output only text mode data (no input fields)....
- 	* @param	boolean	 $actFlag	: Wether to show actions or group by label in first cell...
+ 	* @param	boolean	 	$actFlag	: Whether to show actions or group by label in first cell...
 	* @return	string		$ret : html code
 	*/
 

@@ -4,7 +4,7 @@
 
 $extensionClassesPath = t3lib_extMgm::extPath('meta_feedit') . 'Classes/';
 return array(
-'tx_metafeedit_lib_pidhandler'=>$extensionClassesPath . '/lib/PidHandler.php',
-'phpexcel_writer_excel2007'=>t3lib_extMgm::extPath('meta_feedit') . '/lib/PHPExcel/Writer/Excel2007.php'
+'tx_metafeedit_lib_pidhandler'=>$extensionClassesPath . 'Lib/PidHandler.php',
+'phpexcel_writer_excel2007'=>t3lib_extMgm::extPath('meta_feedit') . 'lib/PHPExcel/Writer/Excel2007.php'
 );
 ?>
