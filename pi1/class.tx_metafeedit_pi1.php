@@ -417,11 +417,11 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		
 		if($mfconf['list.']['TemplatePDFDet']) {
 			try {
-				$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($mfconf['list.']['TemplatePDFDet']))))));
+				$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$this->metafeeditlib->T3StripComments($mfconf['list.']['TemplatePDFDet']))))));
 			} catch (Exception $e) {
 				echo 'PDF Detail Template error : '.$e->getMessage().'<br>';
 				echo "============================<br>";
-				echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
+				echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$this->metafeeditlib->T3StripComments($content))));
 				echo "============================<br>";
 				die();
 			};
