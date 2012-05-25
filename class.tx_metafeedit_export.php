@@ -76,9 +76,6 @@ class tx_metafeedit_pdf extends FPDF {
 			$user = '';
 			$user = $GLOBALS['TSFE']->fe_user->user[username];
 			$this->Cell(0,$this->footercellsize, utf8_decode($this->caller->caller->metafeeditlib->getLL('printedby', $this->caller->conf)).$user,0,0,'R');
-			//$this->SetLineWidth(0.3);
-			//$this->setDrawColor(200,200,200);
-			//$this->Line($this->leftmargin,100,-$this->rightmargin,200);
 		}
 	}
 	
@@ -308,7 +305,7 @@ class tx_metafeedit_export {
 			echo "============================<br>";
 			echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
 			echo "============================<br>";
-    	    die();
+			die();
 		};
 		$count = 0;
 		$taille = 0;
@@ -444,8 +441,6 @@ class tx_metafeedit_export {
 			}
 			// We print row cells ...
 			foreach($row->td as $col) {
-				//print_r($col);
-				
 				$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule 
 				$size=40;
 				$val = strip_tags($col->data);
@@ -453,7 +448,7 @@ class tx_metafeedit_export {
 				$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
 				// Affichage du signe Euro sur l'export PDF //CBY nothing to do here !!
 				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
-				
+				//if we have an image
 				if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
 					$vala=t3lib_div::trimexplode(',',$val);
 					$img='';
@@ -462,6 +457,10 @@ class tx_metafeedit_export {
 				 	if (isset($col->spec->attributes()->y)) {				 		
 				 		$pdf->SetY((float)$col->spec->attributes()->y);
 				 	}
+				 	//Image border
+				 	$ib=0;
+				 	if ($col->img->attributes()->b) $ib=1;
+				 	error_log("ib=$ib");
 					if (!is_object($col->spec)) $pdf->Cell($taille,$height,'',1,0,'L',1);
 					$pdf->SetX($myx);
 					foreach($vala as $v) {
@@ -481,20 +480,27 @@ class tx_metafeedit_export {
 						if (is_array($imginfo)) {
 							$w=$imginfo[0];
 							$h=$imginfo[1];
-							//print_r($imginfo);
+							error_log(print_r($imginfo,true));
 							//@todo resize or crop if image too big
 							$imgh=$nblines*$height;
-							$imgw=0;
 							$imgx=$pdf->GetX();
 							$imgy=$pdf->GetY();
+							$imgw=0;//We do not stretch image
 							if (isset($col->img->attributes()->h)) $imgh=(float)$col->img->attributes()->h; //height override
 							if (isset($col->img->attributes()->w)) $imgw=(float)$col->img->attributes()->w; //width override
 							if (isset($col->img->attributes()->x)) $imgx=(float)$col->img->attributes()->x; //x override
 							if (isset($col->img->attributes()->y)) $imgy=(float)$col->img->attributes()->y; //x override
 							$pdf->Image($img,$imgx,$imgy,$imgw,$imgh);
+							//We calculate image width based on piction width/height ratio);
+							if ($imgh && !$imgw) {
+								$imgw=$imgh*($w/$h);
+							}
 							$w=$size;
 							if (isset($col->spec->attributes()->w)) $w=$col->spec->attributes()->w;
-							$pdf->Rect($imgx,$imgy,$w,$imgh);
+							if ($ib) {
+								$pdf->Rect($imgx,$imgy,$imgw,$imgh);
+							}
+							
 							$ey = ($imgy+$imgh)>$ey?($imgy+$imgh):$ey;
 						}
 					}
@@ -547,7 +553,8 @@ class tx_metafeedit_export {
 						$pdf->SetXY((float)$col->spec->attributes()->x,(float)$col->spec->attributes()->y);
 						//$h=$h*$nblines;
 						if (isset($col->spec->attributes()->b)  || isset($col->spec->attributes()->bc) ) {
-							 $pdf->Cell($w,$h,$utf8val,$b,0,$p,1);
+							error_log("b=$b");
+							$pdf->Cell($w,$h,$utf8val,$b,0,$p,1);
 							 $cell=true;
 						} else {
 							$pdf->Write($h,$utf8val);
@@ -558,7 +565,7 @@ class tx_metafeedit_export {
 					} else {
 						$x = $pdf->getX();
 						$y = $pdf->getY();
-						
+						error_log("multicell");
 						$pdf->MultiCell($w,$h,$utf8val,0,0,$p,1);
 						if ($b) $pdf->Rect($x,$y,$w,$h*$nblines);
 						// We handle bigger cells !!!

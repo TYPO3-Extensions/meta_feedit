@@ -2082,8 +2082,8 @@ class tx_metafeedit extends  tslib_pibase {
 		// We open batchmode form
 		if ($conf['list.']['batchactions']) {
 			//onsubmit="return false;"
-	   		$tmp.='<form action="#" method="post" enctype="multipart/form-data" id="mf-'.$conf['pluginId'].'" name="mf-'.$conf['pluginId'].'">';
-	   	}
+			$tmp.='<form action="#" method="post" enctype="multipart/form-data" id="mf-'.$conf['pluginId'].'" name="mf-'.$conf['pluginId'].'">';
+		}
 		$tmp.='<table '.$this->caller->pi_classParam('editmenu-list-table').' style="width: 100%;">'.($conf['list.']['nbCols']?'':'<tr'.$this->caller->pi_classParam('editmenu-list-table-header').'>###ACTIONS-LIST-LIB###'.$this->getListFields($conf).'</tr>').'<!-- ###ALLITEMS### begin -->';
 		// Group By processing
 		$GROUPBYFIELDS=$this->getGroupByFields($conf);
