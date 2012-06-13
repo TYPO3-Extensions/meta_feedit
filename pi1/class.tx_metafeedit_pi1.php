@@ -376,7 +376,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['lastLinkWrap']=$this->metafeeditlib->is_extent($conf['lastLinkWrap'])?$conf['lastLinkWrap']:$lconf['lastLinkWrap'];
 		$mfconf['list.']['searchBox']=$lconf['searchBox'];
 		$mfconf['list.']['align.']=$conf[$pluginId.'.']['list.']['align.']?$conf[$pluginId.'.']['list.']['align.']:$conf['list.']['align.'];
-		$mfconf['list.']['searchBox.']=$conf['searchBox.'];	
+		$mfconf['list.']['searchBox.']=$conf['searchBox.'];
+		$mfconf['list.']['forceSearch']=$lconf['forceSearch'];
 		// advancedSearch
 		$mfconf['list.']['advancedSearchFields']=$this->correctFieldSets($lconf['advancedSearchFields']);
 		$mfconf['list.']['advancedSearch']=$lconf['advancedSearch'];
@@ -415,6 +416,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['edit.']['pdf']=$lconf['editpdf']?$lconf['editpdf']:0;			// Récupère l'info de si la case est cochée
 		
 		
+		/*
+		  
 		if($mfconf['list.']['TemplatePDFDet']) {
 			try {
 				$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$this->metafeeditlib->T3StripComments($mfconf['list.']['TemplatePDFDet']))))));
@@ -429,9 +432,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			foreach($xml->templates as $template) {
 				$mfconf['list.']['TemplatePDFDets'][$template->attributes()->id]=$template;
 			}
-			error_log($mfconf['list.']['TemplatePDFDets']);
 		}
 		
+		*/
 		
 		// --------------------------------------------------------------------------------------------------------------------- //
 
@@ -692,6 +695,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['userFunc_afterSave']=$conf[$pluginId.'.']['userFunc_afterSave']; // Ok
 		$mfconf['userFunc_afterSaveAndBeforeStatus']=$conf[$pluginId.'.']['userFunc_afterSaveAndBeforeStatus']; // Ok
 		if ($conf[$pluginId.'.']['meta_feedit_afterSave']) $mfconf['userFunc_afterSave']=$conf[$pluginId.'.']['meta_feedit_afterSave']; // Ok
+		$mfconf['userFunc_afterDelete']=$conf[$pluginId.'.']['userFunc_afterDelete']; // Ok
+		if ($conf[$pluginId.'.']['userFunc_afterDelete']) $mfconf['userFunc_afterDelete']=$conf[$pluginId.'.']['userFunc_afterDelete']; // Ok
 		$mfconf['userFunc_afterInitConf']=$conf[$pluginId.'.']['userFunc_afterInitConf']; // Ok
 		$mfconf['userFunc_afterParse']=$conf[$pluginId.'.']['userFunc_afterParse']; // Ok
 		$mfconf['userFunc_afterOverride']=$conf[$pluginId.'.']['userFunc_afterOverride']?$conf[$pluginId.'.']['userFunc_afterOverride']:$conf['default.']['userFunc_afterOverride']; // Ok
@@ -846,6 +851,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['inputvar.']['fedata']=t3lib_div::_GP('FE');
 		$mfconf['inputvar.']['mfbmuids']=t3lib_div::_GP('mfcheck');
 		$mfconf['inputvar.']['mfbmaction']=t3lib_div::_GP('mfbmaction');
+		$mfconf['inputvar.']['gpvars']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'GP');
 		$mfconf['inputvar.']['BACK']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'BACK');
 		$mfconf['inputvar.']['ajx']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'ajx');
 		$mfconf['inputvar.']['cameFromBlog']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'cameFromBlog');
@@ -1009,7 +1015,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			//$GLOBALS['TSFE']->JSeventFuncCalls['onload']['initLightbox()'].= "showWindowCaisse('<div id=\'billetterie\' class=\'billetterie\'></div>');";
 	 	}
 	 	// we handle batchmode actions here
-	 	//error_log(print_r($mfconf['inputvar.']['mfbmaction'],true).' -'.print_r($mfconf['inputvar.']['mfbmuids'],true));
 	 	if ($mfconf['inputvar.']['mfbmaction'][$pluginId]) {
 	 		if (!$mfconf['list.']['userFunc_batchAction']) {
 	 			echo "No userFunc_batchAction defined !!";

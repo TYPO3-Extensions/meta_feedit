@@ -89,13 +89,20 @@ class tx_metafeedit_flexfill {
 		
 		$this->clearTCA($table);
 	}
-	
+	/**
+	 * 
+	 * @param unknown_type $table
+	 */
 	function clearTCA($table) {
 		global $TCA;
 		unset($TCA[$table]['columns']['pid']);
 		unset($GLOBALS['TCA'][$table]['columns']['pid']);
 	}
 	
+	/**
+	 * 
+	 * @param unknown_type $table
+	 */
 	function LoadTCA($table) {
 		if (!$table) return;
 		global $TCA;
@@ -193,9 +200,9 @@ class tx_metafeedit_flexfill {
 		$this->clearTCA($table);
 	}
 	/**
-	* main_ob
+	* make order by field list
 	*
-	* @param	[type]		$$params: ...
+	* @param	[type]		$params: ...
 	* @param	[type]		$pObj: ...
 	* @return	[type]		...
 	*/
@@ -231,7 +238,7 @@ class tx_metafeedit_flexfill {
 	*/
 	
 	function main_ft(&$params,&$pObj)	{
-	    global $TCA;
+		global $TCA;
 		$flex=$this->getFlex();
 		if (!$flex) return;
 		$flexarr=t3lib_div::xml2array($flex);
@@ -243,19 +250,19 @@ class tx_metafeedit_flexfill {
 		$this->getFieldsFT($params,$table,'');
 		$foreignTables=@$flexarr['data']['sDEF']['lDEF']['foreignTables']['vDEF'];
 		$fta=explode(',',$foreignTables);
-        if (count($fta)) foreach($fta as $ft) {
-		    if (!$FTRel) continue;
-            $ftable=$TCA[$table]['columns'][$ft]['config']['foreign_table'];            
-            $this->getFieldsFT($params,$ftable,$ft);
-        }    
+		if (count($fta)) foreach($fta as $ft) {
+			if (!$FTRel) continue;
+			$ftable=$TCA[$table]['columns'][$ft]['config']['foreign_table'];			
+			$this->getFieldsFT($params,$ftable,$ft);
+		}	
  		$this->clearTCA($table);
-          
+		  
 	}
 
 	/**
-	 * [Describe function...]
+	 * Get's pluhin id from flexform data
 	 *
-	 * @param	[type]		$$params: ...
+	 * @param	[type]		$params: ...
 	 * @param	[type]		$pObj: ...
 	 * @return	[type]		...
 	 */
@@ -264,9 +271,6 @@ class tx_metafeedit_flexfill {
 		if (!$flex) return;
 		$flexarr=t3lib_div::xml2array($flex);
 		$pluginId=@$flexarr['data']['sQuickStart']['lDEF']['pluginId']['vDEF'];
-		//echo $pluginId." @@@ ".$pObj->uid." uuu";
-		//$params['items']=array();
-		//$params['items'][]=Array('', '');
 	}
 
 	/**
@@ -316,8 +320,20 @@ class tx_metafeedit_flexfill {
 		global $TCA;
 		$prefix=$rel?$rel.'.':'';
 		t3lib_div::loadTCA($table);
+		// we add uid field.
+		if (!is_array($TCA[$table]['columns']['uid'])) {
+			$TCA[$table]['columns']['uid']=array(
+					'exclude'=>1,
+					'label'=>'LLL:EXT:meta_feedit/locallang.xml:uid',
+					'config'=>array(
+							'type'=>'input',
+							'size'=>10,
+							'eval'=>'int',
+					),
+			);
+		}
 		if (is_array($TCA[$table]['columns']))  {
-			foreach($TCA[$table]['columns'] as $key => $config)     {
+			foreach($TCA[$table]['columns'] as $key => $config)	 {
 				$label = t3lib_div::fixed_lgd(preg_replace('/:$/','',$GLOBALS['LANG']->sL($config['label'])),30).' ('.$prefix.$key.')';
 				$params['items'][]=Array($label, $prefix.$key);
 			}
@@ -326,13 +342,13 @@ class tx_metafeedit_flexfill {
 		if (@$TCA[$table]['ctrl']['crdate']) $params['items'][]=Array($TCA[$table]['ctrl']['crdate'].' ('.$prefix.$TCA[$table]['ctrl']['crdate'].')', $prefix.$TCA[$table]['ctrl']['crdate']);
 		if (@$TCA[$table]['ctrl']['cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['cruser_id'].' ('.$prefix.$TCA[$table]['ctrl']['cruser_id'].')',$prefix.$TCA[$table]['ctrl']['cruser_id']);
 		if (@$TCA[$table]['ctrl']['fe_cruser_id']){
-			$params['items'][]=Array($TCA[$table]['ctrl']['fe_cruser_id'].' ('.$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].')',$prefix.$TCA[$table]['ctrl']['fe_cruser_id']);    
+			$params['items'][]=Array($TCA[$table]['ctrl']['fe_cruser_id'].' ('.$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].')',$prefix.$TCA[$table]['ctrl']['fe_cruser_id']);	
 		}
 		return $params;
 	}
 
 	/**
-	 * getFields_OB
+	 * generates order by fields for table $table
 	 *
 	 * @param	array		$params: ...
 	 * @param	string		$table: tablename
@@ -347,7 +363,7 @@ class tx_metafeedit_flexfill {
 		$prefix=$rel?$rel.'.':'';
 		
 		if (is_array($TCA[$table]['columns']))  {
-			foreach($TCA[$table]['columns'] as $key => $config)     {
+			foreach($TCA[$table]['columns'] as $key => $config)	 {
 				$label = t3lib_div::fixed_lgd(preg_replace('/:$/','',$GLOBALS['LANG']->sL($config['label'])),30).' ASC ('.$prefix.$key.')';
 				$params['items'][]=Array($label, $prefix.$key.':asc' );
 				$label = t3lib_div::fixed_lgd(preg_replace('/:$/','',$GLOBALS['LANG']->sL($config['label'])),30).' DESC ('.$prefix.$key.')';
@@ -357,12 +373,12 @@ class tx_metafeedit_flexfill {
 		if (@$TCA[$table]['ctrl']['tstamp']) $params['items'][]=Array($TCA[$table]['ctrl']['tstamp'].' ASC ('.$prefix.$TCA[$table]['ctrl']['tstamp'].')', $prefix.$TCA[$table]['ctrl']['tstamp'].':asc');
 		if (@$TCA[$table]['ctrl']['crdate']) $params['items'][]=Array($TCA[$table]['ctrl']['crdate'].' ASC ('.$prefix.$TCA[$table]['ctrl']['crdate'].')', $prefix.$TCA[$table]['ctrl']['crdate'].':asc');
 		if (@$TCA[$table]['ctrl']['cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['cruser_id'].' ASC ('.$prefix.$TCA[$table]['ctrl']['cruser_id'].')',$prefix.$TCA[$table]['ctrl']['cruser_id'].':asc');
-		if (@$TCA[$table]['ctrl']['fe_cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['fe_cruser_id'].' ASC ('.$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].')',$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].':asc');    
+		if (@$TCA[$table]['ctrl']['fe_cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['fe_cruser_id'].' ASC ('.$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].')',$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].':asc');	
 		if (@$TCA[$table]['ctrl']['tstamp']) $params['items'][]=Array($TCA[$table]['ctrl']['tstamp'].' DESC ('.$prefix.$TCA[$table]['ctrl']['tstamp'].')', $prefix.$TCA[$table]['ctrl']['tstamp'].':desc');
 		if (@$TCA[$table]['ctrl']['crdate']) $params['items'][]=Array($TCA[$table]['ctrl']['crdate'].' DESC ('.$prefix.$TCA[$table]['ctrl']['crdate'].')', $prefix.$TCA[$table]['ctrl']['crdate'].':desc');
 		if (@$TCA[$table]['ctrl']['cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['cruser_id'].' DESC ('.$prefix.$TCA[$table]['ctrl']['cruser_id'].')',$prefix.$TCA[$table]['ctrl']['cruser_id'].':desc');
-		if (@$TCA[$table]['ctrl']['fe_cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['fe_cruser_id'].' DESC ('.$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].')',$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].':desc');    
-                		
+		if (@$TCA[$table]['ctrl']['fe_cruser_id']) $params['items'][]=Array($TCA[$table]['ctrl']['fe_cruser_id'].' DESC ('.$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].')',$prefix.$TCA[$table]['ctrl']['fe_cruser_id'].':desc');	
+						
 		// We add sql calculated fields added by user in flexform
 
 		$FTs=explode(chr(10),@$flexarr['data']['sList']['lDEF']['listsqlcalcfields']['vDEF']);
@@ -389,8 +405,8 @@ class tx_metafeedit_flexfill {
 		$ta=array();
 		t3lib_div::loadTCA($table);
 		// we add uid field.
-		if (!is_array($GLOBALS['TCA'][$table]['columns']['uid'])) {
-			$GLOBALS['TCA'][$table]['columns']['uid']=array(
+		if (!is_array($TCA[$table]['columns']['uid'])) {
+			$TCA[$table]['columns']['uid']=array(
 				'exclude'=>1,
 				'label'=>'LLL:EXT:meta_feedit/locallang.xml:uid',
 				'config'=>array(
@@ -400,22 +416,21 @@ class tx_metafeedit_flexfill {
 				),
 			);	
 		}
-        if (is_array($TCA[$table]['columns']))  {
-            foreach($TCA[$table]['columns'] as $key => $config)     {
+		if (is_array($TCA[$table]['columns']))  {
+			foreach($TCA[$table]['columns'] as $key => $config)	 {
 				if ($config['config']['foreign_table']) {
-                    $label = t3lib_div::fixed_lgd(preg_replace('/:$/','',$GLOBALS['LANG']->sL($config['label'])),30).' ('.($prefix?$prefix.'.':'').$key.')';
-                    $params['items'][]=Array($label, ($prefix?$prefix.'.':'').$key);
-                    //echo ($prefix?$prefix.'.':'').$key."-$label<br>";
+					$label = t3lib_div::fixed_lgd(preg_replace('/:$/','',$GLOBALS['LANG']->sL($config['label'])),30).' ('.($prefix?$prefix.'.':'').$key.')';
+					$params['items'][]=Array($label, ($prefix?$prefix.'.':'').$key);
 				}
-            }
-        }
+			}
+		}
 		return $params;
 	}
 
 	/**
 	 * getFlex
-	 *
-	 * @return	[type]		...
+	 * Get's flexform xml from tt_contant table
+	 * @return	string flexform xml
 	 */
 	function getFlex() {
 		// we get uid  of the current editing plugin
@@ -428,7 +443,7 @@ class tx_metafeedit_flexfill {
 		$res=$db->exec_SELECTquery('pi_flexform','tt_content',$where);
 		while ($row=$db->sql_fetch_row($res))
 		{
-			   $flex=$row[0];
+			$flex=$row[0];
 		}
 		return $flex;
 	}

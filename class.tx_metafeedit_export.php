@@ -300,6 +300,8 @@ class tx_metafeedit_export {
 
 		try {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
+			//print_r($xml);
+			//die(yoo);
 		} catch (Exception $e) {
 			echo 'PDF Detail Template error : '.$e->getMessage().'<br>';
 			echo "============================<br>";
@@ -460,7 +462,6 @@ class tx_metafeedit_export {
 				 	//Image border
 				 	$ib=0;
 				 	if ($col->img->attributes()->b) $ib=1;
-				 	error_log("ib=$ib");
 					if (!is_object($col->spec)) $pdf->Cell($taille,$height,'',1,0,'L',1);
 					$pdf->SetX($myx);
 					foreach($vala as $v) {
@@ -480,7 +481,6 @@ class tx_metafeedit_export {
 						if (is_array($imginfo)) {
 							$w=$imginfo[0];
 							$h=$imginfo[1];
-							error_log(print_r($imginfo,true));
 							//@todo resize or crop if image too big
 							$imgh=$nblines*$height;
 							$imgx=$pdf->GetX();
@@ -553,7 +553,6 @@ class tx_metafeedit_export {
 						$pdf->SetXY((float)$col->spec->attributes()->x,(float)$col->spec->attributes()->y);
 						//$h=$h*$nblines;
 						if (isset($col->spec->attributes()->b)  || isset($col->spec->attributes()->bc) ) {
-							error_log("b=$b");
 							$pdf->Cell($w,$h,$utf8val,$b,0,$p,1);
 							 $cell=true;
 						} else {
@@ -565,7 +564,6 @@ class tx_metafeedit_export {
 					} else {
 						$x = $pdf->getX();
 						$y = $pdf->getY();
-						error_log("multicell");
 						$pdf->MultiCell($w,$h,$utf8val,0,0,$p,1);
 						if ($b) $pdf->Rect($x,$y,$w,$h*$nblines);
 						// We handle bigger cells !!!

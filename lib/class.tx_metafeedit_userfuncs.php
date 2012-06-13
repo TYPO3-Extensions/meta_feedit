@@ -62,6 +62,18 @@ class tx_metafeedit_userfuncs {
 		}
 		$dec=str_pad($dec,2,'0');
 		return $int.".".$dec."&nbsp;$params[currency]";
-	} 
+	}
+	/**
+	 * transform float to percentage
+	 * @param unknown_type $val
+	 * @param unknown_type $params
+	 */
+	function user_percentage($val,$params) {
+		return round($val*100,0);
+	}
+	
+	function user_round($val,$params) {
+		return round($val,(int)$params['precision']);
+	}
 } 
 ?>

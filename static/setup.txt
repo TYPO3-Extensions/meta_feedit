@@ -1,5 +1,5 @@
 plugin.tx_meta_feedit_pi1 {
-        _CSS_DEFAULT_STYLE (
+	_CSS_DEFAULT_STYLE (
 
 						/* CSS META_FEEDIT */
 						

@@ -3,13 +3,12 @@
 $LOCAL_LANG = Array (
 	'default' => Array (
 		'meta_feedit.pi_flexform.feeditevalvalues' => 'Edit eval Values',
-	  	'meta_feedit.pi_flexform.fecreateevalvalues' => 'Create eval Values',
-	   	'meta_feedit.pi_flexform.editPreview' => 'Edit Preview',
-	   	'meta_feedit.pi_flexform.gridAjax' => 'Grid',
+		'meta_feedit.pi_flexform.fecreateevalvalues' => 'Create eval Values',
+		'meta_feedit.pi_flexform.editPreview' => 'Edit Preview',
+		'meta_feedit.pi_flexform.gridAjax' => 'Grid',
 		'meta_feedit.pi_flexform.gridEdit' => 'Edit',
 		'meta_feedit.pi_flexform.sheet_general' => 'General Settings',
 		'meta_feedit.pi_flexform.sheet_cal' => 'Calendar mode Settings',
-
 		'meta_feedit.pi_flexform.sheet_quickstart' => 'Quick Start',
 		'meta_feedit.pi_flexform.sheet_create' => 'Create',
 		'meta_feedit.pi_flexform.sheet_edit' => 'Edit',
@@ -71,9 +70,9 @@ $LOCAL_LANG = Array (
 		'meta_feedit.pi_flexform.rUJoinField' => 'rU Join Field',
 		'meta_feedit.pi_flexform.noUserCheck' => 'No User Check',
 		'meta_feedit.pi_flexform.editUserCheck' => 'User Check',
-	  'meta_feedit.pi_flexform.deleteUserCheck' => 'User Check',
-	  'meta_feedit.pi_flexform.deleteGroupCheck' => 'Group Check',
-	  'meta_feedit.pi_flexform.editGroupCheck' => 'Group Check',
+		'meta_feedit.pi_flexform.deleteUserCheck' => 'User Check',
+		'meta_feedit.pi_flexform.deleteGroupCheck' => 'Group Check',
+		'meta_feedit.pi_flexform.editGroupCheck' => 'Group Check',
 		'meta_feedit.pi_flexform.fe_userOwnSelf' => 'Fe User Own Self',
 		'meta_feedit.pi_flexform.feshowfields' => 'Creation show Fields',
 		'meta_feedit.pi_flexform.fepreviewfields' =>'Preview Fields',
@@ -82,7 +81,7 @@ $LOCAL_LANG = Array (
 		'meta_feedit.pi_flexform.noActions' => 'No actions',
 		'meta_feedit.pi_flexform.noHeaders' => 'No headers',
 		'meta_feedit.pi_flexform.cacheMode' => 'Cache Mode',
-		
+		'meta_feedit.pi_flexform.forceSearch' => 'Force search before list display',
 		'meta_feedit.pi_flexform.sheet_ajax' => 'AjaxParameters',
 		'meta_feedit.pi_flexform.ajaxOn' => 'Activate WEB 2.0 Functionnality',
 		'meta_feedit.pi_flexform.jqueryCompatMode' => 'Activate jQuery compatibility mode (for use with mootools, prototype, ...)',
@@ -424,7 +423,7 @@ $LOCAL_LANG = Array (
 		'meta_feedit.pi_flexform.TemplatePDF' => 'Gabarit PDF pour les listes',
 		'meta_feedit.pi_flexform.TemplatePDFDet' => 'Gabarit PDF pour la vue en détail',
 		'meta_feedit.pi_flexform.TemplatePDFTab' => 'Gabarit PDF pour les tabaleaux',
-
+		'meta_feedit.pi_flexform.forceSearch' => 'Forcer saisie critères de recherche avant requête'
 	),
 	'es' => Array (
 	),

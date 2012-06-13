@@ -407,22 +407,28 @@ border-top:2px solid #000;
 .tx-metafeedit-groupBy{
 white-space:nowrap;
 }
+.tx-metafeedit-groupBy-lvl-1 td:first-child{
+text-indent:1em;
+}
 .tx-metafeedit-groupBy-lvl-1 {
 background:#0080FF;
 color:#fff;
-text-indent:1em;
 font-size:0.9em
+}
+.tx-metafeedit-groupBy-lvl-2 td:first-child{
+text-indent:2em;
 }
 .tx-metafeedit-groupBy-lvl-2 {
 background:#0080FF;
 color:#fff;
-text-indent:2em;
 font-size:0.8em
+}
+.tx-metafeedit-groupBy-lvl-3 td:first-child{
+text-indent:3em;
 }
 .tx-metafeedit-groupBy-lvl-3 {
 background:#0080FF;
 color:#fff;
-text-indent:3em;
 font-size:0.7em
 }
 )

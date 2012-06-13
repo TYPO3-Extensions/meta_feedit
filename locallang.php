@@ -5,6 +5,8 @@
  */
 $LOCAL_LANG = Array (
 	'default' => Array (
+'selectall' => 'Select all',
+
 		'total' => 'Total',
 		'pi1_title' => 'FE Edition Meta',
 		'pi1_plus_wiz_description' => 'Adds a frontend form for submitting and editing of tables to your page',

@@ -1,28 +1,28 @@
 <T3DataStructure>
-    <meta>
-       <langDisable>1</langDisable> 
-    </meta>
+	<meta>
+	   <langDisable>1</langDisable> 
+	</meta>
   <sheets>
 	<sQuickStart>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_quickstart</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<fetable>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fetable</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <special>tables</special>
-                                        <minitems>0</minitems>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <suppress_icons>ONLY_SELECTED</suppress_icons>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<special>tables</special>
+										<minitems>0</minitems>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<suppress_icons>ONLY_SELECTED</suppress_icons>
 				</config>
 			</TCEforms>		 
 		</fetable>
@@ -78,25 +78,25 @@
 				</config>
 			</TCEforms>
 		</recursive>
-                <pluginId>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pluginId</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </pluginId>
-	    </el>
+				<pluginId>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pluginId</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</pluginId>
+		</el>
 	  </ROOT>
-        </sQuickStart>
+		</sQuickStart>
 	<sDEF>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_general</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		  <defaultCmd>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.defaultCmd</label>
@@ -120,7 +120,7 @@
 					<size>1</size>
 				</config>
 			</TCEforms>
-	         </defaultCmd>
+			 </defaultCmd>
 	   <defaultListMode>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.defaultListMode</label>
@@ -145,7 +145,7 @@
 				</config>
 			</TCEforms>
 	  </defaultListMode>
-	    <cacheMode>
+		<cacheMode>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.cacheMode</label>
 				<config>
@@ -168,7 +168,7 @@
 					<size>1</size>
 				</config>
 			</TCEforms>
-	         </cacheMode>
+			 </cacheMode>
 		<xhtml>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.xhtml</label>
@@ -198,8 +198,8 @@
 				<exclude>1</exclude>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.referenceMetafeeditText</label>
 				<config>
-                                  <type>input</type>
-                                  <size>10</size>
+								  <type>input</type>
+								  <size>10</size>
 				</config>
 
 			</TCEforms>
@@ -217,9 +217,9 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.referenceKeyExclude</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>
 				</config>
 			</TCEforms>
 		</referenceKeyExclude>
@@ -236,9 +236,9 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.tabLabels</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</tabLabels>
@@ -294,14 +294,14 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.foreignTables</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <type>select</type>
-                                        <maxitems>500</maxitems>
-                                        <size>5</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main_ft</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<type>select</type>
+										<maxitems>500</maxitems>
+										<size>5</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main_ft</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</foreignTables>
@@ -309,13 +309,13 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.idField</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</idField>
@@ -323,13 +323,13 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fecruser_field</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</fecruser_field>
@@ -337,32 +337,32 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fecrgroup_field</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <minitems>0</minitems>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<minitems>0</minitems>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</fecrgroup_field>
 		<noUserCheck>
    <TCEforms>
-    <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.noUserCheck</label>
-    <config>
-     <type>check</type>
-    </config>
+	<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.noUserCheck</label>
+	<config>
+	 <type>check</type>
+	</config>
    </TCEforms>   
   </noUserCheck>
 		<feparsevalues>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.feparsevalues</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</feparsevalues>
@@ -370,13 +370,13 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.ferequiredfields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>500</maxitems>
-                                        <size>5</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>500</maxitems>
+										<size>5</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</ferequiredfields>
@@ -404,25 +404,25 @@
 				</config>
 			</TCEforms>		 
 		</useDistinct>
-	    </el>
+		</el>
 	  </ROOT>
-    </sDEF>
-    <sGeneralTemplate>
+	</sDEF>
+	<sGeneralTemplate>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_generalTemplate</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<generalAuthTemplate>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.generalAuthTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</generalAuthTemplate>
@@ -430,28 +430,28 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.generalNoPermTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</generalNoPermTemplate>
-	    </el>
+		</el>
 	  </ROOT>
-    </sGeneralTemplate>
-    <sList>
+	</sGeneralTemplate>
+	<sList>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_list</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
-                <listPid>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listPid</label>
-                                <config>
+		<type>array</type>
+		<el>
+				<listPid>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listPid</label>
+								<config>
 					<type>group</type>
 					<internal_type>db</internal_type>
 					<allowed>pages</allowed>
@@ -459,236 +459,244 @@
 					<maxitems>1</maxitems>
 					<minitems>0</minitems>
 					<show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </listPid>
+								</config>
+						</TCEforms>
+				</listPid>
  		<backPagePid>
-                        <TCEforms>
-                                <exclude>1</exclude>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.backPagePid</label>
-                                <config>
-                                        <type>group</type>
-                                        <internal_type>db</internal_type>
-                                        <allowed>pages</allowed>
-                                        <size>1</size>
-                                        <maxitems>1</maxitems>
-                                        <minitems>0</minitems>
-                                        <show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </backPagePid>
+						<TCEforms>
+								<exclude>1</exclude>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.backPagePid</label>
+								<config>
+										<type>group</type>
+										<internal_type>db</internal_type>
+										<allowed>pages</allowed>
+										<size>1</size>
+										<maxitems>1</maxitems>
+										<minitems>0</minitems>
+										<show_thumbs>1</show_thumbs>
+								</config>
+						</TCEforms>
+				</backPagePid>
 
-                <searchBox>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.searchBox</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </searchBox>
-                <advancedSearch>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.advancedSearch</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </advancedSearch>
+				<searchBox>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.searchBox</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</searchBox>
+				<forceSearch>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.forceSearch</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</forceSearch>
+				<advancedSearch>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.advancedSearch</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</advancedSearch>
 				<advancedSearchAjaxSelector>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.advancedSearchAjaxSelector</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </advancedSearchAjaxSelector>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.advancedSearchAjaxSelector</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</advancedSearchAjaxSelector>
 
 		<advancedSearchFields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.advancedSearchFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
  					<multiple>1</multiple>
-                                       <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;mainav</itemsProcFunc>
+									   <size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;mainav</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</advancedSearchFields>
-                <alphabeticalSearch>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.alphabeticalSearch</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </alphabeticalSearch>
-                <calendarSearch>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.calendarSearch</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calendarSearch>
-                <pagination>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pagination</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </pagination>
-                <pageSize>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pageSize</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </pageSize>
-                <nbCols>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.nbCols</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </nbCols>
+				<alphabeticalSearch>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.alphabeticalSearch</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</alphabeticalSearch>
+				<calendarSearch>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.calendarSearch</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calendarSearch>
+				<pagination>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pagination</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</pagination>
+				<pageSize>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pageSize</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</pageSize>
+				<nbCols>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.nbCols</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</nbCols>
 		<displaydirection>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.displaydirection</label>
-                                <config>
-                                        <type>select</type>
-                                        <items type="array">
-                                        <numIndex index="0" type="array">
-                                                <numIndex index="0">Right</numIndex>
-                                                <numIndex index="1">Right</numIndex>
-                                        </numIndex>
-                                        <numIndex index="1" type="array">
-                                                <numIndex index="0">Down</numIndex>
-                                                <numIndex index="1">Down</numIndex>
-                                        </numIndex>
-                                        </items>
-                                </config>
-                        </TCEforms>
-                </displaydirection>
-                <maxPages>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.maxPages</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </maxPages>
-                <sortFields>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fieldSort</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </sortFields>
-                <listnobackbutton>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listnobackbutton</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </listnobackbutton>
-                                
-                <listMediaPlayer>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listMediaPlayer</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </listMediaPlayer>
-                <listAltRows>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listAltRows</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                        <default>2</default>			
-                                </config>
-                        </TCEforms>
-                </listAltRows>
-                                <rowField>
-         <TCEforms>
-          <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.rowField</label>
-           <config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
-           </config>
-          </TCEforms>   
-        </rowField>
-        <colField>
-         <TCEforms>
-          <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.colField</label>
-           <config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
-           </config>
-          </TCEforms>   
-        </colField>
-        <beginDateField>
-         <TCEforms>
-          <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.beginDateField</label>
-           <config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
-           </config>
-          </TCEforms>   
-        </beginDateField>
-                <endDateField>
-         <TCEforms>
-          <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.endDateField</label>
-           <config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
-           </config>
-          </TCEforms>   
-        </endDateField>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.displaydirection</label>
+								<config>
+										<type>select</type>
+										<items type="array">
+										<numIndex index="0" type="array">
+												<numIndex index="0">Right</numIndex>
+												<numIndex index="1">Right</numIndex>
+										</numIndex>
+										<numIndex index="1" type="array">
+												<numIndex index="0">Down</numIndex>
+												<numIndex index="1">Down</numIndex>
+										</numIndex>
+										</items>
+								</config>
+						</TCEforms>
+				</displaydirection>
+				<maxPages>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.maxPages</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</maxPages>
+				<sortFields>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fieldSort</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</sortFields>
+				<listnobackbutton>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listnobackbutton</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</listnobackbutton>
+								
+				<listMediaPlayer>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listMediaPlayer</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</listMediaPlayer>
+				<listAltRows>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listAltRows</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+										<default>2</default>			
+								</config>
+						</TCEforms>
+				</listAltRows>
+								<rowField>
+		 <TCEforms>
+		  <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.rowField</label>
+		   <config>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+		   </config>
+		  </TCEforms>   
+		</rowField>
+		<colField>
+		 <TCEforms>
+		  <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.colField</label>
+		   <config>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+		   </config>
+		  </TCEforms>   
+		</colField>
+		<beginDateField>
+		 <TCEforms>
+		  <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.beginDateField</label>
+		   <config>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+		   </config>
+		  </TCEforms>   
+		</beginDateField>
+				<endDateField>
+		 <TCEforms>
+		  <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.endDateField</label>
+		   <config>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+		   </config>
+		  </TCEforms>   
+		</endDateField>
 		<listFields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</listFields>
@@ -697,13 +705,13 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listExtraFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</listExtraFields>
@@ -711,9 +719,9 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listsqlcalcfields</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</listsqlcalcfields>
@@ -721,32 +729,32 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listphpcalcfields</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</listphpcalcfields>
-       	<listPreOrderByString>
-                        <TCEforms>
-                               <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listPreOrderByString</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>500</size>
-                                </config>
-                        </TCEforms>
-        </listPreOrderByString>
+	   	<listPreOrderByString>
+						<TCEforms>
+							   <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listPreOrderByString</label>
+								<config>
+										<type>input</type>
+										<size>500</size>
+								</config>
+						</TCEforms>
+		</listPreOrderByString>
 		<groupByFields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.groupByFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main_ob</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main_ob</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</groupByFields>
@@ -754,115 +762,115 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.groupByFieldBreaks</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main_ob</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main_ob</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</groupByFieldBreaks>
 		<groupBySize>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.groupBySize</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </groupBySize>
-        <listHavingString>
-                        <TCEforms>
-                               <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listHavingString</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>500</size>
-                                </config>
-                        </TCEforms>
-        </listHavingString>
-              <listnodetail>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listnodetail</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </listnodetail>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.groupBySize</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</groupBySize>
+		<listHavingString>
+						<TCEforms>
+							   <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listHavingString</label>
+								<config>
+										<type>input</type>
+										<size>500</size>
+								</config>
+						</TCEforms>
+		</listHavingString>
+			  <listnodetail>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listnodetail</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</listnodetail>
 
 
-                <listJumpPageOnGroupBy>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listJumpPageOnGroupBy</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </listJumpPageOnGroupBy>
-                <categorySearch>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.categorySearch</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </categorySearch>
+				<listJumpPageOnGroupBy>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listJumpPageOnGroupBy</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</listJumpPageOnGroupBy>
+				<categorySearch>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.categorySearch</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</categorySearch>
 		<sumFields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sumFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</sumFields>
 		<pdf>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pdf</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </pdf>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pdf</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</pdf>
 		<csv>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.csv</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </csv>		
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.csv</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</csv>		
 		<excel>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.excel</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </excel>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.excel</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</excel>
 
 		<euros>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.euros</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </euros>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.euros</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</euros>
 
 				<listrecordactions>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listrecordactions</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</listrecordactions>
@@ -870,9 +878,9 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.batchactions</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</batchactions>
@@ -880,45 +888,45 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.rUJoinField</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</rUJoinField>
 		<listWhereString>
-                        <TCEforms>
-                               <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listWhereString</label>
-                                <config>
-                                        <type>text</type>
-                                        <size>500</size>
-                                </config>
-                        </TCEforms>
-        </listWhereString>
+						<TCEforms>
+							   <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listWhereString</label>
+								<config>
+										<type>text</type>
+										<size>500</size>
+								</config>
+						</TCEforms>
+		</listWhereString>
 	<listOrderByString>
-                        <TCEforms>
-                               <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listOrderByString</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>500</size>
-                                </config>
-                        </TCEforms>
-        </listOrderByString>
+						<TCEforms>
+							   <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listOrderByString</label>
+								<config>
+										<type>input</type>
+										<size>500</size>
+								</config>
+						</TCEforms>
+		</listOrderByString>
 		<orderByFields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.orderByFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main_ob</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main_ob</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</orderByFields>
@@ -926,36 +934,36 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listlangmarks</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</listlangmarks>
 
-            </el>
-          </ROOT>
-    </sList>
-    <sListTemplate>
+			</el>
+		  </ROOT>
+	</sList>
+	<sListTemplate>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_listTemplate</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<listItemTemplate>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listItemTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>
-	    				<wizards>
-	    					<_VERTICAL>1</_VERTICAL>
-	    					<_DISTANCE>10</_DISTANCE>
-                <getTemplate>
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>
+						<wizards>
+							<_VERTICAL>1</_VERTICAL>
+							<_DISTANCE>10</_DISTANCE>
+				<getTemplate>
 									<type>popup</type>
 									<title>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listItemTemplate</title>
 									<script>EXT:meta_feedit/wizards/class.tx_metafeedit_wizards.php</script>
@@ -963,16 +971,16 @@
 									<dim>20x20</dim>
 									<tableStyle>solid 1px #000000; margin-left: 20px;</tableStyle>
 									<JSopenParams>width=365,height=550,status=0,menubar=0,scrollbars=1</JSopenParams>
-                </getTemplate>
-                <clearTemplate>
+				</getTemplate>
+				<clearTemplate>
 									<type>popup</type>
 									<title>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listItemTemplate</title>
 									<script>EXT:meta_feedit/wizards/class.tx_metafeedit_wizards.php?cmdtpl=clear</script>
 									<tableStyle>solid 1px #000000; margin-left: 20px;</tableStyle>
 									<JSopenParams>width=365,height=550,status=0,menubar=0,scrollbars=1</JSopenParams>
 									<icon>garbage.gif</icon>
-                </clearTemplate>
-              </wizards>
+				</clearTemplate>
+			  </wizards>
 				</config>
 			</TCEforms>
 		</listItemTemplate>
@@ -980,25 +988,25 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listNoItemTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</listNoItemTemplate>
-	    </el>
+		</el>
 	  </ROOT>
-    </sListTemplate>
-    <sCal>
+	</sListTemplate>
+	<sCal>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_cal</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
-	    	    <calMode>
+		<type>array</type>
+		<el>
+				<calMode>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.calMode</label>
 				<config>
@@ -1033,12 +1041,12 @@
 					<size>1</size>
 				</config>
 			</TCEforms>
-	         </calMode>
+			 </calMode>
 
-                <calPid>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.calPid</label>
-                                <config>
+				<calPid>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.calPid</label>
+								<config>
 					<type>group</type>
 					<internal_type>db</internal_type>
 					<allowed>pages</allowed>
@@ -1046,201 +1054,201 @@
 					<maxitems>1</maxitems>
 					<minitems>0</minitems>
 					<show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </calPid>
+								</config>
+						</TCEforms>
+				</calPid>
  		<calbackPagePid>
-                        <TCEforms>
-                                <exclude>1</exclude>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.calbackPagePid</label>
-                                <config>
-                                        <type>group</type>
-                                        <internal_type>db</internal_type>
-                                        <allowed>pages</allowed>
-                                        <size>1</size>
-                                        <maxitems>1</maxitems>
-                                        <minitems>0</minitems>
-                                        <show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </calbackPagePid>
+						<TCEforms>
+								<exclude>1</exclude>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.calbackPagePid</label>
+								<config>
+										<type>group</type>
+										<internal_type>db</internal_type>
+										<allowed>pages</allowed>
+										<size>1</size>
+										<maxitems>1</maxitems>
+										<minitems>0</minitems>
+										<show_thumbs>1</show_thumbs>
+								</config>
+						</TCEforms>
+				</calbackPagePid>
 
-                <calSearchBox>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.searchBox</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calSearchBox>
-                <calAdvancedSearch>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.advancedSearch</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calAdvancedSearch>
+				<calSearchBox>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.searchBox</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calSearchBox>
+				<calAdvancedSearch>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.advancedSearch</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calAdvancedSearch>
 				<calAdvancedSearchAjaxSelector>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.advancedSearchAjaxSelector</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calAdvancedSearchAjaxSelector>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.advancedSearchAjaxSelector</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calAdvancedSearchAjaxSelector>
 
 		<calAdvancedSearchFields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.advancedSearchFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
  					<multiple>1</multiple>
-                                       <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;mainav</itemsProcFunc>
+									   <size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;mainav</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</calAdvancedSearchFields>
-                <calAlphabeticalSearch>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.alphabeticalSearch</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calAlphabeticalSearch>
-                <calCalendarSearch>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.calendarSearch</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calCalendarSearch>
-                <calPagination>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pagination</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calPagination>
-                <calPageSize>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pageSize</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </calPageSize>
-                <calNbCols>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.nbCols</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </calNbCols>
+				<calAlphabeticalSearch>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.alphabeticalSearch</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calAlphabeticalSearch>
+				<calCalendarSearch>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.calendarSearch</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calCalendarSearch>
+				<calPagination>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pagination</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calPagination>
+				<calPageSize>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pageSize</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</calPageSize>
+				<calNbCols>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.nbCols</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</calNbCols>
 		<calDisplaydirection>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.displaydirection</label>
-                                <config>
-                                        <type>select</type>
-                                        <items type="array">
-                                        <numIndex index="0" type="array">
-                                                <numIndex index="0">Right</numIndex>
-                                                <numIndex index="1">Right</numIndex>
-                                        </numIndex>
-                                        <numIndex index="1" type="array">
-                                                <numIndex index="0">Down</numIndex>
-                                                <numIndex index="1">Down</numIndex>
-                                        </numIndex>
-                                        </items>
-                                </config>
-                        </TCEforms>
-                </calDisplaydirection>
-                <calMaxPages>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.maxPages</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </calMaxPages>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.displaydirection</label>
+								<config>
+										<type>select</type>
+										<items type="array">
+										<numIndex index="0" type="array">
+												<numIndex index="0">Right</numIndex>
+												<numIndex index="1">Right</numIndex>
+										</numIndex>
+										<numIndex index="1" type="array">
+												<numIndex index="0">Down</numIndex>
+												<numIndex index="1">Down</numIndex>
+										</numIndex>
+										</items>
+								</config>
+						</TCEforms>
+				</calDisplaydirection>
+				<calMaxPages>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.maxPages</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</calMaxPages>
 
-                <calNoBackButton>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listnobackbutton</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calNoBackButton>
-                                
-                <calMediaPlayer>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listMediaPlayer</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calMediaPlayer>
-                <calAltRows>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listAltRows</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                        <default>2</default>			
-                                </config>
-                        </TCEforms>
-                </calAltRows>
-        <calBeginDateField>
-         <TCEforms>
-          <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.beginDateField</label>
-           <config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
-           </config>
-          </TCEforms>   
-        </calBeginDateField>
-                <calEndDateField>
-         <TCEforms>
-          <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.endDateField</label>
-           <config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
-           </config>
-          </TCEforms>   
-        </calEndDateField>
+				<calNoBackButton>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listnobackbutton</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calNoBackButton>
+								
+				<calMediaPlayer>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listMediaPlayer</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calMediaPlayer>
+				<calAltRows>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listAltRows</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+										<default>2</default>			
+								</config>
+						</TCEforms>
+				</calAltRows>
+		<calBeginDateField>
+		 <TCEforms>
+		  <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.beginDateField</label>
+		   <config>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+		   </config>
+		  </TCEforms>   
+		</calBeginDateField>
+				<calEndDateField>
+		 <TCEforms>
+		  <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.endDateField</label>
+		   <config>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+		   </config>
+		  </TCEforms>   
+		</calEndDateField>
 		<calFields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</calFields>
@@ -1249,13 +1257,13 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listExtraFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</calExtraFields>
@@ -1263,9 +1271,9 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listsqlcalcfields</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</calSqlCalcFields>
@@ -1273,77 +1281,77 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listphpcalcfields</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</calPhpCalcFields>
-              <calNoDetail>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listnodetail</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calNoDetail>
+			  <calNoDetail>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listnodetail</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calNoDetail>
 
 
-                <calCategorySearch>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.categorySearch</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calCategorySearch>
+				<calCategorySearch>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.categorySearch</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calCategorySearch>
 		<calSumFields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sumFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</calSumFields>
 		<calPdf>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pdf</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calPdf>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pdf</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calPdf>
 		<calCsv>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.csv</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calCsv>		
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.csv</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calCsv>		
 		<calExcel>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.excel</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </calExcel>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.excel</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</calExcel>
 
 
 				<calRecordActions>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listrecordactions</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</calRecordActions>
@@ -1351,50 +1359,50 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.rUJoinField</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</calRuJoinField>
 		<calWhereString>
-                        <TCEforms>
-                               <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listWhereString</label>
-                                <config>
-                                        <type>text</type>
-                                        <size>500</size>
-                                </config>
-                        </TCEforms>
-        </calWhereString>
+						<TCEforms>
+							   <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listWhereString</label>
+								<config>
+										<type>text</type>
+										<size>500</size>
+								</config>
+						</TCEforms>
+		</calWhereString>
 		<calLangmarks>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listlangmarks</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</calLangmarks>
 
-            </el>
-          </ROOT>
-    </sCal>
-    <sGrid>
+			</el>
+		  </ROOT>
+	</sCal>
+	<sGrid>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_grid</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
-                <gridPid>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridPid</label>
-                                <config>
+		<type>array</type>
+		<el>
+				<gridPid>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridPid</label>
+								<config>
 					<type>group</type>
 					<internal_type>db</internal_type>
 					<allowed>pages</allowed>
@@ -1402,168 +1410,168 @@
 					<maxitems>1</maxitems>
 					<minitems>0</minitems>
 					<show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </gridPid>
+								</config>
+						</TCEforms>
+				</gridPid>
  		<gridBackPagePid>
-                        <TCEforms>
-                                <exclude>1</exclude>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridBackPagePid</label>
-                                <config>
-                                        <type>group</type>
-                                        <internal_type>db</internal_type>
-                                        <allowed>pages</allowed>
-                                        <size>1</size>
-                                        <maxitems>1</maxitems>
-                                        <minitems>0</minitems>
-                                        <show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </gridBackPagePid>
-                <gridRows>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridRows</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </gridRows>
-                <gridAltRows>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridAltRows</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                       <default>2</default>			
-                                </config>
-                        </TCEforms>
-                </gridAltRows>
-                <gridCols>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridCols</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </gridCols>
+						<TCEforms>
+								<exclude>1</exclude>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridBackPagePid</label>
+								<config>
+										<type>group</type>
+										<internal_type>db</internal_type>
+										<allowed>pages</allowed>
+										<size>1</size>
+										<maxitems>1</maxitems>
+										<minitems>0</minitems>
+										<show_thumbs>1</show_thumbs>
+								</config>
+						</TCEforms>
+				</gridBackPagePid>
+				<gridRows>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridRows</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</gridRows>
+				<gridAltRows>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridAltRows</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+									   <default>2</default>			
+								</config>
+						</TCEforms>
+				</gridAltRows>
+				<gridCols>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridCols</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</gridCols>
 
  		<gridExportPDF>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridExportPDF</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </gridExportPDF>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridExportPDF</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</gridExportPDF>
 		
 		<gridExportCSV>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridExportCSV</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </gridExportCSV>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridExportCSV</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</gridExportCSV>
 
 		<gridExportExcel>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridExportExcel</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </gridExportExcel>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridExportExcel</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</gridExportExcel>
 
 		<gridEuros>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridEuros</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </gridEuros>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridEuros</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</gridEuros>
 
-                 <gridMediaPlayer>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridMediaPlayer</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </gridMediaPlayer>
-                <gridAjax>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridAjax</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </gridAjax>
-                <gridEdit>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridEdit</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </gridEdit>
-                <gridRowField>
-         						<TCEforms>
-          					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridRowField</label>
-           					<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
-           </config>
-          </TCEforms>   
-        </gridRowField>
-                <gridColField>
-         <TCEforms>
-          <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridColField</label>
-           <config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
-           </config>
-          </TCEforms>   
-        </gridColField>
-        <secondaryColFields>
-         <TCEforms>
-          <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.secondaryColFields</label>
-           <config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>10</maxitems>
-                                        <size>5</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
-           </config>
-          </TCEforms>   
-        </secondaryColFields>
+				 <gridMediaPlayer>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridMediaPlayer</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</gridMediaPlayer>
+				<gridAjax>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridAjax</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</gridAjax>
+				<gridEdit>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridEdit</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</gridEdit>
+				<gridRowField>
+		 						<TCEforms>
+		  					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridRowField</label>
+		   					<config>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+		   </config>
+		  </TCEforms>   
+		</gridRowField>
+				<gridColField>
+		 <TCEforms>
+		  <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridColField</label>
+		   <config>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+		   </config>
+		  </TCEforms>   
+		</gridColField>
+		<secondaryColFields>
+		 <TCEforms>
+		  <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.secondaryColFields</label>
+		   <config>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>10</maxitems>
+										<size>5</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+		   </config>
+		  </TCEforms>   
+		</secondaryColFields>
 
 
 		<gridFields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</gridFields>
@@ -1571,13 +1579,13 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridExtraFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</gridExtraFields>
@@ -1585,9 +1593,9 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridrecordactions</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</gridrecordactions>
@@ -1595,45 +1603,45 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridrUJoinField</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</gridrUJoinField>
 		<gridWhereString>
-                        <TCEforms>
-                               <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridWhereString</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-        </gridWhereString>
+						<TCEforms>
+							   <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridWhereString</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+		</gridWhereString>
 	<gridOrderByString>
-                        <TCEforms>
-                               <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridOrderByString</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>500</size>
-                                </config>
-                        </TCEforms>
-        </gridOrderByString>
+						<TCEforms>
+							   <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridOrderByString</label>
+								<config>
+										<type>input</type>
+										<size>500</size>
+								</config>
+						</TCEforms>
+		</gridOrderByString>
 		<gridOrderByFields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridOrderByFields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main_ob</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main_ob</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</gridOrderByFields>
@@ -1641,32 +1649,32 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridLangmarks</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</gridLangmarks>
 
-            </el>
-          </ROOT>
-    </sGrid>
-    <sGridTemplate>
+			</el>
+		  </ROOT>
+	</sGrid>
+	<sGridTemplate>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_gridTemplate</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<gridItemTemplate>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridItemTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</gridItemTemplate>
@@ -1674,24 +1682,24 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.gridNoItemTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</gridNoItemTemplate>
-	    </el>
+		</el>
 	  </ROOT>
-    </sGridTemplate>
-    <sCreate>
+	</sGridTemplate>
+	<sCreate>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_create</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<disableCreate>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.disableCreate</label>
@@ -1737,13 +1745,13 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fecreatefields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
 					<maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</fecreatefields>
@@ -1751,14 +1759,14 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.feshowfields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>500</maxitems>
-                                        <size>10</size>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>500</maxitems>
+										<size>10</size>
 					<multiple>1</multiple>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;tabFields</itemsProcFunc>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;tabFields</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</feshowfields>
@@ -1766,14 +1774,14 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fecreatereadonlyfields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>500</maxitems>
-                                        <size>10</size>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>500</maxitems>
+										<size>10</size>
 					<multiple>1</multiple>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</fecreatereadonlyfields>
@@ -1781,9 +1789,9 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fecreateoverridevalues</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</fecreateoverridevalues>
@@ -1791,16 +1799,16 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fecreateevalvalues</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</fecreateevalvalues>
-                <createPid>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createPid</label>
-                                <config>
+				<createPid>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createPid</label>
+								<config>
 					<type>group</type>
 					<internal_type>db</internal_type>
 					<allowed>pages</allowed>
@@ -1808,13 +1816,13 @@
 					<maxitems>1</maxitems>
 					<minitems>0</minitems>
 					<show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </createPid>
-                <T3SourceTreePid>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.T3SourceTreePid</label>
-                                <config>
+								</config>
+						</TCEforms>
+				</createPid>
+				<T3SourceTreePid>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.T3SourceTreePid</label>
+								<config>
 					<type>group</type>
 					<internal_type>db</internal_type>
 					<allowed>pages</allowed>
@@ -1822,13 +1830,13 @@
 					<maxitems>1</maxitems>
 					<minitems>0</minitems>
 					<show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </T3SourceTreePid>
-                <T3TreeTargetPid>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.T3TreeTargetPid</label>
-                                <config>
+								</config>
+						</TCEforms>
+				</T3SourceTreePid>
+				<T3TreeTargetPid>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.T3TreeTargetPid</label>
+								<config>
 					<type>group</type>
 					<internal_type>db</internal_type>
 					<allowed>pages</allowed>
@@ -1836,13 +1844,13 @@
 					<maxitems>1</maxitems>
 					<minitems>0</minitems>
 					<show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </T3TreeTargetPid>
-                <T3AdminUid>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.T3AdminUid</label>
-                                <config>
+								</config>
+						</TCEforms>
+				</T3TreeTargetPid>
+				<T3AdminUid>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.T3AdminUid</label>
+								<config>
 					<type>group</type>
 					<internal_type>db</internal_type>
 					<allowed>be_users</allowed>
@@ -1850,13 +1858,13 @@
 					<maxitems>1</maxitems>
 					<minitems>0</minitems>
 					<show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </T3AdminUid>
-                <T3FEGroupsPID>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.T3FEGroupsPID</label>
-                                <config>
+								</config>
+						</TCEforms>
+				</T3AdminUid>
+				<T3FEGroupsPID>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.T3FEGroupsPID</label>
+								<config>
 					<type>group</type>
 					<internal_type>db</internal_type>
 					<allowed>pages</allowed>
@@ -1864,20 +1872,20 @@
 					<maxitems>1</maxitems>
 					<minitems>0</minitems>
 					<show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </T3FEGroupsPID>
+								</config>
+						</TCEforms>
+				</T3FEGroupsPID>
 		<T3TableHomePidField>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.T3TableHomePidField</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>1</maxitems>
-                                        <size>1</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>1</maxitems>
+										<size>1</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</T3TableHomePidField>
@@ -1885,34 +1893,34 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createlangmarks</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createlangmarks>
 
 
 
-	    </el>
+		</el>
 	  </ROOT>
-    </sCreate>
-    <sCreateTemplate>
+	</sCreate>
+	<sCreateTemplate>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_createTemplate</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<createScreenTemplate>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createScreenTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createScreenTemplate>
@@ -1920,11 +1928,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createPreviewTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createPreviewTemplate>
@@ -1932,11 +1940,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createScreenLoginTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createScreenLoginTemplate>
@@ -1944,11 +1952,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createPreviewLoginTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createPreviewLoginTemplate>
@@ -1956,11 +1964,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createSavedTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createSavedTemplate>
@@ -1968,11 +1976,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createUserNotifyMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createUserNotifyMailTemplate>
@@ -1980,11 +1988,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createAdminNotifyMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createAdminNotifyMailTemplate>
@@ -1992,11 +2000,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createDataNotifyMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createDataNotifyMailTemplate>
@@ -2004,11 +2012,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createAdminValidMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createAdminValidMailTemplate>
@@ -2016,11 +2024,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createUserNotifyOkMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createUserNotifyOkMailTemplate>
@@ -2028,24 +2036,24 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.createUserNotifyKoMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</createUserNotifyKoMailTemplate>
-	    </el>
+		</el>
 	  </ROOT>
-    </sCreateTemplate>
-    <sEdit>
+	</sCreateTemplate>
+	<sEdit>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_edit</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<disableEdit>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.disableEdit</label>
@@ -2114,10 +2122,10 @@
 		</fe_userEditSelf>
 		<editUserCheck>
    <TCEforms>
-    <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editUserCheck</label>
-    <config>
-     <type>check</type>
-    </config>
+	<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editUserCheck</label>
+	<config>
+	 <type>check</type>
+	</config>
    </TCEforms>   
   </editUserCheck>
 	<editDontUseHidden>
@@ -2158,33 +2166,33 @@
 				</config>
 			</TCEforms>		 
 		</editPid>
-		     <editBackPagePid>
-                        <TCEforms>
-                                <exclude>1</exclude>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editBackPagePid</label>
-                                <config>
-                                        <type>group</type>
-                                        <internal_type>db</internal_type>
-                                        <allowed>pages</allowed>
-                                        <size>1</size>
-                                        <maxitems>1</maxitems>
-                                        <minitems>0</minitems>
-                                        <show_thumbs>1</show_thumbs>
-                                </config>
-                        </TCEforms>
-                </editBackPagePid>
+			 <editBackPagePid>
+						<TCEforms>
+								<exclude>1</exclude>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editBackPagePid</label>
+								<config>
+										<type>group</type>
+										<internal_type>db</internal_type>
+										<allowed>pages</allowed>
+										<size>1</size>
+										<maxitems>1</maxitems>
+										<minitems>0</minitems>
+										<show_thumbs>1</show_thumbs>
+								</config>
+						</TCEforms>
+				</editBackPagePid>
 
 		<feeditfields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.feeditfields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>500</maxitems>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</feeditfields>
@@ -2192,14 +2200,14 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.feeditshowfields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>500</maxitems>
-                                        <size>50</size>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>500</maxitems>
+										<size>50</size>
 					<multiple>1</multiple>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;tabFields</itemsProcFunc>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;tabFields</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</feeditshowfields>
@@ -2207,14 +2215,14 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.feeditreadonlyfields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>500</maxitems>
-                                        <size>10</size>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>500</maxitems>
+										<size>10</size>
 					<multiple>1</multiple>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</feeditreadonlyfields>
@@ -2222,9 +2230,9 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.feeditoverridevalues</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</feeditoverridevalues>
@@ -2232,9 +2240,9 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.feeditevalvalues</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</feeditevalvalues>
@@ -2257,9 +2265,9 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editlangmarks</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</editlangmarks>
@@ -2267,32 +2275,32 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editrecordactions</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</editrecordactions>
 
-	    </el>
+		</el>
 	  </ROOT>
-    </sEdit>
-    <sEditTemplate>
+	</sEdit>
+	<sEditTemplate>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_editTemplate</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<editScreenTemplate>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editScreenTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</editScreenTemplate>
@@ -2300,11 +2308,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editPreviewTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</editPreviewTemplate>
@@ -2312,11 +2320,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editSavedTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</editSavedTemplate>
@@ -2324,11 +2332,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editUserNotifyMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</editUserNotifyMailTemplate>
@@ -2336,11 +2344,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editDataNotifyMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</editDataNotifyMailTemplate>
@@ -2348,11 +2356,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editAdminNotifyMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</editAdminNotifyMailTemplate>
@@ -2360,11 +2368,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editAdminValidMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</editAdminValidMailTemplate>
@@ -2372,11 +2380,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editUserNotifyOkMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</editUserNotifyOkMailTemplate>
@@ -2384,24 +2392,24 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.editUserNotifyKoMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</editUserNotifyKoMailTemplate>
-	    </el>
+		</el>
 	  </ROOT>
-    </sEditTemplate>
-    <sDelete>
+	</sEditTemplate>
+	<sDelete>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_delete</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<disableDelete>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.disableDelete</label>
@@ -2421,10 +2429,10 @@
 		</hideDelete>
 		<deleteUserCheck>
    <TCEforms>
-    <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.deleteUserCheck</label>
-    <config>
-     <type>check</type>
-    </config>
+	<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.deleteUserCheck</label>
+	<config>
+	 <type>check</type>
+	</config>
    </TCEforms>   
   </deleteUserCheck>
 		<deleteStatusScreen>
@@ -2441,35 +2449,35 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fedeletefields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>500</maxitems>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</fedeletefields>
-            </el>
-          </ROOT>
-    </sDelete>
-    <sDeleteTemplate>
+			</el>
+		  </ROOT>
+	</sDelete>
+	<sDeleteTemplate>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_deleteTemplate</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<deletePreviewTemplate>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.deletePreviewTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</deletePreviewTemplate>
@@ -2477,11 +2485,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.deleteSavedTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</deleteSavedTemplate>
@@ -2489,11 +2497,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.deleteUserNotifyMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</deleteUserNotifyMailTemplate>
@@ -2501,33 +2509,33 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.deleteAdminNotifyMailTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</deleteAdminNotifyMailTemplate>
-	    </el>
+		</el>
 	  </ROOT>
-    </sDeleteTemplate>
-    <sSetFixedTemplate>
+	</sDeleteTemplate>
+	<sSetFixedTemplate>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.setFixedTemplate</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<setFixedOkTemplate>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.setFixedOkTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</setFixedOkTemplate>
@@ -2535,11 +2543,11 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.setFixedOkDeleteTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</setFixedOkDeleteTemplate>
@@ -2547,24 +2555,24 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.setFixedFailedTemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</setFixedFailedTemplate>
-	    </el>
+		</el>
 	  </ROOT>
-    </sSetFixedTemplate>
-    <sPreview>
+	</sSetFixedTemplate>
+	<sPreview>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_preview</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<previewnoemptyfields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.previewnoemptyfields</label>
@@ -2577,87 +2585,87 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fepreviewfields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>500</maxitems>
-                                        <size>10</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>500</maxitems>
+										<size>10</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</fepreviewfields>
-            </el>
-          </ROOT>
-    </sPreview>
-    <sBlog>
+			</el>
+		  </ROOT>
+	</sPreview>
+	<sBlog>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_blogs</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
-                <showComments>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.showComments</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </showComments>
-                <allowComments>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.allowComments</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </allowComments>
-                <blogCaptcha>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.blogCaptcha</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </blogCaptcha>
+		<type>array</type>
+		<el>
+				<showComments>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.showComments</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</showComments>
+				<allowComments>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.allowComments</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</allowComments>
+				<blogCaptcha>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.blogCaptcha</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</blogCaptcha>
 
-      <blogtemplate>
+	  <blogtemplate>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.blogtemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</blogtemplate>
-	    </el>
+		</el>
 	  </ROOT>
 
-    </sBlog>
+	</sBlog>
   <sTemplatePDF>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_TemplatePDF</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<TemplatePDF>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.TemplatePDF</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>
-	    				<wizards>
-	    					<_VERTICAL>1</_VERTICAL>
-	    					<_DISTANCE>10</_DISTANCE>
-                <getTemplate>
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>
+						<wizards>
+							<_VERTICAL>1</_VERTICAL>
+							<_DISTANCE>10</_DISTANCE>
+				<getTemplate>
 									<type>popup</type>
 									<title>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pdfTemplate</title>
 									<script>EXT:meta_feedit/wizards/class.tx_metafeedit_pdf_template_wizard.php</script>
@@ -2665,17 +2673,17 @@
 									<dim>20x20</dim>
 									<tableStyle>solid 1px #000000; margin-left: 20px;</tableStyle>
 									<JSopenParams>width=365,height=550,status=0,menubar=0,scrollbars=1</JSopenParams>
-                </getTemplate>
+				</getTemplate>
 
-                <clearTemplate>
+				<clearTemplate>
 									<type>popup</type>
 									<title>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listItemTemplate</title>
 									<script>EXT:meta_feedit/wizards/class.tx_metafeedit_pdf_template_wizard.php?cmdtpl=clear</script>
 									<tableStyle>solid 1px #000000; margin-left: 20px;</tableStyle>
 									<JSopenParams>width=365,height=550,status=0,menubar=0,scrollbars=1</JSopenParams>
 									<icon>garbage.gif</icon>
-                </clearTemplate>
-              </wizards>  
+				</clearTemplate>
+			  </wizards>  
 				</config>
 			</TCEforms>		 
 		</TemplatePDF>
@@ -2683,15 +2691,15 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.TemplatePDFDet</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>
-	    				<wizards>
-	    					<_VERTICAL>1</_VERTICAL>
-	    					<_DISTANCE>10</_DISTANCE>
-                <getTemplate>
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>
+						<wizards>
+							<_VERTICAL>1</_VERTICAL>
+							<_DISTANCE>10</_DISTANCE>
+				<getTemplate>
 									<type>popup</type>
 									<title>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pdfTemplate</title>
 									<script>EXT:meta_feedit/wizards/class.tx_metafeedit_pdf_det_template_wizard.php</script>
@@ -2699,17 +2707,17 @@
 									<dim>20x20</dim>
 									<tableStyle>solid 1px #000000; margin-left: 20px;</tableStyle>
 									<JSopenParams>width=365,height=550,status=0,menubar=0,scrollbars=1</JSopenParams>
-                </getTemplate>
+				</getTemplate>
 
-                <clearTemplate>
+				<clearTemplate>
 									<type>popup</type>
 									<title>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listItemTemplate</title>
 									<script>EXT:meta_feedit/wizards/class.tx_metafeedit_pdf_det_template_wizard.php?cmdtpl=clear</script>
 									<tableStyle>solid 1px #000000; margin-left: 20px;</tableStyle>
 									<JSopenParams>width=365,height=550,status=0,menubar=0,scrollbars=1</JSopenParams>
 									<icon>garbage.gif</icon>
-                </clearTemplate>
-              </wizards>  
+				</clearTemplate>
+			  </wizards>  
 				</config>
 			</TCEforms>		 
 		</TemplatePDFDet>
@@ -2717,15 +2725,15 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.TemplatePDFTab</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>
-	    				<wizards>
-	    					<_VERTICAL>1</_VERTICAL>
-	    					<_DISTANCE>10</_DISTANCE>
-                <getTemplate>
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>
+						<wizards>
+							<_VERTICAL>1</_VERTICAL>
+							<_DISTANCE>10</_DISTANCE>
+				<getTemplate>
 									<type>popup</type>
 									<title>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pdfTemplate</title>
 									<script>EXT:meta_feedit/wizards/class.tx_metafeedit_pdf_tab_template_wizard.php</script>
@@ -2733,178 +2741,178 @@
 									<dim>20x20</dim>
 									<tableStyle>solid 1px #000000; margin-left: 20px;</tableStyle>
 									<JSopenParams>width=365,height=550,status=0,menubar=0,scrollbars=1</JSopenParams>
-                </getTemplate>
+				</getTemplate>
 
-                <clearTemplate>
+				<clearTemplate>
 									<type>popup</type>
 									<title>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.listItemTemplate</title>
 									<script>EXT:meta_feedit/wizards/class.tx_metafeedit_pdf_tab_template_wizard.php?cmdtpl=clear</script>
 									<tableStyle>solid 1px #000000; margin-left: 20px;</tableStyle>
 									<JSopenParams>width=365,height=550,status=0,menubar=0,scrollbars=1</JSopenParams>
 									<icon>garbage.gif</icon>
-                </clearTemplate>
-              </wizards>  
+				</clearTemplate>
+			  </wizards>  
 				</config>
 			</TCEforms>		 
 		</TemplatePDFTab>		
-	    </el>
+		</el>
 	  </ROOT>
-    </sTemplatePDF>
+	</sTemplatePDF>
 
  <sTemplateCSV>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_TemplateCSV</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<TemplateCSV>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.TemplateCSV</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</TemplateCSV>
 		
-	    </el>
+		</el>
 	  </ROOT>
-    </sTemplateCSV>
+	</sTemplateCSV>
 
  <sTemplateExcel>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_TemplateExcel</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<TemplateExcel>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.TemplateExcel</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</TemplateExcel>
 		
-	    </el>
+		</el>
 	  </ROOT>
-    </sTemplateExcel>
-    <sSetFixed>
+	</sTemplateExcel>
+	<sSetFixed>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_setfixed</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
-                <sendAdminMail>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendAdminMail</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </sendAdminMail>
-                <sendFEUserMail>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendFEUserMail</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </sendFEUserMail>
-                <sendDataMail>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendDataMail</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </sendDataMail>
+		<type>array</type>
+		<el>
+				<sendAdminMail>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendAdminMail</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</sendAdminMail>
+				<sendFEUserMail>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendFEUserMail</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</sendFEUserMail>
+				<sendDataMail>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendDataMail</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</sendDataMail>
 		<dataMailField>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.dataMailField</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>10</maxitems>
-                                        <size>5</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>10</maxitems>
+										<size>5</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</dataMailField>
-                <sendAdminInfoMail>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendAdminInfoMail</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </sendAdminInfoMail>
-                <sendFEUserInfoMail>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendFEUserInfoMail</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </sendFEUserInfoMail>
-                <sendDataInfoMail>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendDataInfoMail</label>
-                                <config>
-                                        <type>check</type>
-                                </config>
-                        </TCEforms>
-                </sendDataInfoMail>
-                <emailFrom>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.emailFrom</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </emailFrom>
-                <emailFromName>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.emailFromName</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </emailFromName>
-                <emailAdmin>
-                        <TCEforms>
-                                <label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.emailAdmin</label>
-                                <config>
-                                        <type>input</type>
-                                        <size>10</size>
-                                </config>
-                        </TCEforms>
-                </emailAdmin>
+				<sendAdminInfoMail>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendAdminInfoMail</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</sendAdminInfoMail>
+				<sendFEUserInfoMail>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendFEUserInfoMail</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</sendFEUserInfoMail>
+				<sendDataInfoMail>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sendDataInfoMail</label>
+								<config>
+										<type>check</type>
+								</config>
+						</TCEforms>
+				</sendDataInfoMail>
+				<emailFrom>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.emailFrom</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</emailFrom>
+				<emailFromName>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.emailFromName</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</emailFromName>
+				<emailAdmin>
+						<TCEforms>
+								<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.emailAdmin</label>
+								<config>
+										<type>input</type>
+										<size>10</size>
+								</config>
+						</TCEforms>
+				</emailAdmin>
 		<feapprovefields>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.feapprovefields</label>
 				<config>
-                                      <items>
-                                                <n0></n0>
-                                        </items>
-                                        <type>select</type>
-                                        <maxitems>500</maxitems>
-                                        <size>5</size>
-                                        <itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+									  <items>
+												<n0></n0>
+										</items>
+										<type>select</type>
+										<maxitems>500</maxitems>
+										<size>5</size>
+										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</feapprovefields>
@@ -2912,23 +2920,23 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fesetfixoverridevalues</label>
 				<config>
-	    				<type>text</type>
-	    				<size>500</size>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>500</size>
+						<allowed>fe_users</allowed>	
 				</config>
 			</TCEforms>		 
 		</fesetfixoverridevalues>
-	            </el>
-          </ROOT>
-    </sSetFixed>
+				</el>
+		  </ROOT>
+	</sSetFixed>
 
-    <sTemplate>
+	<sTemplate>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fetemplate</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
+		<type>array</type>
+		<el>
 		<generateTemplate>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.generateTemplate</label>
@@ -2949,26 +2957,26 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fetemplate</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
-	    				<allowed>fe_users</allowed>    
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
+						<allowed>fe_users</allowed>	
 
 				</config>
 			</TCEforms>		 
 		</fetemplate>
-	    </el>
+		</el>
 	  </ROOT>
-    </sTemplate>
-            <sAjax>
+	</sTemplate>
+			<sAjax>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_ajax</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
-	    		<ajaxOn>
+		<type>array</type>
+		<el>
+				<ajaxOn>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.ajaxOn</label>
 				<config>
@@ -2988,10 +2996,10 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.xml:meta_feedit.pi_flexform.ajaxDomReady</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
 
 				</config>
 			</TCEforms>		 
@@ -3000,25 +3008,25 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.xml:meta_feedit.pi_flexform.ajaxLibs</label>
 				<config>
-	    				<type>text</type>
-	    				<size>10000</size>
-	    				<rows>500</rows>
-	    				<cols>100</cols>
+						<type>text</type>
+						<size>10000</size>
+						<rows>500</rows>
+						<cols>100</cols>
 
 				</config>
 			</TCEforms>		 
 		</ajaxLibs>
-	    </el>
+		</el>
 	  </ROOT>
-    </sAjax>
-        <sDebug>
+	</sAjax>
+		<sDebug>
 	  <ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_debug</sheetTitle>
 		</TCEforms>
-	    <type>array</type>
-	    <el>
-	    		<debug>
+		<type>array</type>
+		<el>
+				<debug>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debug</label>
 				<config>
@@ -3099,9 +3107,9 @@
 			</TCEforms>		 
 		</debugTSFE>
 
-	    </el>
+		</el>
 	  </ROOT>
-    </sDebug>
+	</sDebug>
 
   </sheets>
 </T3DataStructure>

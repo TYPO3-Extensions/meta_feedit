@@ -9,6 +9,8 @@
     </meta>
     <data type="array">
         <languageKey index="default" type="array">
+        	<label index="selectall">Select all</label>
+        	<label index="deselectall">Deselect all</label>
             <label index="total">Total</label>
             <label index="pi1_title">FE Edition Meta</label>
             <label index="pi1_plus_wiz_description">Adds a frontend form for submitting and editing of tables to your page</label>
@@ -107,6 +109,8 @@
             <label index="nbpages">Nb pages : </label>
             <label index="gotopage">Goto page : </label>
             <label index="nbrows">Nb rows : </label>
+            <label index="list_nocriteriae_header">No search criteriae.</label>
+            <label index="list_nocriteriae_description">Select search criterae</label>
         </languageKey>
         
         <languageKey index="de" type="array">
@@ -211,6 +215,8 @@
             <label index="listBatchSel">Select this row for batch action</label>
         </languageKey>
         <languageKey index="fr" type="array">
+        	<label index="selectall">Tout sélectionner</label>
+        	<label index="deselectall">Tout déselectionner</label>
             <label index="total">Total</label>
             <label index="crdate">Date de création</label>
             <label index="uid">identifiant unique</label>
@@ -319,6 +325,9 @@
             <label index="gotopage">Aller &amp;agrave; la page : </label>
             <label index="nbrows">Nb éléments : </label>
             <label index="listBatchSel">Sélectionner cette ligne pour le traitement par lot</label>
+            <label index="list_nocriteriae_header">Aucun critère de sélection saisi</label>
+            <label index="list_nocriteriae_description">Affinez votre recherche</label>
+
         </languageKey>
     </data>
     <orig_hash type="array">

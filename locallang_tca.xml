@@ -266,7 +266,8 @@
             <label index="meta_feedit.pi_flexform.ajaxDomReady">DomReady event code</label>
             <label index="meta_feedit.pi_flexform.useDistinct">Use distinct in sql clauses</label>
             <label index="meta_feedit.pi_flexform.ajaxLibs">Js libraries to load</label>
-        </languageKey>
+            <label index="meta_feedit.pi_flexform.forceSearch">Force search before list display</label>
+		</languageKey>
         <languageKey index="fr" type="array">
             <label index="meta_feedit.pi_flexform.gridAjax">Grille</label>
             <label index="meta_feedit.pi_flexform.gridEdit">Edition</label>
@@ -383,6 +384,7 @@
             <label index="meta_feedit.pi_flexform.ajaxDomReady">Code évènement DomReady</label>
            <label index="meta_feedit.pi_flexform.useDistinct">Utiliser distinct dans les clauses SQL</label>
             <label index="meta_feedit.pi_flexform.ajaxLibs">Librairies Js à charger</label>
+            <label index="meta_feedit.pi_flexform.forceSearch">Forcer saisie critères de recherche avant requête</label>
         </languageKey>
     </data>
     <orig_hash type="array">
