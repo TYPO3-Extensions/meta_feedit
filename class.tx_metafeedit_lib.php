@@ -440,17 +440,17 @@ class tx_metafeedit_lib {
 				case 'wildside_flash_mp3_player':
 					if (t3lib_extmgm::isLoaded('wildside_flash_mp3_player')) $ret = $this->buildMp3PlayerFlashCode2($file);
 					return $ret;
-				break;
+					break;
 				case 'image':
-				   $imgA['file.']['maxW'] = 300;
-				   $imgA['file.']['maxH'] = 200;
-				   if ($conf[$conf['cmdmode'].'.']['mediaImgConf.'] || $conf['mediaImgConf.']) $imgA=$conf[$conf['cmdmode'].'.']['mediaImgConf.']?$conf[$conf['cmdmode'].'.']['mediaImgConf.']:$conf['mediaImgConf.'];
-									 $imgA['file'] = $file;
-									 $imgA['altText']=$file;
-									 $imgA['titleText']=trim(basename($file));
- 									 return $this->cObj->IMAGE($imgA);
-								default :
-				break;
+					$imgA['file.']['maxW'] = 300;
+					$imgA['file.']['maxH'] = 200;
+					if ($conf[$conf['cmdmode'].'.']['mediaImgConf.'] || $conf['mediaImgConf.']) $imgA=$conf[$conf['cmdmode'].'.']['mediaImgConf.']?$conf[$conf['cmdmode'].'.']['mediaImgConf.']:$conf['mediaImgConf.'];
+					$imgA['file'] = $file;
+					$imgA['altText']=$file;
+					$imgA['titleText']=trim(basename($file));
+ 					return $this->cObj->IMAGE($imgA);
+				default :
+					break;
 			}
 
 		}
