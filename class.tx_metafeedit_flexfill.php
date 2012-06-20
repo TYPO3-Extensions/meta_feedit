@@ -387,7 +387,7 @@ class tx_metafeedit_flexfill {
 			if (count($OVs)==2) {
 				$params['items'][]=Array($OVs[0]." ASC", $OVs[0].':asc:calc');
 				$params['items'][]=Array($OVs[0]." DESC", $OVs[0].':desc:calc');
-			}		
+			}
 		}
 		return $params;
 	}

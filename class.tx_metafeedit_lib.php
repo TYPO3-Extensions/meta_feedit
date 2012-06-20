@@ -4700,13 +4700,20 @@ class tx_metafeedit_lib {
 				  	}
 					$markerArray['###ASFIELD_'.$key.'_VAL###']=$valeur;
 				}
+				$my_op='';
+				$my_val='';
+				$my_valsup='';
 				if ($value['op'] && is_array($value) ) {
 					$my_op = $value['op'];
 					$my_val = $value['val'];
 					$my_valsup = $value['valsup'];
-				}elseif(is_array($value['default.'])){
+					error_log(__METHOD__.": $key, ".print_r($value,true));
+					
+				} elseif (is_array($value['default.'])){
 					$my_op = $value['default.']['op'];
 					//TODO format date get default format
+
+					error_log(__METHOD__.": $key,  >>".$value['default.']['val']);
 					$my_val = ($value['default.']['val'] == 'now')?date('d-m-Y'):$value['default.']['val'];
 					$my_valsup = $value['default.']['valsup'];
 				}

@@ -2,7 +2,7 @@
 /**
  * PHPExcel
  *
- * Copyright (c) 2006 - 2009 PHPExcel
+ * Copyright (c) 2006 - 2012 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,29 +20,26 @@
  *
  * @category   PHPExcel
  * @package    PHPExcel_Calculation
- * @copyright  Copyright (c) 2006 - 2009 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @copyright  Copyright (c) 2006 - 2012 PHPExcel (http://www.codeplex.com/PHPExcel)
  * @license	http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version	1.6.7, 2009-04-22
+ * @version	1.7.7, 2012-05-19
  */
-
-/** PHPExcel_Calculation_Exception */
-require_once 'PHPExcel/Calculation/Exception.php';
 
 /**
  * PHPExcel_Calculation_ExceptionHandler
  *
  * @category   PHPExcel
  * @package    PHPExcel_Calculation
- * @copyright  Copyright (c) 2006 - 2009 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @copyright  Copyright (c) 2006 - 2012 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_Calculation_ExceptionHandler { 
+class PHPExcel_Calculation_ExceptionHandler {
 	/**
 	 * Register errorhandler
 	 */
 	public function __construct() {
-		set_error_handler(array('PHPExcel_Calculation_Exception', 'errorHandlerCallback'), E_ALL); 
+		set_error_handler(array('PHPExcel_Calculation_Exception', 'errorHandlerCallback'), E_ALL);
 	}
-	
+
 	/**
 	 * Unregister errorhandler
 	 */

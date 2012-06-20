@@ -919,6 +919,29 @@ class tx_metafeedit_export {
 	}
 */
 	function getEXCEL(&$content,&$caller) {
+		$this->headerConf=array(
+			0=>array(
+				'size'=>16,
+				'bgcolor'=>'9999999'
+				),
+			1=>array(
+				'size'=>14,
+				'bgcolor'=>'AAAAAAAA'
+				),
+			2=>array(
+				'size'=>12,
+				'bgcolor'=>'BBBBBBBB'
+				),
+			3=>array(
+				'size'=>10,
+				'bgcolor'=>'CCCCCCCC'),
+			4=>array(
+				'size'=>8,
+				'bgcolor'=>'DDDDDDDD'),
+			5=>array(
+				'size'=>6,
+				'bgcolor'=>'EEEEEEEE')
+		);
 		/** PHPExcel_IOFactory */
 		require_once(t3lib_extMgm::extPath('meta_feedit').'/lib/PHPExcel.php'); 
 		require_once(t3lib_extMgm::extPath('meta_feedit').'/lib/PHPExcel/IOFactory.php'); 
@@ -927,10 +950,11 @@ class tx_metafeedit_export {
 		//echo $content;die(t);
 		// Prepare content
 		try {
+			error_log(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
 			echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
-    	die( 'Caught exception: '.  $e->getMessage());
+			die( 'Caught exception: '.  $e->getMessage());
 		};
 		$count = 0;
 		$taille = 0;
@@ -939,9 +963,12 @@ class tx_metafeedit_export {
 		$pos=array(); // Array of positions (left,right,center)
 		$x=0; //compteur des colonnes
 		$maxwidth=array();
+		$nbcs=0;
+		$maxcol='A';
 		$c='A';
 
 		if($xml->tr) {
+			$x=0;
 			foreach ($xml->tr->td as $cell) {
 				$fields[$x]=str_replace('.','_',$fields[$x]);
 				$taille += ($this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width'])?$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']:(($this->confTS['default.']['list.'][$fields[$x].'.']['width'])?$this->confTS['default.']['list.'][$fields[$x].'.']['width']:$cell->size);
@@ -949,14 +976,14 @@ class tx_metafeedit_export {
 				$pos[$x]=($this->confTS[$this->pluginId.'.']['list.']['align.'][$fields[$x]])?$this->confTS[$this->pluginId.'.']['list.']['align.'][$fields[$x]]:(($this->confTS['default.']['list.']['align.'][$fields[$x]])?$this->confTS['default.']['list.']['align.'][$fields[$x]]:($this->confTS['list.']['align.'][$fields[$x]]?$this->confTS['list.']['align.'][$fields[$x]]:'left'));
 				$x++;
 				$maxwidth[$c]=0;
+				if ($c>$maxcol) $maxcol=$c;
 				$c++;
 			}
 		}
-
+		//error_log("Nb cols 0 :  $nbcs");
 		// La feuille est de dimension 21 x 29.7- cmd reduit a 20 pour conserver la marge
 		if ($taille <200) $orientation=PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT;	// portrait
-		else $orientation=PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE;				// paysage
-
+		else $orientation=PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE;// paysage
 		// We handle the header here 
 		//
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
@@ -1003,8 +1030,8 @@ class tx_metafeedit_export {
 		// Handle Rows
 		$r=3;
 		$bgcolor="FFFFFFFF";
-		
-		
+		// We handle column headers here !!
+		$lastgbr=0;
 		foreach($xml->tr as $row) {
 			$x=0; // col counter
 			$c='A'; //compteur des colonnes
@@ -1016,6 +1043,7 @@ class tx_metafeedit_export {
 			}
 			$alt++;
 			$nbcols=count($row->td);
+			//error_log("Nb cols 0.5 :  $nbcols");
 			$csize=0;
 			if ($row->gb) {
 				//$pdf->SetFont('Arial', 'B', 9);
@@ -1023,127 +1051,174 @@ class tx_metafeedit_export {
 				//$pdf->SetFont('Arial', '', 9);
 			}				
 			$objPHPExcel->getActiveSheet()->getRowDimension($r)->setRowHeight($height);
-			foreach($row->th as $col) {
-			
-
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->getStartColor()->setARGB("DDDDDDDD");
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFont()->setBold(true);
-				$val = strip_tags($col->data);
-				$objPHPExcel->getActiveSheet()->getCell($c.$r)->setValueExplicit("".$val, PHPExcel_Cell_DataType::TYPE_STRING);
-				$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
-
-				$x++;
-				$c++;
+			if (count($row->th) > 0) {
+				foreach($row->th as $col) {
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->getStartColor()->setARGB("99999999");
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFont()->setBold(true);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFont()->setSize(16);
+					$val = strip_tags($col->data);
+					$objPHPExcel->getActiveSheet()->getCell($c.$r)->setValueExplicit("".$val, PHPExcel_Cell_DataType::TYPE_STRING);
+					$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
+					if ($c>$maxcol) $maxcol=$c;
+					$x++;
+					$c++;
+				}
 			}
+			if ($x>$nbcs) $nbcs=$x;
+			//error_log("Nb cols 1 :  $nbcs");
 			$c='A';
-			foreach($row->td as $col) {
-			
-
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->getStartColor()->setARGB($bgcolor);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-
-
-				$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule  une valeur se transformer en une autre du coup tenais plus sur la page			
-				$val = strip_tags($col->data);
-				$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
-
-				// Affichage du signe Euro sur l'export PDF CBY : a virer !!!
-				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
-
-				if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
-					$vala=t3lib_div::trimexplode(',',$val);
-					$img='';
-					$objPHPExcel->getActiveSheet()->setCellValue($c.$r, "".$val);
-					$offset=10;
-					foreach($vala as $v) {
-						$img=PATH_site.($v?$col->img->dir.'/'.$v:'');
-						$objCommentRichText = $objPHPExcel->getActiveSheet()->getComment($c.$r)->getText()->createTextRun($img);
-						$imginfo=getimagesize($img);
-						if (is_array( $imginfo)) {
-							$w=$imginfo[0];
-							$h=$imginfo[1];
-							
-							$objDrawing = new PHPExcel_Worksheet_Drawing();
-							$objDrawing->setName($v);
-							$objDrawing->setDescription($img);
-							$objDrawing->setPath($img);
-							$objDrawing->setHeight($height);
-							$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
-							$objDrawing->setCoordinates($c.$r);
-							$objDrawing->setOffsetX($offset);
-							$objDrawing->setRotation(15);
-							$objDrawing->getShadow()->setVisible(true);
-							$objDrawing->getShadow()->setDirection(45);
-							$offset+=$objDrawing->getWidth()+10;
-							$maxwidth[$c]=$offset>$maxwidth[$c]?$offset:$maxwidth[$c];
+			$x=0;
+			if (count($row->td) > 0) {
+				foreach($row->td as $col) {
+					if ($x>=$nbcs) continue;
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->getStartColor()->setARGB($bgcolor);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+	
+	
+					$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule  une valeur se transformer en une autre du coup tenais plus sur la page			
+					$val = strip_tags($col->data);
+					$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
+	
+					// Affichage du signe Euro sur l'export PDF CBY : a virer !!!
+					if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
+	
+					if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
+						$vala=t3lib_div::trimexplode(',',$val);
+						$img='';
+						$objPHPExcel->getActiveSheet()->setCellValue($c.$r, "".$val);
+						$offset=10;
+						foreach($vala as $v) {
+							$img=PATH_site.($v?$col->img->dir.'/'.$v:'');
+							$objCommentRichText = $objPHPExcel->getActiveSheet()->getComment($c.$r)->getText()->createTextRun($img);
+							$imginfo=getimagesize($img);
+							if (is_array( $imginfo)) {
+								$w=$imginfo[0];
+								$h=$imginfo[1];
+								$objDrawing = new PHPExcel_Worksheet_Drawing();
+								$objDrawing->setName($v);
+								$objDrawing->setDescription($img);
+								$objDrawing->setPath($img);
+								$objDrawing->setHeight($height);
+								$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+								$objDrawing->setCoordinates($c.$r);
+								$objDrawing->setOffsetX($offset);
+								$objDrawing->setRotation(15);
+								$objDrawing->getShadow()->setVisible(true);
+								$objDrawing->getShadow()->setDirection(45);
+								$offset+=$objDrawing->getWidth()+10;
+								$maxwidth[$c]=$offset>$maxwidth[$c]?$offset:$maxwidth[$c];
+							}
+						}
+						$maxoffset=$offset>$maxoffset?$offset:$maxoffset;
+						//$pdf->setX($size+$pdf->leftmargin);									// + la marge definie plus haut pour la page => ligne 2308
+					} else {
+						switch($pos[$x]) {
+							case 'left' :
+								$p='L';
+								break;
+							case 'right' :
+							  $p='R';
+								break;
+							case 'center' :
+							  $p='C';
+								break;
+							default :
+								$p='L';
+								break;
+					 	}
+					 	if (!$r) $p='L'; // So that column headers are always aligned left. 
+					 	if ($row->gb && !strlen($val)) {
+					 		//$pdf->setX($myx+$size);
+					 	} else {
+					 		if ($row->gb && $x==0) { 
+								$objPHPExcel->getActiveSheet()->setCellValue($c.$r, "".$val);
+								$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
+							} else {
+								$border=1;
+								//if ($row->gb) $border=0;
+								$objPHPExcel->getActiveSheet()->setCellValue($c.$r, "".$val);
+								$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
+							}
 						}
 					}
-					$maxoffset=$offset>$maxoffset?$offset:$maxoffset;
-					//$pdf->setX($size+$pdf->leftmargin);									// + la marge definie plus haut pour la page => ligne 2308
+					if ($c>$maxcol) $maxcol=$c;
+					$x++;
+					$c++;
+				}
+			}
+			// We handle group by headers here
+			if ($row->gb || $row->sum){//$row->gb should be group by level: 1 is biggest (first)-> n is smallest
+				//$highestCol = $objPHPExcel->getActiveSheet()->getHighestColumn();
+				$lvlindex=(int)$row->gb;
+				if ($row->gb===0) $lvlindex=0;
+				$fs=$this->headerConf[$lvlindex]['size'];
+				$bgc=$this->headerConf[$lvlindex]['bgcolor'];
+				error_log("fs : $fs, ngc: $bgc, gb :$row->gb,  gbf :".$row->gbf.", hc $highestCol,maxcol : $maxcol ");
+				if ($x==1) {
+					$lastgbr=$r;
+					$range='A'.$r.':'.$maxcol.$r;
+					$objPHPExcel->getActiveSheet()->mergeCells($range);
+					$objPHPExcel->getActiveSheet()->getStyle($range)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setARGB($bgc);
+					$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($range)->getFont()->setBold(true);
+					//$objPHPExcel->getActiveSheet()->getStyle($range)->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
+					$objPHPExcel->getActiveSheet()->getStyle($range)->getFont()->setSize($fs);
 				} else {
-					switch($pos[$x]) {
-						case 'left' :
-							$p='L';
-							break;
-						case 'right' :
-						  $p='R';
-							break;
-						case 'center' :
-						  $p='C';
-							break;
-						default :
-							$p='L';
-							break;
-				 	}
-				 	if (!$r) $p='L'; // So that column headers are always aligned left. 
-				 	//$myx=$pdf->getX();
-				 	if ($row->gb && !strlen($val)) {
-				 		//$pdf->setX($myx+$size);
-				 	} else {
-				 		if ($row->gb && $x==0) { 
-							$objPHPExcel->getActiveSheet()->setCellValue($c.$r, "".$val);
-							$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
-						} else {
-							$border=1;
-							//if ($row->gb) $border=0;
-							$objPHPExcel->getActiveSheet()->setCellValue($c.$r, "".$val);
-							$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
-						}
+					//group by footer ?
+					if ($lastgbr) {
+						$range='A'.$r.':'.$maxcol.$r;
+						$objPHPExcel->getActiveSheet()->getStyle($range)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setARGB($bgc);
+						$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$objPHPExcel->getActiveSheet()->getStyle($range)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle($range)->getFont()->setSize($fs);
+						
+						$range='A'.$lastgbr.':'.$maxcol.$r;
+						//$objPHPExcel->getActiveSheet()->getStyle($range)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setARGB("FEFEFEFE");
+						$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$objPHPExcel->getActiveSheet()->getStyle($range)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
 					}
 				}
-				$x++;
-				$c++;
 			}
 			// We handle footer here
 			$c='A';
-			if (count($row->tf) > 0) $r++;
-			foreach($row->tf as $col) {
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->getStartColor()->setARGB("DDDDDDDD");
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-				$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFont()->setBold(true);
-				
-				$val = strip_tags($col->data);
-				$objPHPExcel->getActiveSheet()->getCell($c.$r)->setValueExplicit("".$val, PHPExcel_Cell_DataType::TYPE_STRING);
-				$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
-				$x++;
-				$c++;
+			if (count($row->tf) > 0) {
+				$r++;
+				$x=0;
+				foreach($row->tf as $col) {
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->getStartColor()->setARGB("99999999");
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFont()->setBold(true);
+					$val = strip_tags($col->data);
+					//$objPHPExcel->getActiveSheet()->mergeCells($c.$r.':'.$c.'99');
+					$objPHPExcel->getActiveSheet()->getCell($c.$r)->setValueExplicit("".$val, PHPExcel_Cell_DataType::TYPE_STRING);
+					$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
+					$x++;
+					//$c++;
+					$r++;
+				}
 			}
 			$bgcolor="FFFFFFFF";
-			
-			
 			$r++;
 		}
 		
@@ -1157,6 +1232,7 @@ class tx_metafeedit_export {
 		$highestRow = $objPHPExcel->getActiveSheet()->getHighestRow();
 		$highestCol = $objPHPExcel->getActiveSheet()->getHighestColumn();
 		$objPHPExcel->getActiveSheet()->getPageSetup()->setPrintArea('A1:'.$highestCol.$highestRow);
+		//$objPHPExcel->getActiveSheet()->setAutoFilter('A3:'.$highestCol.($highestRow-2));
 		$objPHPExcel->getActiveSheet()->setAutoFilter('A3:'.$highestCol.($highestRow-2));
 		
 		//-----Create a Writer and output the file to the browser-----

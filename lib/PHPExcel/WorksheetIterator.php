@@ -2,7 +2,7 @@
 /**
  * PHPExcel
  *
- * Copyright (c) 2006 - 2009 PHPExcel
+ * Copyright (c) 2006 - 2012 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,29 +20,22 @@
  *
  * @category   PHPExcel
  * @package    PHPExcel
- * @copyright  Copyright (c) 2006 - 2009 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @copyright  Copyright (c) 2006 - 2012 PHPExcel (http://www.codeplex.com/PHPExcel)
  * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version    1.6.7, 2009-04-22
+ * @version    1.7.7, 2012-05-19
  */
-
-
-/** PHPExcel */
-require_once 'PHPExcel.php';
-
-/** PHPExcel_Worksheet */
-require_once 'PHPExcel/Worksheet.php';
 
 
 /**
  * PHPExcel_WorksheetIterator
- * 
+ *
  * Used to iterate worksheets in PHPExcel
  *
  * @category   PHPExcel
  * @package    PHPExcel
- * @copyright  Copyright (c) 2006 - 2009 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @copyright  Copyright (c) 2006 - 2012 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_WorksheetIterator extends IteratorIterator
+class PHPExcel_WorksheetIterator implements Iterator
 {
 	/**
 	 * Spreadsheet to iterate
@@ -50,7 +43,7 @@ class PHPExcel_WorksheetIterator extends IteratorIterator
 	 * @var PHPExcel
 	 */
 	private $_subject;
-	
+
 	/**
 	 * Current iterator position
 	 *
@@ -67,14 +60,14 @@ class PHPExcel_WorksheetIterator extends IteratorIterator
 		// Set subject
 		$this->_subject = $subject;
 	}
-	
+
 	/**
 	 * Destructor
 	 */
 	public function __destruct() {
 		unset($this->_subject);
 	}
-	
+
 	/**
 	 * Rewind iterator
 	 */

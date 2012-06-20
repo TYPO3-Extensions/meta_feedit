@@ -1770,6 +1770,7 @@ class tx_metafeedit extends  tslib_pibase {
 		}
 		return $ret;
 	}
+	
 	/**
 	* getEditSumFields : generates template field cells (<td>) for sums of displayed columns ....
 	*
@@ -1789,7 +1790,7 @@ class tx_metafeedit extends  tslib_pibase {
 		$firstemptycell='###FIRSTEMPTYCELL###';
 		$count=0;
 		$total=0;
-		$ret=$type=='PDF'?'<gb>1</gb>':'';
+		$ret=($type=='PDF'||$type=='XLS')?'<gb>0</gb><sum>1</sum>':'';
 		//$ret.=$actFlag?'<td>###FIRSTEMPTYCELL###</td>':'';
 		$fc=0;
 		foreach($fieldArray as $FN) {
@@ -1819,7 +1820,11 @@ class tx_metafeedit extends  tslib_pibase {
 					if (!$textmode)	{// Not text mode only
 						if ($fc) {
 							$count+=$fc+$actFlag;
-							$ret.='<td colspan="'.($fc+$actFlag).'">'.($firstemptycell?$firstemptycell:'').'</td>';
+							if ($type) {
+								$ret .= '<td colspan="'.($fc+$actFlag).'"><data>'.($firstemptycell?$firstemptycell:'').'</data><size>'.$size.'</size></td>';
+							} else {
+								$ret.='<td colspan="'.($fc+$actFlag).'">'.($firstemptycell?$firstemptycell:'').'</td>';
+							}
 						}
 						$count++;
 						if ($firstemptycell) $firstemptycell='';
@@ -1991,7 +1996,7 @@ class tx_metafeedit extends  tslib_pibase {
 				
 				$size = $this->getSize($conf, $fN, $conf['table']);
 			
-				$GROUPBYFIELDS.='<!-- ###GROUPBYFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?$conf['list.']['nbCols']+$hasActions:$nbf).'"><div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.( $conf['list.']['groupby.'][$fN.'.']['header']?$conf['list.']['groupby.'][$fN.'.']['header']:'###GROUPBY_'.$fN.'###').($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</div></td></tr>').'<!-- ###GROUPBYFIELD_'.$fN.'### end -->';
+				$GROUPBYFIELDS.='<!-- ###GROUPBYFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>'.($lvl+1).'</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?$conf['list.']['nbCols']+$hasActions:$nbf).'"><div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.( $conf['list.']['groupby.'][$fN.'.']['header']?$conf['list.']['groupby.'][$fN.'.']['header']:'###GROUPBY_'.$fN.'###').($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</div></td></tr>').'<!-- ###GROUPBYFIELD_'.$fN.'### end -->';
 				$tab.="";//&nbsp;>&nbsp;";
 				$lvl++;
 			}
@@ -2034,9 +2039,9 @@ class tx_metafeedit extends  tslib_pibase {
 					$sum='<!--###FOOTERSUM_FIELDS### begin -->'.$this->getEditSumFields('FOOTERSUM_'.$fN,$conf,$count, $textmode, $exporttype,$hasActions);
 					$sum.='<!--###FOOTERSUM_FIELDS### end -->';
 					$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$div);
-					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'">').$sum.($textmode?($exporttype?'</tr>':chr(10)):'</tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
+					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr>1<gb>'.($lvl+1).'</gb><gbf>'.($lvl+1).'</gbf>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'">').$sum.($textmode?($exporttype?'</tr>':chr(10)):'</tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
 				} else {
-					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>1</gb><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?($conf['list.']['nbCols']+$hasActions):$nbf).'" >').$div.($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</td></tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
+					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>'.($lvl+1).'</gb><gbf>'.($lvl+1).'</gbf><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?($conf['list.']['nbCols']+$hasActions):$nbf).'" >').$div.($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</td></tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
 				}
 				$tab.="";//&nbsp;>&nbsp;";
 				$lvl++;
@@ -3292,7 +3297,11 @@ function getCSVTemplate(&$conf)
 	return $tmp;
 }
 
-
+/**
+ * 
+ * @param unknown_type $conf
+ * @return string
+ */
 function getExcelTemplate(&$conf)
 {
 	$pluginId=$conf['pluginId'];
@@ -3302,15 +3311,16 @@ function getExcelTemplate(&$conf)
 	
 	$cont = $conf['inputvar.']['advancedSearch'];
 	$recherche="<tf><data>";
+	$rec="";
 	if (is_array($conf['inputvar.']['advancedSearch'])) {	
 		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
 			if($val) {
-				$recherche .= ($recherche?', ':'').$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['label'], $conf).':';
-				$recherche .= $conf['inputvar.']['advancedSearch'][$key]['val']?$conf['inputvar.']['advancedSearch'][$key]['val']:$conf['inputvar.']['advancedSearch'][$key];
+				$rec .= ($rec?', ':'').$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['label'], $conf).':';
+				$rec .= $conf['inputvar.']['advancedSearch'][$key]['val']?$conf['inputvar.']['advancedSearch'][$key]['val']:$conf['inputvar.']['advancedSearch'][$key];
 			}
 		}
 	}
-	
+	$recherche.=$rec;
 	if ($conf['inputvar.']['sortLetter'])
 	$recherche.= '  tri par la lettre: '.$conf['inputvar.']['sortLetter'];
 	$recherche.='</data><size>'.strlen($recherche).'</size></tf>';
@@ -3324,15 +3334,12 @@ function getExcelTemplate(&$conf)
 		$tmp.='<!-- ###ITEM-COL### begin -->';
 		$tmp.='<!-- ###ITEM### begin --><!-- ###ITEM-EL### begin --><tr>'.$this->getListDataFields($conf,true,'html').'</tr><!-- ###ITEM-EL### end --><!-- ###ITEM### end -->';		
 		$tmp.='<!-- ###ITEM-COL### end -->';
-	}
-	else		
-	{
+	}else{
 		$tmp.=$GROUPBYFIELDS.'<!-- ###ITEM### begin --><!-- ###ITEM-EL### begin --><tr>'.$this->getListDataFields($conf,true,'html').'</tr><!-- ###ITEM-EL### end --><!-- ###ITEM### end -->';
 	}
 	
-	if ($conf['list.']['sumFields'])
-	{
-		$sum=$this->getEditSumFields('SUM',$conf,$count);
+	if ($conf['list.']['sumFields']){
+		$sum=$this->getEditSumFields('SUM',$conf,$count,true,'XLS');
 		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$this->metafeeditlib->getLLFromLabel('total',$conf).($conf['list.']['totalCount']?' (###SUM_FIELD_metafeeditnbelts###)':''));
 		$tmp.='<!--###SUM_FIELDS### begin---><tr>'.$sum.'</tr>';
 		//$tmp.='<tr>'.$this->getSumFields($conf).'</tr><!--###SUM_FIELDS### end--->';
