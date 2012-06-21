@@ -3642,7 +3642,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	
 	function logErrors($msg) {
 		//die(logErrors);
-		$msg=date('j/m/y h:i:s').' : '.$msg . "\n";
+		$msg=date('j/m/y H:i:s').' : '.$msg . "\n";
 		$errfilename = "mfeediterror.log";
 		$f = fopen($errfilename, "a");
 		if($f) {
