@@ -409,8 +409,7 @@ class tx_metafeedit_lib {
 		}
 
 		Function enleveaccents($chaine) {
-			$string = strtr($chaine, "�����������������������������������������������������", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");
-			//$string = strtr($chaine, "�����������������������������������������������������',;:\@'", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn-------");
+			$string = strtr($chaine, "àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ", "aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY");
 			return $string;
 		}
 
@@ -4707,7 +4706,6 @@ class tx_metafeedit_lib {
 					$my_op = $value['op'];
 					$my_val = $value['val'];
 					$my_valsup = $value['valsup'];
-					error_log(__METHOD__.": $key, ".print_r($value,true));
 					
 				} elseif (is_array($value['default.'])){
 					$my_op = $value['default.']['op'];
@@ -4830,9 +4828,7 @@ class tx_metafeedit_lib {
 	 
 	function getHeader(&$title, &$recherche, &$conf,$data=array()) {
 		if($conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre']) $title = $conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre'];
-		//print_r($this->feadminlib->piVars);
 		if  (!isset($title) && $this->feadminlib->piVars['title']) $title=$this->feadminlib->piVars['title'];
-		//print_r($this->piVars);
 		if (!isset($title)) $title = $GLOBALS['TSFE']->page['title'];
 		$markerArray=array();
 

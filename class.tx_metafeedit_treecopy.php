@@ -223,7 +223,7 @@ function setRootPageProperties($recordArray,&$res,$conf)  {
 		}
 
 	Function enleveaccents($chaine) {
-			$string= strtr($chaine, "�����������������������������������������������������", "aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn");
+			$string= strtr($chaine, "àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ", "aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY");
 			return $string;
 		}
 

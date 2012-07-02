@@ -300,8 +300,6 @@ class tx_metafeedit_export {
 
 		try {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
-			//print_r($xml);
-			//die(yoo);
 		} catch (Exception $e) {
 			echo 'PDF Detail Template error : '.$e->getMessage().'<br>';
 			echo "============================<br>";

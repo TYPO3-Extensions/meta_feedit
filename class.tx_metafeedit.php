@@ -1804,12 +1804,14 @@ class tx_metafeedit extends  tslib_pibase {
  				$Lib=$this->metafeeditlib->getLLFromLabel('total',$conf).' '.$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf).':';
 				$size = $this->getSize($conf, $_FN, $masterTable);
 				$total++;
-				if (!in_array($_FN,$sumarray) && !in_array($FN,$sumarray)) {			// If field is not a sum field ...
+				if (!in_array($_FN,$sumarray) && !in_array($FN,$sumarray)) {// If field is not a sum field ...
+					//error_log("tm : $textmode,t: $type");
 					if ($textmode){
 						$ret.=($actFlag&&$firstemptycell)?'<td>###FIRSTEMPTYCELL###</td>':'';
-						if ($type)					// Empty cell for PDF
+						if ($type && $type!='html')	{
+							error_log("size !!! tm : $textmode,t: $type");		// Empty cell for PDF
 							$ret .= '<td><data>'.($firstemptycell?$firstemptycell:'').'</data><size>'.$size.'</size></td>';
-						else 								// Empty cell for CSV
+						} else 								// Empty cell for CSV
 							$ret.= ($firstemptycell?$firstemptycell:'').';';
 						if ($firstemptycell) $firstemptycell='';
 					} else	{							// Empty cell for html
@@ -1820,7 +1822,8 @@ class tx_metafeedit extends  tslib_pibase {
 					if (!$textmode)	{// Not text mode only
 						if ($fc) {
 							$count+=$fc+$actFlag;
-							if ($type) {
+							if ($type && $type!='html') {
+								//error_log("size2 !!! tm : $textmode,t: $type");
 								$ret .= '<td colspan="'.($fc+$actFlag).'"><data>'.($firstemptycell?$firstemptycell:'').'</data><size>'.$size.'</size></td>';
 							} else {
 								$ret.='<td colspan="'.($fc+$actFlag).'">'.($firstemptycell?$firstemptycell:'').'</td>';
@@ -1830,7 +1833,8 @@ class tx_metafeedit extends  tslib_pibase {
 						if ($firstemptycell) $firstemptycell='';
 						$ret.='<td '.($conf['list.']['align.'][$mfn]?'align="'.$conf['list.']['align.'][$mfn].'"':'').'>'.'###'.$prefix.'_FIELD_'.$mfn.'###</td>';
 					} else  {
-						if ($type) 						// Fichier PDF, EXcel 
+						//error_log("size3 !!! tm : $textmode,t: $type");
+						if ($type && $type!='html') 						// Fichier PDF, EXcel 
 							$ret.='<td><data>###'.$prefix.'_FIELD_'.$mfn.'###</data><size>'.$size.'</size></td>';
 						else 
 							//CSV 
@@ -2082,11 +2086,7 @@ class tx_metafeedit extends  tslib_pibase {
 		<div'.$this->caller->pi_classParam('error').'>###EVAL_ERROR###</div>
 		<div'.$this->caller->pi_classParam('editmenu-list').'>'.$this->getSearchBox($conf);
 		$tmp.='<!-- ###TEMPLATE_LIST_TABLEDATA### begin -->';
-		// We open batchmode form
-		if ($conf['list.']['batchactions']) {
-			//onsubmit="return false;"
-			$tmp.='<form action="#" method="post" enctype="multipart/form-data" id="mf-'.$conf['pluginId'].'" name="mf-'.$conf['pluginId'].'">';
-		}
+
 		$tmp.='<table '.$this->caller->pi_classParam('editmenu-list-table').' style="width: 100%;">'.($conf['list.']['nbCols']?'':'<tr'.$this->caller->pi_classParam('editmenu-list-table-header').'>###ACTIONS-LIST-LIB###'.$this->getListFields($conf).'</tr>').'<!-- ###ALLITEMS### begin -->';
 		// Group By processing
 		$GROUPBYFIELDS=$this->getGroupByFields($conf);
@@ -2119,6 +2119,11 @@ class tx_metafeedit extends  tslib_pibase {
 		$tmp.='<tr class="mfeblog"><td colspan="'.$nbf.'">###MEDIAPLAYER###</td></tr>'.($conf['blog.']['showComments']?'<tr class="mfeblog"><td colspan="'.$nbf.'">###MEDIA_ACTION_BLOG###</td></tr>':'').'<tr class="mfepagenav"><td colspan="'.$nbf.'">###PAGENAV######METAFEEDITNBPAGES######METAFEEDITNBROWS###</td></tr></table>';
 		// we close batchmode form
 		if ($conf['list.']['batchactions']) {
+			// We open batchmode form
+			$fieldname='mfcheck['.$conf['pluginId'].'][]';
+			$inputid='mfserialize-'.$conf['pluginId'];
+			$onSubmitJs="var names=[];jQuery('input[name=\'$fieldname\']:checked').each(function() {names.push(this.value);});jQuery('#$inputid').val(names.join(','));";
+			$tmp.='<form action="#" method="post" enctype="multipart/form-data" onSubmit="'.$onSubmitJs.'" id="mf-'.$conf['pluginId'].'" name="mf-'.$conf['pluginId'].'"><input type="hidden" name="mfserialize-'.$conf['pluginId'].'" id="mfserialize-'.$conf['pluginId'].'" value="">';
 			if ($conf['ajax.']['ajaxOn']) $tmp.='<a href="#" onclick="jQuery(\'.mfcheck\').attr(\'checked\', true);return false;"><img src="/typo3conf/ext/meta_feedit/res/checked.png"/>'.$this->metafeeditlib->getLL('selectall',$conf).'</a><a href="#" onclick="jQuery(\'.mfcheck\').attr(\'checked\', false);return false;"><img src="/typo3conf/ext/meta_feedit/res/cancel.png"/>'.$this->metafeeditlib->getLL('deselectall',$conf).'</a>';
 			$ActionArr=t3lib_div::trimexplode(chr(10),$conf['list.']['batchactions']);
 			foreach($ActionArr as $action) {
@@ -2129,15 +2134,7 @@ class tx_metafeedit extends  tslib_pibase {
 				if (isset($cmdarr[2])) {
 					$extraParams=$cmdarr[2];
 				}
-				/*$astdconf=$conf[$conf['cmdmode'].'.']['actionStdWrap.'][$cmdarr[0].'.'];
-				$act='<a href="'.$actionUrl.'" '.$extraParams.'>'.$this->getLL($actionLib,$conf).'</a>';
-				if (is_array($astdconf)) $act=$this->cObj->stdWrap($this->getLL($actionLib,$conf), $astdconf);
-				//$act='<br/><div  class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-'.$actionLib).' '.$caller->pi_getClassName('link-'.$actionLib.'-list').'"><a href="'.$actionUrl.'">'.$this->getLL($actionLib,$conf).$actionLib.'</a></div>';
-				$act='<div  class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('link-'.$actionLib).' '.$caller->pi_getClassName('link-'.$actionLib.'-list').'">'.$act.'</div>';
-				$markerArray['###ACTION_'.$actionLib.'###']=$act;
-				$ret.=$act;*/
-				//$tmp.='<button name="mfbmaction['.$conf['pluginId'].']" type="submit" value="toggleselection" title="'.$this->metafeeditlib->getLL(toggleselection,$conf).'">'.$this->metafeeditlib->getLL(toggleselection,$conf).'</button>';
-				//$tmp.='<button name="mfbmaction['.$conf['pluginId'].']" type="submit" value="toggleselection" title="'.$this->metafeeditlib->getLL(toggleselection,$conf).'">'.$this->metafeeditlib->getLL(toggleselection,$conf).'</button>';
+				
 				$tmp.='<button name="mfbmaction['.$conf['pluginId'].']" type="submit" value="'.$actionLib.'" title="'.$this->metafeeditlib->getLL($actionLib,$conf).'">'.$this->metafeeditlib->getLL($actionLib,$conf).'</button>';
 			}
 			$tmp.='</form>';
