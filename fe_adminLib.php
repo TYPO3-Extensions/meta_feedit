@@ -1795,7 +1795,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$hiddenField = isset($this->conf['TCAN'][$this->theTable]['ctrl']['enablecolumns']['disabled'])?$this->conf['TCAN'][$this->theTable]['ctrl']['enablecolumns']['disabled']:'';
 
 			// on recupere l'enregistrement suivant dans l'ordre du sorting
-			$fields = $this->theTable.'1.'.$this->conf['uidField']." as 'nextUid'";
+			$fields = $this->theTable.'1.'.$this->conf['uidField']." as `nextUid`";
 			$tables = $this->theTable.' as '.$this->theTable.'1, '.$this->theTable.' as '.$this->theTable.'2';
 			$where = '1';
 			$where.= ($deletedField!=''?' and '.$this->theTable.'1.deleted=0 and '.$this->theTable.'2.deleted=0':''); //deleted clause

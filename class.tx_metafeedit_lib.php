@@ -3652,8 +3652,8 @@ class tx_metafeedit_lib {
 					$rA=t3lib_div::trimexplode('.',$sF);
 					//modif by CMD - pour gerer le champ dans la table s'il nest pas la table etrangere
 					if ($rA[0]==$FT && isset($rA[1])) {
-						$sql['fields'].= ','.$aliasA['tableAlias'].'.'.$rA[1]." as '$FT.$rA[1]'";
-						$sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$rA[1]." as '$FT.$rA[1]'";
+						$sql['fields'].= ','.$aliasA['tableAlias'].'.'.$rA[1]." as `$FT.$rA[1]`";
+						$sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$rA[1]." as `$FT.$rA[1]`";
 					}
 				}
 				
@@ -3713,7 +3713,7 @@ class tx_metafeedit_lib {
 				// We handle inline relation based on ',' seperated list of uids
 				if ($conf['TCAN'][$table]['columns'][$link]['config']['size']>1 && !$conf['TCAN'][$table]['columns'][$link]['config']['foreign_field'] ) {
 					$sql['joinTables'][]=$foreignTableAlias;		
-					$sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable." as '".$foreignTableAlias."' on FIND_IN_SET(".$foreignTableAlias.'.'.$ff.','.$tableAlias.'.uid)>0 ';
+					$sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable." as `".$foreignTableAlias."` on FIND_IN_SET(".$foreignTableAlias.'.'.$ff.','.$tableAlias.'.uid)>0 ';
 				} else {
 					// Normal 1/n relation ...
 					$sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable.($foreignTableAlias?" as `".$foreignTableAlias."`":'').' ON '.$foreignTableAlias.'.'.$ff.'='.$tableAlias.'.uid ';
@@ -3724,7 +3724,7 @@ class tx_metafeedit_lib {
 				$MMTable=$conf['TCAN'][$table]['columns'][$link]['config']['MM'];
 				$uidLocal = isset($conf['TCAN'][$foreignTable]['ctrl']['uidLocalField'])?$conf['TCAN'][$foreignTable]['ctrl']['uidLocalField']:'uid';
 				//$this->getTableAlias($sql,$table,$tableAlias,$MMTable,$uidLocal,$conf);
-				$sql['join.'][$foreignTableAlias]=' JOIN '.$MMTable.' ON '.$MMTable.'.uid_local ='.$tableAlias.'.uid JOIN '.$foreignTable." as '".$foreignTableAlias."' ON ".$foreignTableAlias.'.'.$ff.'='.$MMTable.'.uid_foreign';
+				$sql['join.'][$foreignTableAlias]=' JOIN '.$MMTable.' ON '.$MMTable.'.uid_local ='.$tableAlias.'.uid JOIN '.$foreignTable." as `".$foreignTableAlias."` ON ".$foreignTableAlias.'.'.$ff.'='.$MMTable.'.uid_foreign';
 				$sql['joinTables'][]=$foreignTableAlias;
 			}			
 		} else { //select ??			
@@ -3732,7 +3732,7 @@ class tx_metafeedit_lib {
 			// 
 				if ($conf['TCAN'][$table]['columns'][$link]['config']['size']>1) {
 					$sql['joinTables'][]=$foreignTableAlias;		
-					$sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable." as '".$foreignTableAlias."' on FIND_IN_SET(".$foreignTableAlias.'.uid,'.$tableAlias.'.'.$link.')>0 ';
+					$sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable." as `".$foreignTableAlias."` on FIND_IN_SET(".$foreignTableAlias.'.uid,'.$tableAlias.'.'.$link.')>0 ';
 				} else {
 					// Normal 1/1 relation ...
 					$sql['join.'][$foreignTableAlias]=' LEFT JOIN '.$foreignTable.($foreignTableAlias?" as `".$foreignTableAlias."`":'').' ON '.$foreignTableAlias.'.uid='.$tableAlias.'.'.$link.' ';
@@ -3743,7 +3743,7 @@ class tx_metafeedit_lib {
 				$MMTable=$conf['TCAN'][$table]['columns'][$link]['config']['MM'];
 				$uidLocal = isset($conf['TCAN'][$foreignTable]['ctrl']['uidLocalField'])?$conf['TCAN'][$foreignTable]['ctrl']['uidLocalField']:'uid';
 				//$this->getTableAlias($sql,$table,$tableAlias,$MMTable,$uidLocal,$conf);
-				$sql['join.'][$foreignTableAlias]=' JOIN '.$MMTable.' ON '.$MMTable.'.uid_local ='.$tableAlias.'.uid JOIN '.$foreignTable." as '".$foreignTableAlias."' ON ".$foreignTableAlias.'.uid='.$MMTable.'.uid_foreign';
+				$sql['join.'][$foreignTableAlias]=' JOIN '.$MMTable.' ON '.$MMTable.'.uid_local ='.$tableAlias.'.uid JOIN '.$foreignTable." as `".$foreignTableAlias."` ON ".$foreignTableAlias.'.uid='.$MMTable.'.uid_foreign';
 				$sql['joinTables'][]=$foreignTableAlias;
 			}
 		}			
@@ -4377,7 +4377,7 @@ class tx_metafeedit_lib {
 						$fT=$conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['foreign_table'];						
 						$label=$conf['TCAN'][$fT]['ctrl']['label'];
 						$aliasA=$this->getTableAlias($sql,$fN2[0].'.'.$label,$conf);
-						$GBFields.=','.$aliasA['tableAlias'].'.'.$label." as '".$aliasA['tableAlias'].'_'.strtoupper($label)."'";
+						$GBFields.=','.$aliasA['tableAlias'].'.'.$label." as `".$aliasA['tableAlias'].'_'.strtoupper($label)."`";
 						$sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$label.' as \''.$fN2[0].'.'.$label.'\'';
 						$GrpByField[$fN]=$aliasA['tableAlias'].'.'.strtoupper($label);
 						$sql['breakOrderBy'][]=$gbtableAlias.'.'.$gbfN.$dir;//$GrpByField[$fN].$dir;
@@ -4385,8 +4385,8 @@ class tx_metafeedit_lib {
 						$fT=$conf['TCAN'][$gbtable]['columns'][$gbfN]['config']['foreign_table'];						
 						$label=$conf['TCAN'][$fT]['ctrl']['label'];
 						$aliasA=$this->getTableAlias($sql,$fN2[0].'.'.$label,$conf);
-						$GBFields.=','.$aliasA['tableAlias'].'.'.$label." as '".$aliasA['tableAlias'].'_'.strtoupper($label)."'";
-						$sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$label.' as \''.$fN2[0].'.'.$label.'\'';
+						$GBFields.=','.$aliasA['tableAlias'].'.'.$label." as `".$aliasA['tableAlias'].'_'.strtoupper($label)."`";
+						$sql['fieldArray'][]=$aliasA['tableAlias'].'.'.$label.' as `'.$fN2[0].'.'.$label.'`';
 						$GrpByField[$fN]=$aliasA['tableAlias'].'.'.strtoupper($label);
 						$sql['breakOrderBy'][]=$gbtableAlias.'.'.$gbfN.$dir;//$GrpByField[$fN].$dir;
 			  		}else {
