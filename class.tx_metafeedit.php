@@ -1809,7 +1809,7 @@ class tx_metafeedit extends  tslib_pibase {
 					if ($textmode){
 						$ret.=($actFlag&&$firstemptycell)?'<td>###FIRSTEMPTYCELL###</td>':'';
 						if ($type && $type!='html')	{
-							error_log("size !!! tm : $textmode,t: $type");		// Empty cell for PDF
+							//error_log("size !!! tm : $textmode,t: $type");		// Empty cell for PDF
 							$ret .= '<td><data>'.($firstemptycell?$firstemptycell:'').'</data><size>'.$size.'</size></td>';
 						} else 								// Empty cell for CSV
 							$ret.= ($firstemptycell?$firstemptycell:'').';';

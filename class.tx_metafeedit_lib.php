@@ -4711,7 +4711,7 @@ class tx_metafeedit_lib {
 					$my_op = $value['default.']['op'];
 					//TODO format date get default format
 
-					error_log(__METHOD__.": $key,  >>".$value['default.']['val']);
+					//error_log(__METHOD__.": $key,  >>".$value['default.']['val']);
 					$my_val = ($value['default.']['val'] == 'now')?date('d-m-Y'):$value['default.']['val'];
 					$my_valsup = $value['default.']['valsup'];
 				}

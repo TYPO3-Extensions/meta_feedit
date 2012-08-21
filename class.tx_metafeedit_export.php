@@ -948,7 +948,7 @@ class tx_metafeedit_export {
 		//echo $content;die(t);
 		// Prepare content
 		try {
-			error_log(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
+			//error_log(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
 			echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
@@ -1160,7 +1160,7 @@ class tx_metafeedit_export {
 				if ($row->gb===0) $lvlindex=0;
 				$fs=$this->headerConf[$lvlindex]['size'];
 				$bgc=$this->headerConf[$lvlindex]['bgcolor'];
-				error_log("fs : $fs, ngc: $bgc, gb :$row->gb,  gbf :".$row->gbf.", hc $highestCol,maxcol : $maxcol ");
+				//error_log("fs : $fs, ngc: $bgc, gb :$row->gb,  gbf :".$row->gbf.", hc $highestCol,maxcol : $maxcol ");
 				if ($x==1) {
 					$lastgbr=$r;
 					$range='A'.$r.':'.$maxcol.$r;
