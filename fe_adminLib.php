@@ -1959,6 +1959,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	*/
 	
 	function displayListScreen($TABLES,$DBSELECT,&$conf)	{
+		
 		if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc displaylist start:']=$this->metafeeditlib->displaytime()." Seconds";
 		// Initialisation
 		$conf['cmdmode']='list';
@@ -1968,7 +1969,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$dispDir= $conf['list.']['displayDirection']?$conf['list.']['displayDirection']:'Right'; //-- this should be handled in template choice...
 		// Gestion des templates selon exporttype (can't this be done in Pi1 ?)
 		$exporttype=$this->piVars['exporttype'];
+		//Print parameters
 		$print=$this->piVars['print'];
+		$printerName=$this->piVars['printername'];
+		$printServerName=$this->piVars['printservername'];
+		
 		if (($exporttype == 'PDF') && ($conf['list.']['nbCols'])){$exporttype = "PDFTAB";}
 		
 		//$this->markerArray['###BACK_URL###'] = "";
@@ -2426,13 +2431,13 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				$this->metafeeditexport->getCSV($content,$this);
 				break;
 			case "PDF": 
-				$this->metafeeditexport->getPDF($content,$this,$print);
+				$this->metafeeditexport->getPDF($content,$this,$print,$printerName,$printServerName);
 				break;
 			case "PDFTAB": 
-				$this->metafeeditexport->getPDFTAB($content,$this,$print);
+				$this->metafeeditexport->getPDFTAB($content,$this,$print,$printerName,$printServerName);
 				break;
 			case "PDFDET": 
-				$this->metafeeditexport->getPDFDET($content,$this,$print);
+				$this->metafeeditexport->getPDFDET($content,$this,$print,$printerName,$printServerName);
 				break;
 			case "XLS":
 			case "EXCEL": 
@@ -2674,6 +2679,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($this->conf['debug']) echo t3lib_div::view_array(array('displayEditScreen'=>'on'));
 		$exporttype=$this->piVars['exporttype'];
 		$print=$this->piVars['print'];
+		$printerName=$this->piVars['printername'];
+		$printServerName=$this->piVars['printservename'];
 		if ($exporttype == 'PDF') $exporttype = "PDFDET";
 		$this->conf['cmdmode']='edit';	
 		// We handle here Edit mode or Preview Mode
@@ -2800,7 +2807,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 							$origArr = $this->userProcess('evalFunc',$origArr);
 						}
 						$this->markerArray = $this->setfixed($this->markerArray, $this->conf['setfixed.'], $origArr);
-						$content=$this->displayEditForm($origArr,$this->conf,$exporttype,$print);
+						$content=$this->displayEditForm($origArr,$this->conf,$exporttype,$print,$printerName,$printServerName);
 					} else {
 						// Else display error, that you could not edit that particular record...	
 						$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_NO_PERMISSIONS###');
@@ -2848,7 +2855,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 * @see displayEditScreen()
 	 */
 	 
-	function displayEditForm($origArr,&$conf,$exporttype='',$print='')	{
+	function displayEditForm($origArr,&$conf,$exporttype='',$print='',$printerName='',$printServerName='')	{
+		error_log(__METHOD__.":$print");
 		//We merge data with override values and eval values ...
 		$currentArr = array_merge($origArr,(array)$this->dataArr);
 		
@@ -2985,13 +2993,13 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$this->metafeeditexport->getCSV($content,$this);
 			break;
 			case "PDF": 
-			$this->metafeeditexport->getPDF($content,$this,$print);
+			$this->metafeeditexport->getPDF($content,$this,$print,$printerName,$printServerName);
 			break;
 			case "PDFTAB": 
-			$this->metafeeditexport->getPDFTAB($content,$this,$print);
+			$this->metafeeditexport->getPDFTAB($content,$this,$print,$printerName,$printServerName);
 			break;
 			case "PDFDET": 
-			$this->metafeeditexport->getPDFDET($content,$this,$print);
+			$this->metafeeditexport->getPDFDET($content,$this,$print,$printerName,$printServerName);
 			break;
 			case "XLS":
 			case "EXCEL": 

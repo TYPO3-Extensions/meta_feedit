@@ -111,27 +111,107 @@ class tx_metafeedit_pdf extends FPDF {
 			$this->_out('/Names <</JavaScript '.($this->n_js).' 0 R>>');
 		}
 	}
-
+	// generates printer javascript depending on parameters and config
+	function generatePrintScript($print,$printer,$server) {
+		error_log(__METHOD__.":$print,$printer,$server");
+		$dialog=true;
+		$autoprint=false;
+		//We add print dialog or not ...
+		switch ($print) {
+			case 'print':
+			case 'printnodialog':
+				$dialog=false;
+				$autoprint=true;
+				break;
+			case 'printdialog':
+	
+				$autoprint=true;
+				break;
+			default:
+				break;
+		}
+		if ($autoprint) {
+			if ($printer && $server) {
+				$this->AutoPrintToNetPrinter($server, $printer, $dialog);
+			} elseif ($printer) {
+				$this->AutoPrintToPrinter( $printer, $dialog);
+			} else {
+				$this->AutoPrint($dialog);
+			}
+		}
+	}
+	
+	/**
+	 * We autoprint to defauklt printer
+	 * @param bool $dialog
+	 */
+	
 	function AutoPrint($dialog=false)
 	{
 		//Open the print dialog or start printing immediately on the standard printer
 		$param=($dialog ? 'true' : 'false');
-		$script="print($param);";
+		$script=$dialog?"print(true);":"if(typeof JSSilentPrint != 'undefined') {JSSilentPrint(this);}else{print(false);};";
+		//$script=$dialog?"print(true);":"if(typeof JSSilentPrint != 'undefined') {app.alert('silent');JSSilentPrint(this);}else{app.alert('notsilent');print(false);};";
+		//$script=$dialog?"print(true);":"app.alert('yoi');if(typeof JSSilentPrint == 'undefined') {app.alert('notsilent');};";
+		error_log(__METHOD__.":$script");
+		$this->IncludeJS($script);
+		//$this->IncludeJS("app.alert('yop');".$script);
+	}
+	
+	/**
+	 * We autoprint to printer by printername on network
+	 * @param string $server
+	 * @param string $printer
+	 * @param boolean $dialog
+	 */
+	
+	function AutoPrintToNetPrinter($server, $printer, $dialog=false)
+	{
+		//Print on a shared printer (requires at least Acrobat 6)
+		
+		if($dialog) {
+			$script = "var pp = getPrintParams();";
+			$script .= "pp.interactive = pp.constants.interactionLevel.full;";
+			$script .= "pp.printerName = '\\\\\\\\".$server."\\\\".$printer."';";
+			$script .= "print(pp);";
+		}else{
+			$script="if(typeof JSSilentPrintOnNetPrinter != 'undefined') {JSSilentPrintOnNetPrinter(this,'".$printer."','".$server."');}else{";
+			$script .= "var pp = getPrintParams();";
+			$script .= "pp.interactive = pp.constants.interactionLevel.automatic;";
+			$script .= "pp.printerName = '\\\\\\\\".$server."\\\\".$printer."';";
+			$script .= "print(pp);}";
+		}
+		error_log(__METHOD__.":$script");
 		$this->IncludeJS($script);
 	}
 	
-	function AutoPrintToPrinter($server, $printer, $dialog=false)
+	/**
+	 * We autoprint to printer by printername
+	 * 
+	 * @param string $printer
+	 * @param bool $dialog (do we try to print with dialog or not)
+	 */
+	
+	function AutoPrintToPrinter( $printer, $dialog=false)
 	{
 		//Print on a shared printer (requires at least Acrobat 6)
-		$script = "var pp = getPrintParams();";
-		if($dialog)
-		$script .= "pp.interactive = pp.constants.interactionLevel.full;";
-		else
-		$script .= "pp.interactive = pp.constants.interactionLevel.automatic;";
-		$script .= "pp.printerName = '\\\\\\\\".$server."\\\\".$printer."';";
-		$script .= "print(pp);";
+
+		if($dialog) {
+			$script = "var pp = getPrintParams();";
+			$script .= "pp.interactive = pp.constants.interactionLevel.full;";
+			$script .= "pp.printerName = '".$printer."';";
+			$script .= "print(pp);";
+		} else {
+			$script="if(typeof JSSilentPrintOnPrinter != 'undefined') {JSSilentPrintOnPrinter(this,'".$printer."');}else{";
+			$script .= "var pp = getPrintParams();";
+			$script .= "pp.interactive = pp.constants.interactionLevel.automatic;";
+			$script .= "pp.printerName = '".$printer."';";
+			$script .= "print(pp);}";
+		}
+		error_log(__METHOD__.":$script");
 		$this->IncludeJS($script);
 	}
+	
 	/**
 	 * 
 	 * Counts line numbers for multi-cell
@@ -139,6 +219,7 @@ class tx_metafeedit_pdf extends FPDF {
 	 * @param string $txt
 	 * @return number
 	 */
+	
 	function NbLines($w,$txt)
 	{
 		//Calcule le nombre de lignes qu'occupe un MultiCell de largeur w
@@ -295,7 +376,8 @@ class tx_metafeedit_export {
 
 
 	// We handle here PDF file generation for detail ...
-	function getPDFDET(&$content,&$caller,$print='') {
+	function getPDFDET(&$content,&$caller,$print='',$printer='',$server='') {
+		error_log(__METHOD__.":$print,$printer,$server");
 		//die($content);
 
 		try {
@@ -586,24 +668,15 @@ class tx_metafeedit_export {
 			$r++;
 		}
 		ob_clean();
-		//We add print dialog or not ...
-		switch ($print) {
-			case 'print':
-			case 'printnodialog':
-				$pdf->AutoPrint(false);
-				break;
-			case 'printdialog':
-				$pdf->AutoPrint(true);
-				break;
-			default:
-				break;
-		}
+		$pdf->generatePrintScript($print,$printer,$server);
+
 		$pdf->Output($caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf', 'I');
 		die;
 	}	
-	
+
 	// We handle here PDF file generation for lists ...
-	function getPDF(&$content,&$caller,$print='') {
+	function getPDF(&$content,&$caller,$print='',$printer='',$server='') {
+		error_log(__METHOD__.":$print,$printer,$server");
 		try {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
@@ -778,18 +851,7 @@ class tx_metafeedit_export {
 		//Convert to PDF
 		$name=$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf';
 		ob_clean();
-		//echo "#### $print";
-		switch ($print) {
-			case 'print':
-			case 'printnodialog':
-				$pdf->AutoPrint(false);
-				break;
-			case 'printdialog':
-				$pdf->AutoPrint(true);
-				break;
-			default:
-				break;
-		}
+		$pdf->generatePrintScript($print,$printer,$server);
 		$pdf->Output($name, 'I'); 
 		die;
 
