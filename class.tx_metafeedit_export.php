@@ -950,7 +950,7 @@ class tx_metafeedit_export {
 		}
 		ob_clean();
 		//$pdf->Output();
-		switch ($print) {
+		/*switch ($print) {
 			case 'print':
 			case 'printnodialog':
 				$pdf->AutoPrint(false);
@@ -960,7 +960,8 @@ class tx_metafeedit_export {
 				break;
 			default:
 				break;
-		}
+		}*/
+		$pdf->generatePrintScript($print,$printer,$server);
 		$content = $pdf->Output('test.pdf', 'S');
 		echo $content;
 		die;
