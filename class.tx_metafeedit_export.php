@@ -113,7 +113,7 @@ class tx_metafeedit_pdf extends FPDF {
 	}
 	// generates printer javascript depending on parameters and config
 	function generatePrintScript($print,$printer,$server) {
-		error_log(__METHOD__.":$print,$printer,$server");
+		//error_log(__METHOD__.":$print,$printer,$server");
 		$dialog=true;
 		$autoprint=false;
 		//We add print dialog or not ...
@@ -153,7 +153,7 @@ class tx_metafeedit_pdf extends FPDF {
 		$script=$dialog?"print(true);":"if(typeof JSSilentPrint != 'undefined') {JSSilentPrint(this);}else{print(false);};";
 		//$script=$dialog?"print(true);":"if(typeof JSSilentPrint != 'undefined') {app.alert('silent');JSSilentPrint(this);}else{app.alert('notsilent');print(false);};";
 		//$script=$dialog?"print(true);":"app.alert('yoi');if(typeof JSSilentPrint == 'undefined') {app.alert('notsilent');};";
-		error_log(__METHOD__.":$script");
+		//error_log(__METHOD__.":$script");
 		$this->IncludeJS($script);
 		//$this->IncludeJS("app.alert('yop');".$script);
 	}
@@ -181,7 +181,7 @@ class tx_metafeedit_pdf extends FPDF {
 			$script .= "pp.printerName = '\\\\\\\\".$server."\\\\".$printer."';";
 			$script .= "print(pp);}";
 		}
-		error_log(__METHOD__.":$script");
+		//error_log(__METHOD__.":$script");
 		$this->IncludeJS($script);
 	}
 	
@@ -208,7 +208,7 @@ class tx_metafeedit_pdf extends FPDF {
 			$script .= "pp.printerName = '".$printer."';";
 			$script .= "print(pp);}";
 		}
-		error_log(__METHOD__.":$script");
+		//error_log(__METHOD__.":$script");
 		$this->IncludeJS($script);
 	}
 	
@@ -377,7 +377,7 @@ class tx_metafeedit_export {
 
 	// We handle here PDF file generation for detail ...
 	function getPDFDET(&$content,&$caller,$print='',$printer='',$server='') {
-		error_log(__METHOD__.":$print,$printer,$server");
+		//error_log(__METHOD__.":$print,$printer,$server");
 		//die($content);
 
 		try {
@@ -530,8 +530,22 @@ class tx_metafeedit_export {
 				$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
 				// Affichage du signe Euro sur l'export PDF //CBY nothing to do here !!
 				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
-				//if we have an image
-				if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
+				
+				if ($col->line==1) {
+					//We handle lines here
+					//error_log(__METHOD__.":line");
+					$pdf->Line($col->line->attributes()->x1, $col->line->attributes()->y1, $col->line->attributes()->x2, $col->line->attributes()->y2);
+				
+				} elseif ($col->rect==1) {
+					//We handle lines here
+					//error_log(__METHOD__.":rect");
+					$pdf->Line($col->rect->attributes()->x1, $col->rect->attributes()->y1, $col->rect->attributes()->x2, $col->rect->attributes()->y1);
+					$pdf->Line($col->rect->attributes()->x2, $col->rect->attributes()->y1, $col->rect->attributes()->x2, $col->rect->attributes()->y2);
+					$pdf->Line($col->rect->attributes()->x2, $col->rect->attributes()->y2, $col->rect->attributes()->x1, $col->rect->attributes()->y2);
+					$pdf->Line($col->rect->attributes()->x1, $col->rect->attributes()->y2, $col->rect->attributes()->x1, $col->rect->attributes()->y1);
+					
+				} elseif ($col->img==1 && strlen($val)>0) {
+					// We handle images here...
 					$vala=t3lib_div::trimexplode(',',$val);
 					$img='';
 				 	$myx=isset($col->spec->attributes()->x)?(float)$col->spec->attributes()->x:$pdf->getX();
@@ -676,7 +690,7 @@ class tx_metafeedit_export {
 
 	// We handle here PDF file generation for lists ...
 	function getPDF(&$content,&$caller,$print='',$printer='',$server='') {
-		error_log(__METHOD__.":$print,$printer,$server");
+		//error_log(__METHOD__.":$print,$printer,$server");
 		try {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
