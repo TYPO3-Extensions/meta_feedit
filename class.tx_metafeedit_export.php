@@ -559,6 +559,7 @@ class tx_metafeedit_export {
 					if (!is_object($col->spec)) $pdf->Cell($taille,$height,'',1,0,'L',1);
 					$pdf->SetX($myx);
 					foreach($vala as $v) {
+						error_log(__METHOD__.":$v");
 						$img=PATH_site.($v?$col->img->dir.'/'.$v:'');
 						if ($col->img->attributes()->gh || $col->img->attributes()->gw || $col->img->attributes()->mh || $col->img->attributes()->mw ) {
 						
@@ -597,6 +598,8 @@ class tx_metafeedit_export {
 							
 							$ey = ($imgy+$imgh)>$ey?($imgy+$imgh):$ey;
 						}
+						//We only handle first image
+						break;
 					}
 				} else {
 					switch($pos[$x]) {
