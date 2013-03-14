@@ -872,7 +872,7 @@ class tx_metafeedit_lib {
 		$relTable=$ftable;
 		foreach ($fNA as $f) {
 			if ((strpos($f,'--fse--')!==false) || (strpos($f,'--fsb--')!==false)) continue;
-		$relTable=$ftable;
+			$relTable=$ftable;
 			//ugly hack by CMD
 			if ($f!="sorting") {
 				if (!is_array($conf['TCAN'][$ftable]['columns'][$f]) && !$conf['list.']['sqlcalcfields.'][$fN] ) {
@@ -1642,11 +1642,11 @@ class tx_metafeedit_lib {
 				if ($conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']) {
 					// reference to elements from another table
 					$FT = $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'];
+					$this->makeTypo3TCAForTable($conf['TCAN'],$FT);
 					$label = $conf['label.'][$FT]?$conf['label.'][$FT]:$conf['TCAN'][$FT]['ctrl']['label'];
 					$label_alt = $conf['label_alt.'][$FT]?$conf['label_alt.'][$FT]:$conf['TCAN'][$FT]['ctrl']['label_alt'];
 
-					$label_alt_force = $conf['label_alt_force.'][$FT]?$conf['label_alt_force.'][$FT]: 
-						$conf['TCAN'][$FT]['ctrl']['label_alt_force'];
+					$label_alt_force = $conf['label_alt_force.'][$FT]?$conf['label_alt_force.'][$FT]: $conf['TCAN'][$FT]['ctrl']['label_alt_force'];
 						
 					if ($dataArr[$fN]) {
 						if ($conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"] && $dataArr[$conf['uidField']]) {
@@ -1663,8 +1663,7 @@ class tx_metafeedit_lib {
 
 
 						$whereClause = " 1 ";
-						foreach($uids as $uid) $orClause .= $orClause ? ' OR '.$conf['uidField'].' LIKE \''.$uid.'\'' :
-						 $conf['uidField'].' = \''.$uid.'\'';
+						foreach($uids as $uid) $orClause .= $orClause ? ' OR '.$conf['uidField'].' = \''.$uid.'\'' : $conf['uidField'].' = \''.$uid.'\'';
 						$TCAFT = $conf['TCAN'][$FT];
 						$statictable = 0;
 						if (strpos($FT, 'static_') === 0) {
@@ -1673,8 +1672,7 @@ class tx_metafeedit_lib {
 						if ($FT && $TCAFT['ctrl']['languageField'] && $TCAFT['ctrl']['transOrigPointerField']) {
 							//		$whereClause .= ' AND '.$TCAFT['ctrl']['transOrigPointerField'].'=0';
 						}
-						$orClause = $orClause?" and (".$orClause.") ":
-						"";
+						$orClause = $orClause?" and (".$orClause.") ":"";
 
 						$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'], $whereClause.' '.$orClause);
 						if ($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(), 'sql error');
@@ -1704,14 +1702,11 @@ class tx_metafeedit_lib {
 						foreach($vals as $v) {
 							$i++;
 							if ($i == $cc && $cc > 1) {
-								$sep = $conf['evalLastSep.'][$fN]?$conf['evalLastSep.'][$fN]:
-								',';
+								$sep = $conf['evalLastSep.'][$fN]?$conf['evalLastSep.'][$fN]:',';
 							} else {
-								$sep = $conf['evalSep.'][$fN]?$conf['evalSep.'][$fN]:
-								',';
+								$sep = $conf['evalSep.'][$fN]?$conf['evalSep.'][$fN]:',';
 							}
-							$values .= $values ? $sep . $v :
-							 $v;
+							$values .= $values ? $sep . $v :$v;
 						}
 					}
 				} elseif(count($conf['TCAN'][$table]['columns'][$fNiD]['config']['items'])) {
