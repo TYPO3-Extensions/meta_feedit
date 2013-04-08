@@ -75,7 +75,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents('fileadmin/reports/'.basename($configurationFile))),true);
 			$conf=$configstore['tsconf'];
 			$piFlexForm=$configstore['flexForm'];
-			$piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF'];
+			//$piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF'];
 			$pid=intval($piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
 			if ($pid==0 && $piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']) $pid=$pidHandler->getPid($piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
 			if ($pid) $piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']=$pid;
@@ -90,7 +90,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents($configurationFile)),true);
 			$conf=$configstore['tsconf'];
 			$piFlexForm=$configstore['flexForm'];
-			$piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF'];
+			//$piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF'];
 			$pid=intval($piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
 			if ($pid==0 && $piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']) $pid=$pidHandler->getPid($piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
 			if ($pid) $piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']=$pid;
@@ -139,8 +139,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['performanceaudit']=$lconf['debugPerformances'];
 
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Start ']=$this->metafeeditlib->displaytime()." Seconds"; 
-	    if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Conf size ']=strlen(serialize($conf))." Bytes"; 
-	    if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Conf metafeedit size ']=strlen(serialize($mfconf))." Bytes"; 
+		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Conf size ']=strlen(serialize($conf))." Bytes"; 
+		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Conf metafeedit size ']=strlen(serialize($mfconf))." Bytes"; 
 		
 		if (($lconf['referenceMetafeedit'])||($lconf['referenceMetafeeditText'])){
 
@@ -267,7 +267,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			$path= $pidHandler->getPath($pid);
 			if ($path) $flexForm['data']['sQuickStart']['lDEF']['page']['vDEF']=$path;
 			$storeConf['tsconf']=$conf;
-		    $storeConf['flexForm']=$flexForm;
+			$storeConf['flexForm']=$flexForm;
 
 			$f = fopen($file, "w");
 			if($f) {
@@ -318,7 +318,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['grid.']['col.']['fU']=$conf[$lconf['pluginId'].'.']['grid.']['col.']['fU'];
 		$mfconf['grid.']['col.']['fUKeyField']=$conf[$lconf['pluginId'].'.']['grid.']['col.']['fUKeyField'];
 		$mfconf['grid.']['langmarks']=$lconf['gridLangmarks'];
-  	    $mfconf['grid.']['secondcols.']=$conf[$lconf['pluginId'].'.']['grid.']['secondcols.'];
+  		$mfconf['grid.']['secondcols.']=$conf[$lconf['pluginId'].'.']['grid.']['secondcols.'];
 		$mfconf['grid.']['nbAltRows']=$lconf['gridAltRows'];
 		
 		// CALENDAR CONF
@@ -330,7 +330,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['cal.']['col.']['fU']=$conf[$lconf['pluginId'].'.']['cal.']['col.']['fU'];
 		$mfconf['cal.']['col.']['fUKeyField']=$conf[$lconf['pluginId'].'.']['cal.']['col.']['fUKeyField'];
 		$mfconf['cal.']['langmarks']=$lconf['calLangmarks'];
-  	    $mfconf['cal.']['secondcols.']=$conf[$lconf['pluginId'].'.']['cal.']['secondcols.'];
+  		$mfconf['cal.']['secondcols.']=$conf[$lconf['pluginId'].'.']['cal.']['secondcols.'];
 		$mfconf['cal.']['nbAltRows']=$lconf['calAltRows'];
 		
 		//$mfconf['fUKeyField'][$lconf['pluginId']]=$conf[$lconf['pluginId'].'.']['fUKeyField'];
@@ -399,7 +399,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['itemTpl']=$lconf['listItemTemplate'];
 		$mfconf['list.']['noItemTpl']=$lconf['listNoItemTemplate'];
 		$mfconf['list.']['mediaPlayer']=$lconf['listMediaPlayer'];
-        $mfconf['list.']['mediaplayerWrap.']=$conf[$lconf['pluginId'].'.']['list.']['mediaplayerWrap.']?$conf[$lconf['pluginId'].'.']['list.']['mediaplayerWrap.']:$conf['default.']['list.']['mediaplayerWrap.'];
+		$mfconf['list.']['mediaplayerWrap.']=$conf[$lconf['pluginId'].'.']['list.']['mediaplayerWrap.']?$conf[$lconf['pluginId'].'.']['list.']['mediaplayerWrap.']:$conf['default.']['list.']['mediaplayerWrap.'];
 		$mfconf['list.']['weekdayNameLength']=3;
 		
 		// Exports
@@ -835,7 +835,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			 
 		//==================================================================================
 		// Handling INCOMING VARIABLES !!!
-    	// All variables must be indexed on pluginID !!! to avoid problems whend 2 plugins are put in same page.
+		// All variables must be indexed on pluginID !!! to avoid problems whend 2 plugins are put in same page.
 		// Variable priorites are :
 		// Typoscript
 		// Flexform
@@ -845,8 +845,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// rU is edited Uid :
 		
 		//$mfconf['inputvar.']['fedata']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'FE');
-    
-    	// We should handle keep var ...
+	
+		// We should handle keep var ...
 		$mfconf['inputvar.']=array();
 		$mfconf['inputvar.']['fedata']=t3lib_div::_GP('FE');
 		$mfconf['inputvar.']['mfbmuids']=t3lib_div::_GP('mfcheck');
@@ -915,7 +915,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		if (!$mfconf['inputvar.']['cmd']) $mfconf['inputvar.']['cmd']='edit';
 		//if ($mfconf['inputvar.']['cmd']=='create') 
 		// we check here editUnique Creation Mode (must optimize this);
-        
+		
 		if ($conf['editUnique']) {
 			//@todo why do i have to do this ?
 			$mfconf['inputvar.']['cmd']='edit';
@@ -932,9 +932,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 					//TODO If we have no record we allow creation .... (!this must be put in Pi1) otherwise templates won't be loaded 
 				}
 			}
-        }
+		}
 		
-        
+		
 		// we handle back url here by calculating referer..
 		//9002 is page type if called through ajax
 		//
@@ -1066,67 +1066,67 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		}*/
 	}
 	/**
-     * Pretty-print JSON string
-     *
-     * Use 'format' option to select output format - currently html and txt supported, txt is default
-     * Use 'indent' option to override the indentation string set in the format - by default for the 'txt' format it's a tab
-     *
-     * @param string $json Original JSON string
-     * @param array $options Encoding options
-     * @return string
-     */
-    public  function prettyPrint($json, $options = array())
-    {
-        $tokens = preg_split('|([\{\}\]\[,])|', $json, -1, PREG_SPLIT_DELIM_CAPTURE);
-        $result = "";
-        $indent = 0;
+	 * Pretty-print JSON string
+	 *
+	 * Use 'format' option to select output format - currently html and txt supported, txt is default
+	 * Use 'indent' option to override the indentation string set in the format - by default for the 'txt' format it's a tab
+	 *
+	 * @param string $json Original JSON string
+	 * @param array $options Encoding options
+	 * @return string
+	 */
+	public  function prettyPrint($json, $options = array())
+	{
+		$tokens = preg_split('|([\{\}\]\[,])|', $json, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$result = "";
+		$indent = 0;
 
-        $format= "txt";
+		$format= "txt";
 
-        $ind = "\t";
+		$ind = "\t";
 
-        if(isset($options['format'])) {
-            $format = $options['format'];
-        }
+		if(isset($options['format'])) {
+			$format = $options['format'];
+		}
 
-        switch ($format):
-            case 'html':
-                $line_break = "<br />";
-                $ind = "\$nbsp;\$nbsp;\$nbsp;\$nbsp;";
-                break;
-            default:
-            case 'txt':
-                $line_break = "\n";
-                $ind = "\t";
-                break;
-        endswitch;
+		switch ($format):
+			case 'html':
+				$line_break = "<br />";
+				$ind = "\$nbsp;\$nbsp;\$nbsp;\$nbsp;";
+				break;
+			default:
+			case 'txt':
+				$line_break = "\n";
+				$ind = "\t";
+				break;
+		endswitch;
 
-        //override the defined indent setting with the supplied option
-        if(isset($options['indent'])) {
-            $ind = $options['indent'];
-        }
+		//override the defined indent setting with the supplied option
+		if(isset($options['indent'])) {
+			$ind = $options['indent'];
+		}
 
-        foreach($tokens as $token) {
-            if($token == "") continue;
+		foreach($tokens as $token) {
+			if($token == "") continue;
 
-            $prefix = str_repeat($ind, $indent);
-            if($token == "{" || $token == "[") {
-                $indent++;
-                if($result != "" && $result[strlen($result)-1] == $line_break) {
-                    $result .= $prefix;
-                }
-                $result .= "$token$line_break";
-            } else if($token == "}" || $token == "]") {
-                $indent--;
-                $prefix = str_repeat($ind, $indent);
-                $result .= "$line_break$prefix$token";
-            } else if($token == ",") {
-                $result .= "$token$line_break" ;
-            } else {
-                $result .= $prefix.$token;
-            }
-        }
-        return $result;
+			$prefix = str_repeat($ind, $indent);
+			if($token == "{" || $token == "[") {
+				$indent++;
+				if($result != "" && $result[strlen($result)-1] == $line_break) {
+					$result .= $prefix;
+				}
+				$result .= "$token$line_break";
+			} else if($token == "}" || $token == "]") {
+				$indent--;
+				$prefix = str_repeat($ind, $indent);
+				$result .= "$line_break$prefix$token";
+			} else if($token == ",") {
+				$result .= "$token$line_break" ;
+			} else {
+				$result .= $prefix.$token;
+			}
+		}
+		return $result;
    }
 	
 	/**

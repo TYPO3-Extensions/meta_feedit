@@ -74,7 +74,9 @@ class tx_metafeedit_pdf extends FPDF {
 			$this->Cell(0,$this->footercellsize,'Page '.$this->PageNo().'/{nb}',0,0,'C');
 			$this->SetX($this->leftmargin);			
 			$user = '';
-			$user = $GLOBALS['TSFE']->fe_user->user[username];
+			$user = $GLOBALS['TSFE']->fe_user->user[username]?$GLOBALS['TSFE']->fe_user->user[username]:$this->caller->caller->metafeeditlib->getLL('anonymous', $this->caller->conf);
+			//->caller
+			//error_log(__METHOD__.":".get_class($this->caller));
 			$this->Cell(0,$this->footercellsize, utf8_decode($this->caller->caller->metafeeditlib->getLL('printedby', $this->caller->conf)).$user,0,0,'R');
 		}
 	}
@@ -297,7 +299,7 @@ class tx_metafeedit_export {
 	/**
 	 * CreatePDFButton
 	 *
-	 * @return	[type]		...
+	 * @return	[type]	...
 	 */
 	//------------------------------------------------------- PDF / CSV / EXCEL Buttons (should be in template generating File) ------------------------------------------------ //
 	function CreatePDFButton(&$conf,&$caller,$form=true,$id='') {
@@ -374,8 +376,14 @@ class tx_metafeedit_export {
 		die;
 	}
 
-
-	// We handle here PDF file generation for detail ...
+	/**
+	 * We handle here PDF file generation for detail ...
+	 * @param unknown_type $content
+	 * @param unknown_type $caller
+	 * @param unknown_type $print
+	 * @param unknown_type $printer
+	 * @param unknown_type $server
+	 */
 	function getPDFDET(&$content,&$caller,$print='',$printer='',$server='') {
 		//error_log(__METHOD__.":$print,$printer,$server");
 		//die($content);
@@ -395,6 +403,9 @@ class tx_metafeedit_export {
 		$fields = explode(',', $this->conf['list.']['show_fields']); //liste des champ affiches afin de recuperer la dimension des colonnes defini en TS
 		$sizeArr = array(); //tableau de la taille des cellules
 		$pos=array(); // Array of positions (left,right,center)
+		// Do we handle multiple media (default no)
+		$multipleMedia=$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']?$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']:($this->confTS['default.']['list.']['multipleMedia']?$this->confTS['default.']['list.']['multipleMedia']:false);
+				
 		$x=0; //compteur des colonnes
 		if($xml->tr) {
 			$taille = 0;
@@ -428,6 +439,7 @@ class tx_metafeedit_export {
 				$format=array($s->attributes()->w,$s->attributes()->h);
 		}
 		$unit='mm';
+		//error_log(__METHOD__.":".get_class($this->caller));
 		$pdf = new tx_metafeedit_pdf($orientation, $unit, $format);
 		$pdf->caller=&$this;
 		$pdf->AddFont('3OF9','','3OF9.php');
@@ -509,6 +521,7 @@ class tx_metafeedit_export {
 			//We detect height
 			foreach($row->td as $col) {
 				$val = strip_tags($col->data);
+				// We handle images
 				if ($col->img==1) {
 					$imgh=30;
 					if (isset($col->img->attributes()->h)) $imgh=(float)$col->img->attributes()->h; //height override
@@ -559,7 +572,6 @@ class tx_metafeedit_export {
 					if (!is_object($col->spec)) $pdf->Cell($taille,$height,'',1,0,'L',1);
 					$pdf->SetX($myx);
 					foreach($vala as $v) {
-						error_log(__METHOD__.":$v");
 						$img=PATH_site.($v?$col->img->dir.'/'.$v:'');
 						if ($col->img->attributes()->gh || $col->img->attributes()->gw || $col->img->attributes()->mh || $col->img->attributes()->mw ) {
 						
@@ -598,8 +610,8 @@ class tx_metafeedit_export {
 							
 							$ey = ($imgy+$imgh)>$ey?($imgy+$imgh):$ey;
 						}
-						//We only handle first image
-						break;
+						// By defaullt we only handle first media
+						if (!$multipleMedia) break;
 					}
 				} else {
 					switch($pos[$x]) {
@@ -691,7 +703,15 @@ class tx_metafeedit_export {
 		die;
 	}	
 
-	// We handle here PDF file generation for lists ...
+
+	/**
+	 * We handle here PDF file generation for lists ...
+	 * @param unknown_type $content
+	 * @param unknown_type $caller
+	 * @param unknown_type $print
+	 * @param unknown_type $printer
+	 * @param unknown_type $server
+	 */
 	function getPDF(&$content,&$caller,$print='',$printer='',$server='') {
 		//error_log(__METHOD__.":$print,$printer,$server");
 		try {
@@ -706,6 +726,7 @@ class tx_metafeedit_export {
 		$sizeArr = array(); //tableau de la taille des cellules
 		$pos=array(); // Array of positions (left,right,center)
 		$x=0; //compteur des colonnes
+		// Column size calculations on first row
 		if($xml->tr) {
 			foreach ($xml->tr->td as $cell) {
 				$fields[$x]=str_replace('.','_',$fields[$x]);
@@ -715,13 +736,26 @@ class tx_metafeedit_export {
 				$x++;
 			}
 		}
-
+		// Do we handle multiple media (default no)
+		$multipleMedia=$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']?$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']:($this->confTS['default.']['list.']['multipleMedia']?$this->confTS['default.']['list.']['multipleMedia']:false);
 		// Page size is 21 x 29.7- reduced to 20 to preserve margin.
-		if ($taille <200) $orientation='P';	// portrait
-		else $orientation='L';				// landscape
+		
 
-		$format=A4;
+		$format=A4; //210 × 297
+		
 		$unit='mm';
+		$H=210;
+		$W=297;
+		$orientation='L';// landscape
+		if ($taille <200) {
+			$orientation='P';	// portrait
+			$H=297;
+			$W=210;
+		} 
+		// Line width
+		$lw=0.3;
+
+		//error_log(__METHOD__.":".get_class($this->caller));
 		$pdf = new tx_metafeedit_pdf($orientation, $unit, $format);
 		$pdf->caller=&$this;
 
@@ -731,6 +765,16 @@ class tx_metafeedit_export {
 		$pdf->leftmargin=8;
 		$pdf->rightmargin=8;
 		$pdf->topmargin=8;
+		
+		// We calculate last cell size eventually
+		$workWidth=$W-$pdf->rightmargin-$pdf->leftmargin-$taille - ($x*$lw);
+		// do this onlsy if cell size not set ...(
+		$cw=$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']?$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']:0;
+		if (!$cw && $workWidth>0) {
+			$sizeArr[$x-1]+=$workWidth;
+		}
+		
+		
 		$this->footercellsize=7;
 		$this->headercellsize=7;
 		$this->cellsize=7;
@@ -743,14 +787,14 @@ class tx_metafeedit_export {
 		// We handle the header here 
 		//
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
-		if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
-
+		if ($this->conf['inputvar.']['sortLetter']) $tri = '  Tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 		$pdf->SetFont('Arial','B',11);
+		
 		$pdf->SetY(0);
 		$pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');	
 		$pdf->SetFont('Arial', '', 9);
 		$pdf->Cell(0,$this->headercellsize,utf8_decode($recherche),0,0,'R');
-		$pdf->SetY(5);
+		$pdf->SetY(0);
 		$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
 		$pdf->SetXY($pdf->leftmargin,6);
 		//$pdf->Ln();
@@ -758,9 +802,8 @@ class tx_metafeedit_export {
 		$pdf->Cell(0,$this->headercellsize,'','T',0,'C');
 		$pdf->Ln(2);	
 		
-		
 		// we set font and size
-		
+		// Where do we get $plice and $font ??????
 		$this->getPolice($police);
 		$this->getFont($font);
 		$pdf->SetFont($font,'',$police);
@@ -771,6 +814,12 @@ class tx_metafeedit_export {
 		$height = ($this->confTS[$this->pluginId.'.']['list.']['height'])?$this->confTS[$this->pluginId.'.']['list.']['height']:(($this->confTS['default.']['list.']['height'])?$this->confTS['default.']['list.']['height']:($pdf->cellsize?$pdf->cellsize:5)); // hauteur de la ligne pdf
 		$r=0;
 		foreach($xml->tr as $row) {
+			$Y=$pdf->GetY()+$pdf->bottommargin+$height;
+			//error_log(__METHOD__.": $H , $Y, $height - ".$pdf->GetY());
+			if ($Y>=$H) {
+				//error_log(__METHOD__."addpage");
+				$pdf->AddPage();
+			}
 			$x=0; //column counter 
 			if ($alt>1) {							// changement de couleur 1 ligne sur 2
 				$alt=0;
@@ -781,13 +830,13 @@ class tx_metafeedit_export {
 			$nbcols=count($row->td);
 			$csize=0;
 			if ($row->gb) {
-				$pdf->SetLineWidth(0.3);
+				$pdf->SetLineWidth($lw);
 				$pdf->SetFont('Arial', 'B', 9);
 			} else {
 				$pdf->SetLineWidth(0.2);
 				$pdf->SetFont('Arial', '', 9);
 			}				
-
+			// We handle cell content here
 			foreach($row->td as $col) {
 				$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule			
 				$val = str_replace('€','Eur',strip_tags($col->data));
@@ -795,14 +844,13 @@ class tx_metafeedit_export {
 
 				// Currency handling Euro CBY should not be here !!!
 				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
-
-				if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
+				// We handle images here...
+				if ($col->img==1 && strlen($val)>0) {	 				
 					$vala=t3lib_div::trimexplode(',',$val);
 					$img='';
 				 	$myx=$pdf->getX();
 					$pdf->Cell($size,$height,'',1,0,'L',1);
 					$pdf->setX($myx);
-
 					foreach($vala as $v) {
 						$img=PATH_site.($v?$col->img->dir.'/'.$v:'');
 						$imginfo=getimagesize($img);
@@ -813,6 +861,8 @@ class tx_metafeedit_export {
 							$pdf->Image($img,$pdf->getX()+0.5,$pdf->getY()+0.5,0, $height-1);
 							$pdf->setX($pdf->getX()+((($height-1)/$h)*$w));
 						}
+						// By defaullt we only handle first media
+						if (!$multipleMedia) break;
 					}
 					$pdf->setX($size+$pdf->leftmargin);									// + la marge definie plus haut pour la page => ligne 2308
 				} else {
@@ -847,6 +897,9 @@ class tx_metafeedit_export {
 						}
 					}
 				}
+				/*if ($x==2) {
+					error_log(__METHOD__.": $H , $Y, $val");
+				}*/
 				$x++;
 			}
 			$pdf->setFillColor(255,255,255);
@@ -860,10 +913,16 @@ class tx_metafeedit_export {
 				$ey=0;
 				$cell=false;
 			}else {*/
-				$pdf->Ln();
-			//}
-			//$pdf->Ln();
+			// We erase all text right of last cell
+			//300 is maximum width  of page in A4
+			$X=$pdf->GetX();
+			$pdf->Cell(300,$height,"",0,0,$p,1);
+			$pdf->SetX($X);
+			$pdf->Cell(0.001,$height,"",1,0,$p,1);
+			// Line break
+			$pdf->Ln();
 			$r++;
+			
 		}
 		//Convert to PDF
 		$name=$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf';
@@ -873,26 +932,184 @@ class tx_metafeedit_export {
 		die;
 
 	}
+	/**
+	 * Calculate tab cell height
+	 * 
+	 */
+	function getPDFTABRowHeight($pdf,$row) {
+		/**
+		 * Get Max row height
+		 */
+		$rowHeight=0;
+		foreach($row->td as $elem) {
+			if ($elem->img==1) {
+				$rowHeight+=$this->imageHeight;
+			} else {
+				$rowHeight+= ceil( $pdf->GetStringWidth($elem->data) / $this->cellWidth )*$this->lineHeight;
+			}		
+		}
+		return $rowHeight;
+	}
 	
-	// tabular presentation for pdf
+	/**
+	 * 
+	 * @param unknown_type $fullPathToImage
+	 */
+	function PDFDisplayImage($pdf,$fullPathToImage,$displayEmptyImage=true){
+		$imginfo=getimagesize($fullPathToImage);
+		//error_log(__METHOD__.":$fullPathToImage");
+		if (is_array($imginfo)) {
+			$w=$imginfo[0];
+			$h=$imginfo[1];
+			$pdf->Image($fullPathToImage,$pdf->getX()+0.5,$pdf->getY()+0.5,0, $this->imageHeight-1);
+			//$pdf->setX($pdf->getX()+((($height-1)/$h)*$w));
+			$pdf->SetY($this->Y+0.5+$this->imageHeight-1);
+		} else {
+			//error_log(__METHOD__.":$fullPathToImage not found");
+			if ($displayEmptyImage) {
+				$fullPathToUnknownImage=PATH_site.'typo3conf/ext/meta_feedit/res/noimage.jpg';
+				$this->PDFDisplayImage($pdf,$fullPathToUnknownImage,false);
+			} else {
+				// Empty image we make room for it
+				$pdf->SetY($this->Y+0.5+$this->imageHeight-1);
+				error_log(__METHOD__.": Could not find $fullPathToImage");
+			}
+		}
+	}
 	
+	/**
+	* PDF Tabular print row
+	*
+	*/
+	function getPDFTABPrintRow($pdf,$cellData) {
+		//error_log(__METHOD__.": cw $this->cellWidth, count".count($cellData));
+		$cptCols=0;
+		foreach ($cellData as $cell) {
+			$X=$pdf->leftmargin+($cptCols*$this->cellWidth);
+			$pdf->setXY($X,$this->Y);
+			foreach($cell->td as $elem) {
+				$pdf->setX($X);
+				if ($elem->img==1) {
+					$vala=t3lib_div::trimexplode(',',$elem->data);
+					$img='';
+					//$myx=$pdf->getX();
+					//$pdf->Cell($size,$height,'',1,0,'L',1);
+					//$pdf->setX($myx);
+					if ($elem->data != '') {
+						foreach($vala as $v) {
+							$img=PATH_site.($v?$elem->img->dir.'/'.$v:'');
+							$this->PDFDisplayImage($pdf,$img);
+							
+							/*$imginfo=getimagesize($img);
+							if (is_array($imginfo)) {
+								$w=$imginfo[0];
+								$h=$imginfo[1];
+								$pdf->Image($img,$pdf->getX()+0.5,$pdf->getY()+0.5,0, $this->imageHeight-1);
+								//$pdf->setX($pdf->getX()+((($height-1)/$h)*$w));
+								$pdf->SetY($this->Y+0.5+$this->imageHeight-1);
+							} else {
+								// Empty image we make room for it
+								$pdf->SetY($this->Y+0.5+$this->imageHeight-1);
+							}*/
+							// By defaullt we only handle first media
+							if (!$this->multipleMedia) break;
+						}
+					} else {
+						$this->PDFDisplayImage($pdf,'');
+						// Empty image we make room for it
+						//$pdf->SetY($this->Y+0.5+$this->imageHeight-1);
+					}
+					//$pdf->setX($size+$pdf->leftmargin);
+				} else {
+					$val= strip_tags($elem->data);
+					//error_log($val);
+					$pdf->MultiCell($this->cellWidth,$this->lineHeight,utf8_decode($val),0,'L',0);
+				}
+			}
+			$cptcols++;
+			$Y2=$pdf->GetY();
+			if ($this->LastY<$Y2) {
+				$this->LastY=$Y2;
+			}
+			$cptCols++;
+		}
+		//Draw rectangles
+		$cptCols=0;
+		foreach ($cellData as $cell) {
+			$rh=$this->LastY-$this->Y;
+			$pdf->Rect($pdf->leftmargin+($this->cellWidth*$cptCols), $this->Y, $this->cellWidth, $rh);
+			$cptCols++;
+		}
+		$this->Y=$this->LastY;
+		//$this->lastY=0;
+	
+	}
+	/**
+	 * Tabular presentation for pdf
+	 * @param unknown_type $content
+	 * @param unknown_type $caller
+	 * @param unknown_type $print
+	 */
 	function getPDFTAB(&$content,&$caller,$print='') {
-		$xml = new SimpleXMLElement($content);
+		//$xml = new SimpleXMLElement($content);
+		try {
+			//error_log(__METHOD__.":".str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content)))));
+			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
+		} catch (Exception $e) {
+			echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
+			die( 'Caught exception: '.  $e->getMessage());
+		};
 		$count = 0;
 
 		$orientation = ($this->confTS[$this->pluginId.'.']['list.']['OrientationPDF'])?$this->confTS[$this->pluginId.'.']['list.']['OrientationPDF']:(($this->confTS['default.']['list.']['OrientationPDF'])?$this->confTS['default.']['list.']['OrientationPDF']:'P');
 		$format=A4;
 		$unit='mm';
+		$H=210;
+		$W=297;
+		//$orientation='L';// landscape
+		//$orientation='P';	// portrait
+		if ($orientation=='P') {
+			$H=297;
+			$W=210;
+		}
+		// Line width
+		$lw=0.3;
+		// Number of columns in tabular display
+		$nbCols = (int)$this->conf['list.']['nbCols'];		// Nombre de colonnes voulues par l'utilisateur
+		
+		$this->footercellsize=7;
+		$this->headercellsize=7;
+		$this->cellsize=7;
+		// Do we handle multiple media (default no)
+		$this->multipleMedia=$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']?$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']:($this->confTS['default.']['list.']['multipleMedia']?$this->confTS['default.']['list.']['multipleMedia']:false);
+		
 		$pdf = new tx_metafeedit_pdf($orientation, $unit, $format);
+		$pdf->caller=&$this;
+		
+		$pdf->bottommargin=9;
+		$pdf->leftmargin=8;
+		$pdf->rightmargin=8;
+		$pdf->topmargin=8;
+		
+		// We calculate last cell size eventually
+		$workWidth=$W-$pdf->rightmargin-$pdf->leftmargin-$taille - ($x*$lw);
+		// do this onlsy if cell size not set ...(
+		/*$cw=$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']?$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']:0;
+		 if (!$cw && $workWidth>0) {
+		$sizeArr[$x-1]+=$workWidth;
+		}*/
+		//$cellWidth=$workWidth/$nbCols;
+		
+		
 		$pdf->AliasNbPages();
-		$pdf->setMargins(5,5,8);
+		$pdf->setMargins($pdf->leftmargin,$pdf->topmargin,$pdf->rightpmargin);
+		$pdf->SetAutoPageBreak(1,$pdf->bottommargin);
 		$pdf->AddPage();
-
 		// title of the page - Il est definit ici et non dans le header pour qu'il ne soit pas present sur chaque page mais seulement la 1ere
 		$title =''; 
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
-
-		if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
+		error_log("TITLE $title");
+		/*if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 
 		$pdf->SetFont('Arial','B',11);
 		$pdf->SetY(15);
@@ -902,100 +1119,181 @@ class tx_metafeedit_export {
 		$pdf->Cell(0,8,utf8_decode($recherche),0,0,'C');
 		$pdf->SetY(25);
 		$pdf->Cell(0,8,$tri,0,0,'C');
-		$pdf->Ln();
+		$pdf->Ln();*/
 
+		if ($this->conf['inputvar.']['sortLetter']) $tri = '  Tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
+		$pdf->SetFont('Arial','B',11);
+		
+		$pdf->SetY(0);
+		$pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');
+		$pdf->SetFont('Arial', '', 9);
+		$pdf->Cell(0,$this->headercellsize,utf8_decode($recherche),0,0,'R');
+		$pdf->SetY(0);
+		$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
+		$pdf->SetXY($pdf->leftmargin,6);
+		//$pdf->Ln();
+		$pdf->setFillColor(200,200,200);
+		$pdf->Cell(0,$this->headercellsize,'','T',0,'C');
+		$pdf->Ln(2);		
+		
 		// on met la taille et la police d'impression
+		// Where do we get $plice and $font ??????
 		$this->getPolice($police);
 		$this->getFont($font);
-
 		$pdf->SetFont($font,'',$police);
-		$pdf->Ln();
+		//$pdf->Ln();
 		$alt=0;
 
 		// Contenu
 		$pdf->setFillColor(200,200,200);		// couleur de fond des cellules
 		$nbx=0;		
-		$cptcols = 1;
+		$cptcols = 0;
 		$posy=1;
-		$marginl=1;
-		$marginh=1;
 		$cpt=0;
-		$nbcol = $this->conf['list.']['nbCols'];		// Nombre de colonnes voulues par l'utilisateur
+		$this->imageHeight=20;
+		
 
-		if ($orientation == 'P') $taillepage = 20;
-		else $taillepage = 27.7;
+		/*if ($orientation == 'P') $workWidth = 20;
+		else $workWidth = 27.7;*/
 
 		if ($this->confTS[$this->pluginId.'.']['list.']['size']) $size = $this->confTS[$this->pluginId.'.']['list.']['size'];
-		else $size = ($taillepage/$nbcol);			// taille de la colonne en cm selon l'orientation du PDF
-
+		else $size = $workWidth/$nbCols;			// taille de la colonne en cm selon l'orientation du PDF
+		$this->cellWidth=$size;
+		
 		if ($this->confTS[$this->pluginId.'.']['list.']['sizeh']) $sizeh = $this->confTS[$this->pluginId.'.']['list.']['sizeh'];
-		$sizeh = $sizeh/7*10;			// 7 => hauteur d'une ligne,  *10 => pour avoir la taille en mm
-
+		$sizeh = 5;			// 7 => hauteur d'une ligne,  *10 => pour avoir la taille en mm
+		$this->lineHeight=$sizeh;
+		$this->Y=$pdf->GetY();
+		$this->LastY=$this->Y;
+		// We should read rows , nbcols at a time (so we can caluclate line height
+		$nbCells=count($xml->tr);
+		$cellHeight=array();
+		$rowHeight=0;
+		$cellData=array();
 		foreach($xml->tr as $row) {
-			foreach($row->td as $elem) {
-				if ($elem->data != '') {
-					$val .= strip_tags($elem->data);
-					$val .= "\n";
-				} else {
-					$cpt++;
-				}
-			}
-			while ($cpt>0) {
-				$val .= "\n";
-				$cpt--;
-			}
-			$cpt=0;   		// just in case
 			
-			$pdf->setXY( ($marginl? 20 : $nbx*$size*9+20), ($marginh ? 35 : $posy+25));
-			$marginl=0;
-
-			$pdf->MultiCell($size*8,($sizeh? $sizeh : 7),utf8_decode($val),1,'L',1);
-
-			if ($cptcols == $nbcol)			// Si on arrive au nombre de colonnes indiquee dans le flexform, on passe a une nouvelle ligne d'elements
-			{
-				$pdf->Ln();					// Nouvelle ligne
-				$cptcols = 0;				// Compteur de colonnes remis a 0
-				$posy=$pdf->getY();			// On recupere la position en Y actuelle pour savoir ou placer les prochaines colonnes
-				$nbx=-1;					// le nombre d'elements et remis a 0 (-1 en realite car il est incremente juste apres)
-				$marginl=1;					// La marge de gauche est reinitialisee
-				$marginh=0;
+			$cellData[$cptCols]=$row;
+			$cellHeight[$cptCols]=$this->getPDFTABRowHeight($pdf,$row);
+			if ($cellHeight[$cptCols]>$rowHeight) $rowHeight=$cellHeight[$cptCols];
+			/**
+			 * End of row detection
+			 */
+			$cptCols++;
+			$nbCells--;
+			
+			if ($cptCols>=$nbCols || $nbCells<=0 ) {
+				//error_log(__METHOD__.": bm $pdf->bottommargin Y $this->Y, Height $H, rowHeight $rowHeight, res".($this->Y+$rowHeight+$pdf->bottommargin));
+				// Why +5 ?
+				if ($this->Y+$rowHeight+$pdf->bottommargin+5>=$H) {
+					//error_log(__METHOD__.": AddPage");
+					$this->Y=$pdf->topmargin;
+					$this->LastY=$pdf->topmargin;
+					$pdf->addPage();
+				}
+				// We have reached end of row or end of file ...
+				$this->getPDFTABPrintRow($pdf,$cellData);
+				// We reset data arrays
+				//error_log(__METHOD__.": cptCols $cptCols,nbCell $nbCells, rowHeight $rowHeight");
+				$cptCols=0;
+				$cellData=array();
+				$cellHeight=array();
+				$rowHeight=0;	
 			}
-	
-		$val='';
-		$cptcols++;	
-		$nbx++;
 		}
-		ob_clean();
-		//$pdf->Output();
-		/*switch ($print) {
-			case 'print':
-			case 'printnodialog':
-				$pdf->AutoPrint(false);
-				break;
-			case 'printdialog':
-				$pdf->AutoPrint(true);
-				break;
-			default:
-				break;
+		/*
+		//Draw rectangles
+		
+		while ($cptcols>0) {
+			$cptcols--;
+			$rh=$LastY-$Y;
+			$pdf->Rect($pdf->leftmargin+($size*$cptcols), $Y, $size, $rh);
+		}
+		$Y=$LastY;
+		$pdf->Ln();					// Nouvelle ligne
+		$cptcols = 0;				// Compteur de colonnes remis a 0
+		$posy=$pdf->getY();			// On recupere la position en Y actuelle pour savoir ou placer les prochaines colonnes
+		$nbx=-1;					// le nombre d'elements et remis a 0 (-1 en realite car il est incremente juste apres)
+		$marginh=0;
+		if ($Y>$H) {
+			$Y=$pdf->topmargin;
+			$pdf->addPage();
+		}
+		// I subtracted one from column width as a kind of cell padding
+		foreach($row->td as $elem) {
+			$pdf->setX($X);
+		
+			if ($elem->img==1) {
+		
+				$vala=t3lib_div::trimexplode(',',$elem->data);
+				$img='';
+				//$myx=$pdf->getX();
+				//$pdf->Cell($size,$height,'',1,0,'L',1);
+				//$pdf->setX($myx);
+				if ($elem->data != '') {
+					foreach($vala as $v) {
+						$img=PATH_site.($v?$elem->img->dir.'/'.$v:'');
+						$imginfo=getimagesize($img);
+						if (is_array($imginfo)) {
+							$w=$imginfo[0];
+							$h=$imginfo[1];
+							$pdf->Image($img,$pdf->getX()+0.5,$pdf->getY()+0.5,0, $height-1);
+							//$pdf->setX($pdf->getX()+((($height-1)/$h)*$w));
+							$pdf->SetY($Y+0.5+$this->imageHeight-1);
+						} else {
+							// Empty image we make room for it
+							$pdf->SetY($Y+0.5+$this->imageHeight-1);
+						}
+						// By defaullt we only handle first media
+						if (!$multipleMedia) break;
+					}
+				} else {
+		
+					// Empty image we make room for it
+					$pdf->SetY($Y+0.5+$this->imageHeight-1);
+				}
+				//$pdf->setX($size+$pdf->leftmargin);
+			} else {
+				$val= strip_tags($elem->data);
+				$pdf->MultiCell($size,$this->lineHeight,utf8_decode($val),0,'L',0);
+			}
+		}
+		
+		//error_log(__METHOD__.":X $X, Y $Y");
+		//$pdf->setXY( ($marginl? 20 : $nbx*$size*9+20), ($marginh ? 35 : $posy+25));
+		
+		$cptcols++;
+		$Y2=$pdf->GetY();
+		if ($LastY<$Y2) {
+			$LastY=$Y2;
+		}
+		if ($cptcols >= $nbCols)			// Si on arrive au nombre de colonnes indiquee dans le flexform, on passe a une nouvelle ligne d'elements
+		{
+			//Draw rectangles
+			while ($cptcols>0) {
+				$cptcols--;
+				$rh=$LastY-$Y;
+				$pdf->Rect($pdf->leftmargin+($size*$cptcols), $Y, $size, $rh);
+			}
+			$Y=$LastY;
+			$pdf->Ln();					// Nouvelle ligne
+			$cptcols = 0;				// Compteur de colonnes remis a 0
+			$posy=$pdf->getY();			// On recupere la position en Y actuelle pour savoir ou placer les prochaines colonnes
+			if ($Y>$H) {
+				$Y=$pdf->topmargin;
+				$pdf->addPage();
+			}
+		
 		}*/
+		
+		ob_clean();
+		$name=$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf';
+		ob_clean();
 		$pdf->generatePrintScript($print,$printer,$server);
-		$content = $pdf->Output('test.pdf', 'S');
-		echo $content;
+		$pdf->Output($name, 'I');
 		die;
 	}
 		
 	// We handle here excel file generation
-/*	function getEXCEL(&$content,&$caller) {
-		//[HTTP_REFERER] => http://cric.ard.fr/44.0.html
-		header("Content-Type: apllication/xls");
-		header('Content-disposition: filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.xls"');
-		$www=t3lib_div::trimexplode(':',$_SERVER['HTTP_REFERER']);
-		echo '<head><base href="'.$www[0].'://'.$_SERVER['SERVER_NAME'].'/" /><base target="_blank" /></head>';
-
-		echo utf8_decode($caller->metafeeditlib->T3StripComments($content));
-		die;
-	}
-*/
 	function getEXCEL(&$content,&$caller) {
 		$this->headerConf=array(
 			0=>array(
@@ -1044,7 +1342,9 @@ class tx_metafeedit_export {
 		$nbcs=0;
 		$maxcol='A';
 		$c='A';
-
+		// Do we handle multiple media (default no)
+		$multipleMedia=$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']?$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']:($this->confTS['default.']['list.']['multipleMedia']?$this->confTS['default.']['list.']['multipleMedia']:false);
+		
 		if($xml->tr) {
 			$x=0;
 			foreach ($xml->tr->td as $cell) {
@@ -1168,10 +1468,11 @@ class tx_metafeedit_export {
 	
 					// Affichage du signe Euro sur l'export PDF CBY : a virer !!!
 					if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
-	
-					if ($col->img==1 && strlen($val)>0) {	 				// We handle images here...
+					// We handle images here...
+					if ($col->img==1 && strlen($val)>0) {
 						$vala=t3lib_div::trimexplode(',',$val);
 						$img='';
+						if (!$multipleMedia) $val=$vala[0];
 						$objPHPExcel->getActiveSheet()->setCellValue($c.$r, "".$val);
 						$offset=10;
 						foreach($vala as $v) {
@@ -1195,9 +1496,12 @@ class tx_metafeedit_export {
 								$offset+=$objDrawing->getWidth()+10;
 								$maxwidth[$c]=$offset>$maxwidth[$c]?$offset:$maxwidth[$c];
 							}
+							// By defaullt we only handle first media
+							if (!$multipleMedia) break;
 						}
 						$maxoffset=$offset>$maxoffset?$offset:$maxoffset;
-						//$pdf->setX($size+$pdf->leftmargin);									// + la marge definie plus haut pour la page => ligne 2308
+						//$pdf->setX($size+$pdf->leftmargin);
+						// + la marge definie plus haut pour la page => ligne 2308
 					} else {
 						switch($pos[$x]) {
 							case 'left' :

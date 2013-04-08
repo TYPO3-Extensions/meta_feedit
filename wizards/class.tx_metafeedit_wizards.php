@@ -15,7 +15,7 @@ require_once(PATH_t3lib.'class.t3lib_div.php');
 class tx_metafeedit_wizards {
 	// GET vars:
 	var $P;				// Wizard parameters, coming from TCEforms linking to the wizard.
-	var $colorValue;	// Value of the current color picked.
+	var $fieldValue;	// Value of the current field.
 	var $fieldChangeFunc;	// Serialized functions for changing the field... Necessary to call when the value is transferred to the TCEform since the form might need to do internal processing. Otherwise the value is simply not be saved.
 	var $fieldName;		// Form name (from opener script)
 	var $formName;		// Field name (from opener script)
@@ -73,18 +73,229 @@ class tx_metafeedit_wizards {
 		$this->content.='
 </html>';
 }
+	/**
+	 * Pretty-print JSON string
+	 *
+	 * Use 'format' option to select output format - currently html and txt supported, txt is default
+	 * Use 'indent' option to override the indentation string set in the format - by default for the 'txt' format it's a tab
+	 *
+	 * @param string $json Original JSON string
+	 * @param array $options Encoding options
+	 * @return string
+	 */
 
+	public  function prettyPrint($json, $options = array())
+	{
+		$tokens = preg_split('|([\{\}\]\[,])|', $json, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$result = "";
+		$indent = 0;
+	
+		$format= "txt";
+	
+		$ind = "\t";
+	
+		if(isset($options['format'])) {
+			$format = $options['format'];
+		}
+	
+		switch ($format):
+		case 'html':
+			$line_break = "<br />";
+		$ind = "\$nbsp;\$nbsp;\$nbsp;\$nbsp;";
+		break;
+		default:
+		case 'txt':
+			$line_break = "\n";
+		$ind = "\t";
+		break;
+		endswitch;
+	
+		//override the defined indent setting with the supplied option
+		if(isset($options['indent'])) {
+			$ind = $options['indent'];
+		}
+	
+		foreach($tokens as $token) {
+			if($token == "") continue;
+	
+			$prefix = str_repeat($ind, $indent);
+			if($token == "{" || $token == "[") {
+				$indent++;
+				if($result != "" && $result[strlen($result)-1] == $line_break) {
+					$result .= $prefix;
+				}
+				$result .= "$token$line_break";
+			} else if($token == "}" || $token == "]") {
+				$indent--;
+				$prefix = str_repeat($ind, $indent);
+				$result .= "$line_break$prefix$token";
+			} else if($token == ",") {
+				$result .= "$token$line_break" ;
+			} else {
+				$result .= $prefix.$token;
+			}
+		}
+		return $result;
+	}
 
+	function saveReport($ttContentUid) {
+		if ($ttContentUid) {
+			$where='uid='.intval($ttContentUid);
+			// we get associated data
+			$db=$GLOBALS['TYPO3_DB'];
+			$res=$db->exec_SELECTquery('pi_flexform,pid','tt_content',$where);
+			while ($row=$db->sql_fetch_row($res))
+			{
+				$flex=$row[0];
+				$tspid=$row[1];
+			}
+			require_once(PATH_t3lib . 'class.t3lib_timetracknull.php');
+			$TT = new t3lib_timeTrackNull();
+			$GLOBALS['TT']=$TT;
+			$fe=t3lib_div::makeInstance('tslib_fe',$GLOBALS['TYPO3_CONF_VARS'],$tspid,0);
+			$fe->initFEuser();
+			$fe->fetch_the_id();
+			$fe->getPageAndRootline();
+			$fe->initTemplate();
+			$ts=$fe->getConfigArray();
+			
+			//error_log(__METHOD__.":>".print_r($fe->tmpl->setup['plugin.']['tx_metafeedit_pi1.'],true));
+			$flexForm=t3lib_div::xml2array($flex);
+			//return $flex;
+			$conf=$fe->tmpl->setup['plugin.']['tx_metafeedit_pi1.'];
+			if (!class_exists('Tx_MetaFeedit_Lib_PidHandler') )  require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/Lib/PidHandler.php');
+			$pidHandler=t3lib_div::makeInstance('Tx_MetaFeedit_Lib_PidHandler');
+			$pluginId=$flexForm['data']['sQuickStart']['lDEF']['pluginId']['vDEF']?$flexForm['data']['sQuickStart']['lDEF']['pluginId']['vDEF']:$ttContentUid;
+			$file=PATH_site."fileadmin/reports/$pluginId.json";
+			$pid=intval($flexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
+			$path= $pidHandler->getPath($pid);
+			if ($path) $flexForm['data']['sQuickStart']['lDEF']['page']['vDEF']=$path;
+			
+			$storeConf['tsconf']=$conf;
+			$storeConf['flexForm']=$flexForm;
+			$f = fopen($file, "w");
+			if($f) {
+				// We update localconf.php
+				//echo "\$json".str_replace( '}', "}\n", $ob_out );
+				//$w=fwrite($f,json_encode($storeConf));
+				$w=fwrite($f,$this->prettyPrint(json_encode($storeConf)));
+				if (!$w) echo "Can't write to $file";
+		
+				$rf=fflush($f);
+				if (!$rf) echo "Can't flush to $file";
+				$c=fclose($f);
+				if (!$c) echo "Can't close $file";
+			}
+			return $file;
+		}
+		return '';
+	}
+	
+	function loadReport($ttContentUid) {
+		if ($ttContentUid) {
+			$where='uid='.intval($ttContentUid);
+			// we get associated data
+			$db=$GLOBALS['TYPO3_DB'];
+			$res=$db->exec_SELECTquery('pi_flexform,pid','tt_content',$where);
+			while ($row=$db->sql_fetch_row($res))
+			{
+				$flex=$row[0];
+				$tspid=$row[1];
+			}
+			$flexForm=t3lib_div::xml2array($flex);
+			//return $flex;
+			$conf=array();
+			$fileA=explode(',',$this->fieldValue);
+			$file=$fileA[0];
+			if ($file) {
+				if (!class_exists('Tx_MetaFeedit_Lib_PidHandler') ) require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/Lib/PidHandler.php');
+				$pidHandler=t3lib_div::makeInstance('Tx_MetaFeedit_Lib_PidHandler');
+				$configstore=json_decode(str_replace(array("\n","\t"),"",file_get_contents($file)),true);
+				$conf=$configstore['tsconf'];
+				$TS='';
+				$this->tsArrayToTs("plugin.tx_metafeedit_pi1.",$conf,$TS);
+				//error_log(__METHOD__.":TS $TS");
+				$this->updateTSTemplate($tspid,$TS);
+				$piFlexForm=$configstore['flexForm'];
+				$this->updateReportFlexform($ttContentUid,$piFlexForm);
+				//$piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF'];
+				//$pid=intval($piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
+				//if ($pid==0 && $piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']) $pid=$pidHandler->getPid($piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
+				//if ($pid) $piFlexForm['data']['sQuickStart']['lDEF']['page']['vDEF']=$pid;
+				return $file;
+			}
+		}
+		return '';
+	}
+	function updateTSTemplate($tspid,$TS) {
+		$db=$GLOBALS['TYPO3_DB'];
+		$where="pid=$tspid";
+		$res=$db->exec_SELECTquery('uid','sys_template',$where);
+		$cnt=$db->sql_num_rows($res);
+		$data=array();
+		$data['tstamp']=time();
+		$data['config']=$TS;
+		if (!$cnt)  {
+			$data['pid']=$tspid;
+			$data['crdate']=time();
+			$data['title']='+afe reports';
+			$res=$db->exec_INSERTquery('sys_template',$data);
+		} else {
+			$res=$db->exec_UPDATEquery('sys_template',$where,$data);
+		}
+		
+	}
+	function array2Xml($dataArray,&$xml) {
+		//error_log(__METHOD__.":".print_r($dataArray,true));
+		if (is_array($dataArray)) foreach($dataArray as $key=>$val) {
+			//error_log(__METHOD__.":$key >>>");
+			$xml.="<$key>";
+			$this->array2Xml($val,$xml);
+			$xml.="</$key>";
+			//error_log(__METHOD__.":$key, $xml");
+		} else {
+			$xml.=htmlspecialchars($dataArray);
+			//error_log(__METHOD__.":leaf");
+		}
+	}
+	
+	function updateReportFlexform($ttContentUid,$flexform) {
+		$db=$GLOBALS['TYPO3_DB'];
+		$where="uid=$ttContentUid";
+		$data=array();
+		$data['tstamp']=time();
+		$xml='<?xml version="1.0" encoding="utf-8" standalone="yes" ?><T3FlexForms>';
+		//error_log(__METHOD__.":".print_r($flexform, true));
+		$this->array2Xml($flexform,$xml);
+		$xml.='</T3FlexForms>';
+		$data['pi_flexform']=$xml;
+		//$data['title']='+afe reports';
+		$res=$db->exec_UPDATEquery('tt_content',$where,$data);
+		//error_log(__METHOD__.":".$db->UPDATEquery('tt_content',$where,$data));	
+	}
+	
+	function tsArrayToTs($tsPath,$tsArray,&$ret) {
+		if (is_array($tsArray)) foreach($tsArray as $key=>$val) {
+			$this->tsArrayToTs($tsPath.$key,$val,$ret);
+		} else {
+			$ret.="$tsPath=$tsArray".chr(10);
+		}
+	}
+	/**
+	 * 
+	 */
 	function init() {
 		// Setting GET vars (used in frameset script):
 		$this->P = t3lib_div::_GP('P',1);
 		// Setting GET vars (used in colorpicker script):
-		$this->colorValue = t3lib_div::_GP('colorValue');
+		$this->fieldValue = t3lib_div::_GP('colorValue');
 		$this->fieldChangeFunc = t3lib_div::_GP('fieldChangeFunc');
 		$this->fieldName = t3lib_div::_GP('fieldName');
 		$this->formName = t3lib_div::_GP('formName');
 		$this->md5ID = t3lib_div::_GP('md5ID');
-		$this->exampleImg = t3lib_div::_GP('exampleImg');		
+		$this->exampleImg = t3lib_div::_GP('exampleImg');
+		preg_match("/[0-9]+/",$this->fieldName, $matches);
+		$this->ttContentUid=$matches[0]?$matches[0]:0;
 		$cmd=t3lib_div::_GP('cmdtpl');	
 
 
@@ -134,16 +345,69 @@ class tx_metafeedit_wizards {
 			$this->frameSet();
 		} else {
 			// If the save/close button is clicked, then close:
-			if(t3lib_div::_GP('save_close')) {
+			if(t3lib_div::_GP('close')) {
+				$content.=$this->doc->wrapScriptTags('
+					parent.close();
+				');
+				$this->content.=$this->doc->section('Goodbye !', $content, 0,1);
+			}elseif(t3lib_div::_GP('save_close')) {
 				$content.=$this->doc->wrapScriptTags('
 					setValue(\''.t3lib_div::_GP('tpl').'\');
 					parent.close();
 				');
 				$this->content.=$this->doc->section('Goodbye !', $content, 0,1);
 			} else {
+				//error_log(__METHOD__.":".$cmd);
 				switch($cmd) {
+					case 'save':
+						$fs=$this->saveReport($this->ttContentUid);
+						$METAFEEDIT=t3lib_div::makeInstance('tx_metafeedit');
+						$content .= '
+						<form name="colorform" method="post" action="#">
+						<!-- Value box: -->
+						<p class="c-head">File saved at : '.$fs.'</p>
+						<table border="0" cellpadding="0" cellspacing="3">
+							<tr>
+								<td><input type="submit" name="close" value="close" /></td>
+							</tr>
+						</table>
+						<!-- Hidden fields with values that has to be kept constant -->
+						<input type="hidden" name="showPicker" value="1" />
+						<input type="hidden" name="fieldChangeFunc" value="'.htmlspecialchars($this->fieldChangeFunc).'" />
+						<input type="hidden" name="fieldName" value="'.htmlspecialchars($this->fieldName).'" />
+						<input type="hidden" name="formName" value="'.htmlspecialchars($this->formName).'" />
+						<input type="hidden" name="md5ID" value="'.htmlspecialchars($this->md5ID).'" />
+						<input type="hidden" name="tpl" value="Template ...." />
+						<input type="hidden" name="exampleImg" value="'.htmlspecialchars($this->exampleImg).'" />
+						</form>';
+						$this->content.=$this->doc->section('Report has been saved', $content, 0,1);
+						break;
+					case 'load':
+						$fs=$this->loadReport($this->ttContentUid);
+						$METAFEEDIT=t3lib_div::makeInstance('tx_metafeedit');
+						$content .= '
+						<form name="colorform" method="post" action="#">
+						<!-- Value box: -->
+						<p class="c-head">File loaded from : '.$fs.'</p>
+						<table border="0" cellpadding="0" cellspacing="3">
+							<tr>
+								<td><input type="submit" name="close" value="close" /></td>
+							</tr>
+						</table>
+						<!-- Hidden fields with values that has to be kept constant -->
+						<input type="hidden" name="showPicker" value="1" />
+						<input type="hidden" name="fieldChangeFunc" value="'.htmlspecialchars($this->fieldChangeFunc).'" />
+						<input type="hidden" name="fieldName" value="'.htmlspecialchars($this->fieldName).'" />
+						<input type="hidden" name="formName" value="'.htmlspecialchars($this->formName).'" />
+						<input type="hidden" name="md5ID" value="'.htmlspecialchars($this->md5ID).'" />
+						<input type="hidden" name="tpl" value="Template ...." />
+						<input type="hidden" name="exampleImg" value="'.htmlspecialchars($this->exampleImg).'" />
+						</form>';
+						$this->content.=$this->doc->section('Report has been loaded', $content, 0,1);
+						
+						break;
 					case 'clear':
-				$content .= '
+						$content .= '
 							<form name="colorform" method="post" action="">
 									<!-- Value box: -->
 								<p class="c-head">test</p>
@@ -152,8 +416,7 @@ class tx_metafeedit_wizards {
 											<td><input type="submit" name="save_close" value="save & close" /></td>
 									</tr>
 								</table>
-			
-									<!-- Hidden fields with values that has to be kept constant -->
+								<!-- Hidden fields with values that has to be kept constant -->
 								<input type="hidden" name="showPicker" value="1" />
 								<input type="hidden" name="fieldChangeFunc" value="'.htmlspecialchars($this->fieldChangeFunc).'" />
 								<input type="hidden" name="fieldName" value="'.htmlspecialchars($this->fieldName).'" />
@@ -166,18 +429,17 @@ class tx_metafeedit_wizards {
 						$this->content.=$this->doc->section('Are you sure you want to clear template ?', $content, 0,1);
 						break;
 					default :
-					$METAFEEDIT=t3lib_div::makeInstance('tx_metafeedit');
-					$content .= '
+						$METAFEEDIT=t3lib_div::makeInstance('tx_metafeedit');
+						$content .= '
 							<form name="colorform" method="post" action="#">
 									<!-- Value box: -->
 								<p class="c-head">test</p>
 								<table border="0" cellpadding="0" cellspacing="3">
 									<tr>
-											<td><input type="submit" name="save_close" value="save & close" /></td>
+										<td><input type="submit" name="save_close" value="save & close" /></td>
 									</tr>
 								</table>
-			
-									<!-- Hidden fields with values that has to be kept constant -->
+								<!-- Hidden fields with values that has to be kept constant -->
 								<input type="hidden" name="showPicker" value="1" />
 								<input type="hidden" name="fieldChangeFunc" value="'.htmlspecialchars($this->fieldChangeFunc).'" />
 								<input type="hidden" name="fieldName" value="'.htmlspecialchars($this->fieldName).'" />
@@ -186,7 +448,7 @@ class tx_metafeedit_wizards {
 								<input type="hidden" name="tpl" value="Template ...." />
 								<input type="hidden" name="exampleImg" value="'.htmlspecialchars($this->exampleImg).'" />
 							</form>';
-					$this->content.=$this->doc->section('Are you sure you want to set template ?', $content, 0,1);
+						$this->content.=$this->doc->section('Are you sure you want to set template ?', $content, 0,1);
 					break;
 		
 				}	

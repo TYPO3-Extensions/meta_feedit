@@ -4825,6 +4825,7 @@ class tx_metafeedit_lib {
 		if($conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre']) $title = $conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre'];
 		if  (!isset($title) && $this->feadminlib->piVars['title']) $title=$this->feadminlib->piVars['title'];
 		if (!isset($title)) $title = $GLOBALS['TSFE']->page['title'];
+		error_log(__METHOD__.":$title");
 		$markerArray=array();
 
 		
@@ -4872,16 +4873,17 @@ class tx_metafeedit_lib {
 		$title=$this->cObj->substituteMarkerArray($title,$markerArray);
 		
 		if ($this->confTS[$this->pluginId.'.']['list.']['soustitre']) $recherche = $this->confTS[$this->pluginId.'.']['list.']['soustitre'];
-
-		$cont = $this->conf['inputvar.']['advancedSearch'];
-		if (is_array($this->conf['inputvar.']['advancedSearch'])) {		
-			foreach ($this->conf['inputvar.']['advancedSearch'] as $key => $val) {
+		if (is_array($conf['inputvar.']['advancedSearch'])) {	
+			
+			foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
 				if($val) {
-					$recherche .= ($recherche?', ':'').$caller->metafeeditlib->getLLFromLabel($this->conf['TCAN'][$this->conf['table']]['columns'][$key]['label'], $this->conf).':';
-					$recherche .= $this->conf['inputvar.']['advancedSearch'][$key]['val']?$this->conf['inputvar.']['advancedSearch'][$key]['val']:$this->conf['inputvar.']['advancedSearch'][$key];
+					
+					$recherche .= ($recherche?', ':'').$this->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['label'], $conf).'=';
+					$recherche .= $conf['inputvar.']['advancedSearch'][$key]['val']?$conf['inputvar.']['advancedSearch'][$key]['val']:$conf['inputvar.']['advancedSearch'][$key];
 				}
 			}
 		}
+		error_log(__METHOD__.":2$title");
 		return $title;
 
 	}
