@@ -426,18 +426,19 @@ class tx_metafeedit_export {
 		$format=A4;
 		$noheader=false;
 		$nofooter=false;
-		
+
 		// We handle special settings here
-		
+
 		foreach($xml->spec as $s) {
-				$noheader=$s->attributes()->nh;
-				$nofooter=$s->attributes()->nf;
-				$margintop=$s->attributes()->mt;		
-				$marginleft=$s->attributes()->ml;		
-				$marginright=$s->attributes()->mr;		
-				$marginbottom=$s->attributes()->mb;		
-				$format=array($s->attributes()->w,$s->attributes()->h);
+			$noheader=$s->attributes()->nh;
+			$nofooter=$s->attributes()->nf;
+			$margintop=$s->attributes()->mt;
+			$marginleft=$s->attributes()->ml;
+			$marginright=$s->attributes()->mr;
+			$marginbottom=$s->attributes()->mb;
+			$format=array($s->attributes()->w,$s->attributes()->h);
 		}
+
 		$unit='mm';
 		//error_log(__METHOD__.":".get_class($this->caller));
 		$pdf = new tx_metafeedit_pdf($orientation, $unit, $format);
@@ -445,8 +446,7 @@ class tx_metafeedit_export {
 		$pdf->AddFont('3OF9','','3OF9.php');
 		$pdf->nofooter=$nofooter;
 		// TODO Handle typoscript here ...
-		
-		
+
 		$pdf->bottommargin=$marginbottom?$marginbottom:8;
 		$pdf->leftmargin=$marginleft?$marginleft:8;
 		$pdf->rightmargin=$marginright?$marginright:8;
@@ -454,7 +454,7 @@ class tx_metafeedit_export {
 		$this->footercellsize=7;
 		$this->headercellsize=7;
 		$this->cellsize=7;
-				
+
 		$pdf->AliasNbPages();
 		$pdf->setMargins($pdf->leftmargin,$pdf->topmargin,$pdf->rightpmargin);
 		$pdf->SetAutoPageBreak(1,$pdf->bottommargin);
@@ -713,12 +713,15 @@ class tx_metafeedit_export {
 	 * @param unknown_type $server
 	 */
 	function getPDF(&$content,&$caller,$print='',$printer='',$server='') {
+		if (!$content) {
+			die(__METHOD__.': No template for pdf mode, maybe pdf export is not activated');
+		}
 		//error_log(__METHOD__.":$print,$printer,$server");
 		try {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
 			echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
-			die( 'Caught exception: '.  $e->getMessage());
+			die( __METHOD__.': Caught exception: '.  $e->getMessage().', maybe pdf export is not activated');
 		};
 		$count = 0;
 		$taille = 0;

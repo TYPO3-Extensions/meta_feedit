@@ -265,6 +265,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			$pidHandler=t3lib_div::makeInstance('Tx_MetaFeedit_Lib_PidHandler');
 			$pid=intval($flexForm['data']['sQuickStart']['lDEF']['page']['vDEF']);
 			$path= $pidHandler->getPath($pid);
+			if (strpos($path,'/')==0){
+				$path=substr($path,1);
+			}
 			if ($path) $flexForm['data']['sQuickStart']['lDEF']['page']['vDEF']=$path;
 			$storeConf['tsconf']=$conf;
 			$storeConf['flexForm']=$flexForm;

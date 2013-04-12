@@ -273,7 +273,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->nc = $this->conf['cacheMode']==0 ? '&no_cache=1' : $this->nc;
 		// pid
 		$this->thePid = intval($this->conf['pid']) ? intval($this->conf['pid']) : $GLOBALS['TSFE']->id;
-		 if ($conf['debug']) echo t3lib_div::view_array(array('thePid '=>$this->thePid ));
+		 if ($conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('thePid '=>$this->thePid ));
 		//
 		$this->codeLength = intval($this->conf['authcodeFields.']['codeLength']) ? intval($this->conf['authcodeFields.']['codeLength']) : 8;
 
@@ -706,7 +706,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					break;
 				case 'list': //TODO to be improved move displayListScreen here.
 				case 'edit':
-					if ($this->conf['debug']) echo t3lib_div::view_array(array('displayEditScreen'=>'on'));
+					if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('displayEditScreen'=>'on'));
 					$this->conf['cmdmode']='edit';
 					$content = $this->displayEditScreen();
 					break;
@@ -752,7 +752,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		
 		// We update Session vars in case of change of cmd mode
 		$this->metafeeditlib->updateSessionVars($this->conf);
-		return ($conf['performanceaudit']?t3lib_div::view_array($this->perfArray):'').$content.$conf['debug.']['debugString'].$DEBUG;
+		return ($conf['performanceaudit']?Tx_MetaFeedit_Lib_ViewArray::viewArray($this->perfArray):'').$content.$conf['debug.']['debugString'].$DEBUG;
 	}
 
 	/**
@@ -2676,7 +2676,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// We handle here Edit mode or Preview Mode
 		// Edit Mode : User can edit fields
 		// Preview Mode : user can only see fields	
-		if ($this->conf['debug']) echo t3lib_div::view_array(array('displayEditScreen'=>'on'));
+		if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('displayEditScreen'=>'on'));
 		$exporttype=$this->piVars['exporttype'];
 		$print=$this->piVars['print'];
 		$printerName=$this->piVars['printername'];
@@ -2697,15 +2697,15 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// If editing is enabled
 		if ($this->conf['edit'] || $this->preview || $this->conf['list'] )	{	
 			// hack for lists in second plugin ... to be checked.., Will not work if we want to edit in second plugin ...
-			if ($this->conf['debug']) echo t3lib_div::view_array(array('Edit or preview'=>'on'));
+			if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('Edit or preview'=>'on'));
 			$uid=$this->dataArr[$this->conf['uidField']]?$this->dataArr[$this->conf['uidField']]:$this->recUid;
  			if ($this->conf['list.']['rUJoinField']=='uid' && $uid){
-				if ($this->conf['debug']) echo t3lib_div::view_array(array('UIDFIELD'=>$this->conf['uidField'].' : '.$this->recUid));
-				if ($this->conf['debug']) echo t3lib_div::view_array(array('dataArr'=>$this->dataArr[$this->conf['uidField']]));
+				if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('UIDFIELD'=>$this->conf['uidField'].' : '.$this->recUid));
+				if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('dataArr'=>$this->dataArr[$this->conf['uidField']]));
 				$origArr = $this->metafeeditlib->getRawRecord($this->theTable,$uid,$this->conf);
 			}
 			
-			if ($this->conf['debug']) echo t3lib_div::view_array(array('editMode'=>'on'));
+			if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('editMode'=>'on'));
 
 			// here we handle foreign tables not the best way , we should work on join tables especially if we handle lists...
 			
@@ -2762,11 +2762,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$DBSELECT=$this->metafeeditlib->DBmayFEUserEditSelectMM($this->theTable,$GLOBALS['TSFE']->fe_user->user, $this->conf['allowedGroups'],$this->conf['fe_userEditSelf'],$mmTable,$this->conf).$GLOBALS['TSFE']->sys_page->deleteClause($this->theTable);
 
 			$TABLES=$mmTable?$this->theTable.','.$mmTable:$this->theTable;
-			if ($this->conf['debug']) echo t3lib_div::view_array(array('EDIT'=>$origArr));
+			if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('EDIT'=>$origArr));
 			if (!is_array($origArr)&&$this->conf['editUnique']) {
 				$lockPid = ($this->conf['edit.']['menuLockPid'] && $this->conf['pid'])? ' AND pid='.intval($this->thePid) : '';
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $TABLES, '1 '.$lockPid.$DBSELECT);
-				if ($this->conf['debug']) 	echo t3lib_div::view_array(array('EDITUNIQUE TEST'=>$GLOBALS['TYPO3_DB']->SELECTquery('*', $TABLES, '1 '.$lockPid.$DBSELECT)));
+				if ($this->conf['debug']) 	echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('EDITUNIQUE TEST'=>$GLOBALS['TYPO3_DB']->SELECTquery('*', $TABLES, '1 '.$lockPid.$DBSELECT)));
 				$resu=$GLOBALS['TYPO3_DB']->sql_num_rows($res);
 				if ($resu>=1)	{
  					while($menuRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))   {
@@ -2784,7 +2784,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				// Must be logged in OR be authenticated by the aC code in order to edit
 
 				// If the recUid selects a record.... (no check here)
-				if ($this->conf['debug']) echo t3lib_div::view_array(array('EDIT'=>"No login"));
+				if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('EDIT'=>"No login"));
 			
 				// We come from ??
 				if (is_array($origArr) && !($this->conf['inputvar.']['BACK'] && $this->conf['inputvar.']['cameFromBlog']))	{
@@ -2802,7 +2802,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 					if ($this->aCAuth($origArr) || $this->metafeeditlib->DBmayFEUserEdit($this->theTable,$origArr, $GLOBALS['TSFE']->fe_user->user,$this->conf['allowedGroups'],$this->conf['fe_userEditSelf'],$this->conf))	{	
 						// Display the form, if access granted.
-						if ($this->conf['debug']) echo t3lib_div::view_array(array('EDIT'=>"User may edit"));
+						if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('EDIT'=>"User may edit"));
 						if 	($this->conf['evalFunc'])	{
 							$origArr = $this->userProcess('evalFunc',$origArr);
 						}
@@ -2964,7 +2964,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($this->conf['blogData']) $content = $this->cObj->substituteSubpart($content,'###PREVIEWACTIONS###',$action['BACK']); ;
 
 		$content = $this->cObj->substituteMarkerArray($content, $markerArray);
-		if ($conf['debug.']['markerArray']) echo t3lib_div::view_array($markerArray);
+		if ($conf['debug.']['markerArray']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray($markerArray);
 		// Blog Comment Display :
 		// We handle empty fields here ..
  		if ($this->conf['preview.']['noemptyfields'] && $this->preview) {

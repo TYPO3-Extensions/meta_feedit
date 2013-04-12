@@ -43,7 +43,7 @@ class tx_metafeedit_sqlengine {
     */
     
  	function debug($title,$content,&$DEBUG) {
- 		if (is_array($content)) $content=t3lib_div::view_array($content);
+ 		if (is_array($content)) $content=Tx_MetaFeedit_Lib_ViewArray::viewArray($content);
  		if (is_object($content)) {
  			//$content='';
  			ob_start();
@@ -225,7 +225,7 @@ class tx_metafeedit_sqlengine {
     */
 	function DBmayFEUserEditSelectMM($table,$fe_user,$allowedGroups,$fe_userEditSelf, &$mmTable,&$conf) {
 		$ret='';
-		if ($conf['debug']) echo t3lib_div::view_array(array('checkT3Rights'=>$conf['checkT3Rights']));
+		if ($conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('checkT3Rights'=>$conf['checkT3Rights']));
 
 		if ($conf['checkT3Rights']) {
 
@@ -260,7 +260,7 @@ class tx_metafeedit_sqlengine {
 
                 // points to the field (integer) that holds the fe_users-id of the creator fe_user
 
-		  if ($conf['debug']) echo t3lib_div::view_array(array('fe_cruser_id'=>$conf['TCAN'][$table]['ctrl']['fe_cruser_id']));
+		  if ($conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('fe_cruser_id'=>$conf['TCAN'][$table]['ctrl']['fe_cruser_id']));
 
                 if ($conf['TCAN'][$table]['ctrl']['fe_cruser_id'])    {
 			$mmTable=$conf['TCAN'][$table]['columns'][$conf['TCAN'][$table]['ctrl']['fe_cruser_id']]['config']['MM'];
@@ -280,7 +280,7 @@ class tx_metafeedit_sqlengine {
                         }
                 }
 
-		  if ($conf['debug']) echo t3lib_div::view_array(array('feEditSelf '=>$feEditSelf ));
+		  if ($conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('feEditSelf '=>$feEditSelf ));
 
                 // If $feEditSelf is set, fe_users may always edit them selves...
                 if ($feEditSelf && $table=='fe_users')  {
@@ -800,7 +800,7 @@ class tx_metafeedit_sqlengine {
 		//krumo($sql)
 		//die('proout');
 
- 		if ($conf['debug.']['sql']) $DEBUG.="<br/>LIST 2SQL ARRAY <br/>".t3lib_div::view_array($sql);   
+ 		if ($conf['debug.']['sql']) $DEBUG.="<br/>LIST 2SQL ARRAY <br/>".Tx_MetaFeedit_Lib_ViewArray::viewArray($sql);   
 		return $sql;
 	}
 
@@ -979,7 +979,7 @@ class tx_metafeedit_sqlengine {
 	function getLockPidJoin(&$conf,&$sql) {
  		$table=$conf['table'];
  		// Initial variables
-		if ($conf['debug']) echo t3lib_div::view_array(array('pid'=>$conf['pid']));
+		if ($conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('pid'=>$conf['pid']));
 
 		$lockPid = ($conf['edit.']['menuLockPid'] && $conf['pid'])? ' AND '.$table.'.pid='.intval($conf['pid']) : '';
 		if ($conf['recursive']) {

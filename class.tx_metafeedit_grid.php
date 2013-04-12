@@ -137,7 +137,7 @@ class tx_metafeedit_grid {
 		$jRowField=$this->metafeeditlib->getFieldJoin($conf,$sql,$conf['table'],$rowField);
 		$jColField=$this->metafeeditlib->getFieldJoin($conf,$sql,$conf['table'],$colField);		
 		if ($conf['debug.']['sql']) 
-			$DEBUG.="<br/>GRID SQL ARRAY <br/>".t3lib_div::view_array($sql);   	
+			$DEBUG.="<br/>GRID SQL ARRAY <br/>".Tx_MetaFeedit_Lib_ViewArray::viewArray($sql);   	
 		
 		// Clean up ..
 		
@@ -234,7 +234,7 @@ class tx_metafeedit_grid {
 				
 				if ($conf['parentObj']->conf['grid.']['row.']['whereString']) $sqlrow['where'].=$conf['parentObj']->conf['grid.']['row.']['whereString'];
 				
-				if ($conf['debug.']['sql']) $DEBUG.="<br/>Row Field SQL 1 <br/>".t3lib_div::view_array($sqlrow);   
+				if ($conf['debug.']['sql']) $DEBUG.="<br/>Row Field SQL 1 <br/>".Tx_MetaFeedit_Lib_ViewArray::viewArray($sqlrow);   
 
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($sqlrow['fields'].','.$conf['TCAN'][$rowTable]['ctrl']['label'],$sqlrow['fromTables'],$sqlrow['where']);
 
@@ -301,7 +301,7 @@ class tx_metafeedit_grid {
 				$conf['parentObj']=&$this->feadminlib;
 				if ($conf['grid.']['userFunc_afterColWhere']) t3lib_div::callUserFunction($conf['grid.']['userFunc_afterColWhere'],$conf,$conf['parentObj']);
 				if ($conf['parentObj']->conf['grid.']['col.']['whereString']) $sqlcol['where'].=$conf['parentObj']->conf['grid.']['col.']['whereString'];
-				if ($conf['debug.']['sql']) $DEBUG.="<br/>Col Field SQL <br/>".t3lib_div::view_array($sqlcol);   
+				if ($conf['debug.']['sql']) $DEBUG.="<br/>Col Field SQL <br/>".Tx_MetaFeedit_Lib_ViewArray::viewArray($sqlcol);   
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($sqlcol['fields'].','.$conf['TCAN'][$colTable]['ctrl']['label'],$sqlcol['fromTables'],$sqlcol['where']);
 				if ($conf['debug.']['sql']) $DEBUG.="<br/>Col Field SQL <br/>".$GLOBALS['TYPO3_DB']->SELECTquery($sqlcol['fields'].','.$conf['TCAN'][$colTable]['ctrl']['label'],$sqlcol['fromTables'],$sqlcol['where']);   
 				if (!$secondaryTable) {				
@@ -311,7 +311,7 @@ class tx_metafeedit_grid {
 						$colLabel[$nbCols]=$item[$conf['TCAN'][$colTable]['ctrl']['label']];
 					}
 				} else {
-					if ($conf['debug.']['sql']) $DEBUG.="<br/>Secondary Col Fields SQL <br/>".t3lib_div::view_array($sql2);   
+					if ($conf['debug.']['sql']) $DEBUG.="<br/>Secondary Col Fields SQL <br/>".Tx_MetaFeedit_Lib_ViewArray::viewArray($sql2);   
 					$res2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery($sql2['fields'].','.$conf['TCAN'][$secondaryTable]['ctrl']['label'],$sql2['fromTables'],$sql2['where']);
 					$nb2=$GLOBALS['TYPO3_DB']->sql_num_rows($res2);
 					if ($nb2>0) {

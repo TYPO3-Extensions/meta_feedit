@@ -157,7 +157,7 @@ class tx_metafeedit extends  tslib_pibase {
 			/**** ADDS THE REQUIRED JAVASCRIPTS ****/	
 
 		$content .= $this->getJSAfter($conf);
-		return ($conf['performanceaudit']?t3lib_div::view_array($this->caller->perfArray):'').$form.$content;
+		return ($conf['performanceaudit']?Tx_MetaFeedit_Lib_ViewArray::viewArray($this->caller->perfArray):'').$form.$content;
   	}	
 
 	// for template wizards
@@ -246,7 +246,7 @@ class tx_metafeedit extends  tslib_pibase {
 		t3lib_div::loadTCA($this->table);
 		//t3lib_div::loadTCA('tx_metafeedit_comments');
 		$conf['uidField']=$GLOBALS['TCA'][$this->table]['ctrl']['uidField']?$GLOBALS['TCA'][$this->table]['ctrl']['uidField']:'uid';
-   		if ($conf['debug']) echo t3lib_div::view_array(array('UIDFIELD'=>$conf['uidField']));
+   		if ($conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('UIDFIELD'=>$conf['uidField']));
 		/**** CONFIGURE TCA ****/
 		// here we should calculate fieldList from showFields, evalFields, and override fields..
 		$GLOBALS['TCA'][$this->table]["feInterface"]["fe_admin_fieldList"] = $conf['create.']['fields'] ? $conf['create.']['fields'].($conf['edit.']['fields']?','.$conf['edit.']['fields']:'') : $conf['edit.']['fields'];
