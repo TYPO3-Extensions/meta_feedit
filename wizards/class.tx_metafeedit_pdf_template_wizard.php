@@ -66,10 +66,9 @@ class tx_metafeedit_wizards {
 		$this->content.='
 			<frameset rows="*,1" framespacing="0" frameborder="0" border="0">
 				<frame name="content" src="'.htmlspecialchars($url).'" marginwidth="0" marginheight="0" frameborder="0" scrolling="auto" noresize="noresize" />
-				<frame name="menu" src="dummy.php" marginwidth="0" marginheight="0" frameborder="0" scrolling="no" noresize="noresize" />
 			</frameset>
 		';
-
+		//				<frame name="menu" src="dummy.php" marginwidth="0" marginheight="0" frameborder="0" scrolling="no" noresize="noresize" />
 		$this->content.='
 </html>';
 }
