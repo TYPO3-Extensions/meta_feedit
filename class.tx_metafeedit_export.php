@@ -473,7 +473,7 @@ class tx_metafeedit_export {
 			$pdf->SetY(0);
 			$pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');	
 			$pdf->SetFont('Arial', '', 9);
-			$pdf->Cell(0,$this->headercellsize,utf8_decode($recherche),0,0,'R');
+			$pdf->Cell(0,$this->headercellsize,utf8_decode(htmlspecialchars_decode($recherche)),0,0,'R');
 			$pdf->SetY(5);
 			$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
 			$pdf->SetXY($pdf->leftmargin,6);
@@ -797,7 +797,7 @@ class tx_metafeedit_export {
 		$pdf->SetY(0);
 		$pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');	
 		$pdf->SetFont('Arial', '', 9);
-		$pdf->Cell(0,$this->headercellsize,utf8_decode($recherche),0,0,'R');
+		$pdf->Cell(0,$this->headercellsize,utf8_decode(htmlspecialchars_decode($recherche)),0,0,'R');
 		$pdf->SetY(0);
 		$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
 		$pdf->SetXY($pdf->leftmargin,6);
@@ -1132,7 +1132,7 @@ class tx_metafeedit_export {
 		$pdf->SetY(0);
 		$pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');
 		$pdf->SetFont('Arial', '', 9);
-		$pdf->Cell(0,$this->headercellsize,utf8_decode($recherche),0,0,'R');
+		$pdf->Cell(0,$this->headercellsize,utf8_decode(htmlspecialchars_decode($recherche)),0,0,'R');
 		$pdf->SetY(0);
 		$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
 		$pdf->SetXY($pdf->leftmargin,6);

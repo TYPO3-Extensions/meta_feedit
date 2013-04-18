@@ -3141,7 +3141,7 @@ class tx_metafeedit_lib {
 	 * @return	[type]		...
 	 */
 	function getListASResetAction(&$conf,&$caller) {
-		//$ret='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('advancedSearch-action').' '.$caller->pi_getClassName('as_reset').'"><a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[reset]['.$conf['pluginId'].']=1">'.$this->metafeeditlib->getLL("advanced_search_reset",$conf).'</a></div>';
+		//$ret='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('advancedSearch-action').' '.$caller->pi_getClassName('as_reset').'"><a href="###FORM_URL_NO_PRM###&amp;'.$this->prefixId.'[reset]['.$conf['pluginId'].']=1">'.$this->getLL("advanced_search_reset",$conf).'</a></div>';
 		$ret='<div class="'.$caller->pi_getClassName('link').' '.$caller->pi_getClassName('advancedSearch-action').' '.$caller->pi_getClassName('as_reset').'"><button name="'.$this->prefixId.'[reset]['.$conf['pluginId'].']" type="submit" value="1">'.$this->getLL("advanced_search_reset",$conf).'</button></div>';
 		return $ret;
 	}
@@ -4609,6 +4609,120 @@ class tx_metafeedit_lib {
 		// AS Search end
 	}
 	/**
+	 * Returns human readable search filter
+	 * @param unknown_type $conf
+	 */
+	function getHumanReadableSearchFilter(&$conf) {
+		// TODO  We get Search Filter here (MUST BE REPLACED by tag !!!!!)....
+		// TODO Put all this in function getSearchFilter ..
+		//-- Should be put in fe_adminLib
+		$fulltext=$conf['inputvar.']['sword']?$this->getLL("fulltext_search",$conf).' = "'.$conf['inputvar.']['sword'].'"':'';
+		$obs=t3lib_div::trimexplode(':',$conf['inputvar.']['sort']);
+		$orderby=$obs[0]?$this->getLL("order_by",$conf).' '.$this->getLL($obs[0],$conf).' '.($obs[1]?$this->getLL("ascending",$conf):$this->getLL("descending",$conf)):'';
+		$filterArray=array();
+		$recherche='';
+		if ($fulltext) $filterArray[]=$fulltext;
+		if ($conf['inputvar.']['sortLetter'])  $filterArray[]=$this->getLL("filtre_lettre",$conf).' = "'.$conf['inputvar.']['sortLetter'].'"';
+		if (is_array($conf['inputvar.']['advancedSearch'])) {
+			foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
+				if($this->is_extent($val)) {
+					$tab=array();
+					$ftA=$this->getForeignTableFromField($key,$conf,'',$tab);
+					$recherche='';
+					if (is_array($val)) {
+						$isset=($this->is_extent($val['op']) && ($this->is_extent($val['val'])||$this->is_extent($val['valsup'])));
+						if ($isset) {
+							switch($val['op']) {
+								case '><' :
+									$recherche .= ($this->is_extent($val['val'])&&$this->is_extent($val['valsup']))?$val['val'].' &lt; '.$this->getLLFromLabel($ftA['fieldLabel'], $conf).' &gt; '.$val['valsup']:'';
+									break;
+								default:
+									$recherche .= $this->getLLFromLabel($ftA['fieldLabel'], $conf).' '.($this->is_extent($val)?$val['op'].' '.$val['val']:'');
+							}
+						}
+					} else {
+						$curTable = $this->getForeignTableFromField($key, $conf,'',$sql);
+						$type=$conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
+						switch ($type) {
+							//TODO handle multiple values...
+							case 'select' :
+								if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']) {
+									if (!$conf['TCAN'][$conf['table']]['columns'][$key]['config']['MM']) {
+										$vals=explode(',',$val);
+										$vs=array();
+										foreach($vals as $v) {
+											$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table'],$v);
+											$vs[]=$rec[$conf['TCAN'][$conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']]['ctrl']['label']];
+										}
+										$val=implode(', ',$vs);
+									}
+								} else if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
+									foreach($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'] as $item) {
+										if ($item[1]==$val) {
+											$val = $this->getLLFromLabel($item[0], $conf);
+											break;
+										}
+									}
+								}
+								break;
+							case 'inline' :
+								if ($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']) {
+									if (!$conf['TCAN'][$conf['table']]['columns'][$key]['config']['MM']) {
+										$vals=explode(',',$val);
+										$vs=array();
+										foreach($vals as $v) {
+											$rec = $GLOBALS['TSFE']->sys_page->getRawRecord($conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table'],$v);
+											$vs[]=$rec[$conf['TCAN'][$conf['TCAN'][$conf['table']]['columns'][$key]['config']['foreign_table']]['ctrl']['label']];
+										}
+										$val=implode(', ',$vs);
+									}
+								} else if (is_array($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'])) {
+									$val = $this->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$val][0], $conf);
+								}
+								break;
+							case 'radio' :
+								$items=$conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'];
+								$index=-1;
+								for ($i = 0; $i < count ($items); ++$i) {
+									if ($items[$i][1]==$val) {
+										$index=$i;
+										break;
+									}
+								}
+								$val = ($index===-1)?'':$this->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['config']['items'][$index][0], $conf);
+								break;
+	
+							case 'check' :
+								$val = $this->getLLFromLabel(($val?'check_yes': 'check_no'), $conf);
+								break;
+							case 'input' :
+								break;
+							default:
+								$val=$val.'('.$type.')';
+						}
+						$recherche .= $this->getLLFromLabel($ftA['fieldLabel'], $conf).' = '.$val;
+					}
+					if ($recherche) $filterArray[]=$recherche;
+				}
+			}
+		}
+		$filtercnt=count($filterArray);
+		if ($orderby) $filterArray[]=$orderby;
+	
+		// Should all be replaceD by marker and evaluation should be done in metafeedit_lib called from feadminlib.php
+		/*$filter='<div id="blockfiltre">';
+		$filter2=$this->getLL("filtre_recherche",$conf).'<br />';
+		if ($fulltext) $filter2.= '<tr><td class="searchf">'.$fulltext.' </td></tr>';
+		if($conf['inputvar.']['advancedSearch']) $filter2.='<tr><td class="searchf">'.($recherche? $recherche : $this->getLL("search_nothing",$conf)).'</td></tr>';
+		if ($conf['inputvar.']['sortLetter']) $filter2.= '<tr><td class="searchf">'.$this->getLL("filtre_lettre",$conf).$conf['inputvar.']['sortLetter'].' </td></tr>';
+		if ($this->piVars['sort']) $filter2.= '<tr><td class="searchf">'.$orderby.' </td></tr>';
+		if ($filter2) $filter.='<table>'.$filter2.'</table>';
+		$filter .= '</div>';
+		*/
+		$ret=implode(', ',$filterArray);
+		return $ret;
+	}
+	/**
 	* getAdvancedSearchWhere : generates advancedsearch where from input vars ...
 	*
 	* @param	[array]		$conf: configuration array
@@ -4883,14 +4997,7 @@ class tx_metafeedit_lib {
 		
 		if ($this->confTS[$this->pluginId.'.']['list.']['soustitre']) $recherche = $this->confTS[$this->pluginId.'.']['list.']['soustitre'];
 		if (is_array($conf['inputvar.']['advancedSearch'])) {	
-			
-			foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
-				if($val) {
-					
-					$recherche .= ($recherche?', ':'').$this->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['label'], $conf).'=';
-					$recherche .= $conf['inputvar.']['advancedSearch'][$key]['val']?$conf['inputvar.']['advancedSearch'][$key]['val']:$conf['inputvar.']['advancedSearch'][$key];
-				}
-			}
+			$recherche=$this->getHumanReadableSearchFilter($conf);
 		}
 		return $title;
 
