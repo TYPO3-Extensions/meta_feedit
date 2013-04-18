@@ -4705,10 +4705,20 @@ class tx_metafeedit_lib {
 				} elseif (is_array($value['default.'])){
 					$my_op = $value['default.']['op'];
 					//TODO format date get default format
-
-					//error_log(__METHOD__.": $key,  >>".$value['default.']['val']);
-					$my_val = ($value['default.']['val'] == 'now')?date('d-m-Y'):$value['default.']['val'];
-					$my_valsup = $value['default.']['valsup'];
+					
+					if (substr($value['default.']['val'],0,3) == 'now') {
+						$complement = (int)substr(str_replace(' ','',$value['default.']['val']),3);
+						$my_val = ($complement) ? date('d-m-Y', time()+$complement) : date('d-m-Y');
+					} else {
+						$my_val = $value['default.']['val'];
+					}
+					
+					if (substr($value['default.']['valsup'],0,3) == 'now') {
+						$complement = (int)substr(str_replace(' ','',$value['default.']['valsup']),3);
+						$my_valsup = ($complement) ? date('d-m-Y', time()+$complement) : date('d-m-Y');
+					} else {
+						$my_valsup = $value['default.']['valsup'];
+					}
 				}
 				// dates !				
 				if ($my_op && is_array($value) ) {
@@ -4825,7 +4835,6 @@ class tx_metafeedit_lib {
 		if($conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre']) $title = $conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre'];
 		if  (!isset($title) && $this->feadminlib->piVars['title']) $title=$this->feadminlib->piVars['title'];
 		if (!isset($title)) $title = $GLOBALS['TSFE']->page['title'];
-		error_log(__METHOD__.":$title");
 		$markerArray=array();
 
 		
@@ -4883,7 +4892,6 @@ class tx_metafeedit_lib {
 				}
 			}
 		}
-		error_log(__METHOD__.":2$title");
 		return $title;
 
 	}

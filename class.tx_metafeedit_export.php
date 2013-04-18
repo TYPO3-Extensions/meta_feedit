@@ -789,6 +789,7 @@ class tx_metafeedit_export {
 
 		// We handle the header here 
 		//
+		$title =null;
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
 		if ($this->conf['inputvar.']['sortLetter']) $tri = '  Tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 		$pdf->SetFont('Arial','B',11);
@@ -1086,6 +1087,8 @@ class tx_metafeedit_export {
 		// Do we handle multiple media (default no)
 		$this->multipleMedia=$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']?$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']:($this->confTS['default.']['list.']['multipleMedia']?$this->confTS['default.']['list.']['multipleMedia']:false);
 		
+		
+		
 		$pdf = new tx_metafeedit_pdf($orientation, $unit, $format);
 		$pdf->caller=&$this;
 		
@@ -1109,9 +1112,8 @@ class tx_metafeedit_export {
 		$pdf->SetAutoPageBreak(1,$pdf->bottommargin);
 		$pdf->AddPage();
 		// title of the page - Il est definit ici et non dans le header pour qu'il ne soit pas present sur chaque page mais seulement la 1ere
-		$title =''; 
+		$title =null; 
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
-		error_log("TITLE $title");
 		/*if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 
 		$pdf->SetFont('Arial','B',11);

@@ -1973,7 +1973,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$print=$this->piVars['print'];
 		$printerName=$this->piVars['printername'];
 		$printServerName=$this->piVars['printservername'];
-		
 		if (($exporttype == 'PDF') && ($conf['list.']['nbCols'])){$exporttype = "PDFTAB";}
 		
 		//$this->markerArray['###BACK_URL###'] = "";
@@ -2001,6 +2000,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($conf['list.']['forceSearch']) {
 			$searchfieldsSet=false;
 			$as=$conf['inputvar.']['advancedSearch'];
+			error_log(__METHOD__.":".print_r($conf['inputvar.'],true));
 			if (is_array($as) && count($as)) {
 				foreach($as as $searchField=>$searchFieldConf) {
 					if (is_array($searchFieldConf)) {
@@ -2014,6 +2014,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					}
 				}
 			}
+			// Alphabetical Search
+			if ($conf['inputvar.']['sortLetter']) $searchfieldsSet=true;
 			if (!$searchfieldsSet) $this->markerArray['###EVAL_ERROR###'].=$this->metafeeditlib->makeErrorMarker($conf,$this->cObj->substituteMarkerArray($this->metafeeditlib->getPlainTemplate($conf,$this->markerArray,'###TEMPLATE_LIST_NOSEARCHCRITERAE###'),$this->markerArray));
 		}
 		
@@ -2424,7 +2426,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		//if (!$num) $content .= $this->cObj->substituteMarkerArray($this->metafeeditlib->getPlainTemplate($conf,$this->markerArray,'###TEMPLATE_EDITMENU_NOITEMS###'),$this->markerArray);
 	
 		$this->getListSums($conf,$sql,$content,$tpl,$DEBUG);
-	
 		switch ($exporttype)
 		{
 			case "CSV": 
@@ -2856,7 +2857,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 */
 	 
 	function displayEditForm($origArr,&$conf,$exporttype='',$print='',$printerName='',$printServerName='')	{
-		error_log(__METHOD__.":$print");
 		//We merge data with override values and eval values ...
 		$currentArr = array_merge($origArr,(array)$this->dataArr);
 		
@@ -2986,7 +2986,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				}
 			}	
 		}
-		
 		switch ($exporttype)
 		{
 			case "CSV": 
