@@ -2028,7 +2028,6 @@ class tx_metafeedit extends  tslib_pibase {
 	
 			if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="<tr><td>";
 			$fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
-			$tab="";
 			$lvl=0;
 			foreach($fNA as $fN) {
 				$fN2=t3lib_div::trimexplode(':',$fN);
@@ -2038,7 +2037,7 @@ class tx_metafeedit extends  tslib_pibase {
 				$classFn = str_replace('.', '_', $fN);
 				// Total processing 
 				$size = $this->getSize($conf, $fN, $conf['table']);
-				$div=($textmode?'':'<div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').$tab.( $conf['list.']['groupby.'][$fN.'.']['footer']?$conf['list.']['groupby.'][$fN.'.']['footer']:$this->metafeeditlib->getLLFromLabel('total',$conf).' ###GROUPBYFOOTER_'.$fN.'###'.(($conf['list.']['groupByCount']||$conf['list.']['groupby.'][$fN.'.']['footer.']['showcount'])?'(###FOOTERSUM_'.$fN.'_FIELD_metafeeditnbelts###)':'')).($textmode?'':'</div>');
+				$div=($textmode?'':'<div class="'.$this->caller->pi_getClassName('groupBy').' '.$this->caller->pi_getClassName('groupBy_'.$classFn).'">').( $conf['list.']['groupby.'][$fN.'.']['footer']?$conf['list.']['groupby.'][$fN.'.']['footer']:$this->metafeeditlib->getLLFromLabel('total',$conf).' ###GROUPBYFOOTER_'.$fN.'###'.(($conf['list.']['groupByCount']||$conf['list.']['groupby.'][$fN.'.']['footer.']['showcount'])?'(###FOOTERSUM_'.$fN.'_FIELD_metafeeditnbelts###)':'')).($textmode?'':'</div>');
 				if ($conf['list.']['sumFields']) {
 					$sum='<!--###FOOTERSUM_FIELDS### begin -->'.$this->getEditSumFields('FOOTERSUM_'.$fN,$conf,$count, $textmode, $exporttype,$hasActions);
 					$sum.='<!--###FOOTERSUM_FIELDS### end -->';
@@ -2047,12 +2046,12 @@ class tx_metafeedit extends  tslib_pibase {
 				} else {
 					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>'.($lvl+1).'</gb><gbf>'.($lvl+1).'</gbf><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?($conf['list.']['nbCols']+$hasActions):$nbf).'" >').$div.($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</td></tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
 				}
-				$tab.="";//&nbsp;>&nbsp;";
 				$lvl++;
 			}
 			if ($conf['list.']['displayDirection']=='Down') $this->GROUPBYFIELDS.="</td></tr>";
 			$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELDS### begin -->'.$GROUPBYFIELDS.'<!-- ###GROUPBYFOOTERFIELDS### end -->';
 		}
+		
 		return $GROUPBYFIELDS;
 	}
 	

@@ -724,7 +724,7 @@ class tx_metafeedit_export {
 			die( __METHOD__.': Caught exception: '.  $e->getMessage().', maybe pdf export is not activated');
 		};
 		$count = 0;
-		$taille = 0;
+		$docWidth = 0;
 		$fields = explode(',', $this->conf['list.']['show_fields']); //liste des champs affiches afin de recuperer la dimension des colonnes defini en TS
 		$sizeArr = array(); //tableau de la taille des cellules
 		$pos=array(); // Array of positions (left,right,center)
@@ -733,7 +733,7 @@ class tx_metafeedit_export {
 		if($xml->tr) {
 			foreach ($xml->tr->td as $cell) {
 				$fields[$x]=str_replace('.','_',$fields[$x]);
-				$taille += ($this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width'])?$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']:(($this->confTS['default.']['list.'][$fields[$x].'.']['width'])?$this->confTS['default.']['list.'][$fields[$x].'.']['width']:$cell->size);
+				$docWidth += ($this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width'])?$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']:(($this->confTS['default.']['list.'][$fields[$x].'.']['width'])?$this->confTS['default.']['list.'][$fields[$x].'.']['width']:$cell->size);
 				$sizeArr[$x] = ($this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width'])?$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']:(($this->confTS['default.']['list.'][$fields[$x].'.']['width'])?$this->confTS['default.']['list.'][$fields[$x].'.']['width']:$cell->size);
 				$pos[$x]=($this->confTS[$this->pluginId.'.']['list.']['align.'][$fields[$x]])?$this->confTS[$this->pluginId.'.']['list.']['align.'][$fields[$x]]:(($this->confTS['default.']['list.']['align.'][$fields[$x]])?$this->confTS['default.']['list.']['align.'][$fields[$x]]:($this->confTS['list.']['align.'][$fields[$x]]?$this->confTS['list.']['align.'][$fields[$x]]:'left'));
 				$x++;
@@ -750,7 +750,7 @@ class tx_metafeedit_export {
 		$H=210;
 		$W=297;
 		$orientation='L';// landscape
-		if ($taille <200) {
+		if ($docWidth <200) {
 			$orientation='P';	// portrait
 			$H=297;
 			$W=210;
@@ -770,11 +770,13 @@ class tx_metafeedit_export {
 		$pdf->topmargin=8;
 		
 		// We calculate last cell size eventually
-		$workWidth=$W-$pdf->rightmargin-$pdf->leftmargin-$taille - ($x*$lw);
+		
+		$workWidth=$W-$pdf->rightmargin-$pdf->leftmargin;
+		$spaceLeft=$workWidth-$docWidth;// - ($x*$lw);
 		// do this onlsy if cell size not set ...(
 		$cw=$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']?$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']:0;
-		if (!$cw && $workWidth>0) {
-			$sizeArr[$x-1]+=$workWidth;
+		if (!$cw && $spaceLeft>0) {
+			$sizeArr[$x-1]+=$spaceLeft;
 		}
 		
 		
@@ -837,19 +839,19 @@ class tx_metafeedit_export {
 				$pdf->SetLineWidth($lw);
 				$pdf->SetFont('Arial', 'B', 9);
 			} else {
-				$pdf->SetLineWidth(0.2);
+				$pdf->SetLineWidth($lw);
 				$pdf->SetFont('Arial', '', 9);
 			}				
 			// We handle cell content here
 			foreach($row->td as $col) {
-				$size = $nbcols==1?$taille:$sizeArr[$x]; //taille de la cellule			
+				$size = $nbcols==1?$workWidth:$sizeArr[$x]; //taille de la cellule		
+				//@todo why do we do this	
 				$val = str_replace('€','Eur',strip_tags($col->data));
 				$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
-
 				// Currency handling Euro CBY should not be here !!!
 				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
 				// We handle images here...
-				if ($col->img==1 && strlen($val)>0) {	 				
+				if ($col->img==1 && strlen($val)>0) {
 					$vala=t3lib_div::trimexplode(',',$val);
 					$img='';
 				 	$myx=$pdf->getX();
@@ -861,14 +863,14 @@ class tx_metafeedit_export {
 						if (is_array($imginfo)) {
 							$w=$imginfo[0];
 							$h=$imginfo[1];
-						
 							$pdf->Image($img,$pdf->getX()+0.5,$pdf->getY()+0.5,0, $height-1);
 							$pdf->setX($pdf->getX()+((($height-1)/$h)*$w));
 						}
 						// By defaullt we only handle first media
 						if (!$multipleMedia) break;
 					}
-					$pdf->setX($size+$pdf->leftmargin);									// + la marge definie plus haut pour la page => ligne 2308
+					$pdf->setX($size+$pdf->leftmargin);
+					// + la marge definie plus haut pour la page => ligne 2308
 				} else {
 					switch($pos[$x]) {
 						case 'left' :
@@ -887,36 +889,26 @@ class tx_metafeedit_export {
 				 	if (!$r) $p='L'; // So that column headers are always aligned left. 
 				 	$myx=$pdf->getX();
 				 	if ($row->gb && !strlen($val)) {
+				 		error_log(__METHOD__.":No val - myx : $myx - size $size");
 				 		$pdf->setX($myx+$size);
 				 	} else {
 				 		if ($row->gb && $x==0) { 
-							$pdf->Cell($taille,$height,utf8_decode($val),1,0,$p,1);
+				 			error_log(__METHOD__.":a $val - taille : $docWidth, size : $size  ,x : $x, myx $myx ,workWidth $workWidth");
+							$pdf->Cell($workWidth,$height,utf8_decode($val),1,0,$p,1);
 							$cell=true;
 							$pdf->setX($myx+$size);
 						} else {
+							error_log(__METHOD__.":b $val - myx : $myx - size $size");
 							$border=1;
-							//if ($row->gb) $border=0;
 							$pdf->Cell($size,$height,utf8_decode($val),1,0,$p,1);
 							$cell=true;
+							$pdf->setX($myx+$size);
 						}
 					}
 				}
-				/*if ($x==2) {
-					error_log(__METHOD__.": $H , $Y, $val");
-				}*/
 				$x++;
 			}
 			$pdf->setFillColor(255,255,255);
-			//$pdf->setX($pdf->getX()+0.1);			$pdf->setX(213.33);
-			//$pdf->Cell(100000,$height,'',0,0,'L',1);
-			/*if ($cell) {
-				//$pdf->setFillColor(200,200,200);
-				$pdf->setFillColor(255,255,255);
-				$pdf->Cell(0,$h,'',0,0,'',1);
-				if ($ey) $pdf->SetXY($pdf->leftmargin,$ey);
-				$ey=0;
-				$cell=false;
-			}else {*/
 			// We erase all text right of last cell
 			//300 is maximum width  of page in A4
 			$X=$pdf->GetX();

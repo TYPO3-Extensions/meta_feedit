@@ -3046,16 +3046,21 @@ class tx_metafeedit_lib {
 		
 		// user override of language labels
 		if (isset($conf['LOCAL_LANG'][$conf['LLkey']][$label2])) {
-			return $conf['LOCAL_LANG'][$conf['LLkey']][$label2];
+			//error_log(__METHOD__.":$label2 -  :".print_r($conf['LOCAL_LANG'][$conf['LLkey']][$label2],true));
+			$ret=$conf['LOCAL_LANG'][$conf['LLkey']][$label2];
+		} else {
+			$ret=$GLOBALS['TSFE']->sL($label);
+			$ret=$ret?$ret:"$label";
+			if ($ret==$label) {
+				// We didn't find label...
+				$labela=explode('.',$label);
+				$label=end($labela);
+				$ret=$GLOBALS['TSFE']->getLLL($label,$conf['LOCAL_LANG']);
+				//$GLOBALS['TSFE']->sL($label)?$GLOBALS['TSFE']->sL($label):"$label";
+			}
 		}
-		$ret=$GLOBALS['TSFE']->sL($label);
-		$ret=$ret?$ret:"$label";
-		if ($ret==$label) {
-			// We didn't find label...
-			$labela=explode('.',$label);
-			$label=end($labela);
-			$ret=$GLOBALS['TSFE']->getLLL($label,$conf['LOCAL_LANG']);
-			//$GLOBALS['TSFE']->sL($label)?$GLOBALS['TSFE']->sL($label):"$label";
+		if (version_compare($GLOBALS['TYPO_VERSION'], '4.5.0', '>') && is_array($ret)) {
+			$ret=$ret[0]['target'];
 		}
 		return $ret;
 	}
