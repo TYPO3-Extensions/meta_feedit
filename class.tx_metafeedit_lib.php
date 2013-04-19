@@ -2153,6 +2153,7 @@ class tx_metafeedit_lib {
 		$pluginId=$conf['pluginId'];
 		$piVars=$conf['piVars'];
 		$typoscript=$conf['typoscript.'];
+		$res=Null;
 		if ($keepvar) {
 			// we look into session vars
 			$vars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
@@ -2672,7 +2673,7 @@ class tx_metafeedit_lib {
 	* @return	[type]		...
 	*/
 	 
-	function getSelectOptions($fN,$table,&$conf,$forceEmptyOption='',$forceVal='') {
+	function getSelectOptions($fN,$table,&$conf,$forceEmptyOption='',$forceVal=Null) {
 		$feData = $conf['inputvar.']['fedata'];
 		$uid = $feData[$table][$conf['uidField']] ? $feData[$table][$conf['uidField']] : $conf['inputvar.']['rU'];
 		  //$uid=$uid?$uid:$conf['rU'];
@@ -2697,50 +2698,42 @@ class tx_metafeedit_lib {
 		$foreignTable = $conf['TCAN'][$table]['columns'][$fN]['config']["allowed"]?$conf['TCAN'][$table]['columns'][$fN]['config']["allowed"]:$conf['TCAN'][$table]['columns'][$fN]['config']['foreign_table'];
 		if (count(t3lib_div::trimexplode(',',$foreignTable))>1) unset($foreignTable); // multiple Relations not handled CBY???
 		if (!$foreignTable) {
-				if($conf['TCAN'][$table]['columns'][$fN]['config']["items"]) {   // fixed items
-
-					// Get selected uids.
-					$uids = array();
-					if($feData[$table][$fN]) {								// from post var
-		  			$uids = explode(",",$feData[$table][$fN]);
-					} elseif(!is_null($rec)) {									  // clean from DB
-		  				$uids = explode(",",$rec[$fN]);
-					} elseif($cmd=='create' && $conf['TCAN'][$table]['columns'][$fN]['config']['default']){
-		  				$uids = explode(",",$conf['TCAN'][$table]['columns'][$fN]['config']['default']);
-					}
-
-					$items = $conf['TCAN'][$table]['columns'][$fN]['config']["items"];
+			// fixed items
+			if($conf['TCAN'][$table]['columns'][$fN]['config']["items"]) {
+				// Get selected uids.
+				$uids = array();
+				if($feData[$table][$fN]) {								// from post var
+	  				$uids = explode(",",$feData[$table][$fN]);
+				} elseif(!is_null($rec)) {								// clean from DB
+	  				$uids = explode(",",$rec[$fN]);
+				} elseif($cmd=='create' && $conf['TCAN'][$table]['columns'][$fN]['config']['default']){
+	  				$uids = explode(",",$conf['TCAN'][$table]['columns'][$fN]['config']['default']);
+				}
+				$items = $conf['TCAN'][$table]['columns'][$fN]['config']["items"];
 				$selected='';
 				if (!$this->is_extent($forceVal)) $selected='selected="selected"';
-					$options = '<option value="" '.$selected.' >&nbsp;</option>';
+				$options = '<option value="" '.$selected.' >&nbsp;</option>';
 
-					if($conf['TCAN'][$table]['columns'][$fN]['config']["itemsProcFunc"]) {	 // if itemsProcFunc is set to fill the select box
-		  				$options = '';
-		  				//$params = $conf['TCAN'][$table]['columns'][$fN];
-		  				//$params['items'] = &$items;		  				
-		  				//t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fN]['config']["itemsProcFunc"], $params, $this);
-		 				$this->t3lib_TCEforms->procItems($items,$conf['TCAN'][$table]['columns'][$fN],$conf['TCAN'][$table]['columns'][$fN]['config'],$table,$feData[$table],$fN);
-					}
+				if($conf['TCAN'][$table]['columns'][$fN]['config']["itemsProcFunc"]) {	 // if itemsProcFunc is set to fill the select box
+					$options = '';
+					//$params = $conf['TCAN'][$table]['columns'][$fN];
+					//$params['items'] = &$items;		  				
+					//t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fN]['config']["itemsProcFunc"], $params, $this);
+					$this->t3lib_TCEforms->procItems($items,$conf['TCAN'][$table]['columns'][$fN],$conf['TCAN'][$table]['columns'][$fN]['config'],$table,$feData[$table],$fN);
+				}
+				foreach((array)$items as $key => $item) {
+					$selected = ((string)$item[1]===$forceVal)?'selected="selected"':"";
+					$options .= '<option value="'.$item[1].'"'.$selected.'>'.$this->getLLFromLabel($item[0],$conf).'</option>';
+				}
+			} else {// unknown TCA config
+				$options = '<option><em>Unknown TCA-configuration</em></option>';
+			}
 
-					foreach((array)$items as $key => $item) {
-
-		  				$selected = ($item[1]===$forceVal)?'selected="selected"':"";
-		  				//if($key!=0)
-							$options .= '<option value="'.$item[1].'"'.$selected.'>'.$this->getLLFromLabel($item[0],$conf).'</option>';
-					}
-
-	  			} else {// unknown TCA config
-					$options = '<option><em>Unknown TCA-configuration</em></option>';
-	  			}
-
-		} else {
+		} else { // We handle foreign table
 			$label = $conf['label.'][$foreignTable]?$conf['label.'][$foreignTable]:$conf['TCAN'][$foreignTable]['ctrl']['label'];
-			
 			$label_alt = $conf['label_alt.'][$foreignTable]?$conf['label_alt.'][$foreignTable]:$conf['TCAN'][$foreignTable]['ctrl']['label_alt'];
-			
 			$label_alt_force = $conf['label_alt_force.'][$foreignTable]?$conf['label_alt_force.'][$foreignTable]:$conf['TCAN'][$foreignTable]['ctrl']['label_alt_force'];
-			
-		  	$whereClause='';
+			$whereClause='';
 
 			/*if ($uid) {
 					$whereClause .= $conf['TCAN'][$table]['whereClause.'][$fN]?$conf['TCAN'][$table]['whereClause.'][$fN]:$conf['TCAN'][$table]['columns'][$fN]['config']["foreign_table_where"];
@@ -2754,16 +2747,16 @@ class tx_metafeedit_lib {
 			// gets uids of selected records.
 			$uids = array();
 			if($feData[$table][$fN]) {								// from post var
-			  	  	$uids = explode(",",$feData[$table][$fN]);
+				$uids = explode(",",$feData[$table][$fN]);
 			} elseif($conf['TCAN'][$table]['columns'][$fN]['config']["MM"] && $uid) {  // from mm-relation
-			  			$mmTable = $conf['TCAN'][$table]['columns'][$fN]['config']['MM'];
-						$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'','', ' '.$mmTable.'.sorting ');
-						if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
-						$cnt=mysql_num_rows($MMres);
-				  		if($conf['debug'] && $cnt!=$rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->getSelectOptions(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
-				  		while($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
-						} else {														// clean from DB
-						$uids = explode(",",$rec[$fN]);
+				$mmTable = $conf['TCAN'][$table]['columns'][$fN]['config']['MM'];
+				$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'','', ' '.$mmTable.'.sorting ');
+				if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
+				$cnt=mysql_num_rows($MMres);
+				if($conf['debug'] && $cnt!=$rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->getSelectOptions(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+				while($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
+			} else {														// clean from DB
+				$uids = explode(",",$rec[$fN]);
 			}
 			if (function_exists($this->getOverrideValue)){
 				$overrideuids=$this->getOverrideValue($fN,$conf['inputvar.']['cmd'],$conf,$this->cObj);
@@ -4623,6 +4616,7 @@ class tx_metafeedit_lib {
 					}
 				}
 			}
+			
 		}
 		// AS Search end
 	}

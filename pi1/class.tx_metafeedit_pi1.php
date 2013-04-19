@@ -848,8 +848,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// rU is edited Uid :
 		
 		//$mfconf['inputvar.']['fedata']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'FE');
-		error_log(__METHOD__.": POST".print_r($_POST,true));
-		error_log(__METHOD__.":Get :".print_r($_GET,true));
 		// We should handle keep var ...
 		$mfconf['inputvar.']=array();
 		$mfconf['inputvar.']['fedata']=t3lib_div::_GP('FE');

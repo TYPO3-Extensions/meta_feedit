@@ -44,9 +44,10 @@ class tx_metafeedit_pdf extends FPDF {
 	var $conf;
 	var $javascript;
 	var $n_js;
-		
+	
 	function Header()
 	{
+		error_log(__METHOD__);
 		// Logo - present sur toutes les pages du pdf
 		//$logo = PATH_site.($xml->tr->td->img->dir).'logo.png';
 		//$this->Image($logo,1,1,17,8);
@@ -544,6 +545,8 @@ class tx_metafeedit_export {
 	var $confTS;							// TS du plugin
 	var $cObj;
 	var $caller;
+	var $headerFields=array();
+	var $headerFieldsSize=array();
 	/**
 	 * Initialisation function called by fe_adminlib.php allow this class to acces $conf array
 	 *
@@ -1037,7 +1040,8 @@ class tx_metafeedit_export {
 		$this->footercellsize=7;
 		$this->headercellsize=7;
 		$this->cellsize=7;
-				
+		$this->headerFields=array();
+		$this->headerFieldsSize=array();
 		$pdf->AliasNbPages();
 		$pdf->setMargins($pdf->leftmargin,$pdf->topmargin,$pdf->rightpmargin);
 		$pdf->SetAutoPageBreak(1,$pdf->bottommargin);
@@ -1057,7 +1061,7 @@ class tx_metafeedit_export {
 		$pdf->SetY(0);
 		$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
 		$pdf->SetXY($pdf->leftmargin,6);
-		//$pdf->Ln();
+		//We set header color (headers are first row in file).
 		$pdf->setFillColor(200,200,200);
 		$pdf->Cell(0,$this->headercellsize,'','T',0,'C');
 		$pdf->Ln(2);	
@@ -1096,13 +1100,18 @@ class tx_metafeedit_export {
 			}				
 			// We handle cell content here
 			foreach($row->td as $col) {
-				$size = $nbcols==1?$workWidth:$sizeArr[$x]; //taille de la cellule		
+				$size = $nbcols==1?$workWidth:$sizeArr[$x]; //taille de la cellule
 				//@todo why do we do this	
 				$val = str_replace('€','Eur',strip_tags($col->data));
 				$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
 				// Currency handling Euro CBY should not be here !!!
 				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
 				// We handle images here...
+				if ($r=0) {
+					// first row we have headers;
+					$this->headerFieldsSize[]=$size;
+					$this->headerFields[]=$val;
+				}
 				if ($col->img==1) {
 					if (strlen($val)>0) {
 						$vala=t3lib_div::trimexplode(',',$val);
@@ -1170,6 +1179,7 @@ class tx_metafeedit_export {
 				}
 				$x++;
 			}
+			//white
 			$pdf->setFillColor(255,255,255);
 			// We erase all text right of last cell
 			//300 is maximum width  of page in A4

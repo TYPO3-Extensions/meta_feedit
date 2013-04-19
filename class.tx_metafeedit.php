@@ -4109,7 +4109,7 @@ function getFormJs($formName,&$conf) {
 		$ret.='<div '.$this->caller->pi_classParam('advancedSearch-actions').'><div '.$this->caller->pi_classParam('advancedSearch-action').'>';
 		$ret.='<div '.$this->caller->pi_classParam('advancedSearch-action').'><button type="submit" name="submit" value="'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'" class="'.$this->caller->pi_getClassName('form-submit').' '.$this->caller->pi_getClassName('searchbox-button').'">'.$this->metafeeditlib->getLL("advanced_search_label",$conf).'</button></div>';
 		// we only show reset button if conditions are set 
-		if ($filtercnt) $ret.=$this->metafeeditlib->getListASResetAction($conf,$this->caller);
+		if (true) $ret.=$this->metafeeditlib->getListASResetAction($conf,$this->caller);
 		$ret.= '</div></div></form></div>';
 		return $ret;
 	}
