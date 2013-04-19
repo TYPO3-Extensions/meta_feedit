@@ -2307,10 +2307,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						$lcols.= $this->cObj->substituteMarkerArray($col, $markerArray);
 						$col='';
 					}
-	
 					if ($nbrowscol) $g_mod=$lc%$nbrowscol;
-	
-	
 				} else {
 					// Display Right (rows first)
 					$row.=$item;

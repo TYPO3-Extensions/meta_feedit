@@ -211,7 +211,7 @@
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.xhtml</label>
 				<config>
 					<type>check</type>
-					<default>1</default>					
+					<default>1</default>
 				</config>
 			</TCEforms>		 
 		</xhtml>
@@ -374,14 +374,14 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.fecrgroup_field</label>
 				<config>
-									  <items>
-												<n0></n0>
-										</items>
-										<type>select</type>
-										<minitems>0</minitems>
-										<maxitems>1</maxitems>
-										<size>1</size>
-										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+					<items>
+						<n0></n0>
+					</items>
+					<type>select</type>
+					<minitems>0</minitems>
+					<maxitems>1</maxitems>
+					<size>1</size>
+					<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</fecrgroup_field>
@@ -3006,18 +3006,19 @@
 		</el>
 	  </ROOT>
 	</sTemplate>
-			<sAjax>
-	  <ROOT>
+	<sAjax>
+		<ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_ajax</sheetTitle>
 		</TCEforms>
 		<type>array</type>
 		<el>
-				<ajaxOn>
+			<ajaxOn>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.ajaxOn</label>
 				<config>
 					<type>check</type>
+					<default>1</default>
 				</config>
 			</TCEforms>		 
 		</ajaxOn>
@@ -3026,6 +3027,7 @@
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.jqueryCompatMode</label>
 				<config>
 					<type>check</type>
+					<default>1</default>
 				</config>
 			</TCEforms>		 
 		</jqueryCompatMode>
@@ -3033,11 +3035,10 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.xml:meta_feedit.pi_flexform.ajaxDomReady</label>
 				<config>
-						<type>text</type>
-						<size>10000</size>
-						<rows>500</rows>
-						<cols>100</cols>
-
+					<type>text</type>
+					<size>10000</size>
+					<rows>500</rows>
+					<cols>100</cols>
 				</config>
 			</TCEforms>		 
 		</ajaxDomReady>
@@ -3045,108 +3046,105 @@
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.xml:meta_feedit.pi_flexform.ajaxLibs</label>
 				<config>
-						<type>text</type>
-						<size>10000</size>
-						<rows>500</rows>
-						<cols>100</cols>
-
+					<type>text</type>
+					<size>10000</size>
+					<rows>500</rows>
+					<cols>100</cols>
 				</config>
-			</TCEforms>		 
+			</TCEforms>
 		</ajaxLibs>
 		</el>
 	  </ROOT>
 	</sAjax>
-		<sDebug>
-	  <ROOT>
+	<sDebug>
+		<ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_debug</sheetTitle>
 		</TCEforms>
 		<type>array</type>
 		<el>
-				<debug>
+			<debug>
+				<TCEforms>
+					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debug</label>
+					<config>
+						<type>check</type>
+					</config>
+				</TCEforms>
+			</debug>
+			<debugKrumo>
+				<TCEforms>
+					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugKrumo</label>
+					<config>
+						<type>check</type>
+					</config>
+				</TCEforms>		 
+			</debugKrumo>
+			<debugSQL>
+				<TCEforms>
+					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugSQL</label>
+					<config>
+						<type>check</type>
+					</config>
+				</TCEforms>
+			</debugSQL>
+			<debugPerformances>
+				<TCEforms>
+					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugPerformances</label>
+					<config>
+						<type>check</type>
+					</config>
+				</TCEforms>
+			</debugPerformances>
+			<debugMarkerArray>
+				<TCEforms>
+					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugMarkerArray</label>
+					<config>
+						<type>check</type>
+					</config>
+				</TCEforms>
+			</debugMarkerArray>
+			<debugLangArray>
+				<TCEforms>
+					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugLangArray</label>
+					<config>
+						<type>check</type>
+					</config>
+				</TCEforms>
+			</debugLangArray>
+			<debugTemplate>
+				<TCEforms>
+					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugTemplate</label>
+					<config>
+						<type>check</type>
+					</config>
+				</TCEforms>
+			</debugTemplate>
+			<debugConf>
+				<TCEforms>
+					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugConf</label>
+					<config>
+						<type>check</type>
+					</config>
+				</TCEforms>
+			</debugConf>
+		  <debugVars>
+				<TCEforms>
+					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugVars</label>
+					<config>
+						<type>check</type>
+					</config>
+				</TCEforms>
+			</debugVars>
+		<debugTSFE>
 			<TCEforms>
-				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debug</label>
-				<config>
-					<type>check</type>
-				</config>
-			</TCEforms>		 
-		</debug>
-	<debugKrumo>
-			<TCEforms>
-				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugKrumo</label>
-				<config>
-					<type>check</type>
-				</config>
-			</TCEforms>		 
-		</debugKrumo>
-		<debugSQL>
-			<TCEforms>
-				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugSQL</label>
-				<config>
-					<type>check</type>
-				</config>
-			</TCEforms>		 
-		</debugSQL>
-		<debugPerformances>
-			<TCEforms>
-				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugPerformances</label>
-				<config>
-					<type>check</type>
-				</config>
-			</TCEforms>		 
-		</debugPerformances>
-		<debugMarkerArray>
-			<TCEforms>
-				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugMarkerArray</label>
-				<config>
-					<type>check</type>
-				</config>
-			</TCEforms>		 
-		</debugMarkerArray>
-		<debugLangArray>
-			<TCEforms>
-				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugLangArray</label>
-				<config>
-					<type>check</type>
-				</config>
-			</TCEforms>		 
-		</debugLangArray>
-		<debugTemplate>
-			<TCEforms>
-				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugTemplate</label>
-				<config>
-					<type>check</type>
-				</config>
-			</TCEforms>		 
-		</debugTemplate>
-		<debugConf>
-			<TCEforms>
-				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugConf</label>
-				<config>
-					<type>check</type>
-				</config>
-			</TCEforms>		 
-		</debugConf>
-	  <debugVars>
-			<TCEforms>
-				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugVars</label>
-				<config>
-					<type>check</type>
-				</config>
-			</TCEforms>		 
-		</debugVars>
-	  <debugTSFE>
-			<TCEforms>
-				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugTSFE</label>
-				<config>
-					<type>check</type>
-				</config>
-			</TCEforms>		 
-		</debugTSFE>
-
-		</el>
-	  </ROOT>
+					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.debugTSFE</label>
+					<config>
+						<type>check</type>
+					</config>
+				</TCEforms>
+			</debugTSFE>
+			</el>
+		</ROOT>
 	</sDebug>
-
   </sheets>
 </T3DataStructure>
