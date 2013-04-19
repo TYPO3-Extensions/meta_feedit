@@ -1,10 +1,10 @@
 <T3DataStructure>
 	<meta>
-	   <langDisable>1</langDisable> 
+		<langDisable>1</langDisable>
 	</meta>
   <sheets>
 	<sQuickStart>
-	  <ROOT>
+		<ROOT>
 		<TCEforms>
 			<sheetTitle>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.sheet_quickstart</sheetTitle>
 		</TCEforms>
@@ -79,12 +79,12 @@
 				</TCEforms>
 			</recursive>
 			<pluginId>
-					<TCEforms>
-							<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pluginId</label>
-							<config>
-									<type>input</type>
-									<size>10</size>
-							</config>
+				<TCEforms>
+					<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.pluginId</label>
+					<config>
+						<type>input</type>
+						<size>10</size>
+						</config>
 					</TCEforms>
 			</pluginId>
 			<loadFromFile>
@@ -235,8 +235,8 @@
 				<exclude>1</exclude>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.referenceMetafeeditText</label>
 				<config>
-								  <type>input</type>
-								  <size>10</size>
+					<type>input</type>
+					<size>10</size>
 				</config>
 
 			</TCEforms>
@@ -340,19 +340,19 @@
 					<size>5</size>
 					<itemsProcFunc>tx_metafeedit_flexfill-&gt;main_ft</itemsProcFunc>
 				</config>
-			</TCEforms>		 
+			</TCEforms>
 		</foreignTables>
 		<idField>
 			<TCEforms>
 				<label>LLL:EXT:meta_feedit/locallang_tca.php:meta_feedit.pi_flexform.idField</label>
 				<config>
-									  <items>
-												<n0></n0>
-										</items>
-										<type>select</type>
-										<maxitems>1</maxitems>
-										<size>1</size>
-										<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
+					<items>
+						<n0></n0>
+					</items>
+					<type>select</type>
+					<maxitems>1</maxitems>
+					<size>1</size>
+					<itemsProcFunc>tx_metafeedit_flexfill-&gt;main</itemsProcFunc>
 				</config>
 			</TCEforms>		 
 		</idField>
@@ -616,8 +616,8 @@
 												<numIndex index="1">Right</numIndex>
 										</numIndex>
 										<numIndex index="1" type="array">
-												<numIndex index="0">Down</numIndex>
-												<numIndex index="1">Down</numIndex>
+											<numIndex index="0">Down</numIndex>
+											<numIndex index="1">Down</numIndex>
 										</numIndex>
 										</items>
 								</config>
