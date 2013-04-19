@@ -1546,320 +1546,330 @@ class tx_metafeedit_lib {
 	
 						$size = "";
 						$size = $conf[$fe_adminLib->conf['cmdKey'].'.']['icon_thumbSize.'][$fN];
+						if (!count($imgs)) {
+							$imgs=array('$$$$NOIMAGE$$$$');
+						}
+						// Do we handle multiple media (default no)
+						$multipleMedia=$conf[$this->pluginId.'.']['list.']['multipleMedia']?$conf[$this->pluginId.'.']['list.']['multipleMedia']:($conf['default.']['list.']['multipleMedia']?$conf['default.']['list.']['multipleMedia']:false);
+						
 						foreach ($imgs as $img) {
-							if ($img) {
-								$iimg = explode('|', $img);
-								if (count($iimg) > 1) {
-									$newImgs .= $newImgs?",".$img:$img;
-									$img = $iimg[0];
-									//$img = '../'.$uf2.'/'.$img;
-									$img = $uf2.'/'.$img;
-								} else {
-									$dbImgs .= $dbImgs?",".$img:$img; // what is this ???
-									//$img = '../'.$uf.'/'.$img;
-									$img = $uf.'/'.$img;
-								}
-
-								//We handle image wrap here ... Must do something better here if user wrap defined we disable default link
-
-								$std=$conf[$conf['cmdmode'].'.']['stdWrap.']?$conf[$conf['cmdmode'].'.']['stdWrap.']:$conf['stdWrap.'];// what about item_stdWrap here ?
-								if ($conf[$conf['cmdmode'].'.']['item_stdWrap.'][$table.'.'] || $std[$table.'.'][$fNiD.'.'] || $std[$fNiD.'.']) {
-									$ATageB = '';
-									$ATagE = '';
-								} else {
-									// is there a media player linked to this file type ?
-									if ($conf[$conf['cmdmode'].'.']['mediaPlayer']) $player = $this->getMediaPlayer($img, $conf);
-	
-									$imgi = $img;
-									if ($player) {
-										$conf_pointeur=t3lib_div::_GP("tx_metafeedit");
-										$prm="&".$this->prefixId."[mediafile]=".$img."&".$this->prefixId."[mediaplayer]=".$player."&".$this->prefixId."[mediaru]=".$dataArr['uid']."&".$this->prefixId."[pointer]=".$conf_pointeur['pointer'];
-										$link=$this->makeFormTypoLink($conf,$prm);
-										$imgi = $link;
+							if (!$img) {
+								$img=t3lib_extMgm::siteRelPath('meta_feedit').'res/noimage.jpg';
+							} else {
+								if ($img!='$$$$NOIMAGE$$$$') {
+									$iimg = explode('|', $img);
+									if (count($iimg) > 1) {
+										$newImgs .= $newImgs?",".$img:$img;
+										$img = $iimg[0];
+										$img = $uf2.'/'.$img;
+									} else {
+										$dbImgs .= $dbImgs?",".$img:$img; // what is this ???
+										$img = $uf.'/'.$img;
 									}
-									$ATagB = '<a href="'.$imgi.'" target="_blank">';
-									$ATagE = '</a>';
-								}
-	
-								$imgT = $this->getIconPath($img, $conf, $size);
-	
-								if ($size == "0") {
-									$values .= $ATagB.$this->cObj->stdWrap('<img src="'.$imgT.'" title="'.trim(basename($img)).'" alt="'.$img.'" />', $conf['fileWrap.'][$fN.'.']).$ATagE;
 								} else {
-									// here must use cObject IMAGE
-									$imgA=array();
-									//$imgA['file.']['maxW'] = 100;
-									$imgA['file.']['maxH'] = 50;
-									//$imgA['file.']['width'] = 100;
-									$imgA['file.']['height'] = '50c';
-
-	
-									if ($conf[$conf['cmdmode'].'.']['imgConf.'][$fN.'.'] || $conf['imgConf.'][$fN.'.'])	$imgA=$conf[$conf['cmdmode'].'.']['imgConf.'][$fN.'.']?$conf[$conf['cmdmode'].'.']['imgConf.'][$fN.'.']:$conf['imgConf.'][$fN.'.'];
-										if (!$imgA['file'] ) $imgA['file'] = $imgT;
-										$imgA['altText']=$imgT;
-										$imgA['titleText']=trim(basename($imgT));
-										$values .= $ATagB.$this->cObj->stdWrap($this->cObj->IMAGE($imgA), $conf['fileWrap.'][$fN.'.']).$ATagE;
-									}
+									$img=t3lib_extMgm::siteRelPath('meta_feedit').'res/noimage.jpg';
 								}
 							}
+							//We handle image wrap here ... Must do something better here if user wrap defined we disable default link
+
+							$std=$conf[$conf['cmdmode'].'.']['stdWrap.']?$conf[$conf['cmdmode'].'.']['stdWrap.']:$conf['stdWrap.'];// what about item_stdWrap here ?
+							if ($conf[$conf['cmdmode'].'.']['item_stdWrap.'][$table.'.'] || $std[$table.'.'][$fNiD.'.'] || $std[$fNiD.'.']) {
+								$ATageB = '';
+								$ATagE = '';
+							} else {
+								// is there a media player linked to this file type ?
+								if ($conf[$conf['cmdmode'].'.']['mediaPlayer']) $player = $this->getMediaPlayer($img, $conf);
+
+								$imgi = $img;
+								if ($player) {
+									$conf_pointeur=t3lib_div::_GP("tx_metafeedit");
+									$prm="&".$this->prefixId."[mediafile]=".$img."&".$this->prefixId."[mediaplayer]=".$player."&".$this->prefixId."[mediaru]=".$dataArr['uid']."&".$this->prefixId."[pointer]=".$conf_pointeur['pointer'];
+									$link=$this->makeFormTypoLink($conf,$prm);
+									$imgi = $link;
+								}
+								$ATagB = '<a href="'.$imgi.'" target="_blank">';
+								$ATagE = '</a>';
+							}
+
+							$imgT = $this->getIconPath($img, $conf, $size);
+
+							if ($size == "0") {
+								$values .= $ATagB.$this->cObj->stdWrap('<img src="'.$imgT.'" title="'.trim(basename($img)).'" alt="'.$img.'" />', $conf['fileWrap.'][$fN.'.']).$ATagE;
+							} else {
+								// here must use cObject IMAGE
+								$imgA=array();
+								//$imgA['file.']['maxW'] = 100;
+								$imgA['file.']['maxH'] = 50;
+								//$imgA['file.']['width'] = 100;
+								$imgA['file.']['height'] = '50c';
+
+
+								if ($conf[$conf['cmdmode'].'.']['imgConf.'][$fN.'.'] || $conf['imgConf.'][$fN.'.'])	$imgA=$conf[$conf['cmdmode'].'.']['imgConf.'][$fN.'.']?$conf[$conf['cmdmode'].'.']['imgConf.'][$fN.'.']:$conf['imgConf.'][$fN.'.'];
+								if (!$imgA['file'] ) $imgA['file'] = $imgT;
+								$imgA['altText']=$imgT;
+								$imgA['titleText']=trim(basename($imgT));
+								$values .= $ATagB.$this->cObj->stdWrap($this->cObj->IMAGE($imgA), $conf['fileWrap.'][$fN.'.']).$ATagE;
+							}
+							// By defaullt we only handle first media
+							if (!$multipleMedia) break;
+						}
 	
 							// We handle here files which are not yet saved in DB (preview mode!)
 		
 							$imgs = explode(',', $dataArr[$fN.'_file']);
 							foreach ($imgs as $imga) {
-	
-							$img = explode('|', $imga);
-							$newImgs .= $newImgs?",".$imga:
-							$imga;
-							if (count($img) > 1) {
-								$im = PATH_site.$uf2.'/'.$img[0];
-							} else {
-								$im = PATH_site.$uf.'/'.$img[0];
-							}
-							if ($img[0]) {
-								$img = $this->getIconPath($im, $conf, $size);
-								if ($size == "0") {
-									$values .= $this->cObj->stdWrap('<img src="'.$img.'"  title="'.trim(basename($im)).'" alt="'.$im.'" />', $conf['fileWrap.'][$fN.'.']);
+								$img = explode('|', $imga);
+								$newImgs .= $newImgs?",".$imga:
+								$imga;
+								if (count($img) > 1) {
+									$im = PATH_site.$uf2.'/'.$img[0];
 								} else {
-									$values .= $this->cObj->stdWrap(t3lib_BEfunc::getThumbNail($BACK_PATH.'/typo3/thumbs.php', $img, '', $size), $conf['fileWrap.'][$fN.'.']);
+									$im = PATH_site.$uf.'/'.$img[0];
+								}
+								if ($img[0]) {
+									$img = $this->getIconPath($im, $conf, $size);
+									if ($size == "0") {
+										$values .= $this->cObj->stdWrap('<img src="'.$img.'"  title="'.trim(basename($im)).'" alt="'.$im.'" />', $conf['fileWrap.'][$fN.'.']);
+									} else {
+										$values .= $this->cObj->stdWrap(t3lib_BEfunc::getThumbNail($BACK_PATH.'/typo3/thumbs.php', $img, '', $size), $conf['fileWrap.'][$fN.'.']);
+									}
 								}
 							}
+						
+							$dataArr['EVAL_'.$_fN] = $values;
+							$dataArr[$_fN] = $dataArr[$fN.'_file']?($dataArr[$fN]?$dataArr[$fN].','.$dataArr[$fN.'_file']:$dataArr[$fN.'_file']):$dataArr[$fN];
+		
+							if (!$fe_adminLib->failure) {
+								$dataArr[$_fN.'_file'] = $newImgs;
+								$dataArr[$_fN] = $dbImgs;
+							}
 						}
-						$dataArr['EVAL_'.$_fN] = $values;
-						$dataArr[$_fN] = $dataArr[$fN.'_file']?($dataArr[$fN]?$dataArr[$fN].','.$dataArr[$fN.'_file']:$dataArr[$fN.'_file']):$dataArr[$fN];
+						break;
+				case 'select':
+					// field is of select type
+					$values = '';
+					$uids = array();
+					if ($conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']) {
+						// reference to elements from another table
+						$FT = $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'];
+						$this->makeTypo3TCAForTable($conf['TCAN'],$FT);
+						$label = $conf['label.'][$FT]?$conf['label.'][$FT]:$conf['TCAN'][$FT]['ctrl']['label'];
+						$label_alt = $conf['label_alt.'][$FT]?$conf['label_alt.'][$FT]:$conf['TCAN'][$FT]['ctrl']['label_alt'];
 	
-						if (!$fe_adminLib->failure) {
-							$dataArr[$_fN.'_file'] = $newImgs;
-							$dataArr[$_fN] = $dbImgs;
-						}
-				}
+						$label_alt_force = $conf['label_alt_force.'][$FT]?$conf['label_alt_force.'][$FT]: $conf['TCAN'][$FT]['ctrl']['label_alt_force'];
+							
+						if ($dataArr[$fN]) {
+							if ($conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"] && $dataArr[$conf['uidField']]) {
+								// from mm-relation
+								$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"], 'uid_local=\''.$dataArr[$conf['uidField']].'\'', '');
+								if (mysql_error()) debug(array(mysql_error(), $query), 'processDataArray()::field='.$fN);
+									if ($conf['debug'] && mysql_num_rows($MMres) != $dataArr[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_processDataArray(): Wrong number ($cnt<>".$dataArr[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+								while ($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
+							} else {
+								// clean from DB
+								$uids = t3lib_div::trimExplode(',', $dataArr[$fN]);
+							}
+							$orClause = '';
 	
-				break;
-			case 'select':
-				// field is of select type
-				$values = '';
-				$uids = array();
-				if ($conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']) {
-					// reference to elements from another table
-					$FT = $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'];
-					$this->makeTypo3TCAForTable($conf['TCAN'],$FT);
-					$label = $conf['label.'][$FT]?$conf['label.'][$FT]:$conf['TCAN'][$FT]['ctrl']['label'];
-					$label_alt = $conf['label_alt.'][$FT]?$conf['label_alt.'][$FT]:$conf['TCAN'][$FT]['ctrl']['label_alt'];
-
-					$label_alt_force = $conf['label_alt_force.'][$FT]?$conf['label_alt_force.'][$FT]: $conf['TCAN'][$FT]['ctrl']['label_alt_force'];
-						
-					if ($dataArr[$fN]) {
-						if ($conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"] && $dataArr[$conf['uidField']]) {
-							// from mm-relation
-							$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"], 'uid_local=\''.$dataArr[$conf['uidField']].'\'', '');
-							if (mysql_error()) debug(array(mysql_error(), $query), 'processDataArray()::field='.$fN);
-								if ($conf['debug'] && mysql_num_rows($MMres) != $dataArr[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_processDataArray(): Wrong number ($cnt<>".$dataArr[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
-							while ($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
-						} else {
-							// clean from DB
-							$uids = t3lib_div::trimExplode(',', $dataArr[$fN]);
+	
+							$whereClause = " 1 ";
+							foreach($uids as $uid) $orClause .= $orClause ? ' OR '.$conf['uidField'].' = \''.$uid.'\'' : $conf['uidField'].' = \''.$uid.'\'';
+							$TCAFT = $conf['TCAN'][$FT];
+							$statictable = 0;
+							if (strpos($FT, 'static_') === 0) {
+								$statictable = 1;
+							}
+							if ($FT && $TCAFT['ctrl']['languageField'] && $TCAFT['ctrl']['transOrigPointerField']) {
+								//		$whereClause .= ' AND '.$TCAFT['ctrl']['transOrigPointerField'].'=0';
+							}
+							$orClause = $orClause?" and (".$orClause.") ":"";
+	
+							$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'], $whereClause.' '.$orClause);
+							if ($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(), 'sql error');
+							$values = '';
+							$vals = array();
+							$d = $this->cObj->data;
+							while ($resRow = mysql_fetch_assoc($res)) {
+								$this->cObj->start($resRow, $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']);
+								$resLabel = $resRow[$label];
+								$resLabel_alt = $resRow[$label_alt];
+								if ($statictable) {
+									$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
+									$resLabel = $this->getLL('language_'.$code, $conf);
+									if (!$resLabel ) {
+										$resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset);
+									}
+								}
+								$resLabel = $this->cObj->stdWrap($resLabel, $conf['evalWrap.'][$_fN.'.']);
+								$resLabel_alt = $this->cObj->stdWrap($resLabel_alt, $conf['evalWrap.'][$_fN.'.']);
+								$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
+								$tempLabel = $tempLabel ? $tempLabel : $resLabel_alt;
+								$vals[] = $tempLabel;
+							}
+							$this->cObj->start($d, $table);
+							$cc = count($vals);
+							$i = 0;
+							foreach($vals as $v) {
+								$i++;
+								if ($i == $cc && $cc > 1) {
+									$sep = $conf['evalLastSep.'][$fN]?$conf['evalLastSep.'][$fN]:',';
+								} else {
+									$sep = $conf['evalSep.'][$fN]?$conf['evalSep.'][$fN]:',';
+								}
+								$values .= $values ? $sep . $v :$v;
+							}
 						}
-						$orClause = '';
-
-
-						$whereClause = " 1 ";
-						foreach($uids as $uid) $orClause .= $orClause ? ' OR '.$conf['uidField'].' = \''.$uid.'\'' : $conf['uidField'].' = \''.$uid.'\'';
-						$TCAFT = $conf['TCAN'][$FT];
-						$statictable = 0;
-						if (strpos($FT, 'static_') === 0) {
-							$statictable = 1;
-						}
-						if ($FT && $TCAFT['ctrl']['languageField'] && $TCAFT['ctrl']['transOrigPointerField']) {
-							//		$whereClause .= ' AND '.$TCAFT['ctrl']['transOrigPointerField'].'=0';
-						}
-						$orClause = $orClause?" and (".$orClause.") ":"";
-
-						$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'], $whereClause.' '.$orClause);
-						if ($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(), 'sql error');
-						$values = '';
-						$vals = array();
-						$d = $this->cObj->data;
-						while ($resRow = mysql_fetch_assoc($res)) {
-							$this->cObj->start($resRow, $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']);
-							$resLabel = $resRow[$label];
-							$resLabel_alt = $resRow[$label_alt];
-							if ($statictable) {
-								$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
-								$resLabel = $this->getLL('language_'.$code, $conf);
-								if (!$resLabel ) {
-									$resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset);
+					} elseif(count($conf['TCAN'][$table]['columns'][$fNiD]['config']['items'])) {
+					
+						// fixed items
+						if (isset($dataArr[$fN])) {
+							$vals = t3lib_div::trimExplode(',', $dataArr[$fN]);
+							foreach($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"] as $item) {
+								if (!empty($item)) {
+									list($label, $val) = $item;
+									$label = $this->getLLFromLabel($label,$conf);
+									if (in_array($val, $vals)) {
+										$values .= $values ? ', ' . $label :
+										 $label;
+									}
 								}
 							}
-							$resLabel = $this->cObj->stdWrap($resLabel, $conf['evalWrap.'][$_fN.'.']);
-							$resLabel_alt = $this->cObj->stdWrap($resLabel_alt, $conf['evalWrap.'][$_fN.'.']);
-							$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
-							$tempLabel = $tempLabel ? $tempLabel : $resLabel_alt;
-							$vals[] = $tempLabel;
 						}
-						$this->cObj->start($d, $table);
-						$cc = count($vals);
-						$i = 0;
-						foreach($vals as $v) {
-							$i++;
-							if ($i == $cc && $cc > 1) {
-								$sep = $conf['evalLastSep.'][$fN]?$conf['evalLastSep.'][$fN]:',';
+						if($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"]) {
+							$this->t3lib_TCEforms->procItems($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"],$conf,$conf['TCAN'][$table]['columns'][$fNiD]['config'],$table,$dataArr,$fNiD);
+							//t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"], $newArr, $this);
+							
+							if (is_array($newArr['items'])) foreach($newArr['items'] as $item) {
+								if (!empty($item)) {
+									list($label, $val) = $item;
+									$label = $this->getLLFromLabel($label,$conf);
+									$values .= $values ? ', ' . $label : $label;
+								}
+							}
+						}
+					}
+					$dataArr['EVAL_'.$_fN] = $values;
+					break;
+				case 'inline':
+					// field is of inline type
+					$values = '';
+					$uids = array();
+					if ($conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']) {
+					
+						$FF=$conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_field'];
+					
+						// reference to elements from another table
+						$FT = $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'];
+						$label = $conf['label.'][$FT]?$conf['label.'][$FT]:
+						$conf['TCAN'][$FT]['ctrl']['label'];
+											
+						$label_alt = $conf['label_alt.'][$FT]?$conf['label_alt.'][$FT]: 
+							$conf['TCAN'][$FT]['ctrl']['label_alt'];
+	
+						$label_alt_force = $conf['label_alt_force.'][$FT]?$conf['label_alt_force.'][$FT]: 
+							$conf['TCAN'][$FT]['ctrl']['label_alt_force'];
+							
+						if ($dataArr[$fN]) {
+							if ($conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"] && $dataArr[$conf['uidField']]) {
+								// from mm-relation
+								$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"], 'uid_local=\''.$dataArr[$conf['uidField']].'\'', '');
+								if (mysql_error()) debug(array(mysql_error(), $query), 'processDataArray()::field='.$fN);
+									if ($conf['debug'] && mysql_num_rows($MMres) != $dataArr[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_processDataArray(): Wrong number ($cnt<>".$dataArr[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
+								while ($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
 							} else {
-								$sep = $conf['evalSep.'][$fN]?$conf['evalSep.'][$fN]:',';
+								// clean from DB
+								$uids = t3lib_div::trimExplode(',', $dataArr[$fN]);
 							}
-							$values .= $values ? $sep . $v :$v;
+							$orClause = '';
+	
+	
+							$whereClause = " 1 ";
+							foreach($uids as $uid) $orClause .= $orClause ? ' OR '.$conf['uidField'].' LIKE \''.$uid.'\'' :
+							 $conf['uidField'].' = \''.$uid.'\'';
+							$TCAFT = $conf['TCAN'][$FT];
+							$statictable = 0;
+							if (strpos($FT, 'static_') === 0) {
+								$statictable = 1;
+							}
+							if ($FT && $TCAFT['ctrl']['languageField'] && $TCAFT['ctrl']['transOrigPointerField']) {
+								//		$whereClause .= ' AND '.$TCAFT['ctrl']['transOrigPointerField'].'=0';
+							}
+							$orClause = $orClause?" and (".$orClause.") ":
+							"";
+	
+							$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'], $whereClause.' '.$orClause);
+							if ($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(), 'sql error');
+							$values = '';
+							$vals = array();
+							$d = $this->cObj->data;
+							while ($resRow = mysql_fetch_assoc($res)) {
+								$this->cObj->start($resRow, $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']);
+								$resLabel = $resRow[$label];
+								$resLabel_alt = $resRow[$label_alt];
+								if ($statictable) {
+									$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
+									$resLabel = $this->getLL('language_'.$code, $conf);
+									if (!$resLabel ) {
+										$resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset);
+									}
+								}
+								$resLabel = $this->cObj->stdWrap($resLabel, $conf['evalWrap.'][$fN.'.']);
+								$resLabel_alt = $this->cObj->stdWrap($resLabel_alt, $conf['evalWrap.'][$fN.'.']);
+								$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
+								$tempLabel = $tempLabel ? $tempLabel : $resLabel_alt;
+								$vals[] = $tempLabel;
+							}
+							$this->cObj->start($d, $table);
+							$cc = count($vals);
+							$i = 0;
+							foreach($vals as $v) {
+								$i++;
+								if ($i == $cc && $cc > 1) {
+									$sep = $conf['evalLastSep.'][$fN]?$conf['evalLastSep.'][$fN]:
+									',';
+								} else {
+									$sep = $conf['evalSep.'][$fN]?$conf['evalSep.'][$fN]:
+									',';
+								}
+								$values .= $values ? $sep . $v :
+								 $v;
+							}
 						}
-					}
-				} elseif(count($conf['TCAN'][$table]['columns'][$fNiD]['config']['items'])) {
-				
-					// fixed items
-					if (isset($dataArr[$fN])) {
-						$vals = t3lib_div::trimExplode(',', $dataArr[$fN]);
-						foreach($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"] as $item) {
-							if (!empty($item)) {
-								list($label, $val) = $item;
-								$label = $this->getLLFromLabel($label,$conf);
-								if (in_array($val, $vals)) {
-									$values .= $values ? ', ' . $label :
-									 $label;
+					} elseif($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"]) {
+						// fixed items
+						if (isset($dataArr[$fN])) {
+							$vals = t3lib_div::trimExplode(',', $dataArr[$fN]);
+							foreach($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"] as $item) {
+								if (!empty($item)) {
+									list($label, $val) = $item;
+									$label = $this->getLLFromLabel($label,$conf);
+									if (in_array($val, $vals)) {
+										$values .= $values ? ', ' . $label :
+										 $label;
+									}
+								}
+							}
+						}
+						if($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"]) {
+							//$newArr=array();
+							//t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"], $newArr, $this);
+							$this->t3lib_TCEforms->procItems($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"],$conf['TCAN'][$table]['columns'][$fNiD],$conf['TCAN'][$table]['columns'][$fNiD]['config'],$table,$dataArr,$fNiD);
+							if (is_array($newArr['items'])) foreach($newArr['items'] as $item) {
+								if (!empty($item)) {
+									list($label, $val) = $item;
+									$label = $this->getLLFromLabel($label,$conf);
+									$values .= $values ? ', ' . $label : $label;
 								}
 							}
 						}
 					}
-					if($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"]) {
-						$this->t3lib_TCEforms->procItems($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"],$conf,$conf['TCAN'][$table]['columns'][$fNiD]['config'],$table,$dataArr,$fNiD);
-						//t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"], $newArr, $this);
-						
-						if (is_array($newArr['items'])) foreach($newArr['items'] as $item) {
-							if (!empty($item)) {
-								list($label, $val) = $item;
-								$label = $this->getLLFromLabel($label,$conf);
-								$values .= $values ? ', ' . $label : $label;
-							}
-						}
-					}
-				}
-				$dataArr['EVAL_'.$_fN] = $values;
-				break;
-			case 'inline':
-				// field is of inline type
-				$values = '';
-				$uids = array();
-				if ($conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']) {
-				
-					$FF=$conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_field'];
-				
-					// reference to elements from another table
-					$FT = $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'];
-					$label = $conf['label.'][$FT]?$conf['label.'][$FT]:
-					$conf['TCAN'][$FT]['ctrl']['label'];
-										
-					$label_alt = $conf['label_alt.'][$FT]?$conf['label_alt.'][$FT]: 
-						$conf['TCAN'][$FT]['ctrl']['label_alt'];
-
-					$label_alt_force = $conf['label_alt_force.'][$FT]?$conf['label_alt_force.'][$FT]: 
-						$conf['TCAN'][$FT]['ctrl']['label_alt_force'];
-						
-					if ($dataArr[$fN]) {
-						if ($conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"] && $dataArr[$conf['uidField']]) {
-							// from mm-relation
-							$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"], 'uid_local=\''.$dataArr[$conf['uidField']].'\'', '');
-							if (mysql_error()) debug(array(mysql_error(), $query), 'processDataArray()::field='.$fN);
-								if ($conf['debug'] && mysql_num_rows($MMres) != $dataArr[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->user_processDataArray(): Wrong number ($cnt<>".$dataArr[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
-							while ($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
-						} else {
-							// clean from DB
-							$uids = t3lib_div::trimExplode(',', $dataArr[$fN]);
-						}
-						$orClause = '';
-
-
-						$whereClause = " 1 ";
-						foreach($uids as $uid) $orClause .= $orClause ? ' OR '.$conf['uidField'].' LIKE \''.$uid.'\'' :
-						 $conf['uidField'].' = \''.$uid.'\'';
-						$TCAFT = $conf['TCAN'][$FT];
-						$statictable = 0;
-						if (strpos($FT, 'static_') === 0) {
-							$statictable = 1;
-						}
-						if ($FT && $TCAFT['ctrl']['languageField'] && $TCAFT['ctrl']['transOrigPointerField']) {
-							//		$whereClause .= ' AND '.$TCAFT['ctrl']['transOrigPointerField'].'=0';
-						}
-						$orClause = $orClause?" and (".$orClause.") ":
-						"";
-
-						$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'], $whereClause.' '.$orClause);
-						if ($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(), 'sql error');
-						$values = '';
-						$vals = array();
-						$d = $this->cObj->data;
-						while ($resRow = mysql_fetch_assoc($res)) {
-							$this->cObj->start($resRow, $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']);
-							$resLabel = $resRow[$label];
-							$resLabel_alt = $resRow[$label_alt];
-							if ($statictable) {
-								$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
-								$resLabel = $this->getLL('language_'.$code, $conf);
-								if (!$resLabel ) {
-									$resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset);
-								}
-							}
-							$resLabel = $this->cObj->stdWrap($resLabel, $conf['evalWrap.'][$fN.'.']);
-							$resLabel_alt = $this->cObj->stdWrap($resLabel_alt, $conf['evalWrap.'][$fN.'.']);
-							$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
-							$tempLabel = $tempLabel ? $tempLabel : $resLabel_alt;
-							$vals[] = $tempLabel;
-						}
-						$this->cObj->start($d, $table);
-						$cc = count($vals);
-						$i = 0;
-						foreach($vals as $v) {
-							$i++;
-							if ($i == $cc && $cc > 1) {
-								$sep = $conf['evalLastSep.'][$fN]?$conf['evalLastSep.'][$fN]:
-								',';
-							} else {
-								$sep = $conf['evalSep.'][$fN]?$conf['evalSep.'][$fN]:
-								',';
-							}
-							$values .= $values ? $sep . $v :
-							 $v;
-						}
-					}
-				} elseif($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"]) {
-					// fixed items
-					if (isset($dataArr[$fN])) {
-						$vals = t3lib_div::trimExplode(',', $dataArr[$fN]);
-						foreach($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"] as $item) {
-							if (!empty($item)) {
-								list($label, $val) = $item;
-								$label = $this->getLLFromLabel($label,$conf);
-								if (in_array($val, $vals)) {
-									$values .= $values ? ', ' . $label :
-									 $label;
-								}
-							}
-						}
-					}
-					if($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"]) {
-						//$newArr=array();
-						//t3lib_div::callUserFunction($conf['TCAN'][$table]['columns'][$fNiD]['config']["itemsProcFunc"], $newArr, $this);
-						$this->t3lib_TCEforms->procItems($conf['TCAN'][$table]['columns'][$fNiD]['config']["items"],$conf['TCAN'][$table]['columns'][$fNiD],$conf['TCAN'][$table]['columns'][$fNiD]['config'],$table,$dataArr,$fNiD);
-						if (is_array($newArr['items'])) foreach($newArr['items'] as $item) {
-							if (!empty($item)) {
-								list($label, $val) = $item;
-								$label = $this->getLLFromLabel($label,$conf);
-								$values .= $values ? ', ' . $label : $label;
-							}
-						}
-					}
-				}
-				$dataArr['EVAL_'.$_fN] = $values;
-				break;			
-			default:
-				if ($conf['list.']['sqlcalcfields.'][$fN]) {
-					$dataArr['EVAL_'.$fN]=$this->transformSqlCalcField($fN,$dataArr[$fN],$conf);
-				} 
-				break;
+					$dataArr['EVAL_'.$_fN] = $values;
+					break;			
+				default:
+					if ($conf['list.']['sqlcalcfields.'][$fN]) {
+						$dataArr['EVAL_'.$fN]=$this->transformSqlCalcField($fN,$dataArr[$fN],$conf);
+					} 
+					break;
 				
 			}
 
@@ -2460,17 +2470,18 @@ class tx_metafeedit_lib {
 	
 	function getIconPath($img, &$conf, &$size) {
 		$type = $this->type_from_file($img, $conf);
+		if (!file_exists($img)) return t3lib_extMgm::siteRelPath('meta_feedit').'res/imagenotfound.jpg';
 		switch ($type) {
 			case 'image1' :
-			return $img;
-			break;
+				return $img;
+				break;
 			case 'unknown' :
-			$size = 0;
-			return t3lib_extMgm::siteRelPath('meta_feedit').'res/disconnect.jpg';
-			break;
+				$size = 0;
+				return t3lib_extMgm::siteRelPath('meta_feedit').'res/disconnect.jpg';
+				break;
 			default :
-			$size = 0;
-			return $this->icon_from_type($type, $conf);
+				$size = 0;
+				return $this->icon_from_type($type, $conf);
 		}
 	}
 
@@ -2504,18 +2515,21 @@ class tx_metafeedit_lib {
 	*/
 	
 	function type_from_file($fn, &$conf) {
+		$rettype="unknown";
 		if ($conf["map_type_to_ext."]) {
 			foreach($conf["map_type_to_ext."] as $type => $ext) {
 				$ext = explode("|", $ext);
 				for ($i = 0; $i < count($ext); $i++) {
 					$ext[$i] = str_replace(".", "\.", $ext[$i]);
 					$ext[$i] = str_replace("+", "\+", $ext[$i]);
-					if (preg_match('/'.$ext[$i].'$/i', $fn))
-						return $type;
+					if (preg_match('/'.$ext[$i].'$/i', $fn)) {
+						$rettype= $type;
+						break 2;
+					}
 				}
 			}
 		}
-		return "unknown";
+		return $rettype;
 	}
 
 	/**
@@ -3046,7 +3060,6 @@ class tx_metafeedit_lib {
 		
 		// user override of language labels
 		if (isset($conf['LOCAL_LANG'][$conf['LLkey']][$label2])) {
-			//error_log(__METHOD__.":$label2 -  :".print_r($conf['LOCAL_LANG'][$conf['LLkey']][$label2],true));
 			$ret=$conf['LOCAL_LANG'][$conf['LLkey']][$label2];
 		} else {
 			$ret=$GLOBALS['TSFE']->sL($label);

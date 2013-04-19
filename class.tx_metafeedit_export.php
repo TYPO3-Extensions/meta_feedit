@@ -24,7 +24,7 @@
 /**
 * This is a Class for generating records in some files like CSV, PDF EXCEL, it generated buttons too.
 * called by fe_adminLib.php
-* @author      Christophe BALISKY <cbalisky@metaphore.fr>
+* @author	  Christophe BALISKY <cbalisky@metaphore.fr>
 */
 //define('FPDF_FONTPATH',t3lib_extMgm::extPath('meta_feedit').'res/fonts/');
 define('EURO',chr(128));
@@ -76,7 +76,6 @@ class tx_metafeedit_pdf extends FPDF {
 			$user = '';
 			$user = $GLOBALS['TSFE']->fe_user->user[username]?$GLOBALS['TSFE']->fe_user->user[username]:$this->caller->caller->metafeeditlib->getLL('anonymous', $this->caller->conf);
 			//->caller
-			//error_log(__METHOD__.":".get_class($this->caller));
 			$this->Cell(0,$this->footercellsize, utf8_decode($this->caller->caller->metafeeditlib->getLL('printedby', $this->caller->conf)).$user,0,0,'R');
 		}
 	}
@@ -115,7 +114,6 @@ class tx_metafeedit_pdf extends FPDF {
 	}
 	// generates printer javascript depending on parameters and config
 	function generatePrintScript($print,$printer,$server) {
-		//error_log(__METHOD__.":$print,$printer,$server");
 		$dialog=true;
 		$autoprint=false;
 		//We add print dialog or not ...
@@ -155,7 +153,6 @@ class tx_metafeedit_pdf extends FPDF {
 		$script=$dialog?"print(true);":"if(typeof JSSilentPrint != 'undefined') {JSSilentPrint(this);}else{print(false);};";
 		//$script=$dialog?"print(true);":"if(typeof JSSilentPrint != 'undefined') {app.alert('silent');JSSilentPrint(this);}else{app.alert('notsilent');print(false);};";
 		//$script=$dialog?"print(true);":"app.alert('yoi');if(typeof JSSilentPrint == 'undefined') {app.alert('notsilent');};";
-		//error_log(__METHOD__.":$script");
 		$this->IncludeJS($script);
 		//$this->IncludeJS("app.alert('yop');".$script);
 	}
@@ -183,7 +180,6 @@ class tx_metafeedit_pdf extends FPDF {
 			$script .= "pp.printerName = '\\\\\\\\".$server."\\\\".$printer."';";
 			$script .= "print(pp);}";
 		}
-		//error_log(__METHOD__.":$script");
 		$this->IncludeJS($script);
 	}
 	
@@ -210,7 +206,6 @@ class tx_metafeedit_pdf extends FPDF {
 			$script .= "pp.printerName = '".$printer."';";
 			$script .= "print(pp);}";
 		}
-		//error_log(__METHOD__.":$script");
 		$this->IncludeJS($script);
 	}
 	
@@ -271,7 +266,275 @@ class tx_metafeedit_pdf extends FPDF {
 			$i++;
 		}
 		return $nl;
-	}	
+	}
+	
+	/*******************************************************************************
+	 *																			  *
+	*							   Public methods								 *
+	*																			  *
+	*******************************************************************************/
+	function Image($file,$x,$y,$w=0,$h=0,$type='',$link='', $isMask=false, $maskImg=0)
+	{
+		//Put an image on the page
+		if(!isset($this->images[$file]))
+		{
+			//First use of image, get info
+			if($type=='')
+			{
+				$pos=strrpos($file,'.');
+				if(!$pos)
+					$this->Error('Image file has no extension and no type was specified: '.$file);
+				$type=substr($file,$pos+1);
+			}
+			$type=strtolower($type);
+			$mqr=get_magic_quotes_runtime();
+			set_magic_quotes_runtime(0);
+			if($type=='jpg' || $type=='jpeg')
+				$info=$this->_parsejpg($file);
+			elseif($type=='png'){
+				$info=$this->_parsepng($file);
+				if ($info=='alpha') return $this->ImagePngWithAlpha($file,$x,$y,$w,$h,$link);
+			}
+			else
+			{
+				//Allow for additional formats
+				$mtd='_parse'.$type;
+				if(!method_exists($this,$mtd))
+					$this->Error('Unsupported image type: '.$type);
+				$info=$this->$mtd($file);
+			}
+			set_magic_quotes_runtime($mqr);
+	
+			if ($isMask){
+				$info['cs']="DeviceGray"; // try to force grayscale (instead of indexed)
+			}
+			$info['i']=count($this->images)+1;
+			if ($maskImg>0) $info['masked'] = $maskImg;###
+			$this->images[$file]=$info;
+		}
+		else
+			$info=$this->images[$file];
+		//Automatic width and height calculation if needed
+		if($w==0 && $h==0)
+		{
+			//Put image at 72 dpi
+			$w=$info['w']/$this->k;
+			$h=$info['h']/$this->k;
+		}
+		if($w==0)
+			$w=$h*$info['w']/$info['h'];
+		if($h==0)
+			$h=$w*$info['h']/$info['w'];
+	
+		// embed hidden, ouside the canvas
+		if ((float)FPDF_VERSION>=1.7){
+			if ($isMask) $x = ($this->CurOrientation=='P'?$this->CurPageSize[0]:$this->CurPageSize[1]) + 10;
+		}else{
+			if ($isMask) $x = ($this->CurOrientation=='P'?$this->CurPageFormat[0]:$this->CurPageFormat[1]) + 10;
+		}
+	
+		$this->_out(sprintf('q %.2f 0 0 %.2f %.2f %.2f cm /I%d Do Q',$w*$this->k,$h*$this->k,$x*$this->k,($this->h-($y+$h))*$this->k,$info['i']));
+		if($link)
+			$this->Link($x,$y,$w,$h,$link);
+	
+		return $info['i'];
+	}
+	
+	// needs GD 2.x extension
+	// pixel-wise operation, not very fast
+	function ImagePngWithAlpha($file,$x,$y,$w=0,$h=0,$link='')
+	{
+		$tmp_alpha = tempnam('.', 'mska');
+		$this->tmpFiles[] = $tmp_alpha;
+		$tmp_plain = tempnam('.', 'mskp');
+		$this->tmpFiles[] = $tmp_plain;
+	
+		list($wpx, $hpx) = getimagesize($file);
+		$img = imagecreatefrompng($file);
+		$alpha_img = imagecreate( $wpx, $hpx );
+	
+		// generate gray scale pallete
+		for($c=0;$c<256;$c++) ImageColorAllocate($alpha_img, $c, $c, $c);
+	
+		// extract alpha channel
+		$xpx=0;
+		while ($xpx<$wpx){
+			$ypx = 0;
+			while ($ypx<$hpx){
+				$color_index = imagecolorat($img, $xpx, $ypx);
+				$alpha = 255-($color_index>>24)*255/127; // GD alpha component: 7 bit only, 0..127!
+				imagesetpixel($alpha_img, $xpx, $ypx, $alpha);
+				++$ypx;
+			}
+			++$xpx;
+		}
+	
+		imagepng($alpha_img, $tmp_alpha);
+		imagedestroy($alpha_img);
+	
+		// extract image without alpha channel
+		$plain_img = imagecreatetruecolor ( $wpx, $hpx );
+		imagecopy ($plain_img, $img, 0, 0, 0, 0, $wpx, $hpx );
+		imagepng($plain_img, $tmp_plain);
+		imagedestroy($plain_img);
+	
+		//first embed mask image (w, h, x, will be ignored)
+		$maskImg = $this->Image($tmp_alpha, 0,0,0,0, 'PNG', '', true);
+	
+		//embed image, masked with previously embedded mask
+		$this->Image($tmp_plain,$x,$y,$w,$h,'PNG',$link, false, $maskImg);
+	}
+	
+	function Close()
+	{
+		parent::Close();
+		// clean up tmp files
+		foreach($this->tmpFiles as $tmp) @unlink($tmp);
+	}
+	
+	/*******************************************************************************
+	 *																			  *
+	*							   Private methods								*
+	*																			  *
+	*******************************************************************************/
+	function _putimages()
+	{
+		$filter=($this->compress) ? '/Filter /FlateDecode ' : '';
+		reset($this->images);
+		while(list($file,$info)=each($this->images))
+		{
+			$this->_newobj();
+			$this->images[$file]['n']=$this->n;
+			$this->_out('<</Type /XObject');
+			$this->_out('/Subtype /Image');
+			$this->_out('/Width '.$info['w']);
+			$this->_out('/Height '.$info['h']);
+	
+			if (isset($info["masked"])) $this->_out('/SMask '.($this->n-1).' 0 R'); ###
+	
+			if($info['cs']=='Indexed')
+				$this->_out('/ColorSpace [/Indexed /DeviceRGB '.(strlen($info['pal'])/3-1).' '.($this->n+1).' 0 R]');
+			else
+			{
+				$this->_out('/ColorSpace /'.$info['cs']);
+				if($info['cs']=='DeviceCMYK')
+					$this->_out('/Decode [1 0 1 0 1 0 1 0]');
+			}
+			$this->_out('/BitsPerComponent '.$info['bpc']);
+			if(isset($info['f']))
+				$this->_out('/Filter /'.$info['f']);
+			if(isset($info['parms']))
+				$this->_out($info['parms']);
+			if(isset($info['trns']) && is_array($info['trns']))
+			{
+				$trns='';
+				for($i=0;$i<count($info['trns']);$i++)
+					$trns.=$info['trns'][$i].' '.$info['trns'][$i].' ';
+					$this->_out('/Mask ['.$trns.']');
+		}
+		$this->_out('/Length '.strlen($info['data']).'>>');
+		$this->_putstream($info['data']);
+		unset($this->images[$file]['data']);
+		$this->_out('endobj');
+		//Palette
+		if($info['cs']=='Indexed')
+		{
+				$this->_newobj();
+				$pal=($this->compress) ? gzcompress($info['pal']) : $info['pal'];
+				$this->_out('<<'.$filter.'/Length '.strlen($pal).'>>');
+				$this->_putstream($pal);
+				$this->_out('endobj');
+	}
+	}
+	}
+	
+				// this method overwriing the original version is only needed to make the Image method support PNGs with alpha channels.
+				// if you only use the ImagePngWithAlpha method for such PNGs, you can remove it from this script.
+					function _parsepng($file)
+					{
+					//Extract info from a PNG file
+					$f=fopen($file,'rb');
+					if(!$f)
+						$this->Error('Can\'t open image file: '.$file);
+						//Check signature
+						if(fread($f,8)!=chr(137).'PNG'.chr(13).chr(10).chr(26).chr(10))
+						$this->Error('Not a PNG file: '.$file);
+								//Read header chunk
+								fread($f,4);
+								if(fread($f,4)!='IHDR')
+							$this->Error('Incorrect PNG file: '.$file);
+							$w=$this->_readint($f);
+						$h=$this->_readint($f);
+						$bpc=ord(fread($f,1));
+								if($bpc>8)
+									$this->Error('16-bit depth not supported: '.$file);
+									$ct=ord(fread($f,1));
+									if($ct==0)
+										$colspace='DeviceGray';
+									elseif($ct==2)
+										$colspace='DeviceRGB';
+										elseif($ct==3)
+										$colspace='Indexed';
+									else {
+									fclose($f);	  // the only changes are
+									return 'alpha';  // made in those 2 lines
+				}
+				if(ord(fread($f,1))!=0)
+									$this->Error('Unknown compression method: '.$file);
+									if(ord(fread($f,1))!=0)
+											$this->Error('Unknown filter method: '.$file);
+									if(ord(fread($f,1))!=0)
+										$this->Error('Interlacing not supported: '.$file);
+										fread($f,4);
+										$parms='/DecodeParms <</Predictor 15 /Colors '.($ct==2 ? 3 : 1).' /BitsPerComponent '.$bpc.' /Columns '.$w.'>>';
+										//Scan chunks looking for palette, transparency and image data
+										$pal='';
+										$trns='';
+										$data='';
+										do
+										{
+										$n=$this->_readint($f);
+										$type=fread($f,4);
+										if($type=='PLTE')
+										{
+											//Read palette
+											$pal=fread($f,$n);
+											fread($f,4);
+											}
+											elseif($type=='tRNS')
+											{
+											//Read transparency info
+											$t=fread($f,$n);
+											if($ct==0)
+												$trns=array(ord(substr($t,1,1)));
+												elseif($ct==2)
+														$trns=array(ord(substr($t,1,1)),ord(substr($t,3,1)),ord(substr($t,5,1)));
+																else
+																{
+																$pos=strpos($t,chr(0));
+	if($pos!==false)
+	$trns=array($pos);
+	}
+	fread($f,4);
+	}
+	elseif($type=='IDAT')
+	{
+	//Read image data block
+	$data.=fread($f,$n);
+	fread($f,4);
+	}
+	elseif($type=='IEND')
+	break;
+	else
+	fread($f,$n+4);
+	}
+	while($n);
+	if($colspace=='Indexed' && empty($pal))
+	$this->Error('Missing palette in '.$file);
+	fclose($f);
+	return array('w'=>$w,'h'=>$h,'cs'=>$colspace,'bpc'=>$bpc,'f'=>'FlateDecode','parms'=>$parms,'pal'=>$pal,'trns'=>$trns,'data'=>$data);
+	}
+	
 }
 
 class tx_metafeedit_export {
@@ -385,9 +648,6 @@ class tx_metafeedit_export {
 	 * @param unknown_type $server
 	 */
 	function getPDFDET(&$content,&$caller,$print='',$printer='',$server='') {
-		//error_log(__METHOD__.":$print,$printer,$server");
-		//die($content);
-
 		try {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
@@ -440,7 +700,6 @@ class tx_metafeedit_export {
 		}
 
 		$unit='mm';
-		//error_log(__METHOD__.":".get_class($this->caller));
 		$pdf = new tx_metafeedit_pdf($orientation, $unit, $format);
 		$pdf->caller=&$this;
 		$pdf->AddFont('3OF9','','3OF9.php');
@@ -546,12 +805,10 @@ class tx_metafeedit_export {
 				
 				if ($col->line==1) {
 					//We handle lines here
-					//error_log(__METHOD__.":line");
 					$pdf->Line($col->line->attributes()->x1, $col->line->attributes()->y1, $col->line->attributes()->x2, $col->line->attributes()->y2);
 				
 				} elseif ($col->rect==1) {
 					//We handle lines here
-					//error_log(__METHOD__.":rect");
 					$pdf->Line($col->rect->attributes()->x1, $col->rect->attributes()->y1, $col->rect->attributes()->x2, $col->rect->attributes()->y1);
 					$pdf->Line($col->rect->attributes()->x2, $col->rect->attributes()->y1, $col->rect->attributes()->x2, $col->rect->attributes()->y2);
 					$pdf->Line($col->rect->attributes()->x2, $col->rect->attributes()->y2, $col->rect->attributes()->x1, $col->rect->attributes()->y2);
@@ -716,7 +973,6 @@ class tx_metafeedit_export {
 		if (!$content) {
 			die(__METHOD__.': No template for pdf mode, maybe pdf export is not activated');
 		}
-		//error_log(__METHOD__.":$print,$printer,$server");
 		try {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
@@ -757,8 +1013,6 @@ class tx_metafeedit_export {
 		} 
 		// Line width
 		$lw=0.3;
-
-		//error_log(__METHOD__.":".get_class($this->caller));
 		$pdf = new tx_metafeedit_pdf($orientation, $unit, $format);
 		$pdf->caller=&$this;
 
@@ -821,9 +1075,7 @@ class tx_metafeedit_export {
 		$r=0;
 		foreach($xml->tr as $row) {
 			$Y=$pdf->GetY()+$pdf->bottommargin+$height;
-			//error_log(__METHOD__.": $H , $Y, $height - ".$pdf->GetY());
 			if ($Y>=$H) {
-				//error_log(__METHOD__."addpage");
 				$pdf->AddPage();
 			}
 			$x=0; //column counter 
@@ -851,19 +1103,32 @@ class tx_metafeedit_export {
 				// Currency handling Euro CBY should not be here !!!
 				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
 				// We handle images here...
-				if ($col->img==1 && strlen($val)>0) {
-					$vala=t3lib_div::trimexplode(',',$val);
+				if ($col->img==1) {
+					if (strlen($val)>0) {
+						$vala=t3lib_div::trimexplode(',',$val);
+					} else {
+						$vala=array('');
+					}
 					$img='';
 				 	$myx=$pdf->getX();
 					$pdf->Cell($size,$height,'',1,0,'L',1);
 					$pdf->setX($myx);
+					$notFound=t3lib_extMgm::siteRelPath('meta_feedit').'res/noimage.jpg';
 					foreach($vala as $v) {
-						$img=PATH_site.($v?$col->img->dir.'/'.$v:'');
-						$imginfo=getimagesize($img);
+						
+						$img=$v?$PATH_site.$col->img->dir.'/'.$v:$notFound;
+						$img=$caller->metafeeditlib->getIconPath($img, $this->conf, $size);
+						$imginfo=getimagesize(PATH_site.$img);
 						if (is_array($imginfo)) {
 							$w=$imginfo[0];
 							$h=$imginfo[1];
-							$pdf->Image($img,$pdf->getX()+0.5,$pdf->getY()+0.5,0, $height-1);
+							try {
+								//error_log(__METHOD__.":1 $img");
+								$pdf->Image($img,$pdf->getX()+0.5,$pdf->getY()+0.5,0, $height-1);
+							} catch(Exception $e) {
+								//error_log(__METHOD__.":2 $notFound");
+								$pdf->Image($notFound,$pdf->getX()+0.5,$pdf->getY()+0.5,0, $height-1);
+							}
 							$pdf->setX($pdf->getX()+((($height-1)/$h)*$w));
 						}
 						// By defaullt we only handle first media
@@ -889,16 +1154,13 @@ class tx_metafeedit_export {
 				 	if (!$r) $p='L'; // So that column headers are always aligned left. 
 				 	$myx=$pdf->getX();
 				 	if ($row->gb && !strlen($val)) {
-				 		error_log(__METHOD__.":No val - myx : $myx - size $size");
 				 		$pdf->setX($myx+$size);
 				 	} else {
 				 		if ($row->gb && $x==0) { 
-				 			error_log(__METHOD__.":a $val - taille : $docWidth, size : $size  ,x : $x, myx $myx ,workWidth $workWidth");
 							$pdf->Cell($workWidth,$height,utf8_decode($val),1,0,$p,1);
 							$cell=true;
 							$pdf->setX($myx+$size);
 						} else {
-							error_log(__METHOD__.":b $val - myx : $myx - size $size");
 							$border=1;
 							$pdf->Cell($size,$height,utf8_decode($val),1,0,$p,1);
 							$cell=true;
@@ -953,7 +1215,6 @@ class tx_metafeedit_export {
 	 */
 	function PDFDisplayImage($pdf,$fullPathToImage,$displayEmptyImage=true){
 		$imginfo=getimagesize($fullPathToImage);
-		//error_log(__METHOD__.":$fullPathToImage");
 		if (is_array($imginfo)) {
 			$w=$imginfo[0];
 			$h=$imginfo[1];
@@ -961,7 +1222,6 @@ class tx_metafeedit_export {
 			//$pdf->setX($pdf->getX()+((($height-1)/$h)*$w));
 			$pdf->SetY($this->Y+0.5+$this->imageHeight-1);
 		} else {
-			//error_log(__METHOD__.":$fullPathToImage not found");
 			if ($displayEmptyImage) {
 				$fullPathToUnknownImage=PATH_site.'typo3conf/ext/meta_feedit/res/noimage.jpg';
 				$this->PDFDisplayImage($pdf,$fullPathToUnknownImage,false);
@@ -978,7 +1238,6 @@ class tx_metafeedit_export {
 	*
 	*/
 	function getPDFTABPrintRow($pdf,$cellData) {
-		//error_log(__METHOD__.": cw $this->cellWidth, count".count($cellData));
 		$cptCols=0;
 		foreach ($cellData as $cell) {
 			$X=$pdf->leftmargin+($cptCols*$this->cellWidth);
@@ -995,30 +1254,15 @@ class tx_metafeedit_export {
 						foreach($vala as $v) {
 							$img=PATH_site.($v?$elem->img->dir.'/'.$v:'');
 							$this->PDFDisplayImage($pdf,$img);
-							
-							/*$imginfo=getimagesize($img);
-							if (is_array($imginfo)) {
-								$w=$imginfo[0];
-								$h=$imginfo[1];
-								$pdf->Image($img,$pdf->getX()+0.5,$pdf->getY()+0.5,0, $this->imageHeight-1);
-								//$pdf->setX($pdf->getX()+((($height-1)/$h)*$w));
-								$pdf->SetY($this->Y+0.5+$this->imageHeight-1);
-							} else {
-								// Empty image we make room for it
-								$pdf->SetY($this->Y+0.5+$this->imageHeight-1);
-							}*/
 							// By defaullt we only handle first media
 							if (!$this->multipleMedia) break;
 						}
 					} else {
 						$this->PDFDisplayImage($pdf,'');
 						// Empty image we make room for it
-						//$pdf->SetY($this->Y+0.5+$this->imageHeight-1);
 					}
-					//$pdf->setX($size+$pdf->leftmargin);
 				} else {
 					$val= strip_tags($elem->data);
-					//error_log($val);
 					$pdf->MultiCell($this->cellWidth,$this->lineHeight,utf8_decode($val),0,'L',0);
 				}
 			}
@@ -1049,7 +1293,6 @@ class tx_metafeedit_export {
 	function getPDFTAB(&$content,&$caller,$print='') {
 		//$xml = new SimpleXMLElement($content);
 		try {
-			//error_log(__METHOD__.":".str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content)))));
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
 			echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
@@ -1179,10 +1422,8 @@ class tx_metafeedit_export {
 			$nbCells--;
 			
 			if ($cptCols>=$nbCols || $nbCells<=0 ) {
-				//error_log(__METHOD__.": bm $pdf->bottommargin Y $this->Y, Height $H, rowHeight $rowHeight, res".($this->Y+$rowHeight+$pdf->bottommargin));
 				// Why +5 ?
 				if ($this->Y+$rowHeight+$pdf->bottommargin+5>=$H) {
-					//error_log(__METHOD__.": AddPage");
 					$this->Y=$pdf->topmargin;
 					$this->LastY=$pdf->topmargin;
 					$pdf->addPage();
@@ -1190,7 +1431,6 @@ class tx_metafeedit_export {
 				// We have reached end of row or end of file ...
 				$this->getPDFTABPrintRow($pdf,$cellData);
 				// We reset data arrays
-				//error_log(__METHOD__.": cptCols $cptCols,nbCell $nbCells, rowHeight $rowHeight");
 				$cptCols=0;
 				$cellData=array();
 				$cellHeight=array();
@@ -1255,7 +1495,6 @@ class tx_metafeedit_export {
 			}
 		}
 		
-		//error_log(__METHOD__.":X $X, Y $Y");
 		//$pdf->setXY( ($marginl? 20 : $nbx*$size*9+20), ($marginh ? 35 : $posy+25));
 		
 		$cptcols++;
@@ -1320,10 +1559,8 @@ class tx_metafeedit_export {
 		require_once(t3lib_extMgm::extPath('meta_feedit').'/lib/PHPExcel/IOFactory.php'); 
 		/** PHPExcel_Cell_AdvancedValueBinder */
 		require_once(t3lib_extMgm::extPath('meta_feedit').'/lib/PHPExcel/Cell/AdvancedValueBinder.php');
-		//echo $content;die(t);
 		// Prepare content
 		try {
-			//error_log(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
 			echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
@@ -1355,7 +1592,6 @@ class tx_metafeedit_export {
 				$c++;
 			}
 		}
-		//error_log("Nb cols 0 :  $nbcs");
 		// La feuille est de dimension 21 x 29.7- cmd reduit a 20 pour conserver la marge
 		if ($taille <200) $orientation=PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT;	// portrait
 		else $orientation=PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE;// paysage
@@ -1418,7 +1654,6 @@ class tx_metafeedit_export {
 			}
 			$alt++;
 			$nbcols=count($row->td);
-			//error_log("Nb cols 0.5 :  $nbcols");
 			$csize=0;
 			if ($row->gb) {
 				//$pdf->SetFont('Arial', 'B', 9);
@@ -1445,7 +1680,6 @@ class tx_metafeedit_export {
 				}
 			}
 			if ($x>$nbcs) $nbcs=$x;
-			//error_log("Nb cols 1 :  $nbcs");
 			$c='A';
 			$x=0;
 			if (count($row->td) > 0) {
@@ -1541,7 +1775,6 @@ class tx_metafeedit_export {
 				if ($row->gb===0) $lvlindex=0;
 				$fs=$this->headerConf[$lvlindex]['size'];
 				$bgc=$this->headerConf[$lvlindex]['bgcolor'];
-				//error_log("fs : $fs, ngc: $bgc, gb :$row->gb,  gbf :".$row->gbf.", hc $highestCol,maxcol : $maxcol ");
 				if ($x==1) {
 					$lastgbr=$r;
 					$range='A'.$r.':'.$maxcol.$r;
