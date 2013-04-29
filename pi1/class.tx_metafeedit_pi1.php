@@ -885,24 +885,25 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$resetorderby=$this->metafeeditlib->getMetaFeeditVar($mfconf,'resetorderby');
 		//echo $pluginId;			
 		if ($resetsearch) {
-			  unset ( $mfconf['inputvar.']['advancedSearch']);
-			  unset ( $mfconf['inputvar.']['sword']);
-			  unset ( $mfconf['inputvar.']['sortLetter']);
-			  unset ( $_GET['tx_metafeedit']['reset']);
-			  unset ( $_POST['tx_metafeedit']['reset']);
-			  unset ( $_GET['tx_metafeedit']['advancedSearch']);
-			  unset ( $_POST['tx_metafeedit']['advancedSearch']);
-			  unset ( $this->piVars['advancedSearch']);
-			  unset ($mfconf['piVars']['advancedSearch']);
-			  unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sword']);
-			  unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sortLetter']);
-			  unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['advancedSearch']);
+			unset($mfconf['list.']['forceSearch']);
+			unset ( $mfconf['inputvar.']['advancedSearch']);
+			unset ( $mfconf['inputvar.']['sword']);
+			unset ( $mfconf['inputvar.']['sortLetter']);
+			unset ( $_GET['tx_metafeedit']['reset']);
+			unset ( $_POST['tx_metafeedit']['reset']);
+			unset ( $_GET['tx_metafeedit']['advancedSearch']);
+			unset ( $_POST['tx_metafeedit']['advancedSearch']);
+			unset ( $this->piVars['advancedSearch']);
+			unset ($mfconf['piVars']['advancedSearch']);
+			unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sword']);
+			unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sortLetter']);
+			unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['advancedSearch']);
 		}
 		if ($resetorderby) {
-			  unset ( $mfconf['inputvar.']['sort']);
-			  unset ( $metafeeditvars[$pluginId]['sort']);
-			  if (is_array($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId])) unset ($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sort']);
-			  unset ( $_GET['tx_metafeedit']['resetorderby']);
+			unset ( $mfconf['inputvar.']['sort']);
+			unset ( $metafeeditvars[$pluginId]['sort']);
+			if (is_array($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId])) unset ($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sort']);
+			unset ( $_GET['tx_metafeedit']['resetorderby']);
 		}
 		// persistent variables :		
 
