@@ -3080,7 +3080,7 @@ class tx_metafeedit_lib {
 	*/
 	
 	function getLL($key,&$conf)	{
-		if($conf['debug.']['langArray']) return "?*$key*?"; // if we are debugging language array we show keys of all fields enveloped in "?".
+		if($conf['debug.']['langArray']) return "?*$key*?:".$GLOBALS['TSFE']->getLLL($key,$conf['LOCAL_LANG']); // if we are debugging language array we show keys of all fields enveloped in "?".
 		$label=$GLOBALS['TSFE']->getLLL($key,$conf['LOCAL_LANG']);
 		return isset($label) ? $label : "$key";
 	}

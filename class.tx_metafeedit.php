@@ -343,6 +343,8 @@ class tx_metafeedit extends  tslib_pibase {
   		
 		// loads default locallang
 		$this->LOCAL_LANG = $GLOBALS['TSFE']->readLLfile(t3lib_extMgm::extPath($this->extKey).'locallang.xml');
+		//error_log(__METHOD__.":".print_r($this->LOCAL_LANG,true));
+		
 		// loads callers locallang
 		$this->LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($this->LOCAL_LANG,$this->caller->LOCAL_LANG);
 		

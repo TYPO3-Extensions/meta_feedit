@@ -168,7 +168,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 	// Internal vars, dynamic:
 	var $unlinkTempFiles = array();			// Is loaded with all temporary filenames used for upload which should be deleted before exit...
-
+	/**
+	 * 
+	 * @var Tx_ArdMcm_Core_LanguageHandler
+	 */
+	var $langHandler=null;
 	/**
 	* Main function. Called from TypoScript.
 	* This
@@ -182,7 +186,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	* @return	string		HTML content
 	* @link http://typo3.org/doc.0.html?&tx_extrepmgm_pi1[extUid]=270&tx_extrepmgm_pi1[tocEl]=396&cHash=d267c36546
 	*/
-//function user_init($content,&$conf)	{
+	//function user_init($content,&$conf)	{
 	function user_init($content,$conf)	{
 		$DEBUG='';
 
@@ -204,6 +208,10 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->metafeeditexport=t3lib_div::makeInstance('tx_metafeedit_export');
 		$this->metafeeditexport->init($this);
 
+		if (t3lib_extmgm::isLoaded('ard_mcm')) {
+			$this->langHandler = t3lib_div::makeInstance('Tx_ArdMcm_Core_LanguageHandler', null, 'ard_mcm');
+		}
+		
 		// We should handle here all GET//POST//PIVARS ... should be in pi1
 
 		$this->pi_setPiVarDefaults();
@@ -726,6 +734,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				krumo($this->conf['LOCAL_LANG']);
 			}
 		}
+		
 		// Delete temp files:
 		
 		foreach($this->unlinkTempFiles as $tempFileName)	{
@@ -2212,7 +2221,10 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			
 			// List Item Loop  
 			
-			while(($menuRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) && ($exporttype || $lc<$nblines)){
+			while(($menuRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) && ($exporttype || $lc<$nblines)) {
+				if (t3lib_extmgm::isLoaded('ard_mcm')) {
+					$this->langHandler->localizeRow($menuRow,$this->theTable);
+				}
 				//we add php calculated fields here ...
 				$this->metafeeditlib->addPhpCalcFields($menuRow,$conf);
 				$nbrows++;
