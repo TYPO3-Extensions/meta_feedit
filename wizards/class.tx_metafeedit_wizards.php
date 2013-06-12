@@ -158,8 +158,6 @@ class tx_metafeedit_wizards {
 			$fe->getPageAndRootline();
 			$fe->initTemplate();
 			$ts=$fe->getConfigArray();
-			
-			//error_log(__METHOD__.":>".print_r($fe->tmpl->setup['plugin.']['tx_metafeedit_pi1.'],true));
 			$flexForm=t3lib_div::xml2array($flex);
 			//return $flex;
 			$conf=$fe->tmpl->setup['plugin.']['tx_metafeedit_pi1.'];
@@ -214,7 +212,6 @@ class tx_metafeedit_wizards {
 				$conf=$configstore['tsconf'];
 				$TS='';
 				$this->tsArrayToTs("plugin.tx_metafeedit_pi1.",$conf,$TS);
-				//error_log(__METHOD__.":TS $TS");
 				$this->updateTSTemplate($tspid,$TS);
 				$piFlexForm=$configstore['flexForm'];
 				$this->updateReportFlexform($ttContentUid,$piFlexForm);
@@ -246,16 +243,12 @@ class tx_metafeedit_wizards {
 		
 	}
 	function array2Xml($dataArray,&$xml) {
-		//error_log(__METHOD__.":".print_r($dataArray,true));
 		if (is_array($dataArray)) foreach($dataArray as $key=>$val) {
-			//error_log(__METHOD__.":$key >>>");
 			$xml.="<$key>";
 			$this->array2Xml($val,$xml);
 			$xml.="</$key>";
-			//error_log(__METHOD__.":$key, $xml");
 		} else {
 			$xml.=htmlspecialchars($dataArray);
-			//error_log(__METHOD__.":leaf");
 		}
 	}
 	
@@ -265,13 +258,11 @@ class tx_metafeedit_wizards {
 		$data=array();
 		$data['tstamp']=time();
 		$xml='<?xml version="1.0" encoding="utf-8" standalone="yes" ?><T3FlexForms>';
-		//error_log(__METHOD__.":".print_r($flexform, true));
 		$this->array2Xml($flexform,$xml);
 		$xml.='</T3FlexForms>';
 		$data['pi_flexform']=$xml;
 		//$data['title']='+afe reports';
 		$res=$db->exec_UPDATEquery('tt_content',$where,$data);
-		//error_log(__METHOD__.":".$db->UPDATEquery('tt_content',$where,$data));	
 	}
 	
 	function tsArrayToTs($tsPath,$tsArray,&$ret) {
@@ -357,7 +348,6 @@ class tx_metafeedit_wizards {
 				');
 				$this->content.=$this->doc->section('Goodbye !', $content, 0,1);
 			} else {
-				//error_log(__METHOD__.":".$cmd);
 				switch($cmd) {
 					case 'save':
 						$fs=$this->saveReport($this->ttContentUid);

@@ -47,7 +47,6 @@ class tx_metafeedit_pdf extends FPDF {
 	
 	function Header()
 	{
-		error_log(__METHOD__);
 		// Logo - present sur toutes les pages du pdf
 		//$logo = PATH_site.($xml->tr->td->img->dir).'logo.png';
 		//$this->Image($logo,1,1,17,8);
@@ -1132,15 +1131,13 @@ class tx_metafeedit_export {
 							$w=$imginfo[0];
 							$h=$imginfo[1];
 							try {
-								//error_log(__METHOD__.":1 $img");
 								$pdf->Image($img,$pdf->getX()+0.5,$pdf->getY()+0.5,0, $height-1);
 							} catch(Exception $e) {
-								//error_log(__METHOD__.":2 $notFound");
 								$pdf->Image($notFound,$pdf->getX()+0.5,$pdf->getY()+0.5,0, $height-1);
 							}
 							$pdf->setX($pdf->getX()+((($height-1)/$h)*$w));
 						}
-						// By defaullt we only handle first media
+						// By default we only handle first media
 						if (!$multipleMedia) break;
 					}
 					$pdf->setX($size+$pdf->leftmargin);

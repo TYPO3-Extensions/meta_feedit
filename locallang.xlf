@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2013-04-30T15:02:52Z" product-name="meta_feedit">
+		<header/>
+		<body>
+			<trans-unit id="selectall" xml:space="preserve">
+				<source>Select all</source>
+			</trans-unit>
+			<trans-unit id="deselectall" xml:space="preserve">
+				<source>Deselect all</source>
+			</trans-unit>
+			<trans-unit id="total" xml:space="preserve">
+				<source>Total</source>
+			</trans-unit>
+			<trans-unit id="pi1_title" xml:space="preserve">
+				<source>FE Edition Meta</source>
+			</trans-unit>
+			<trans-unit id="pi1_plus_wiz_description" xml:space="preserve">
+				<source>Adds a frontend form for submitting and editing of tables to your page</source>
+			</trans-unit>
+			<trans-unit id="back_label" xml:space="preserve">
+				<source>Back</source>
+			</trans-unit>
+			<trans-unit id="new_label" xml:space="preserve">
+				<source>New</source>
+			</trans-unit>
+			<trans-unit id="fulltext_search" xml:space="preserve">
+				<source>Fulltext search</source>
+			</trans-unit>
+			<trans-unit id="alphabetical_search" xml:space="preserve">
+				<source>Alphabetical search</source>
+			</trans-unit>
+			<trans-unit id="calendar_search" xml:space="preserve">
+				<source>Calendar search</source>
+			</trans-unit>
+			<trans-unit id="order_by" xml:space="preserve">
+				<source>Ordered by</source>
+			</trans-unit>
+			<trans-unit id="login_required_message" xml:space="preserve">
+				<source>Frontend login is required to view this page</source>
+			</trans-unit>
+			<trans-unit id="edit_header_prefix" xml:space="preserve">
+				<source>Editing of</source>
+			</trans-unit>
+			<trans-unit id="grid_rows_cols" xml:space="preserve">
+				<source>Rows / Cols </source>
+			</trans-unit>
+			<trans-unit id="grid_header" xml:space="preserve">
+				<source>Data Grid</source>
+			</trans-unit>
+			<trans-unit id="crdate" xml:space="preserve">
+				<source>Creation date</source>
+			</trans-unit>
+			<trans-unit id="uid" xml:space="preserve">
+				<source>Unique Identifier</source>
+			</trans-unit>
+			<trans-unit id="pid" xml:space="preserve">
+				<source>Page ID</source>
+			</trans-unit>
+			<trans-unit id="sorting" xml:space="preserve">
+				<source>Sorting Index</source>
+			</trans-unit>
+			<trans-unit id="edit_grid_description" xml:space="preserve">
+				<source>You may edit Grid Data here</source>
+			</trans-unit>
+			<trans-unit id="edit_delete_label" xml:space="preserve">
+				<source>Delete</source>
+			</trans-unit>
+			<trans-unit id="edit_order_up_label" xml:space="preserve">
+				<source>Move up Record</source>
+			</trans-unit>
+			<trans-unit id="edit_order_down_label" xml:space="preserve">
+				<source>Move down Record</source>
+			</trans-unit>
+			<trans-unit id="edit_delete_confirm" xml:space="preserve">
+				<source>Are you sure?</source>
+			</trans-unit>
+			<trans-unit id="edit_saved_header" xml:space="preserve">
+				<source>Saved</source>
+			</trans-unit>
+			<trans-unit id="edit_saved_message" xml:space="preserve">
+				<source>Your record has been saved</source>
+			</trans-unit>
+			<trans-unit id="edit_preview_submit_label" xml:space="preserve">
+				<source>Save changes</source>
+			</trans-unit>
+			<trans-unit id="edit_preview_donotsave_label" xml:space="preserve">
+				<source>Go Back</source>
+			</trans-unit>
+			<trans-unit id="edit_submit_label" xml:space="preserve">
+				<source>See Preview</source>
+			</trans-unit>
+			<trans-unit id="edit_menu_header" xml:space="preserve">
+				<source>Edit menu</source>
+			</trans-unit>
+			<trans-unit id="edit_link" xml:space="preserve">
+				<source>Edit record</source>
+			</trans-unit>
+			<trans-unit id="filtre_recherche" xml:space="preserve">
+				<source>Search Filter</source>
+			</trans-unit>
+			<trans-unit id="filtre_lettre" xml:space="preserve">
+				<source>Alphabetical Filter</source>
+			</trans-unit>
+			<trans-unit id="blog_header" xml:space="preserve">
+				<source>Comments of </source>
+			</trans-unit>
+			<trans-unit id="blog_new_comment" xml:space="preserve">
+				<source>Leave a comment</source>
+			</trans-unit>
+			<trans-unit id="blog_submit_label" xml:space="preserve">
+				<source>Leave my comment</source>
+			</trans-unit>
+			<trans-unit id="blog_captcha_error" xml:space="preserve">
+				<source>The anti-spam value is not the one shown in the image</source>
+			</trans-unit>
+			<trans-unit id="link-edit" xml:space="preserve">
+				<source>Edit record</source>
+			</trans-unit>
+			<trans-unit id="link-consult" xml:space="preserve">
+				<source>View this record</source>
+			</trans-unit>
+			<trans-unit id="edit_menu_description" xml:space="preserve">
+				<source>List of items</source>
+			</trans-unit>
+			<trans-unit id="edit_menu_noitems_header" xml:space="preserve">
+				<source>No items aval.</source>
+			</trans-unit>
+			<trans-unit id="edit_menu_noitems_description" xml:space="preserve">
+				<source>Sorry, there where no items available.</source>
+			</trans-unit>
+			<trans-unit id="edit_menu_createnew_label" xml:space="preserve">
+				<source>Create new record</source>
+			</trans-unit>
+			<trans-unit id="alphabetical_search_all" xml:space="preserve">
+				<source>All</source>
+			</trans-unit>
+			<trans-unit id="advanced_search_label" xml:space="preserve">
+				<source>Search</source>
+			</trans-unit>
+			<trans-unit id="advanced_search_reset" xml:space="preserve">
+				<source>Reset search criteria</source>
+			</trans-unit>
+			<trans-unit id="order_by_reset" xml:space="preserve">
+				<source>Reset order by</source>
+			</trans-unit>
+			<trans-unit id="add_image_tooltip" xml:space="preserve">
+				<source>Click here to browse your computer for a file to upload</source>
+			</trans-unit>
+			<trans-unit id="delete_image_tooltip" xml:space="preserve">
+				<source>Click here to delete a file you selected in the panel. To delete effectively you must save the modification </source>
+			</trans-unit>
+			<trans-unit id="create_header_prefix" xml:space="preserve">
+				<source>Create </source>
+			</trans-unit>
+			<trans-unit id="create_saved_header" xml:space="preserve">
+				<source>Added</source>
+			</trans-unit>
+			<trans-unit id="create_saved_message" xml:space="preserve">
+				<source>Your record has been added</source>
+			</trans-unit>
+			<trans-unit id="create_preview_submit_label" xml:space="preserve">
+				<source>Submit record</source>
+			</trans-unit>
+			<trans-unit id="create_preview_donotsave_label" xml:space="preserve">
+				<source>Do Not Save</source>
+			</trans-unit>
+			<trans-unit id="create_edit_link" xml:space="preserve">
+				<source>Edit a record</source>
+			</trans-unit>
+			<trans-unit id="create_submit_label" xml:space="preserve">
+				<source>See Preview</source>
+			</trans-unit>
+			<trans-unit id="delete_saved_header" xml:space="preserve">
+				<source>Deleted</source>
+			</trans-unit>
+			<trans-unit id="delete_saved_message" xml:space="preserve">
+				<source>The record has been deleted</source>
+			</trans-unit>
+			<trans-unit id="delete_preview_header" xml:space="preserve">
+				<source>Really want to delete the record?</source>
+			</trans-unit>
+			<trans-unit id="delete_preview_message" xml:space="preserve">
+				<source>If you delete the record it will be gone forever. So make sure you relly want to delete it?</source>
+			</trans-unit>
+			<trans-unit id="delete_preview_delete_label" xml:space="preserve">
+				<source>Yes, delete the record.</source>
+			</trans-unit>
+			<trans-unit id="delete_preview_dont_delete_label" xml:space="preserve">
+				<source>No, let me get back.</source>
+			</trans-unit>
+			<trans-unit id="required_message" xml:space="preserve">
+				<source>This field is required</source>
+			</trans-unit>
+			<trans-unit id="error_file_size" xml:space="preserve">
+				<source>Size is beyond %s kb ( %s bytes) and the file cannot be saved.</source>
+			</trans-unit>
+			<trans-unit id="error_file_upload" xml:space="preserve">
+				<source>Surprisingly there was no file for %s in %s</source>
+			</trans-unit>
+			<trans-unit id="error_file_extension" xml:space="preserve">
+				<source>Extension %s not allowed</source>
+			</trans-unit>
+			<trans-unit id="error_file_pattern" xml:space="preserve">
+				<source>Filename matched illegal pattern.</source>
+			</trans-unit>
+			<trans-unit id="error_no_upload_path" xml:space="preserve">
+				<source>No upload path defined !</source>
+			</trans-unit>
+			<trans-unit id="error_occured" xml:space="preserve">
+				<source>An error has arised, check your fields please</source>
+			</trans-unit>
+			<trans-unit id="error_mvalue_existed" xml:space="preserve">
+				<source>A record with the same values exists already. Maybe you clicked twice ...</source>
+			</trans-unit>
+			<trans-unit id="error_value_existed" xml:space="preserve">
+				<source>The value existed already. Enter a new value.</source>
+			</trans-unit>
+			<trans-unit id="error_value_twice" xml:space="preserve">
+				<source>You must enter the same value twice</source>
+			</trans-unit>
+			<trans-unit id="error_valid_email" xml:space="preserve">
+				<source>You must enter a valid email address</source>
+			</trans-unit>
+			<trans-unit id="error_value_required" xml:space="preserve">
+				<source>You must enter a value!</source>
+			</trans-unit>
+			<trans-unit id="error_max_char" xml:space="preserve">
+				<source>You must enter at most %s characters!</source>
+			</trans-unit>
+			<trans-unit id="error_min_char" xml:space="preserve">
+				<source>You must enter at least %s characters!</source>
+			</trans-unit>
+			<trans-unit id="error_value_notInList" xml:space="preserve">
+				<source>The value was not a valid value from this list: %s</source>
+			</trans-unit>
+			<trans-unit id="error_required" xml:space="preserve">
+				<source>A requested field is empty, check your fields !</source>
+			</trans-unit>
+			<trans-unit id="blogcomments" xml:space="preserve">
+				<source>Comments</source>
+			</trans-unit>
+			<trans-unit id="monday" xml:space="preserve">
+				<source>Monday</source>
+			</trans-unit>
+			<trans-unit id="tuesday" xml:space="preserve">
+				<source>Tuesday</source>
+			</trans-unit>
+			<trans-unit id="wednesday" xml:space="preserve">
+				<source>Wednesday</source>
+			</trans-unit>
+			<trans-unit id="thursday" xml:space="preserve">
+				<source>Thursday</source>
+			</trans-unit>
+			<trans-unit id="friday" xml:space="preserve">
+				<source>Friday</source>
+			</trans-unit>
+			<trans-unit id="saturday" xml:space="preserve">
+				<source>Saturday</source>
+			</trans-unit>
+			<trans-unit id="sunday" xml:space="preserve">
+				<source>Sunday</source>
+			</trans-unit>
+			<trans-unit id="view_posts" xml:space="preserve">
+				<source>View posts for %s</source>
+			</trans-unit>
+			<trans-unit id="calReset" xml:space="preserve">
+				<source>Reset</source>
+			</trans-unit>
+			<trans-unit id="check_yes" xml:space="preserve">
+				<source>Yes</source>
+			</trans-unit>
+			<trans-unit id="check_no" xml:space="preserve">
+				<source>No</source>
+			</trans-unit>
+			<trans-unit id="search_nothing" xml:space="preserve">
+				<source>None</source>
+			</trans-unit>
+			<trans-unit id="move_top" xml:space="preserve">
+				<source>Move selected items to top</source>
+			</trans-unit>
+			<trans-unit id="move_up" xml:space="preserve">
+				<source>Move selected items upwards</source>
+			</trans-unit>
+			<trans-unit id="move_bt" xml:space="preserve">
+				<source>Move selected items downwards</source>
+			</trans-unit>
+			<trans-unit id="move_down" xml:space="preserve">
+				<source>Move selected items to bottom</source>
+			</trans-unit>
+			<trans-unit id="move_delete" xml:space="preserve">
+				<source>Delete selected items</source>
+			</trans-unit>
+			<trans-unit id="printedby" xml:space="preserve">
+				<source>Printed by : </source>
+			</trans-unit>
+			<trans-unit id="anonymous" xml:space="preserve">
+				<source>Anonymous</source>
+			</trans-unit>
+			<trans-unit id="nbpages" xml:space="preserve">
+				<source>Nb pages : </source>
+			</trans-unit>
+			<trans-unit id="gotopage" xml:space="preserve">
+				<source>Goto page : </source>
+			</trans-unit>
+			<trans-unit id="nbrows" xml:space="preserve">
+				<source>Nb rows : </source>
+			</trans-unit>
+			<trans-unit id="list_nocriteriae_header" xml:space="preserve">
+				<source>No search criteriae.</source>
+			</trans-unit>
+			<trans-unit id="list_nocriteriae_description" xml:space="preserve">
+				<source>Select search criterae</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

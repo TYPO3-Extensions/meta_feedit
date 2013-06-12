@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2013-04-30T15:03:07Z" product-name="meta_feedit">
+		<header/>
+		<body>
+			<trans-unit id="tt_content.list_type_pi1" xml:space="preserve">
+				<source>Meta FE Edit</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions" xml:space="preserve">
+				<source>meta admin actions</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.title" xml:space="preserve">
+				<source>title</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.image" xml:space="preserve">
+				<source>image</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.url" xml:space="preserve">
+				<source>url</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.tooltip" xml:space="preserve">
+				<source>tooltip</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.page" xml:space="preserve">
+				<source>page</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.category" xml:space="preserve">
+				<source>category</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments" xml:space="preserve">
+				<source>Comments</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.firstname" xml:space="preserve">
+				<source>Firstname</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.surname" xml:space="preserve">
+				<source>Surname</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.email" xml:space="preserve">
+				<source>E-Mail</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.homepage" xml:space="preserve">
+				<source>Website</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.place" xml:space="preserve">
+				<source>Place</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.entry" xml:space="preserve">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.entrycomment" xml:space="preserve">
+				<source>Comment</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.remote_addr" xml:space="preserve">
+				<source>Remote Address</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.uid_tt_news" xml:space="preserve">
+				<source>[uid_tt_news]</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.crdate" xml:space="preserve">
+				<source>Creation date/time</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.tstamp" xml:space="preserve">
+				<source>Last update</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_general.crdate" xml:space="preserve">
+				<source>Creation date</source>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_general.uid" xml:space="preserve">
+				<source>Unique Id</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

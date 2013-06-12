@@ -2009,7 +2009,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($conf['list.']['forceSearch']) {
 			$searchfieldsSet=false;
 			$as=$conf['inputvar.']['advancedSearch'];
-			//error_log(__METHOD__.":".print_r($conf['inputvar.'],true));
 			if (is_array($as) && count($as)) {
 				foreach($as as $searchField=>$searchFieldConf) {
 					if (is_array($searchFieldConf)) {

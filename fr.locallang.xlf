@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" target-language="fr" datatype="plaintext" original="messages" date="2013-04-30T15:02:52Z" product-name="meta_feedit">
+		<header/>
+		<body>
+			<trans-unit id="selectall" xml:space="preserve" approved="yes">
+				<source>Select all</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="deselectall" xml:space="preserve" approved="yes">
+				<source>Deselect all</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="total" xml:space="preserve" approved="yes">
+				<source>Total</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="pi1_title" xml:space="preserve" approved="yes">
+				<source>FE Edition Meta</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="pi1_plus_wiz_description" xml:space="preserve" approved="yes">
+				<source>Adds a frontend form for submitting and editing of tables to your page</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="back_label" xml:space="preserve" approved="yes">
+				<source>Back</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="new_label" xml:space="preserve" approved="yes">
+				<source>New</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="fulltext_search" xml:space="preserve" approved="yes">
+				<source>Fulltext search</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="alphabetical_search" xml:space="preserve" approved="yes">
+				<source>Alphabetical search</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="calendar_search" xml:space="preserve" approved="yes">
+				<source>Calendar search</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="order_by" xml:space="preserve" approved="yes">
+				<source>Ordered by</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="login_required_message" xml:space="preserve" approved="yes">
+				<source>Frontend login is required to view this page</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_header_prefix" xml:space="preserve" approved="yes">
+				<source>Editing of</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="grid_rows_cols" xml:space="preserve" approved="yes">
+				<source>Rows / Cols </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="grid_header" xml:space="preserve" approved="yes">
+				<source>Data Grid</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="crdate" xml:space="preserve" approved="yes">
+				<source>Creation date</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="uid" xml:space="preserve" approved="yes">
+				<source>Unique Identifier</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="pid" xml:space="preserve" approved="yes">
+				<source>Page ID</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sorting" xml:space="preserve" approved="yes">
+				<source>Sorting Index</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_grid_description" xml:space="preserve" approved="yes">
+				<source>You may edit Grid Data here</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_delete_label" xml:space="preserve" approved="yes">
+				<source>Delete</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_order_up_label" xml:space="preserve" approved="yes">
+				<source>Move up Record</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_order_down_label" xml:space="preserve" approved="yes">
+				<source>Move down Record</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_delete_confirm" xml:space="preserve" approved="yes">
+				<source>Are you sure?</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_saved_header" xml:space="preserve" approved="yes">
+				<source>Saved</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_saved_message" xml:space="preserve" approved="yes">
+				<source>Your record has been saved</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_preview_submit_label" xml:space="preserve" approved="yes">
+				<source>Save changes</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_preview_donotsave_label" xml:space="preserve" approved="yes">
+				<source>Go Back</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_submit_label" xml:space="preserve" approved="yes">
+				<source>See Preview</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_menu_header" xml:space="preserve" approved="yes">
+				<source>Edit menu</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_link" xml:space="preserve" approved="yes">
+				<source>Edit record</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="filtre_recherche" xml:space="preserve" approved="yes">
+				<source>Search Filter</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="filtre_lettre" xml:space="preserve" approved="yes">
+				<source>Alphabetical Filter</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="blog_header" xml:space="preserve" approved="yes">
+				<source>Comments of </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="blog_new_comment" xml:space="preserve" approved="yes">
+				<source>Leave a comment</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="blog_submit_label" xml:space="preserve" approved="yes">
+				<source>Leave my comment</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="blog_captcha_error" xml:space="preserve" approved="yes">
+				<source>The anti-spam value is not the one shown in the image</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="link-edit" xml:space="preserve" approved="yes">
+				<source>Edit record</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="link-consult" xml:space="preserve" approved="yes">
+				<source>View this record</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_menu_description" xml:space="preserve" approved="yes">
+				<source>List of items</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_menu_noitems_header" xml:space="preserve" approved="yes">
+				<source>No items aval.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_menu_noitems_description" xml:space="preserve" approved="yes">
+				<source>Sorry, there where no items available.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="edit_menu_createnew_label" xml:space="preserve" approved="yes">
+				<source>Create new record</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="alphabetical_search_all" xml:space="preserve" approved="yes">
+				<source>All</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="advanced_search_label" xml:space="preserve" approved="yes">
+				<source>Search</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="advanced_search_reset" xml:space="preserve" approved="yes">
+				<source>Reset search criteria</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="order_by_reset" xml:space="preserve" approved="yes">
+				<source>Reset order by</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="add_image_tooltip" xml:space="preserve" approved="yes">
+				<source>Click here to browse your computer for a file to upload</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="delete_image_tooltip" xml:space="preserve" approved="yes">
+				<source>Click here to delete a file you selected in the panel. To delete effectively you must save the modification </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="create_header_prefix" xml:space="preserve" approved="yes">
+				<source>Create </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="create_saved_header" xml:space="preserve" approved="yes">
+				<source>Added</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="create_saved_message" xml:space="preserve" approved="yes">
+				<source>Your record has been added</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="create_preview_submit_label" xml:space="preserve" approved="yes">
+				<source>Submit record</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="create_preview_donotsave_label" xml:space="preserve" approved="yes">
+				<source>Do Not Save</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="create_edit_link" xml:space="preserve" approved="yes">
+				<source>Edit a record</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="create_submit_label" xml:space="preserve" approved="yes">
+				<source>See Preview</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="delete_saved_header" xml:space="preserve" approved="yes">
+				<source>Deleted</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="delete_saved_message" xml:space="preserve" approved="yes">
+				<source>The record has been deleted</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="delete_preview_header" xml:space="preserve" approved="yes">
+				<source>Really want to delete the record?</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="delete_preview_message" xml:space="preserve" approved="yes">
+				<source>If you delete the record it will be gone forever. So make sure you relly want to delete it?</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="delete_preview_delete_label" xml:space="preserve" approved="yes">
+				<source>Yes, delete the record.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="delete_preview_dont_delete_label" xml:space="preserve" approved="yes">
+				<source>No, let me get back.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="required_message" xml:space="preserve" approved="yes">
+				<source>This field is required</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_file_size" xml:space="preserve" approved="yes">
+				<source>Size is beyond %s kb ( %s bytes) and the file cannot be saved.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_file_upload" xml:space="preserve" approved="yes">
+				<source>Surprisingly there was no file for %s in %s</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_file_extension" xml:space="preserve" approved="yes">
+				<source>Extension %s not allowed</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_file_pattern" xml:space="preserve" approved="yes">
+				<source>Filename matched illegal pattern.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_no_upload_path" xml:space="preserve" approved="yes">
+				<source>No upload path defined !</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_occured" xml:space="preserve" approved="yes">
+				<source>An error has arised, check your fields please</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_mvalue_existed" xml:space="preserve" approved="yes">
+				<source>A record with the same values exists already. Maybe you clicked twice ...</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_value_existed" xml:space="preserve" approved="yes">
+				<source>The value existed already. Enter a new value.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_value_twice" xml:space="preserve" approved="yes">
+				<source>You must enter the same value twice</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_valid_email" xml:space="preserve" approved="yes">
+				<source>You must enter a valid email address</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_value_required" xml:space="preserve" approved="yes">
+				<source>You must enter a value!</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_max_char" xml:space="preserve" approved="yes">
+				<source>You must enter at most %s characters!</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_min_char" xml:space="preserve" approved="yes">
+				<source>You must enter at least %s characters!</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_value_notInList" xml:space="preserve" approved="yes">
+				<source>The value was not a valid value from this list: %s</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="error_required" xml:space="preserve" approved="yes">
+				<source>A requested field is empty, check your fields !</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="blogcomments" xml:space="preserve" approved="yes">
+				<source>Comments</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="monday" xml:space="preserve" approved="yes">
+				<source>Monday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tuesday" xml:space="preserve" approved="yes">
+				<source>Tuesday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="wednesday" xml:space="preserve" approved="yes">
+				<source>Wednesday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="thursday" xml:space="preserve" approved="yes">
+				<source>Thursday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="friday" xml:space="preserve" approved="yes">
+				<source>Friday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="saturday" xml:space="preserve" approved="yes">
+				<source>Saturday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sunday" xml:space="preserve" approved="yes">
+				<source>Sunday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="view_posts" xml:space="preserve" approved="yes">
+				<source>View posts for %s</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="calReset" xml:space="preserve" approved="yes">
+				<source>Reset</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="check_yes" xml:space="preserve" approved="yes">
+				<source>Yes</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="check_no" xml:space="preserve" approved="yes">
+				<source>No</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="search_nothing" xml:space="preserve" approved="yes">
+				<source>None</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="move_top" xml:space="preserve" approved="yes">
+				<source>Move selected items to top</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="move_up" xml:space="preserve" approved="yes">
+				<source>Move selected items upwards</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="move_bt" xml:space="preserve" approved="yes">
+				<source>Move selected items downwards</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="move_down" xml:space="preserve" approved="yes">
+				<source>Move selected items to bottom</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="move_delete" xml:space="preserve" approved="yes">
+				<source>Delete selected items</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="printedby" xml:space="preserve" approved="yes">
+				<source>Printed by : </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="anonymous" xml:space="preserve" approved="yes">
+				<source>Anonymous</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="nbpages" xml:space="preserve" approved="yes">
+				<source>Nb pages : </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="gotopage" xml:space="preserve" approved="yes">
+				<source>Goto page : </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="nbrows" xml:space="preserve" approved="yes">
+				<source>Nb rows : </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="list_nocriteriae_header" xml:space="preserve" approved="yes">
+				<source>No search criteriae.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="list_nocriteriae_description" xml:space="preserve" approved="yes">
+				<source>Select search criterae</source>
+				<target></target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" target-language="fr" datatype="plaintext" original="messages" date="2013-04-30T15:03:07Z" product-name="meta_feedit">
+		<header/>
+		<body>
+			<trans-unit id="tt_content.list_type_pi1" xml:space="preserve" approved="yes">
+				<source>Meta FE Edit</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions" xml:space="preserve" approved="yes">
+				<source>meta admin actions</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.title" xml:space="preserve" approved="yes">
+				<source>title</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.image" xml:space="preserve" approved="yes">
+				<source>image</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.url" xml:space="preserve" approved="yes">
+				<source>url</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.tooltip" xml:space="preserve" approved="yes">
+				<source>tooltip</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.page" xml:space="preserve" approved="yes">
+				<source>page</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_actions.category" xml:space="preserve" approved="yes">
+				<source>category</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments" xml:space="preserve" approved="yes">
+				<source>Comments</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.firstname" xml:space="preserve" approved="yes">
+				<source>Firstname</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.surname" xml:space="preserve" approved="yes">
+				<source>Surname</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.email" xml:space="preserve" approved="yes">
+				<source>E-Mail</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.homepage" xml:space="preserve" approved="yes">
+				<source>Website</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.place" xml:space="preserve" approved="yes">
+				<source>Place</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.entry" xml:space="preserve" approved="yes">
+				<source>Title</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.entrycomment" xml:space="preserve" approved="yes">
+				<source>Comment</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.remote_addr" xml:space="preserve" approved="yes">
+				<source>Remote Address</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.uid_tt_news" xml:space="preserve" approved="yes">
+				<source>[uid_tt_news]</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.crdate" xml:space="preserve" approved="yes">
+				<source>Creation date/time</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_comments.tstamp" xml:space="preserve" approved="yes">
+				<source>Last update</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_general.crdate" xml:space="preserve" approved="yes">
+				<source>Creation date</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_metafeedit_general.uid" xml:space="preserve" approved="yes">
+				<source>Unique Id</source>
+				<target></target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

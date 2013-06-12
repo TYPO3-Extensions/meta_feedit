@@ -343,7 +343,6 @@ class tx_metafeedit extends  tslib_pibase {
   		
 		// loads default locallang
 		$this->LOCAL_LANG = $GLOBALS['TSFE']->readLLfile(t3lib_extMgm::extPath($this->extKey).'locallang.xml');
-		//error_log(__METHOD__.":".print_r($this->LOCAL_LANG,true));
 		
 		// loads callers locallang
 		$this->LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($this->LOCAL_LANG,$this->caller->LOCAL_LANG);
@@ -1808,11 +1807,9 @@ class tx_metafeedit extends  tslib_pibase {
 				$size = $this->getSize($conf, $_FN, $masterTable);
 				$total++;
 				if (!in_array($_FN,$sumarray) && !in_array($FN,$sumarray)) {// If field is not a sum field ...
-					//error_log("tm : $textmode,t: $type");
 					if ($textmode){
 						$ret.=($actFlag&&$firstemptycell)?'<td>###FIRSTEMPTYCELL###</td>':'';
 						if ($type && $type!='html')	{
-							//error_log("size !!! tm : $textmode,t: $type");		// Empty cell for PDF
 							$ret .= '<td><data>'.($firstemptycell?$firstemptycell:'').'</data><size>'.$size.'</size></td>';
 						} else 								// Empty cell for CSV
 							$ret.= ($firstemptycell?$firstemptycell:'').';';
@@ -1826,7 +1823,6 @@ class tx_metafeedit extends  tslib_pibase {
 						if ($fc) {
 							$count+=$fc+$actFlag;
 							if ($type && $type!='html') {
-								//error_log("size2 !!! tm : $textmode,t: $type");
 								$ret .= '<td colspan="'.($fc+$actFlag).'"><data>'.($firstemptycell?$firstemptycell:'').'</data><size>'.$size.'</size></td>';
 							} else {
 								$ret.='<td colspan="'.($fc+$actFlag).'">'.($firstemptycell?$firstemptycell:'').'</td>';
@@ -1836,7 +1832,6 @@ class tx_metafeedit extends  tslib_pibase {
 						if ($firstemptycell) $firstemptycell='';
 						$ret.='<td '.($conf['list.']['align.'][$mfn]?'align="'.$conf['list.']['align.'][$mfn].'"':'').'>'.'###'.$prefix.'_FIELD_'.$mfn.'###</td>';
 					} else  {
-						//error_log("size3 !!! tm : $textmode,t: $type");
 						if ($type && $type!='html') 						// Fichier PDF, EXcel 
 							$ret.='<td><data>###'.$prefix.'_FIELD_'.$mfn.'###</data><size>'.$size.'</size></td>';
 						else 

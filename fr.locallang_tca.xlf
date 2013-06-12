@@ -1,0 +1,1048 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" target-language="fr" datatype="plaintext" original="messages" date="2013-04-30T15:03:12Z" product-name="meta_feedit">
+		<header/>
+		<body>
+			<trans-unit id="meta_feedit.pi_flexform.feeditevalvalues" xml:space="preserve" approved="yes">
+				<source>Edit eval Values</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fecreateevalvalues" xml:space="preserve" approved="yes">
+				<source>Create eval Values</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editPreview" xml:space="preserve" approved="yes">
+				<source>Edit Preview</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridAjax" xml:space="preserve" approved="yes">
+				<source>Grid</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridEdit" xml:space="preserve" approved="yes">
+				<source>Edit</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_general" xml:space="preserve" approved="yes">
+				<source>General Settings</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_cal" xml:space="preserve" approved="yes">
+				<source>Calendar mode Settings</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_quickstart" xml:space="preserve" approved="yes">
+				<source>Quick Start</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_create" xml:space="preserve" approved="yes">
+				<source>Create</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_edit" xml:space="preserve" approved="yes">
+				<source>Edit</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.idField" xml:space="preserve" approved="yes">
+				<source>Id Field</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.advancedSearch" xml:space="preserve" approved="yes">
+				<source>Advanced Search</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.advancedSearchFields" xml:space="preserve" approved="yes">
+				<source>Advanced Search Fields (default list fields)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.advancedSearchAjaxSelector" xml:space="preserve" approved="yes">
+				<source>Advanced Search Ajax Selectors</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.calendarSearch" xml:space="preserve" approved="yes">
+				<source>Calendar Search</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.alphabeticalSearch" xml:space="preserve" approved="yes">
+				<source>Alphabetical Search</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.categorySearch" xml:space="preserve" approved="yes">
+				<source>Category Search</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.foreignTables" xml:space="preserve" approved="yes">
+				<source>Foreign Tables</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.defaultCmd" xml:space="preserve" approved="yes">
+				<source>Default command</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.defaultCmd.auto" xml:space="preserve" approved="yes">
+				<source>Auto</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.defaultCmd.create" xml:space="preserve" approved="yes">
+				<source>Create</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.defaultCmd.edit" xml:space="preserve" approved="yes">
+				<source>Edit</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.page" xml:space="preserve" approved="yes">
+				<source>Page with records</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.xhtml" xml:space="preserve" approved="yes">
+				<source>XHTML compliancy</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.referenceMetafeedit" xml:space="preserve" approved="yes">
+				<source>Reference MetaFeEdit (DB select)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.referenceMetafeeditText" xml:space="preserve" approved="yes">
+				<source>Reference MetaFeEdit (uid in clear text)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.referenceKeyExclude" xml:space="preserve" approved="yes">
+				<source>Reference Excluded Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.referenceExcludeDbRelation" xml:space="preserve" approved="yes">
+				<source>Reference Excluded DB Relation</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_debug" xml:space="preserve" approved="yes">
+				<source>Debug</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.debugSQL" xml:space="preserve" approved="yes">
+				<source>Generated SQL</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.debugKrumo" xml:space="preserve" approved="yes">
+				<source>Use Krumo to debug (requires extension Krumo)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.debugMarkerArray" xml:space="preserve" approved="yes">
+				<source>Marker Array</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.debugLangArray" xml:space="preserve" approved="yes">
+				<source>Lang Array</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.debugConf" xml:space="preserve" approved="yes">
+				<source>Conf</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.debugPerformances" xml:space="preserve" approved="yes">
+				<source>Performances</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.debugTemplate" xml:space="preserve" approved="yes">
+				<source>Template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.debugVars" xml:space="preserve" approved="yes">
+				<source>POST,GET, PiVars... Variables</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.debugTSFE" xml:space="preserve" approved="yes">
+				<source>TSFE</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.disableDelete" xml:space="preserve" approved="yes">
+				<source>Disable delete</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.disableEditDelete" xml:space="preserve" approved="yes">
+				<source>Disable Edit delete</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.defaultListMode" xml:space="preserve" approved="yes">
+				<source>Default List Mode</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.defaultListMode.list" xml:space="preserve" approved="yes">
+				<source>List</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.defaultListMode.calendar" xml:space="preserve" approved="yes">
+				<source>Calendar</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.defaultListMode.datagrid" xml:space="preserve" approved="yes">
+				<source>Data Grid</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.requireLogin" xml:space="preserve" approved="yes">
+				<source>Require that a user is logged in</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.no_header" xml:space="preserve" approved="yes">
+				<source>Dont display automatic generated headers</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.show_help_icons" xml:space="preserve" approved="yes">
+				<source>Show help icons (if availiable)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.allowedGroups" xml:space="preserve" approved="yes">
+				<source>Allowed editor groups</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.clearCacheOfPages" xml:space="preserve" approved="yes">
+				<source>Pages to clear cache of</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.disableCreate" xml:space="preserve" approved="yes">
+				<source>Disable create</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.hideCreate" xml:space="preserve" approved="yes">
+				<source>Hide create</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.hideEdit" xml:space="preserve" approved="yes">
+				<source>Hide edit</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.hideDelete" xml:space="preserve" approved="yes">
+				<source>Hide delete</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.noSpecialLoginForm" xml:space="preserve" approved="yes">
+				<source>Show no special form when logged in</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fetable" xml:space="preserve" approved="yes">
+				<source>Table to edit</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.previewnoemptyfields" xml:space="preserve" approved="yes">
+				<source>No Empty Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.backPagePid" xml:space="preserve" approved="yes">
+				<source>Back Page Pid</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editBackPagePid" xml:space="preserve" approved="yes">
+				<source>Back Page Pid</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fecreatefields" xml:space="preserve" approved="yes">
+				<source>Creation Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.feparsevalues" xml:space="preserve" approved="yes">
+				<source>parseValues</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.groupBySize" xml:space="preserve" approved="yes">
+				<source>Group By Size (for vertical display)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.displaydirection" xml:space="preserve" approved="yes">
+				<source>Display direction</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editlangmarks" xml:space="preserve" approved="yes">
+				<source>Language marks (lg.label=val)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createlangmarks" xml:space="preserve" approved="yes">
+				<source>Language marks (lg.label=val)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.rUJoinField" xml:space="preserve" approved="yes">
+				<source>rU Join Field</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.noUserCheck" xml:space="preserve" approved="yes">
+				<source>No User Check</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editUserCheck" xml:space="preserve" approved="yes">
+				<source>User Check</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.deleteUserCheck" xml:space="preserve" approved="yes">
+				<source>User Check</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.deleteGroupCheck" xml:space="preserve" approved="yes">
+				<source>Group Check</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editGroupCheck" xml:space="preserve" approved="yes">
+				<source>Group Check</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fe_userOwnSelf" xml:space="preserve" approved="yes">
+				<source>Fe User Own Self</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.feshowfields" xml:space="preserve" approved="yes">
+				<source>Creation show Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fepreviewfields" xml:space="preserve" approved="yes">
+				<source>Preview Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listMediaPlayer" xml:space="preserve" approved="yes">
+				<source>Show Media Player</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.feeditfields" xml:space="preserve" approved="yes">
+				<source>Edit Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.noActions" xml:space="preserve" approved="yes">
+				<source>No actions</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.noHeaders" xml:space="preserve" approved="yes">
+				<source>No headers</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.cacheMode" xml:space="preserve" approved="yes">
+				<source>Cache Mode</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_ajax" xml:space="preserve" approved="yes">
+				<source>AjaxParameters</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.ajaxOn" xml:space="preserve" approved="yes">
+				<source>Activate WEB 2.0 Functionnality</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.jqueryCompatMode" xml:space="preserve" approved="yes">
+				<source>Activate jQuery compatibility mode (for use with mootools, prototype, ...)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.cacheMode.noCache" xml:space="preserve" approved="yes">
+				<source>No Cache</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.cacheMode.mixtCache" xml:space="preserve" approved="yes">
+				<source>Mixt Cache</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.cacheMode.fullCache" xml:space="preserve" approved="yes">
+				<source>Full Cache</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.calMode" xml:space="preserve" approved="yes">
+				<source>Calendar Mode</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.calMode.default" xml:space="preserve" approved="yes">
+				<source>default</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.calMode.dayView" xml:space="preserve" approved="yes">
+				<source>Day view</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.calMode.weekView" xml:space="preserve" approved="yes">
+				<source>WeekView</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.calMode.monthView" xml:space="preserve" approved="yes">
+				<source>Month view</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.calMode.yearView" xml:space="preserve" approved="yes">
+				<source>Year view</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.calMode.upcomingEventsView" xml:space="preserve" approved="yes">
+				<source>Upcoming events view</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.calMode.fullCache" xml:space="preserve" approved="yes">
+				<source>WeekView</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.T3SourceTreePid" xml:space="preserve" approved="yes">
+				<source>Source Tree to copy</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.T3TreeTargetPid" xml:space="preserve" approved="yes">
+				<source>Tree copy target</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.T3FEGroupsPID" xml:space="preserve" approved="yes">
+				<source>Page to store fe groups</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.T3AdminUid" xml:space="preserve" approved="yes">
+				<source>BE user to use to copy</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.T3TableHomePidField" xml:space="preserve" approved="yes">
+				<source>Field storing Copied Tree Pid</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.enableColumns" xml:space="preserve" approved="yes">
+				<source>Use Enable Columns</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.feeditshowfields" xml:space="preserve" approved="yes">
+				<source>Edit show Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fecreatereadonlyfields" xml:space="preserve" approved="yes">
+				<source>Read Only Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.feeditreadonlyfields" xml:space="preserve" approved="yes">
+				<source>Read only fields  in edit mode</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.ferequiredfields" xml:space="preserve" approved="yes">
+				<source>Required Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.feapprovefields" xml:space="preserve" approved="yes">
+				<source>Approve Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fesetfixoverridevalues" xml:space="preserve" approved="yes">
+				<source>Setfix override values</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.feeditoverridevalues" xml:space="preserve" approved="yes">
+				<source>Edit Override Values</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fecreateoverridevalues" xml:space="preserve" approved="yes">
+				<source>Create Override Values</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fedeletefields" xml:space="preserve" approved="yes">
+				<source>Delete Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fecruser_field" xml:space="preserve" approved="yes">
+				<source>User Id Field</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fecrgroup_field" xml:space="preserve" approved="yes">
+				<source>Group Id Field</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.disableEdit" xml:space="preserve" approved="yes">
+				<source>Disable edit</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editUnique" xml:space="preserve" approved="yes">
+				<source>Edit unique</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.menuLockPid" xml:space="preserve" approved="yes">
+				<source>List lock pid</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.pagination" xml:space="preserve" approved="yes">
+				<source>Pagination</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.pageSize" xml:space="preserve" approved="yes">
+				<source>Page size</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.nbCols" xml:space="preserve" approved="yes">
+				<source>Nb cols table presentation</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.maxPages" xml:space="preserve" approved="yes">
+				<source>Max Pages</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.tabLabels" xml:space="preserve" approved="yes">
+				<source>Tab Labels (1 per line)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fieldSort" xml:space="preserve" approved="yes">
+				<source>Field sorting</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listnobackbutton" xml:space="preserve" approved="yes">
+				<source>No Back Button</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listAltRows" xml:space="preserve" approved="yes">
+				<source>Nb alternate row colors</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listsqlcalcfields" xml:space="preserve" approved="yes">
+				<source>SQL Calculated Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listphpcalcfields" xml:space="preserve" approved="yes">
+				<source>PHP Calculated Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listnodetail" xml:space="preserve" approved="yes">
+				<source>No group by detail</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listHavingString" xml:space="preserve" approved="yes">
+				<source>Having string</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.debug" xml:space="preserve" approved="yes">
+				<source>Debug mode</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.no_cache" xml:space="preserve" approved="yes">
+				<source>No cache</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.searchBox" xml:space="preserve" approved="yes">
+				<source>Show Full Text Searchbox</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.emailFrom" xml:space="preserve" approved="yes">
+				<source>From Mail</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sendAdminMail" xml:space="preserve" approved="yes">
+				<source>Send Admin Mail</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sendFEUserMail" xml:space="preserve" approved="yes">
+				<source>Send FE User Mail</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sendDataMail" xml:space="preserve" approved="yes">
+				<source>Send Data Mail</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.dataMailField" xml:space="preserve" approved="yes">
+				<source>Mail Field for dataMail</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sendAdminInfoMail" xml:space="preserve" approved="yes">
+				<source>Send Admin Info Mail (sends an information mail to administrator upon every record operation)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sendFEUserInfoMail" xml:space="preserve" approved="yes">
+				<source>Send FE User Info Mail (sends an information mail to connected user's email upon every record operation)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sendDataInfoMail" xml:space="preserve" approved="yes">
+				<source>Send Data Info Mail (sends an information mail to email stored in record upon every record operation)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.emailFromName" xml:space="preserve" approved="yes">
+				<source>From Mail Name</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.emailAdmin" xml:space="preserve" approved="yes">
+				<source>Admin Mail</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.divide2tabs" xml:space="preserve" approved="yes">
+				<source>Tab mode</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createPid" xml:space="preserve" approved="yes">
+				<source>Create Page PID</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.groupByFields" xml:space="preserve" approved="yes">
+				<source>Group By Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.groupByFieldBreaks" xml:space="preserve" approved="yes">
+				<source>Group By Field Breaks</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.orderByFields" xml:space="preserve" approved="yes">
+				<source>Order By Fields (default)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sumFields" xml:space="preserve" approved="yes">
+				<source>Sum Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editPid" xml:space="preserve" approved="yes">
+				<source>Edit Page PID</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.checkT3Rights" xml:space="preserve" approved="yes">
+				<source>Check TYPO3 rights to edit/save/delete/...</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_blogs" xml:space="preserve" approved="yes">
+				<source>Blogs</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.allowComments" xml:space="preserve" approved="yes">
+				<source>Allow Commenting</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.showComments" xml:space="preserve" approved="yes">
+				<source>Show Comments</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.blogtemplate" xml:space="preserve" approved="yes">
+				<source>Blog Template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.blogCaptcha" xml:space="preserve" approved="yes">
+				<source>Captcha spam protect</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.rowField" xml:space="preserve" approved="yes">
+				<source>Row Field</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.colField" xml:space="preserve" approved="yes">
+				<source>Col Field</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.beginDateField" xml:space="preserve" approved="yes">
+				<source>Begin Date Field</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.endDateField" xml:space="preserve" approved="yes">
+				<source>End Date Field</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_generalTemplate" xml:space="preserve" approved="yes">
+				<source>General templates</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.generalAuthTemplate" xml:space="preserve" approved="yes">
+				<source>Authorisation template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.generalNoPermTemplate" xml:space="preserve" approved="yes">
+				<source>No permission template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_TemplatePDF" xml:space="preserve" approved="yes">
+				<source>Template PDF</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.TemplatePDF" xml:space="preserve" approved="yes">
+				<source>Template PDF for lists</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.TemplatePDFDet" xml:space="preserve" approved="yes">
+				<source>Template PDF for detail</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.TemplatePDFTab" xml:space="preserve" approved="yes">
+				<source>Template PDF for tables</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_TemplateCSV" xml:space="preserve" approved="yes">
+				<source>Template CSV</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.TemplateCSV" xml:space="preserve" approved="yes">
+				<source>Template CSV</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_TemplateExcel" xml:space="preserve" approved="yes">
+				<source>Template Excel</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.TemplateExcel" xml:space="preserve" approved="yes">
+				<source>Template Excel</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_list" xml:space="preserve" approved="yes">
+				<source>List</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_listTemplate" xml:space="preserve" approved="yes">
+				<source>List templates</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listItemTemplate" xml:space="preserve" approved="yes">
+				<source>Item template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listNoItemTemplate" xml:space="preserve" approved="yes">
+				<source>No item template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listrecordactions" xml:space="preserve" approved="yes">
+				<source>List record actions</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.batchactions" xml:space="preserve" approved="yes">
+				<source>Batch record actions</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listJumpPageOnGroupBy" xml:space="preserve" approved="yes">
+				<source>Jump page on group by</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listWhereString" xml:space="preserve" approved="yes">
+				<source>Where String</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listOrderByString" xml:space="preserve" approved="yes">
+				<source>Post Order By String</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listPreOrderByString" xml:space="preserve" approved="yes">
+				<source>Pre Order By String</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listExtraFields" xml:space="preserve" approved="yes">
+				<source>Extra Fields (not shown)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listlangmarks" xml:space="preserve" approved="yes">
+				<source>Language marks (lg.label=val)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listPid" xml:space="preserve" approved="yes">
+				<source>List Page PID</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listFields" xml:space="preserve" approved="yes">
+				<source>List show fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.listHiddenFields" xml:space="preserve" approved="yes">
+				<source>List extra fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_grid" xml:space="preserve" approved="yes">
+				<source>Data grid</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_gridTemplate" xml:space="preserve" approved="yes">
+				<source>Grid template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridItemTemplate" xml:space="preserve" approved="yes">
+				<source>Item template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridNoItemTemplate" xml:space="preserve" approved="yes">
+				<source>No item template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridrecordactions" xml:space="preserve" approved="yes">
+				<source>Grid record actions</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridWhereString" xml:space="preserve" approved="yes">
+				<source>Where String</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridOrderByString" xml:space="preserve" approved="yes">
+				<source>Order By String</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridExtraFields" xml:space="preserve" approved="yes">
+				<source>Extra Fields (not shown)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridLangmarks" xml:space="preserve" approved="yes">
+				<source>Language marks (lg.label=val)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridPid" xml:space="preserve" approved="yes">
+				<source>Grid Page Pid</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridFields" xml:space="preserve" approved="yes">
+				<source>Grid show fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridHiddenFields" xml:space="preserve" approved="yes">
+				<source>Grid extra fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridExportPDF" xml:space="preserve" approved="yes">
+				<source>Export PDF</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridExportCSV" xml:space="preserve" approved="yes">
+				<source>Export CSV</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridExportExcel" xml:space="preserve" approved="yes">
+				<source>Export Excel</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridEuros" xml:space="preserve" approved="yes">
+				<source>Display numeric values in euros</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridMediaPlayer" xml:space="preserve" approved="yes">
+				<source>Show Media Player</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridOrderByFields" xml:space="preserve" approved="yes">
+				<source>Order By Fields</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridCols" xml:space="preserve" approved="yes">
+				<source>Nb Cols</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridRows" xml:space="preserve" approved="yes">
+				<source>Nb Rows</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridRowField" xml:space="preserve" approved="yes">
+				<source>Row Field</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridColField" xml:space="preserve" approved="yes">
+				<source>Col Field</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridBackPagePid" xml:space="preserve" approved="yes">
+				<source>Back Page Pid</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.gridrUJoinField" xml:space="preserve" approved="yes">
+				<source>rU Join Field</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_createTemplate" xml:space="preserve" approved="yes">
+				<source>Create templates</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createScreenTemplate" xml:space="preserve" approved="yes">
+				<source>Create screen template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createPreviewTemplate" xml:space="preserve" approved="yes">
+				<source>Preview template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createScreenLoginTemplate" xml:space="preserve" approved="yes">
+				<source>Create screen login template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createPreviewLoginTemplate" xml:space="preserve" approved="yes">
+				<source>Preview login template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createSavedTemplate" xml:space="preserve" approved="yes">
+				<source>Saved template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createUserNotifyMailTemplate" xml:space="preserve" approved="yes">
+				<source>User notify mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createDataNotifyMailTemplate" xml:space="preserve" approved="yes">
+				<source>Data notify mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createAdminNotifyMailTemplate" xml:space="preserve" approved="yes">
+				<source>Admin notify mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createAdminValidMailTemplate" xml:space="preserve" approved="yes">
+				<source>Admin valid mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createUserNotifyOkMailTemplate" xml:space="preserve" approved="yes">
+				<source>User notify OK mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createUserNotifyKoMailTemplate" xml:space="preserve" approved="yes">
+				<source>User notify KO mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_editTemplate" xml:space="preserve" approved="yes">
+				<source>Edit templates</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editScreenTemplate" xml:space="preserve" approved="yes">
+				<source>Edit screen template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editPreviewTemplate" xml:space="preserve" approved="yes">
+				<source>Preview template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editSavedTemplate" xml:space="preserve" approved="yes">
+				<source>Saved template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editUserNotifyMailTemplate" xml:space="preserve" approved="yes">
+				<source>User notify mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editAdminNotifyMailTemplate" xml:space="preserve" approved="yes">
+				<source>Admin notify mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editDataNotifyMailTemplate" xml:space="preserve" approved="yes">
+				<source>Data notify mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editAdminValidMailTemplate" xml:space="preserve" approved="yes">
+				<source>Admin valid mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editUserNotifyOkMailTemplate" xml:space="preserve" approved="yes">
+				<source>User notify OK mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editUserNotifyKoMailTemplate" xml:space="preserve" approved="yes">
+				<source>User notify KO mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editrecordactions" xml:space="preserve" approved="yes">
+				<source>Edit record actions</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_deleteTemplate" xml:space="preserve" approved="yes">
+				<source>Delete templates</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.deletePreviewTemplate" xml:space="preserve" approved="yes">
+				<source>Preview template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.deleteSavedTemplate" xml:space="preserve" approved="yes">
+				<source>Saved template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.deleteUserNotifyMailTemplate" xml:space="preserve" approved="yes">
+				<source>User notify mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.deleteAdminNotifyMailTemplate" xml:space="preserve" approved="yes">
+				<source>Admin notify mail template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.setFixedTemplate" xml:space="preserve" approved="yes">
+				<source>Set fixed templates</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.setFixedOkTemplate" xml:space="preserve" approved="yes">
+				<source>Ok template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.setFixedOkDeleteTemplate" xml:space="preserve" approved="yes">
+				<source>Ok delete template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.setFixedFailedTemplate" xml:space="preserve" approved="yes">
+				<source>Failed template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.editStatusScreen" xml:space="preserve" approved="yes">
+				<source>Show status screen</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createStatusScreen" xml:space="preserve" approved="yes">
+				<source>Show status screen</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.deleteStatusScreen" xml:space="preserve" approved="yes">
+				<source>Show status screen</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.createPreview" xml:space="preserve" approved="yes">
+				<source>Create Preview</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fetemplate" xml:space="preserve" approved="yes">
+				<source>Template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_preview" xml:space="preserve" approved="yes">
+				<source>Preview</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_setfixed" xml:space="preserve" approved="yes">
+				<source>Mails</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.sheet_delete" xml:space="preserve" approved="yes">
+				<source>Delete</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.useTemplate" xml:space="preserve" approved="yes">
+				<source>use template</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.extTables" xml:space="preserve" approved="yes">
+				<source>Extension TCAs to take into account</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.fe_userEditSelf" xml:space="preserve" approved="yes">
+				<source>Can user edit his info</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.template_file" xml:space="preserve" approved="yes">
+				<source>Use this template file instead of default</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.generateTemplate" xml:space="preserve" approved="yes">
+				<source>Generate Template in Browser</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.pluginId" xml:space="preserve" approved="yes">
+				<source>Plugin Id</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.pdf" xml:space="preserve" approved="yes">
+				<source>PDF</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.csv" xml:space="preserve" approved="yes">
+				<source>Csv</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.excel" xml:space="preserve" approved="yes">
+				<source>Excel</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.euros" xml:space="preserve" approved="yes">
+				<source>Display numeric valuees in Euros</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.ajaxDomReady" xml:space="preserve" approved="yes">
+				<source>DomReady event code</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.useDistinct" xml:space="preserve" approved="yes">
+				<source>Use distinct in sql clauses</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.ajaxLibs" xml:space="preserve" approved="yes">
+				<source>Js libraries to load</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.forceSearch" xml:space="preserve" approved="yes">
+				<source>Force search before list display</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.saveToFile" xml:space="preserve" approved="yes">
+				<source>Save report to file( name : pluginid.json)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="meta_feedit.pi_flexform.loadFromFile" xml:space="preserve" approved="yes">
+				<source>Load report from file</source>
+				<target></target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
