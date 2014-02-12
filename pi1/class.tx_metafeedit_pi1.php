@@ -384,6 +384,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// advancedSearch
 		$mfconf['list.']['advancedSearchFields']=$this->correctFieldSets($lconf['advancedSearchFields']);
 		$mfconf['list.']['advancedSearch']=$lconf['advancedSearch'];
+		error_log("____________________________0___________________________");
+		error_log(print_r($conf['typoscript.'],true));
 		$mfconf['list.']['advancedSearch.']=$conf['advancedSearch.'];
 		$mfconf['list.']['advancedSearchConfig.']=$conf['advancedSearchConfig.'];
 		$mfconf['list.']['advancedSearchAjaxSelector']=$lconf['advancedSearchAjaxSelector'];

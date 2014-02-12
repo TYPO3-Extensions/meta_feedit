@@ -847,6 +847,7 @@ class tx_metafeedit_export {
 						if (is_array($imginfo)) {
 							$w=$imginfo[0];
 							$h=$imginfo[1];
+							$ro=$w/$h;
 							//@todo resize or crop if image too big
 							$imgh=$nblines*$height;
 							$imgx=$pdf->GetX();
@@ -856,8 +857,24 @@ class tx_metafeedit_export {
 							if (isset($col->img->attributes()->w)) $imgw=(float)$col->img->attributes()->w; //width override
 							if (isset($col->img->attributes()->x)) $imgx=(float)$col->img->attributes()->x; //x override
 							if (isset($col->img->attributes()->y)) $imgy=(float)$col->img->attributes()->y; //x override
-							$pdf->Image($img,$imgx,$imgy,$imgw,$imgh);
-							//We calculate image width based on piction width/height ratio);
+							$rd=$imgw/$imgh;
+							$px=$imgx;
+							$py=$imgy;
+							if ($ro<$rd) {
+								//height piority
+								$ph=$imgh;
+								$pw=$ro*$ph;
+								$px+=($imgw-$pw)/2;
+							} else {
+								// Width Priority
+								$pw=$imgw;
+								$ph=$pw/$ro;
+								$py+=($imgh-$ph)/2;
+							}
+							//$pdf->Image($img,$imgx,$imgy,$imgw,$imgh);
+							$pdf->Image($img,$px,$py,$pw,$ph);
+							
+							//We calculate image width based on picture width/height ratio);
 							if ($imgh && !$imgw) {
 								$imgw=$imgh*($w/$h);
 							}
@@ -899,18 +916,21 @@ class tx_metafeedit_export {
 					
 					if (isset($col->spec->attributes()->w)) $w=$col->spec->attributes()->w;
 					
-					if (isset($col->spec->attributes()->bc)) {
-							$bca=t3lib_div::trimexplode(',',$col->spec->attributes()->bc);
-							$pdf->setFillColor((int)$bca[0],(int)$bca[1],(int)$bca[2]);
+					// We handle transparent cell
+					$fillText=isset($col->spec->attributes()->bc) && $col->spec->attributes()->bc == ''?false:true;
+						
+					if (isset($col->spec->attributes()->bc) && $col->spec->attributes()->bc != '') {
+						$bca=t3lib_div::trimexplode(',',$col->spec->attributes()->bc);
+						$pdf->setFillColor((int)$bca[0],(int)$bca[1],(int)$bca[2]);
 					}
 					
 					if (isset($col->spec->attributes()->fc)) {
-							$fca=t3lib_div::trimexplode(',',$col->spec->attributes()->fc);
-							$pdf->setDrawColor($fca[0],$fca[1],$fca[2]);
+						$fca=t3lib_div::trimexplode(',',$col->spec->attributes()->fc);
+						$pdf->setDrawColor($fca[0],$fca[1],$fca[2]);
 					}
 					if (isset($col->spec->attributes()->tc)) {
-							$tca=t3lib_div::trimexplode(',',$col->spec->attributes()->tc);
-							$pdf->setTextColor($tca[0],$tca[1],$tca[2]);
+						$tca=t3lib_div::trimexplode(',',$col->spec->attributes()->tc);
+						$pdf->setTextColor($tca[0],$tca[1],$tca[2]);
 					}
 					if (isset($col->spec->attributes()->fs)) {
 						$fs=$col->spec->attributes()->fs;
@@ -921,7 +941,7 @@ class tx_metafeedit_export {
 						$pdf->SetXY((float)$col->spec->attributes()->x,(float)$col->spec->attributes()->y);
 						//$h=$h*$nblines;
 						if (isset($col->spec->attributes()->b)  || isset($col->spec->attributes()->bc) ) {
-							$pdf->Cell($w,$h,$utf8val,$b,0,$p,1);
+							$pdf->Cell($w,$h,$utf8val,$b,0,$p,$fillText);
 							 $cell=true;
 						} else {
 							$pdf->Write($h,$utf8val);
@@ -957,7 +977,6 @@ class tx_metafeedit_export {
 		}
 		ob_clean();
 		$pdf->generatePrintScript($print,$printer,$server);
-
 		$pdf->Output($caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf', 'I');
 		die;
 	}	

@@ -4763,7 +4763,8 @@ class tx_metafeedit_lib {
 		$GLOBALS["TSFE"]->fe_user->storeSessionData();
 		$pluginId=$conf['pluginId'];
 		if ($conf['typoscript.'][$pluginId.'.']['advancedSearch.']) $advancedSearchDefault = $conf['typoscript.'][$pluginId.'.']['advancedSearch.'];
-
+		//error_log("_____________________1__________________________________");
+		//error_log(print_r($advancedSearchDefault,true));
 		if (is_array($advancedSearch) && is_array($advancedSearchDefault)) {
 			foreach($advancedSearch as $key=>$value) {
 				if ($advancedSearchDefault[$key.'.'] && is_array($advancedSearch[$key])) $advancedSearch[$key] = array_merge($advancedSearch[$key], $advancedSearchDefault[$key.'.']);
