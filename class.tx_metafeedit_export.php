@@ -55,7 +55,7 @@ class tx_metafeedit_pdf extends FPDF {
 	function Footer()
 	{
 		if (!$this->nofooter) {
-			$this->SetFont('Arial','',10);
+			$this->SetFont('Helvetica','',10);
 			$this->setFillColor(200,200,200);
 			//$this->SetY(200); //TODO		
 			$this->SetY(-$this->bottommargin); //TODO		
@@ -219,23 +219,34 @@ class tx_metafeedit_pdf extends FPDF {
 	
 	function NbLines($w,$txt)
 	{
+		$dbg=false;//$dbg=(substr($txt,0,5)=="Adler");
+		if ($dbg) error_log('Nblines '.$txt." - $w");
 		//Calcule le nombre de lignes qu'occupe un MultiCell de largeur w
 		$cw=&$this->CurrentFont['cw'];
+		//error_log(__METHOD__.":".print_r($this->CurrentFont,true));
+		//error_log(__METHOD__.":  ".print_r(array_values($cw),true));
 		if($w==0)
-		$w=$this->w-$this->rMargin-$this->x;
+			$w=$this->w-$this->rMargin-$this->x;
+		
+		//$wmax=$w*1400/$this->FontSize;
+		//$wmax=$w*1000*$this->k;
 		$wmax=($w-2*$this->cMargin)*1000/$this->FontSize;
+		//$wmax=($w-2*$this->cMargin)/$this->k;
 		$s=str_replace("\r",'',$txt);
 		$nb=strlen($s);
+		//Removes trailing carriage return
 		if($nb>0 and $s[$nb-1]=="\n")
-		$nb--;
+			$nb--;
 		$sep=-1;
 		$i=0;
 		$j=0;
 		$l=0;
 		$nl=1;
+		//error_log(__METHOD__.":  $w,$this->cMargin,$this->FontSize, $wmax");
 		while($i<$nb)
 		{
 			$c=$s[$i];
+			//Cariage return we add line
 			if($c=="\n")
 			{
 				$i++;
@@ -243,27 +254,30 @@ class tx_metafeedit_pdf extends FPDF {
 				$j=$i;
 				$l=0;
 				$nl++;
+				//error_log('NewLine');
 				continue;
 			}
-			if($c==' ')
-			$sep=$i;
+			//Space seperator
+			if($c==' ') $sep=$i;
 			$l+=$cw[$c];
+			if ($dbg) error_log(__METHOD__.":  $c,$l,$wmax");
 			if($l>$wmax)
 			{
+				if ($dbg) error_log('$l > $wmax');
 				if($sep==-1)
 				{
 					if($i==$j)
-					$i++;
+						$i++;
 				}
 				else
-				$i=$sep+1;
+					$i=$sep+1;
 				$sep=-1;
 				$j=$i;
 				$l=0;
 				$nl++;
 			}
 			else
-			$i++;
+				$i++;
 		}
 		return $nl;
 	}
@@ -621,6 +635,7 @@ class tx_metafeedit_export {
 		'</div>';
 	}
 
+	
 
 	// We handle here CSV file generation ...
 	function getCSV(&$content,&$caller) {
@@ -730,10 +745,10 @@ class tx_metafeedit_export {
 		//if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 
 		if (!$noheader) {
-			$pdf->SetFont('Arial','B',11);
+			$pdf->SetFont('Helvetica','B',11);
 			$pdf->SetY(0);
 			$pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');	
-			$pdf->SetFont('Arial', '', 9);
+			$pdf->SetFont('Helvetica', '', 9);
 			$pdf->Cell(0,$this->headercellsize,utf8_decode(htmlspecialchars_decode($recherche)),0,0,'R');
 			$pdf->SetY(5);
 			$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
@@ -772,10 +787,10 @@ class tx_metafeedit_export {
 			$ey=0;
 			if ($row->gb) {
 				$pdf->SetLineWidth(0.3);
-				$pdf->SetFont('Arial', 'B', 9);
+				$pdf->SetFont('Helvetica', 'B', 9);
 			} else {
 				$pdf->SetLineWidth(0.2);
-				$pdf->SetFont('Arial', '', 9);
+				$pdf->SetFont('Helvetica', '', 9);
 			}
 			$ih=0;
 			$nblines=1;
@@ -941,9 +956,11 @@ class tx_metafeedit_export {
 						$pdf->SetXY((float)$col->spec->attributes()->x,(float)$col->spec->attributes()->y);
 						//$h=$h*$nblines;
 						if (isset($col->spec->attributes()->b)  || isset($col->spec->attributes()->bc) ) {
+							//error_log(__METHOD__.":cell $utf8val , ".$pdf->NbLines($w, $utf8val));
 							$pdf->Cell($w,$h,$utf8val,$b,0,$p,$fillText);
 							 $cell=true;
 						} else {
+							//error_log(__METHOD__.":write $utf8val , ".$pdf->NbLines($w, $utf8val));
 							$pdf->Write($h,$utf8val);
 						}
 						$newX=(float)$col->spec->attributes()->x+(isset($col->spec->attributes()->w)?(float)$col->spec->attributes()->w:$pdf->GetStringWidth($val));
@@ -952,6 +969,7 @@ class tx_metafeedit_export {
 					} else {
 						$x = $pdf->getX();
 						$y = $pdf->getY();
+						//error_log(__METHOD__.":multi $utf8val , ".$pdf->NbLines($w, $utf8val));
 						$pdf->MultiCell($w,$h,$utf8val,0,0,$p,1);
 						if ($b) $pdf->Rect($x,$y,$w,$h*$nblines);
 						// We handle bigger cells !!!
@@ -1048,7 +1066,7 @@ class tx_metafeedit_export {
 		
 		$workWidth=$W-$pdf->rightmargin-$pdf->leftmargin;
 		$spaceLeft=$workWidth-$docWidth;// - ($x*$lw);
-		// do this onlsy if cell size not set ...(
+		// do this only if cell size not set ...(
 		$cw=$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']?$this->confTS[$this->pluginId.'.']['list.'][$fields[$x].'.']['width']:0;
 		if (!$cw && $spaceLeft>0) {
 			$sizeArr[$x-1]+=$spaceLeft;
@@ -1070,11 +1088,11 @@ class tx_metafeedit_export {
 		$title =null;
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
 		if ($this->conf['inputvar.']['sortLetter']) $tri = '  Tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
-		$pdf->SetFont('Arial','B',11);
+		$pdf->SetFont('Helvetica','B',11);
 		
 		$pdf->SetY(0);
 		$pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');	
-		$pdf->SetFont('Arial', '', 9);
+		$pdf->SetFont('Helvetica', '', 9);
 		$pdf->Cell(0,$this->headercellsize,utf8_decode(htmlspecialchars_decode($recherche)),0,0,'R');
 		$pdf->SetY(0);
 		$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
@@ -1088,17 +1106,41 @@ class tx_metafeedit_export {
 		// Where do we get $plice and $font ??????
 		$this->getPolice($police);
 		$this->getFont($font);
-		$pdf->SetFont($font,'',$police);
+		$pdf->SetFont('Helvetica','',$police);
 		$alt=1;
+		//error_log(__METHOD__.":set  font $font , ".print_r($pdf->CurrentFont,true));
 		
 		// Content 
 		$pdf->setFillColor(125,125,125);
 		$height = ($this->confTS[$this->pluginId.'.']['list.']['height'])?$this->confTS[$this->pluginId.'.']['list.']['height']:(($this->confTS['default.']['list.']['height'])?$this->confTS['default.']['list.']['height']:($pdf->cellsize?$pdf->cellsize:5)); // hauteur de la ligne pdf
 		$r=0;
+		$Y=$pdf->GetY();
 		foreach($xml->tr as $row) {
-			$Y=$pdf->GetY()+$pdf->bottommargin+$height;
-			if ($Y>=$H) {
+			$rowHeight=$height;
+			//We calculate row height :
+			$x=0;
+			foreach($row->td as $col) {
+				if ($col->img==1) {
+					$x++;
+					continue;
+				}
+				$val = str_replace('€','Eur',strip_tags($col->data));
+				$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
+				// Currency handling Euro CBY should not be here !!!
+				if ($this->conf['list.']['euros'] && $result) $val .= ' Eur';
+				$val=utf8_decode($val);
+				$size = $nbcols==1?$workWidth:$sizeArr[$x]; //taille de la cellule
+				$nbl=$pdf->NbLines($size, $val);
+				//if ($nbl>1) error_log(__METHOD__.":$val, $nbl");
+				//error_log(__METHOD__."nbl $size, $nbl, $height ");
+				if ($nbl*$height>$rowHeight) $rowHeight=$nbl*$height;
+				$x++;
+			}
+			
+			$ChkY=$pdf->GetY()+$pdf->bottommargin+$rowHeight;
+			if ($ChkY>=$H) {
 				$pdf->AddPage();
+				$Y=$pdf->GetY();
 			}
 			$x=0; //column counter 
 			if ($alt>1) {							// changement de couleur 1 ligne sur 2
@@ -1111,13 +1153,16 @@ class tx_metafeedit_export {
 			$csize=0;
 			if ($row->gb) {
 				$pdf->SetLineWidth($lw);
-				$pdf->SetFont('Arial', 'B', 9);
+				$pdf->SetFont('Helvetica', 'B', 9);
 			} else {
 				$pdf->SetLineWidth($lw);
-				$pdf->SetFont('Arial', '', 9);
-			}				
+				$pdf->SetFont('Helvetica', '', 9);
+			}			
+
+			
 			// We handle cell content here
 			foreach($row->td as $col) {
+				
 				$size = $nbcols==1?$workWidth:$sizeArr[$x]; //taille de la cellule
 				//@todo why do we do this	
 				$val = str_replace('€','Eur',strip_tags($col->data));
@@ -1131,6 +1176,7 @@ class tx_metafeedit_export {
 					$this->headerFields[]=$val;
 				}
 				if ($col->img==1) {
+					//images
 					if (strlen($val)>0) {
 						$vala=t3lib_div::trimexplode(',',$val);
 					} else {
@@ -1138,7 +1184,8 @@ class tx_metafeedit_export {
 					}
 					$img='';
 				 	$myx=$pdf->getX();
-					$pdf->Cell($size,$height,'',1,0,'L',1);
+				 	$pdf->Rect($myx, $pdf->getY(), $size, $rowHeight,'FD');
+					//$pdf->Cell($size,$height,'',1,0,'L',1);
 					$pdf->setX($myx);
 					$notFound=t3lib_extMgm::siteRelPath('meta_feedit').'res/noimage.jpg';
 					foreach($vala as $v) {
@@ -1182,29 +1229,39 @@ class tx_metafeedit_export {
 				 		$pdf->setX($myx+$size);
 				 	} else {
 				 		if ($row->gb && $x==0) { 
-							$pdf->Cell($workWidth,$height,utf8_decode($val),1,0,$p,1);
+				 			//error_log(__METHOD__.":c1 ".utf8_decode($val)." , ".$pdf->NbLines($size, utf8_decode($val)));
+				 			//$pdf->SetY($Y);
+				 			$pdf->Cell($workWidth,$height,utf8_decode($val),1,0,$p,1);
 							$cell=true;
 							$pdf->setX($myx+$size);
 						} else {
-							$border=1;
-							$pdf->Cell($size,$height,utf8_decode($val),1,0,$p,1);
+							$border=1;							
+							//$pdf->Cell($size,$height,utf8_decode($val),1,0,$p,1);
+							$Y=$pdf->GetY();
+							//$dbg=(substr($val,0,5)=="Adler");
+							//if ($dbg) error_log(__METHOD__.":Rect $val,w: $size");
+							$pdf->Rect($myx, $Y, $size, $rowHeight,'FD');
+							$pdf->MultiCell($size,$height,utf8_decode($val),0,$p);
 							$cell=true;
-							$pdf->setX($myx+$size);
+							//error_log(__METHOD__.":c2 $size, $height ".utf8_decode($val).", $Y, $rowHeight");
+							
+							$pdf->setXY($myx+$size,$Y);
 						}
 					}
 				}
 				$x++;
 			}
+			$pdf->setY($Y+$rowHeight);
 			//white
 			$pdf->setFillColor(255,255,255);
 			// We erase all text right of last cell
 			//300 is maximum width  of page in A4
 			$X=$pdf->GetX();
-			$pdf->Cell(300,$height,"",0,0,$p,1);
+			//$pdf->Cell(300,$rowHeight,"",0,0,$p,1);
 			$pdf->SetX($X);
-			$pdf->Cell(0.001,$height,"",1,0,$p,1);
+			//$pdf->Cell(0.001,$rowHeight,"",1,0,$p,1);
 			// Line break
-			$pdf->Ln();
+			//$pdf->Ln();
 			$r++;
 			
 		}
@@ -1377,10 +1434,10 @@ class tx_metafeedit_export {
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
 		/*if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 
-		$pdf->SetFont('Arial','B',11);
+		$pdf->SetFont('Helvetica','B',11);
 		$pdf->SetY(15);
 		$pdf->Cell(0,8,utf8_decode($title),0,0,'C');	
-		$pdf->SetFont('Arial', '', 9);
+		$pdf->SetFont('Helvetica', '', 9);
 		$pdf->SetY(20);
 		$pdf->Cell(0,8,utf8_decode($recherche),0,0,'C');
 		$pdf->SetY(25);
@@ -1388,11 +1445,11 @@ class tx_metafeedit_export {
 		$pdf->Ln();*/
 
 		if ($this->conf['inputvar.']['sortLetter']) $tri = '  Tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
-		$pdf->SetFont('Arial','B',11);
+		$pdf->SetFont('Helvetica','B',11);
 		
 		$pdf->SetY(0);
 		$pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');
-		$pdf->SetFont('Arial', '', 9);
+		$pdf->SetFont('Helvetica', '', 9);
 		$pdf->Cell(0,$this->headercellsize,utf8_decode(htmlspecialchars_decode($recherche)),0,0,'R');
 		$pdf->SetY(0);
 		$pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
@@ -1682,9 +1739,9 @@ class tx_metafeedit_export {
 			$nbcols=count($row->td);
 			$csize=0;
 			if ($row->gb) {
-				//$pdf->SetFont('Arial', 'B', 9);
+				//$pdf->SetFont('Helvetica', 'B', 9);
 			} else {
-				//$pdf->SetFont('Arial', '', 9);
+				//$pdf->SetFont('Helvetica', '', 9);
 			}				
 			$objPHPExcel->getActiveSheet()->getRowDimension($r)->setRowHeight($height);
 			if (count($row->th) > 0) {
@@ -1904,7 +1961,7 @@ class tx_metafeedit_export {
 	function getFont(&$font) {
 		if ($this->confTS[$this->pluginId.'.']['list.']['font']) $font = $this->confTS[$this->pluginId.'.']['list.']['font'];
 		elseif ($this->confTS['default.']['list.']['font']) $font = $this->confTS['default.']['list.']['font'];
-		else $font = 'Arial';
+		else $font = 'Helvetica';
 	}
 
 }

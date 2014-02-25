@@ -1283,8 +1283,8 @@ class tx_metafeedit_sqlengine {
 		$pluginId=$conf['pluginId'];
 		
 		if ($conf['typoscript.'][$pluginId.'.']['advancedSearch.']) $advancedSearchDefault = $conf['typoscript.'][$pluginId.'.']['advancedSearch.'];
-		error_log("________________________2_______________________________");
-		error_log(print_r($advancedSearchDefault,true));
+		//error_log("________________________2_______________________________");
+		//error_log(print_r($advancedSearchDefault,true));
 		if (is_array($advancedSearch) && is_array($advancedSearchDefault)) {
 			foreach($advancedSearch as $key=>$value) {
 				if ($advancedSearchDefault[$key.'.'] && is_array($advancedSearch[$key])) $advancedSearch[$key] = array_merge($advancedSearch[$key], $advancedSearchDefault[$key.'.']);
