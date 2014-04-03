@@ -19,6 +19,10 @@ $TYPO3_CONF_VARS['EXTCONF']['sr_feuser_register']['tx_srfeuserregister_pi1']['re
 
 // eId scripts
 $TYPO3_CONF_VARS['FE']['eID_include']['tx_metafeedit'] = 'EXT:meta_feedit/Classes/eID/Edit.php';
+/****************************************************************************************************/
+/*											HOOKS													*/
+/****************************************************************************************************/
+$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearCachePostProc'][] = 'Tx_MetaFeedit_Hook_ClearCache->postProc';
 
 // We add path to libraries
 if (TYPO3_MODE){

@@ -30,7 +30,7 @@
 
 // Necessary includes
 
-class tx_metafeedit_lib {
+class tx_metafeedit_lib implements t3lib_singleton {
 	var $st = 0;
 	var $et = 0;
 	var $RTEObj;
@@ -41,6 +41,8 @@ class tx_metafeedit_lib {
 	var $feadminlib;
 	var $returnvalue;
 	var $t3lib_TCEforms;
+	var $langHandler=null;
+	var $extKey = 'meta_feedit';
 
 	/**
 	* debug
@@ -77,6 +79,12 @@ class tx_metafeedit_lib {
 		}
 		if (!is_object($GLOBALS['BE_USER'])) $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
 		$this->t3lib_TCEforms = t3lib_div::makeInstance('t3lib_TCEforms');
+		if (t3lib_extmgm::isLoaded('ard_mcm') ) {
+			//error_log(__METHOD__.":WE create languageHandler");
+			$this->langHandler=t3lib_div::makeInstance('Tx_ArdMcm_Core_LanguageHandler');
+		} else {
+			$this->langHandler=null;
+		}
 		$this->starttime();
 	}
 
@@ -3049,22 +3057,39 @@ class tx_metafeedit_lib {
 	function getLLFromLabel($label,&$conf) {
 		if($conf['debug.']['langArray']) return "?$label?";
 		$labela=explode(':',$label);
+		$key=end($labela);
 		$label2=str_replace('.','_',end($labela));
-		
+		//error_log(__METHOD__.":$key".print_r($conf['LOCAL_LANG']['langoverride'][$conf['LLkey']],true));
+		if ($conf['LOCAL_LANG']['langoverride'][$conf['LLkey']][$key]) {
+			//error_log(__METHOD__.":OVERRIDE1!");
+			return $conf['LOCAL_LANG']['langoverride'][$conf['LLkey']][$key];
+		}
 		// user override of language labels
 		if (isset($conf['LOCAL_LANG'][$conf['LLkey']][$label2])) {
+			//error_log(__METHOD__.":OVERRIDE2L!!");
 			$ret=$conf['LOCAL_LANG'][$conf['LLkey']][$label2];
 		} else {
-			$ret=$GLOBALS['TSFE']->sL($label);
+			if ($this->langHandler) {
+				//error_log(__METHOD__.":LLHANDLER sL!!");
+				$ret=$this->langHandler->sL($label);
+			} else {
+				$ret=$GLOBALS['TSFE']->sL($label);
+			}
 			$ret=$ret?$ret:"$label";
 			if ($ret==$label) {
 				// We didn't find label...
 				$labela=explode('.',$label);
 				$label=end($labela);
-				$ret=$GLOBALS['TSFE']->getLLL($label,$conf['LOCAL_LANG']);
+				if ($this->langHandler) {
+					//error_log(__METHOD__.":LLHANDLER gll !!");
+					$ret=$this->langHandler->gll($label,$this->extKey);
+				} else {
+					$ret=$GLOBALS['TSFE']->getLLL($label,$conf['LOCAL_LANG']);
+				}
 				//$GLOBALS['TSFE']->sL($label)?$GLOBALS['TSFE']->sL($label):"$label";
 			}
 		}
+		//error_log(__METHOD__.":".$label." ".$conf['LLkey']." ".$GLOBALS['TSFE']->lang." , $ret");
 		if (version_compare($GLOBALS['TYPO_VERSION'], '4.5.0', '>') && is_array($ret)) {
 			$ret=$ret[0]['target'];
 		}
@@ -3081,7 +3106,17 @@ class tx_metafeedit_lib {
 	
 	function getLL($key,&$conf)	{
 		if($conf['debug.']['langArray']) return "?*$key*?:".$GLOBALS['TSFE']->getLLL($key,$conf['LOCAL_LANG']); // if we are debugging language array we show keys of all fields enveloped in "?".
-		$label=$GLOBALS['TSFE']->getLLL($key,$conf['LOCAL_LANG']);
+		//error_log(__METHOD__.":$key".print_r($conf['LOCAL_LANG']['langoverride'][$conf['LOCAL_LANG']],true));
+		
+		if ($this->langHandler) {
+			$label=$this->langHandler->gll($key,$this->extKey);
+		} else {
+			if ($conf['LOCAL_LANG']['langoverride'][$conf['LOCAL_LANG']][$key]) {
+				return $conf['LOCAL_LANG']['langoverride'][$conf['LOCAL_LANG']][$key];
+			}
+			$label=$GLOBALS['TSFE']->getLLL($key,$conf['LOCAL_LANG']);
+		}
+		
 		return isset($label) ? $label : "$key";
 	}
 
@@ -4159,7 +4194,7 @@ class tx_metafeedit_lib {
 	
 	function getRUJoin(&$conf,&$sql) {
  		$table=$conf['table'];
-  		if ( ($conf['inputvar.']['rU']|| t3lib_div::_GP($table.'-rU')) && $conf['list.']['rUJoinField']) {
+  		if ( ($conf['inputvar.']['rU']|| t3lib_div::_GP($table.'-rU')) && $conf['list.']['rUJoinField'] &&  strtolower($conf['list.']['rUJoinField'])!='null') {
 			$rF=$conf['list.']['rUJoinField'];
 			$mmTable=$conf['TCAN'][$table]['columns'][$rF]['config']['MM'];
 			$ruid=t3lib_div::_GP($table.'-rU')?t3lib_div::_GP($table.'-rU'):$conf['inputvar.']['rU'];
@@ -4211,6 +4246,7 @@ class tx_metafeedit_lib {
 	function getUserWhereString(&$conf,&$sql) {
 		$conf['parentObj']=&$this->feadminlib;
 		if ($conf['list.']['userFunc_afterWhere']) t3lib_div::callUserFunction($conf['list.']['userFunc_afterWhere'],$conf,$this->feadminlib);
+		error_log(__METHOD__.":conf[".$conf['cmdmode'] . "][whereString]:".$conf[$conf['cmdmode'] . '.']['whereString']);
 		if ($conf[$conf['cmdmode'] . '.']['whereString'])	$sql['userWhereString']=' AND '.$conf[$conf['cmdmode'] . '.']['whereString'];
 		$sql['where'].= $sql['userWhereString'];
 	}
@@ -4722,7 +4758,8 @@ class tx_metafeedit_lib {
 		if ($orderby) $filterArray[]=$orderby;
 	
 		// Should all be replaceD by marker and evaluation should be done in metafeedit_lib called from feadminlib.php
-		/*$filter='<div id="blockfiltre">';
+		/*((
+		 * $filter='<div id="blockfiltre">';
 		$filter2=$this->getLL("filtre_recherche",$conf).'<br />';
 		if ($fulltext) $filter2.= '<tr><td class="searchf">'.$fulltext.' </td></tr>';
 		if($conf['inputvar.']['advancedSearch']) $filter2.='<tr><td class="searchf">'.($recherche? $recherche : $this->getLL("search_nothing",$conf)).'</td></tr>';
@@ -4731,6 +4768,7 @@ class tx_metafeedit_lib {
 		if ($filter2) $filter.='<table>'.$filter2.'</table>';
 		$filter .= '</div>';
 		*/
+			
 		$ret=implode(', ',$filterArray);
 		return $ret;
 	}
@@ -4959,11 +4997,26 @@ class tx_metafeedit_lib {
 	 */
 	 
 	function getHeader(&$title, &$recherche, &$conf,$data=array()) {
-		if($conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre']) $title = $conf['typoscript.'][$conf['pluginId'].'.']['list.']['titre'];
-		if  (!isset($title) && $this->feadminlib->piVars['title']) $title=$this->feadminlib->piVars['title'];
-		if (!isset($title)) $title = $GLOBALS['TSFE']->page['title'];
+		//error_log(__METHOD__.":-------- ".$conf['inputvar.']['cmd']);
+		$cmd=$conf['inputvar.']['cmd'];
+		if ($conf[$cmd.'.']['title']) {
+			$title=$this->getLLFromLabel($conf[$cmd.'.']['title'], $conf);
+			//error_log("oooooooo".$conf['list.']['title']."/".$title);
+		}
+		elseif($conf['typoscript.'][$conf['pluginId'].'.'][$cmd.'.']['titre']) {
+			//error_log("nnnn");
+			$title = $conf['typoscript.'][$conf['pluginId'].'.'][$cmd.'.']['titre'];
+		} else if  (!isset($title) && $this->feadminlib->piVars['title']) {
+			//error_log("jjjj");
+			$title=$this->feadminlib->piVars['title'];
+		} else if (!isset($title)) {
+			//error_log("ttt");
+			$title = $GLOBALS['TSFE']->page['title'];
+		} else {
+			//error_log("No title");
+			$title="";
+		}
 		$markerArray=array();
-
 		
 		/*
 		$uid=$conf['inputvar.']['rU']?$conf['inputvar.']['rU']:$dataArr[$conf['uidField']];
@@ -5001,14 +5054,22 @@ class tx_metafeedit_lib {
 				//$data=$this->user_processDataArray($data, $conf,$table,TRUE);
 				
 			}
-				
 		} 
 		
 		$data['SYSDATE']=date('j/m/y');
+		$headerUserFunction=$conf[$cmd.'.']['headerUserFunction'];
+		if ($headerUserFunction) {
+			eval($headerUserFunction);
+		}
 		$markerArray=$this->cObj->fillInMarkerArray($markerArray, $data, '', TRUE, 'FIELD_', $conf['general.']['xhtml']);
+		
+		
+		//error_log(__METHOD__.":MA ".$title." " .print_r($markerArray,true));
+		
+		
 		$title=$this->cObj->substituteMarkerArray($title,$markerArray);
 		
-		if ($this->confTS[$this->pluginId.'.']['list.']['soustitre']) $recherche = $this->confTS[$this->pluginId.'.']['list.']['soustitre'];
+		if ($this->confTS[$this->pluginId.'.'][$cmd.'.']['soustitre']) $recherche = $this->confTS[$this->pluginId.'.'][$cmd.'.']['soustitre'];
 		if (is_array($conf['inputvar.']['advancedSearch'])) {	
 			$recherche=$this->getHumanReadableSearchFilter($conf);
 		}

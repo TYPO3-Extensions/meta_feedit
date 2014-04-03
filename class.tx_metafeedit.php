@@ -91,9 +91,74 @@ class tx_metafeedit extends  tslib_pibase {
 	var $RTEtypeVal = 'text';
 	var $thePidValue;
 	var $TCATables=array();
+	//var $langOverrides=array();
 	var $performanceaudit; // performance audit flag
 	//var $_LOCAL_LANG = array(); // Language override
-
+	 private function initReportCache($conf) {
+	 	if ($conf['general.']['tplCache']) {
+	 		$finalCacheDirectory = PATH_site . 'typo3temp/Cache/Reports/' . $conf['pluginId'] . '/';
+	 		
+	 		if (!is_dir($finalCacheDirectory)) {
+	 			error_log(__METHOD__.":$finalCacheDirectory");
+	 			$this->createFinalCacheDirectory($finalCacheDirectory);
+	 		}
+	 		$this->cacheDirectory = $finalCacheDirectory;
+	 	}
+	 }
+	 /**
+	  * 
+	  * @param string $templateName
+	  */
+	 private function getTemplate($templateName,&$conf) {
+	 	$tpl='';
+	 	error_log(__METHOD__);
+	 	if ($conf['general.']['tplCache']) {
+	 		$file=$this->cacheDirectory.$templateName.".".$conf['LLKey'].".tpl";
+	 		if (file_exists($file) ) {
+	 			return file_get_contents($file);
+	 		}
+	 	}
+	 	return $tpl;
+	 }
+	 /**
+	  * 
+	  * @param string $templateName
+	  * @param string $template
+	  */
+	 private function saveTemplate($templateName,$template,&$conf) {
+	 	error_log(__METHOD__);
+	 	
+	 	if ($conf['general.']['tplCache']) {
+	 		$file=$this->cacheDirectory.$templateName.".".$conf['LLKey'].".tpl";
+	 		error_log(__METHOD__.'we save template :'.$file);
+	 		return file_put_contents($file,$template);
+	 	}
+	 }
+	 /**
+	  * Create the final cache directory if it does not exist. This method
+	  * exists in TYPO3 v4 only.
+	  *
+	  * @param string $finalCacheDirectory Absolute path to final cache directory
+	  * @return void
+	  * @throws \t3lib_cache_Exception If directory is not writable after creation
+	  */
+	 protected function createFinalCacheDirectory($finalCacheDirectory) {
+	 	try {
+	 		t3lib_div::mkdir_deep($finalCacheDirectory);
+	 	} catch (\RuntimeException $e) {
+	 		throw new \t3lib_cache_Exception(
+	 				'The directory "' . $finalCacheDirectory . '" can not be created.',
+	 				1303669848,
+	 				$e
+	 		);
+	 	}
+	 	if (!is_writable($finalCacheDirectory)) {
+	 		throw new \t3lib_cache_Exception(
+	 				'The directory "' . $finalCacheDirectory . '" is not writable.',
+	 				1203965200
+	 		);
+	 	}
+	 }
 	/**
 	* init : Main method ...
 	*
@@ -103,7 +168,8 @@ class tx_metafeedit extends  tslib_pibase {
 	*/
 	
   	function init(&$caller,&$conf)	{
-
+  		error_log(__METHOD__." start ================".$GLOBALS['TSFE']->lang);
+  		$this->initReportCache($conf);
 		$this->initialize($caller,$conf);
 		 
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init done :']=$this->metafeeditlib->displaytime()." Seconds"; 
@@ -130,7 +196,7 @@ class tx_metafeedit extends  tslib_pibase {
 		}
 
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit USER_INT call done :']=$this->metafeeditlib->displaytime()." Seconds"; 
-	
+		error_log(__METHOD__." end ================".$GLOBALS['TSFE']->lang);
 		/**** ADDS THE REQUIRED JAVASCRIPTS ****/
 		$content = $this->getJSBefore($conf).$content;
 		// XAJAX form handler. Must not be generated if we are in an ajax call.
@@ -180,6 +246,7 @@ class tx_metafeedit extends  tslib_pibase {
 	*/
 	
 	function initialize(&$caller,&$conf) {
+		error_log(__METHOD__." start ================".$GLOBALS['TSFE']->lang);
 		$this->caller = $caller;
 		$conf['caller']=&$caller; // 100 K
 		$this->metafeeditlib=$caller->metafeeditlib;
@@ -232,6 +299,7 @@ class tx_metafeedit extends  tslib_pibase {
 		/**** Init Robert Lemkes dateselectlib if it is loaded  ****/
 		if(t3lib_extmgm::isLoaded('rlmp_dateselectlib')) tx_rlmpdateselectlib::includeLib();
 		$this->conf=&$conf; // TODO : to be removed !!! CBY
+		error_log(__METHOD__." end ================".$GLOBALS['TSFE']->lang);
   	}
   	
   	/**
@@ -339,25 +407,53 @@ class tx_metafeedit extends  tslib_pibase {
 	*/
 	
 	function LoadLanguageConf(&$conf) {
-  	  if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf before Language size ']=strlen(serialize($conf))." Bytes"; 
-  		
-		// loads default locallang
-		$this->LOCAL_LANG = $GLOBALS['TSFE']->readLLfile(t3lib_extMgm::extPath($this->extKey).'locallang.xml');
-		
-		// loads callers locallang
-		$this->LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($this->LOCAL_LANG,$this->caller->LOCAL_LANG);
-		
-		// if we use static info table we must get language file. 
-		// TOCHECK : Do we still need this ?
-		
-		if(t3lib_extmgm::isLoaded('sr_static_info')) {
-			$filepath=t3lib_extMgm::extPath('sr_static_info').'pi1/locallang.php';
-			if (file_exists($filepath)) {
-				$stat_lang=$GLOBALS['TSFE']->readLLfile($filepath);
-				$this->LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($this->LOCAL_LANG,$stat_lang);
+		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Conf before Language size ']=strlen(serialize($conf))." Bytes"; 
+		if (t3lib_extmgm::isLoaded('ard_mcm') ){
+			$this->langHandler=t3lib_div::makeInstance('Tx_ArdMcm_Core_LanguageHandler');
+			//$langHandler->update();
+			$this->langHandler->loadLangFile(t3lib_extMgm::extPath($this->extKey).'locallang.xml',$this->extKey);
+			error_log(__METHOD__.":loaded file  ".t3lib_extMgm::extPath($this->extKey).'locallang.xml');
+			$conf['LLKey']=$this->LLkey=$GLOBALS['LANG']->lang;
+			$this->processTSLanguageOverrides($conf);
+			// We handle ARD FRAMEWORK LANGUAGE OVERRIDES
+			if (t3lib_extMgm::isLoaded('ard_desktop')) $this->processLanguageOverrides();
+		} else {
+			// loads default locallang
+			$this->LOCAL_LANG = $GLOBALS['TSFE']->readLLfile(t3lib_extMgm::extPath($this->extKey).'locallang.xml');
+			
+			// loads callers locallang
+			$this->LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($this->LOCAL_LANG,$this->caller->LOCAL_LANG);
+			
+			// if we use static info table we must get language file. 
+			// TOCHECK : Do we still need this ?
+			
+			if(t3lib_extmgm::isLoaded('sr_static_info')) {
+				$filepath=t3lib_extMgm::extPath('sr_static_info').'pi1/locallang.php';
+				if (file_exists($filepath)) {
+					$stat_lang=$GLOBALS['TSFE']->readLLfile($filepath);
+					$this->LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($this->LOCAL_LANG,$stat_lang);
+				}
 			}
-		}
-		
+			
+			
+			$this->processTSLanguageOverrides($conf);
+			/**
+			 *
+			 */
+			
+			
+			
+			$conf['LLkey']=$this->LLkey;	   
+
+			$conf['LOCAL_LANG']['default']=&$this->LOCAL_LANG['default'];
+			$conf['LOCAL_LANG'][$conf['LLkey']]=&$this->LOCAL_LANG[$conf['LLkey']];
+			$conf['LOCAL_LANG']['langoverride']=&$this->LOCAL_LANG['langoverride'];
+			unset($conf['_LOCAL_LANG.']);
+	 		/**** Init language object (used for translation of labels) ****/
+			//$GLOBALS['TSFE']->initLLvars();
+  	   }
+	}
+	function processTSLanguageOverrides($conf) {
 		// get override language data coming from typoscript. Should handle multiple languages ...
 		//@todo : We should only load default and local language translations ... 
 	   
@@ -375,22 +471,40 @@ class tx_metafeedit extends  tslib_pibase {
 									$skey2.=$skey3;
 								}
 							}
-							$this->LOCAL_LANG[$nkey][$skey2]=$sval;
+							if (t3lib_extmgm::isLoaded('ard_mcm') ) {
+								$this->langHandler->override($nkey,$skey2,$sval);
+							} else {
+								$this->LOCAL_LANG['langoverride'][$nkey][$skey2]=$sval;
+							}
 						}
 					} else {
-						$this->LOCAL_LANG[$nkey][$skey]=$sval;
+						if (t3lib_extmgm::isLoaded('ard_mcm') ) {
+							$this->langHandler->override($nkey,$skey,$sval);
+						} else {
+							$this->LOCAL_LANG['langoverride'][$nkey][$skey]=$sval;
+						}
 					}
 				}
 			}
-		}
-		$conf['LLkey']=$this->LLkey;	   
-		$conf['LOCAL_LANG']['default']=&$this->LOCAL_LANG['default'];
-		$conf['LOCAL_LANG'][$conf['LLkey']]=&$this->LOCAL_LANG[$conf['LLkey']];
-		unset($conf['_LOCAL_LANG.']);
- 		/**** Init language object (used for translation of labels) ****/
-		$GLOBALS['TSFE']->initLLvars();
+		}	
 	}
-
+	
+	function processLanguageOverrides() {
+		$configHandler=t3lib_div::makeInstance('Tx_ArdMcm_Core_ConfigurationHandler');//singleton
+		$lo=$configHandler->getConfVal('ard_desktop','langoverride');
+		$loa=t3lib_div::trimExplode('\\n',$lo);
+		foreach($loa as $lod) {
+			$loda=t3lib_div::trimExplode('|',$lod);
+			//error_log(__METHOD__.":$lod");
+			if (t3lib_extmgm::isLoaded('ard_mcm') ) {
+				$this->langHandler->override($loda[0],$loda[2],$loda[3]);
+			} else {
+				$this->LOCAL_LANG['langoverride'][$loda[0]][$loda[2]]=$loda[3];
+				//$this->langOverrides[$loda[0]][$loda[1]][$loda[2]]=$loda[3];
+			}
+		}
+		
+	}
 	/**
 	* initFieldsCmd
 	*
@@ -466,8 +580,8 @@ class tx_metafeedit extends  tslib_pibase {
 		/**** CHECK IF LOGIN IS REQUIRED ****/
 		//CBY: if($conf['requireLogin'] && !$GLOBALS['TSFE']->loginUser) return $this->metafeeditlib->getLL("login_required_message",$conf);
 		/**** FE ADMIN LIB ****/
-	   //$conf['parentObj']=&$this;
-	   $conf["templateContent"]= $this->getDefaultTemplate($conf); // gets the default template
+		//$conf['parentObj']=&$this;
+		$conf["templateContent"]= $this->getDefaultTemplate($conf); // gets the default template
 
 		// generate default template in browser if required to.
 		if ($conf['generateTemplate']){
@@ -479,12 +593,12 @@ class tx_metafeedit extends  tslib_pibase {
 		  	$conf["templateContent"]=$conf['fetemplate'];
 		}
 		// CBY>
-	   	$conf["templateContentOptions"]=$conf['templateContent']; // can this be removed ?
-	 
-	   	$conf['parentObj']=&$this;
-	   	$conf["templateContent"]=$this->metafeeditlib->replaceOptions($conf["templateContent"],$conf,$cmd,$this->table,'');
-	   	return $conf;
-	  }
+		$conf["templateContentOptions"]=$conf['templateContent']; // can this be removed ?
+	
+		$conf['parentObj']=&$this;
+		$conf["templateContent"]=$this->metafeeditlib->replaceOptions($conf["templateContent"],$conf,$cmd,$this->table,'');
+	 	return $conf;
+	}
 	
 	/* mergeExtendingTCAs($ext_keys)
 	*
@@ -520,56 +634,63 @@ class tx_metafeedit extends  tslib_pibase {
 	*/
 	
 	function getDefaultTemplate(&$conf)	{
-		$callerMethods = get_class_methods(get_class($this->caller));
-		$template = array_search('getrequiredtemplate',$callerMethods) || array_search('getRequiredTemplate',$callerMethods)?
-		$this->caller->getRequiredTemplate($conf) : $this->getRequiredTemplate($conf);
-		$template .= array_search('getemailtemplate',$callerMethods) || array_search('getEmailTemplate',$callerMethods)?$this->caller->getEmailTemplate($conf) : $this->getEmailTemplate($conf);
+		
 		$nbCols = $this->piVars['nbCols'];
 		
-		if ($conf['generateTemplate']){ // We generate all templates
-			$template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
-			$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
-			if ($conf['list.']['csv']) $template .= array_search('getCSVTemplate',$callerMethods) || array_search('getCSVTemplate',$callerMethods)?  $this->caller->getCSVTemplate($conf) : $this->getCSVTemplate($conf);
-			if ($conf['list.']['xls']) $template .= array_search('getExcelTemplate',$callerMethods) || array_search('getExcelTemplate',$callerMethods)?  $this->caller->getExcelTemplate($conf) : $this->getExcelTemplate($conf);
-			if ($conf['list.']['pdf']) $template .= array_search('getPDFTemplate',$callerMethods) || array_search('getPDFTemplate',$callerMethods)?  $this->caller->getPDFTemplate($conf) : $this->getPDFTemplate($conf);
-			if ($conf['list.']['pdf'] || $conf['edit.']['pdf']) $template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);
-			if ($conf['list.']['pdf']) $template .= array_search('getPDFTABTemplate',$callerMethods) || array_search('getPDFTABTemplate',$callerMethods)?  $this->caller->getPDFTABTemplate($conf) : $this->getPDFTABTemplate($conf);
-			if ($conf['grid.']['pdf']) $template .= array_search('getGridPDFTemplate',$callerMethods) || array_search('getGridPDFTemplate',$callerMethods)?  $this->caller->getGridPDFTemplate($conf) : $this->getGridPDFTemplate($conf);
-			if ($conf['grid.']['csv']) $template .= array_search('getGridCSVTemplate',$callerMethods) || array_search('getGridCSVTemplate',$callerMethods)?  $this->caller->getGridCSVTemplate($conf) : $this->getGridCSVTemplate($conf);
-			if ($conf['grid.']['xls']) $template .= array_search('getGridExcelTemplate',$callerMethods) || array_search('getGridExcelTemplate',$callerMethods)?  $this->caller->getGridExcelTemplate($conf) : $this->getGridExcelTemplate($conf);
-			$template .= array_search('getcreatetemplate',$callerMethods) || array_search('getCreateTemplate',$callerMethods)?  $this->caller->getCreateTemplate($conf) : $this->getCreateTemplate($conf);
-			$template .= array_search('getdeletetemplate',$callerMethods) || array_search('getDeleteTemplate',$callerMethods)?
-			$this->caller->getDeleteTemplate($conf) : $this->getDeleteTemplate($conf);
-			$template .= array_search('getsetfixedtemplate',$callerMethods) || array_search('getSetfixedTemplate',$callerMethods)?  $this->caller->getSetfixedTemplate($conf) : $this->getSetfixedTemplate($conf);
+		if ($conf['generateTemplate']||$conf['general.']['tplCache']){ // We generate all templates
+			if ($conf['general.']['tplCache']) {
+				$tpl=$this->getTemplate('full',$conf);
+				if ($tpl) {
+					error_log(__METHOD__.'Used Cached Template');
+					return $tpl;
+				}
+			}
+			$template = $this->getRequiredTemplate($conf);
+			$template .= $this->getEmailTemplate($conf);
+			$template .= $this->getEditTemplate($conf);
+			$template .=  $this->getListTemplate($conf);
+			if ($conf['list.']['csv']) $template .= $this->getCSVTemplate($conf);
+			if ($conf['list.']['xls']) $template .=$this->getExcelTemplate($conf);
+			if ($conf['list.']['pdf']) $template .=  $this->getPDFTemplate($conf);
+			if ($conf['list.']['pdf'] || $conf['edit.']['pdf']) $template .= $this->getPDFDETTemplate($conf);
+			if ($conf['list.']['pdf']) $template .= $this->getPDFTABTemplate($conf);
+			if ($conf['grid.']['pdf']) $template .= $this->getGridPDFTemplate($conf);
+			if ($conf['grid.']['csv']) $template .= $this->getGridCSVTemplate($conf);
+			if ($conf['grid.']['xls']) $template .= $this->getGridExcelTemplate($conf);
+			$template .= $this->getCreateTemplate($conf);
+			$template .= $this->getDeleteTemplate($conf);
+			$template .= $this->getSetfixedTemplate($conf);
+			$this->saveTemplate('full',$template,$conf);
 		} else {
+			$template = $this->getRequiredTemplate($conf);
+			$template .= $this->getEmailTemplate($conf);
 			switch((string) $conf['inputvar.']['cmd']) {
 				case 'edit':
-					$template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
+					$template .= $this->getEditTemplate($conf);
 					if ($conf['list.']['pdf'] || $conf['edit.']['pdf']) {
-						$template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);			  
+						$template .= $this->getPDFDETTemplate($conf);			  
 						//$template .= array_search('getGridPDFTemplate',$callerMethods) || array_search('getGridPDFTemplate',$callerMethods)?  $this->caller->getGridPDFTemplate($conf) : $this->getGridPDFTemplate($conf);
 					}
 					//$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
-					$template .= array_search('getmediaplayertemplate',$callerMethods) || array_search('getMediaPlayerTemplate',$callerMethods)?  $this->caller->getMediaPlayerTemplate($conf): $this->getMediaPlayerTemplate($conf);
+					$template .=$this->getMediaPlayerTemplate($conf);
 				case 'list':
 					// We load edit templates in list mode if editUnique is set.
 					if ($conf['editUnique']) {
-						$template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
+						$template .=  $this->getEditTemplate($conf);
 					}
-					$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
+					$template .= $this->getListTemplate($conf);
 					if ($conf['piVars']['exporttype']) {
-						if ($conf['list.']['csv']) $template .= array_search('getCSVTemplate',$callerMethods) || array_search('getCSVTemplate',$callerMethods)?  $this->caller->getCSVTemplate($conf) : $this->getCSVTemplate($conf);
-						if ($conf['list.']['excel']) $template .= array_search('getExcelTemplate',$callerMethods) || array_search('getExcelTemplate',$callerMethods)?  $this->caller->getExcelTemplate($conf) : $this->getExcelTemplate($conf);
-						if ($conf['list.']['pdf']) $template .= array_search('getPDFTemplate',$callerMethods) || array_search('getPDFTemplate',$callerMethods)?  $this->caller->getPDFTemplate($conf) : $this->getPDFTemplate($conf);
-						if ($conf['list.']['pdf']) $template .= array_search('getPDFTABTemplate',$callerMethods) || array_search('getPDFTABTemplate',$callerMethods)?  $this->caller->getPDFTABTemplate($conf) : $this->getPDFTABTemplate($conf);
+						if ($conf['list.']['csv']) $template .=  $this->getCSVTemplate($conf);
+						if ($conf['list.']['excel']) $template .=  $this->getExcelTemplate($conf);
+						if ($conf['list.']['pdf']) $template .=  $this->getPDFTemplate($conf);
+						if ($conf['list.']['pdf']) $template .= $this->getPDFTABTemplate($conf);
 						//if ($conf['grid.']['csv']) $template .= array_search('getGridCSVTemplate',$callerMethods) || array_search('getGridCSVTemplate',$callerMethods)?  $this->caller->getGridCSVTemplate($conf) : $this->getGridCSVTemplate($conf);
 						//if ($conf['grid.']['xls']) $template .= array_search('getGridExcelTemplate',$callerMethods) || array_search('getGridExcelTemplate',$callerMethods)?  $this->caller->getGridExcelTemplate($conf) : $this->getGridExcelTemplate($conf);
 					}  
 					break;
 				case 'create':
-					$template .= array_search('getcreatetemplate',$callerMethods) || array_search('getCreateTemplate',$callerMethods)?
-					$this->caller->getCreateTemplate($conf) : $this->getCreateTemplate($conf);
-					$template .= array_search('getedittemplate',$callerMethods) || array_search('getEditTemplate',$callerMethods)?  $this->caller->getEditTemplate($conf) : $this->getEditTemplate($conf);
+					$template .=  $this->getCreateTemplate($conf);
+					$template .=  $this->getEditTemplate($conf);
 					/*if ($conf['list.']['pdf'] || $conf['edit.']['pdf']) {
 						$template .= array_search('getPDFDETTemplate',$callerMethods) || array_search('getPDFDETTemplate',$callerMethods)?  $this->caller->getPDFDETTemplate($conf) : $this->getPDFDETTemplate($conf);			  
 					}
@@ -578,11 +699,10 @@ class tx_metafeedit extends  tslib_pibase {
 					break;
 				case 'delete':
 					$template .= $this->getDeleteTemplate($conf);
-					$template .= array_search('getListTemplate',$callerMethods) || array_search('getListTemplate',$callerMethods)?  $this->caller->getListTemplate($conf) : $this->getListTemplate($conf);
+					$template .= $this->getListTemplate($conf);
 					break;
 				case 'setfixed':
-					$template .= array_search('getsetfixedtemplate',$callerMethods) || array_search('getSetfixedTemplate',$callerMethods)?
-					$this->caller->getSetfixedTemplate($conf) : $this->getSetfixedTemplate($conf);
+					$template .= $this->getSetfixedTemplate($conf);
 					break;
 				default:
 					debug('meta_feedit->getDefaultTemplate():: No template found for cmd='.$conf['inputvar.']['cmd'],'No Template');
@@ -1523,6 +1643,8 @@ class tx_metafeedit extends  tslib_pibase {
 	function getSize(&$conf, $fN, $masterTable){	
 		$FT=$conf['TCAN'][$masterTable]['columns'][$fN]['config']['foreign_table'];
 		$size=25;
+		$cmd=$conf['inputvar.']['cmd'];
+		if ($conf[$cmd.'.']['forceDataSize']) return $conf[$cmd.'.']['forceDataSize'];
 		if ($FT) {
 			$labelField=$conf['TCAN'][$FT]['ctrl']['label'];
 			$size=$conf['TCAN'][$FT]['columns'][$labelField]['config']['size'];
@@ -1690,11 +1812,11 @@ class tx_metafeedit extends  tslib_pibase {
 	function getEditDataFields(&$conf,$textmode=false,$type='') {
 		$fields=$conf['edit.']['show_fields']?$conf['edit.']['show_fields']:$this->id_field;
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
+		$cmd=$conf['inputvar.']['cmd'];
 		$cols=$conf['list.']['nbCols'];
-		
 		$rowcount=0;
 		$fscount=0;
-		
+
 		foreach($fieldArray as $FN) {
 			$params=explode(';',$FN);
 			// If we meet tab delimiter
@@ -1737,7 +1859,7 @@ class tx_metafeedit extends  tslib_pibase {
  							// html presentation
 							$masterTable = $conf['table'];
 							$size = $this->getSize($conf, $FN, $masterTable);
-							$sizeLib=25;					
+							$sizeLib=$conf[$cmd.'.']['labelSize']?$conf[$cmd.'.']['labelSize']:'*';					
 							if(!$this->piVars['nbCols']) {
 								$img=0;
 								$dir='';
@@ -3069,10 +3191,11 @@ function getPDFDETTemplate(&$conf)
 	if ($conf['list.']['TemplatePDFDet']) {
 		return '<!-- ###TEMPLATE_EDIT_PDFDET### begin -->'.$conf['list.']['TemplatePDFDet'].'<!-- ###TEMPLATE_EDIT_PDFDET### end -->';
 	}
-	$tmp='<!-- ###TEMPLATE_EDIT_PDFDET### begin --><?xml version="1.0" encoding="utf-8"?><table><tr>';
-	$title=$this->getPreviewFieldCode('edit',$conf,$this->id_field,0);
-	$size=$this->getSize($conf, $this->id_field,$conf['table']);
-	$tmp.='<td><data>'.$title.'</data><size>'.$size.'</size></td></tr><!-- ###ALLITEMS### begin -->';
+	$tmp='<!-- ###TEMPLATE_EDIT_PDFDET### begin --><?xml version="1.0" encoding="utf-8"?><table>';//<tr>';
+	/*$title=$this->getPreviewFieldCode('edit',$conf,$this->id_field,0);
+	$size=$this->getSize($conf, $this->id_field,$conf['table']);*/
+	//$tmp.='<td><data>'.$title.'</data><size>'.$size.'</size></td></tr>';
+	$tmp.='<!-- ###ALLITEMS### begin -->';
 	//$GROUPBYFIELDS=$this->getGroupByFields($conf,true,'PDF');
 	//$tmp.=$GROUPBYFIELDS;
 	$tmp.='<!-- ###ITEM-COL### begin -->';
@@ -4041,6 +4164,7 @@ function getFormJs($formName,&$conf) {
 						break;
 				
 					case 'select':
+						//error_log(__METHOD__.": -".print_r($conf['list.'],true));
 						// For select fields we either draw  ajax selection widget or we relace with getselectoptions ...
 						if ($TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['foreign_table'] && $TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size']==1 && ($conf['list.']['advancedSearchAjaxSelector'] || $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector.'][$FN])) {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'widgets'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/widgets.js"></script>';
@@ -4051,6 +4175,7 @@ function getFormJs($formName,&$conf) {
 							$GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'TCE'] = '<script type="text/javascript" src="'.t3lib_extMgm::siteRelPath($this->extKey).'res/jsfunc.tbe_editor.js"></script>';
 							//$selectSize=is_array($conf['typoscript.'][$pluginId.'.']['advancedSearch.'][$FN]['forceConfig.'])?$conf['typoscript.'][$pluginId.'.']['forceConfig.'][$FN]['forceSize']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
 							$selectSize=$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']?$conf['list.']['advancedSearchConfig.'][$conf['table']]['columns.'][$FN.'.']['config.']['size']:$TConf['TCAN'][$conf['table']]['columns'][$FN]['config']['size'];
+							
 							$name = ' name="'.($selectSize>1?$conf['pluginId'].'['.$FN.']" id="'.$conf['pluginId'].'_'.$FN.'_sel" onchange="getSelected(\''.$conf['pluginId'].'_'.$FN.'\');" multiple="multiple"':$this->prefixId.'[advancedSearch]['.$conf['pluginId'].']['.$FN.']"');
 							$ret.=$div.'<select '.($selectSize?'size="'.$selectSize.'" ':'').$name.$this->caller->pi_classParam('form-asfield').'>';
 							$SO='###AS_FIELD_'.$FN.'###';

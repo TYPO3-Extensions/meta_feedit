@@ -33,7 +33,7 @@ require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_ajax.php'
 require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit.php');
 
 class tx_metafeedit_pi1 extends tslib_pibase {
-	var $prefixId="tx_metafeedit";// Same as class name
+	var $prefixId="tx_metafeedit";// Same as class namex
 	var $scriptRelPath="pi1/class.tx_metafeedit_pi1.php";	// Path to this script relative to the extension dir.
 	var $extKey="meta_feedit";// The extension key.
 	var $metafeeditlib;
@@ -56,6 +56,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 	*/
 	
 	function main($content='',$conf='',$configurationFile=''){
+		error_log(__METHOD__." start ================".$GLOBALS['TSFE']->lang);
 		$TTA[]=  "<br/>main Elapsed Time :".(microtime(true)-$GLOBALS['g_TT']).' s';
 		$DEBUG='';
 		//global $PAGES_TYPES;		
@@ -102,7 +103,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			// Assign the flexform data to a local variable for easier access
 			$piFlexForm=$flexForm=$this->cObj->data['pi_flexform'];
 		}
-		
+		error_log(__METHOD__.":".$conf['includeLibs']);
+		//"includeLibs":"typo3conf\/ext\/meta_feedit\/pi1\/class.tx_metafeedit_pi1.php",
+		//"userFunc":"tx_metafeedit_pi1->main",
 		$versionArray=explode('.',phpversion());
 		if ($versionArray[0]<5) die('Extension meta_feedit requires php5 !');
 		// Hack for php4 compatibility
@@ -130,6 +133,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// $lconf array : configuration from BE flexform
 		$lconf=$this->lconf;
 		
+		//error_log(__METHOD__.":lconf ".print_r($lconf,true));
 		//@todo Why on earth do I have to do this ?
 		if (!$lconf['fetable']) return '';
 
@@ -198,12 +202,13 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		
 		*/
 		
-		// Handle PidHandler Paths here
+		// Handle PidHandler Paths and ARD FRAMEWORK language here
 		
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['ARDDESKTOP']['extensionpids']) && t3lib_extmgm::isLoaded('ard_mcm') ) {
    			require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/Lib/PidHandler.php');
 			$pidHandler=t3lib_div::makeInstance('Tx_MetaFeedit_Lib_PidHandler');
-			
+			$langHandler=t3lib_div::makeInstance('Tx_ArdMcm_Core_LanguageHandler');
+			error_log(__METHOD__.":".$GLOBALS['LANG']->lang);
 			foreach($GLOBALS['TYPO3_CONF_VARS']['ARDDESKTOP']['extensionpids'] as $extension=>$extensionconf) {
 				$defaultpid=0;
 				//$root=$extensionconf['rootpid']?$extensionconf['rootpid']:$defaultpid;
@@ -288,6 +293,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		}				
 		
 		$mfconf['general.']['authTpl']=$lconf['generalAuthTemplate'];
+		$mfconf['general.']['tplCache']=$lconf['tplCache'];
 		$mfconf['general.']['noPermTpl']=$lconf['generalNoPermTemplate'];
 		$mfconf['general.']['fe_cruser_id']=$lconf['fecruser_field'];
 		$mfconf['general.']['fe_crgroup']=$lconf['fecrgroup_field'];
@@ -350,7 +356,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['langmarks']=$lconf['listlangmarks'];
 		$mfconf['list.']['show_fields']=$lconf['listFields'];
 		$mfconf['list.']['extraFields']=$lconf['listExtraFields'];
-		$mfconf['list.']['whereString']=str_replace($pidsearch,$pidreplace,$lconf['listWhereString']);
+		//$mfconf['list.']['whereString']=str_replace($pidsearch,$pidreplace,$lconf['listWhereString']);
 		$mfconf['list.']['orderByString']=$lconf['listOrderByString'];
 		$mfconf['list.']['preOrderByString']=$lconf['listPreOrderByString'];
 		$mfconf['list.']['havingString']=$lconf['listHavingString'];
@@ -388,6 +394,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		//error_log(print_r($conf['typoscript.'],true));
 		$mfconf['list.']['advancedSearch.']=$conf['advancedSearch.'];
 		$mfconf['list.']['advancedSearchConfig.']=$conf['advancedSearchConfig.'];
+		$mfconf['list.']['title']=$lconf['listTitle'];
+		$mfconf['list.']['headerUserFunction']=$lconf['listHeaderUserFunction'];
 		$mfconf['list.']['advancedSearchAjaxSelector']=$lconf['advancedSearchAjaxSelector'];
 		$mfconf['list.']['advancedSearchAjaxSelector.']=$conf[$lconf['pluginId'].'.']['list.']['advancedSearchAjaxSelector.'];
 		$mfconf['list.']['alphabeticalSearch']=$lconf['alphabeticalSearch'];
@@ -418,7 +426,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['TemplatePDFTab']=$lconf['TemplatePDFTab'];
 		$mfconf['list.']['TemplateCSV']=$lconf['TemplateCSV'];
 		$mfconf['list.']['TemplateExcel']=$lconf['TemplateExcel'];
-		$mfconf['edit.']['pdf']=$lconf['editpdf']?$lconf['editpdf']:0;			// Récupère l'info de si la case est cochée
 		
 		
 		/*
@@ -514,15 +521,23 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['create.']['hide']=$lconf['hideCreate'];
 
 		$mfconf['edit']=1;
+		$mfconf['edit.']['pdf']=$lconf['editPdf'];			// Récupère l'info de si la case est cochée
+		$mfconf['edit.']['title']=$lconf['editTitle'];
+		$mfconf['edit.']['headerUserFunction']=$lconf['editHeaderUserFunction'];
 		$mfconf['edit.']['recordactions']=$lconf['editrecordactions'];
 		$mfconf['edit.']['userFunc_afterSave']='tx_metafeedit_lib->user_afterSave';
 		$mfconf['edit.']['langmarks']=$lconf['editlangmarks'];
+		$mfconf['edit.']['labelSize']=$lconf['editLabelSize'];
+		$mfconf['edit.']['forceDataSize']=$lconf['editForceDataSize'];
 		$mfconf['edit.']['formWrap.']=$conf['editFormWrap.'];
 		$mfconf['edit.']['fields']=$lconf['feeditfields'];
 		$mfconf['edit.']['show_fields']=$lconf['feeditshowfields'];
 		$mfconf['edit.']['readonlyFields']=$lconf['feeditreadonlyfields'];
 		$mfconf['edit.']['required']=$lconf['ferequiredfields'];
 		$mfconf['edit.']['preview']=$lconf['editPreview'];
+		$mfconf['edit.']['prePDFDETXMLFunction']=$lconf['editPrePDFDETXMLFunction'];
+		$mfconf['edit.']['postPDFDETXMLFunction']=$lconf['editPostPDFDETXMLFunction'];
+		//error_log(__METHOD__.": ppdf ".$mfconf['edit.']['postPDFDETXMLFunction']);
 		$mfconf['edit.']['dontUseHidden']=$lconf['editDontUseHidden'];
 		$mfconf['edit.']['dontUseDate']=$lconf['editDontUseDate'];
 		$mfconf['edit.']['statusScreen']=$lconf['editStatusScreen'];
@@ -652,6 +667,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['create.']['orderBy.']=$conf['create.']['orderBy.'];
 		$mfconf['create.']['defaultValues.']=$conf[$pluginId.'.']['create.']['defaultValues.']?$conf[$pluginId.'.']['create.']['defaultValues.']:$conf['default.']['create.']['defaultValues.'];
 		$mfconf['list.']['whereString.']=$conf['list.']['whereString.'];
+
 		$mfconf['list.']['orderBy.']=$conf['list.']['orderBy.'];		
 		$mfconf['list.']['header']=$conf['list.']['header'];
 		$mfconf['list.']['footer']=$conf['list.']['footer'];
@@ -861,8 +877,13 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['inputvar.']['cameFromBlog']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'cameFromBlog');
 		$mfconf['inputvar.']['lV']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'lV',true);
 		$mfconf['inputvar.']['lField']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'lField',true);	
-		$mfconf['inputvar.']['rU']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'rU');
-		$mfconf['inputvar.']['rU.']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'rU.');
+		$pidsearch[]="###rU###";
+		$pidreplace[]=$mfconf['inputvar.']['rU']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'rU',true);
+		$mfconf['list.']['whereString']=str_replace($pidsearch,$pidreplace,$lconf['listWhereString']);
+		//error_log(__METHOD__.":".$mfconf['list.']['whereString'].",".print_r($pidsearch,true).",".print_r($pidreplace,true));
+		
+		
+		$mfconf['inputvar.']['rU.']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'rU.',true);
 		$mfconf['inputvar.']['cmd']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'cmd',true);
 		//$mfconf['inputvar.']['backURL']=htmlspecialchars_decode((string)$this->metafeeditlib->getMetaFeeditVar($mfconf,'backURL',true));
 		// backUrl is now also indexed on pageType (for ajax).
@@ -885,6 +906,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['inputvar.']['orderDir.']['dir']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'orderDir');
 		$resetsearch=$this->metafeeditlib->getMetaFeeditVar($mfconf,'reset');
 		$resetorderby=$this->metafeeditlib->getMetaFeeditVar($mfconf,'resetorderby');
+		$vars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
+		
 		//echo $pluginId;			
 		if ($resetsearch) {
 			unset($mfconf['list.']['forceSearch']);
@@ -1041,7 +1064,10 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// Performance Audit
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Meta feedit initialise done:']=$this->metafeeditlib->displaytime()." Seconds"; 
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Conf metafeedit size Fin ']=strlen(serialize($mfconf))." Bytes"; 
+		error_log(__METHOD__."before init ================");
 		$content=$mthfeedit->init($this,$mfconf);
+		
+		error_log(__METHOD__."after init ================");
 		// Performance audit
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 End ']=$this->metafeeditlib->displaytime(); 
 		$mfconf['disablePrefixComment']=$GLOBALS['TSFE']->config['config']['disablePrefixComment'];

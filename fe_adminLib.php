@@ -188,6 +188,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	*/
 	//function user_init($content,&$conf)	{
 	function user_init($content,$conf)	{
+		error_log(__METHOD__."start ================".$GLOBALS['TSFE']->lang);
 		$DEBUG='';
 
 	  	if ( $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector'] || is_array($conf['list.']['advancedSearchAjaxSelector.'])) {
@@ -207,9 +208,14 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		//new export class  (do we need to load this here ?)...Only in export mode ...
 		$this->metafeeditexport=t3lib_div::makeInstance('tx_metafeedit_export');
 		$this->metafeeditexport->init($this);
-
+		
 		if (t3lib_extmgm::isLoaded('ard_mcm')) {
 			$this->langHandler = t3lib_div::makeInstance('Tx_ArdMcm_Core_LanguageHandler', null, 'ard_mcm');
+			//We force language update
+			//error_log(__METHOD__.":before force update ".$GLOBALS['TSFE']->lang);
+			//$this->langHandler->update();
+			//error_log(__METHOD__.": afterforce update ".$GLOBALS['TSFE']->lang);
+			//$GLOBALS['TSFE']->lang=$this->langHandler->getLang();
 		}
 		
 		// We should handle here all GET//POST//PIVARS ... should be in pi1
@@ -241,9 +247,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 		// Getting the preview var
 		$this->preview = $this->conf['inputvar.']['preview'];
-		
+		error_log(__METHOD__.":Preview");
 		// Preview mode is forced also if edit mode is disabled but edit preview mode active		
 		if (!$this->preview) $this->preview=$this->conf['disableEdit']&&$this->conf[$this->conf['inputvar.']['cmd'].'.']['preview'] && ($this->conf['inputvar.']['cmd']=='edit'|| $this->conf['inputvar.']['cmd']=='create');
+		error_log(__METHOD__.":$this->preview,   ".$this->conf['inputvar.']['cmd'].",". $this->conf[$this->conf['inputvar.']['cmd'].'.']['preview']);
+		
 		// backURL is a given URL to return to when login is performed
 		// this should be a seperate function ...
 	
@@ -1968,7 +1976,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	*/
 	
 	function displayListScreen($TABLES,$DBSELECT,&$conf)	{
-		
+		error_log(__METHOD__);
 		if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc displaylist start:']=$this->metafeeditlib->displaytime()." Seconds";
 		// Initialisation
 		$conf['cmdmode']='list';
@@ -2219,7 +2227,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$templateExport='';
 			
 			// List Item Loop  
-			
+			error_log(__METHOD__.":llloop");
 			while(($menuRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) && ($exporttype || $lc<$nblines)) {
 				if (t3lib_extmgm::isLoaded('ard_mcm')) {
 					$this->langHandler->localizeRow($menuRow,$this->theTable);
@@ -2425,6 +2433,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$content=$this->cObj->substituteMarker($content,'###ACTIONS-LIST-BOTTOM###',$this->metafeeditlib->getListBottomActions($conf,$this));
 			
 		}
+		error_log(__METHOD__.":adter");
 		// Call to user  marker function
 		if ($conf['list.']['userFunc_afterMark']) $this->userProcess_alt($conf['list.']['userFunc_afterMark'],$conf['list.']['userFunc_afterMark.'],array($conf['list.']['whereString']));
 		//t3lib_div::callUserFunction($conf['metafeedit.']['userFunc_afterInitConf'],$conf,$this);
@@ -2434,18 +2443,21 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		//if (!$num) $content .= $this->cObj->substituteMarkerArray($this->metafeeditlib->getPlainTemplate($conf,$this->markerArray,'###TEMPLATE_EDITMENU_NOITEMS###'),$this->markerArray);
 	
 		$this->getListSums($conf,$sql,$content,$tpl,$DEBUG);
+		error_log(__METHOD__.":exporttype $exporttype");
 		switch ($exporttype)
 		{
 			case "CSV": 
 				$this->metafeeditexport->getCSV($content,$this);
 				break;
 			case "PDF": 
+				error_log(__METHOD__.":pdf");
 				$this->metafeeditexport->getPDF($content,$this,$print,$printerName,$printServerName);
 				break;
 			case "PDFTAB": 
 				$this->metafeeditexport->getPDFTAB($content,$this,$print,$printerName,$printServerName);
 				break;
 			case "PDFDET": 
+				error_log(__METHOD__.":pdfdet");
 				$this->metafeeditexport->getPDFDET($content,$this,$print,$printerName,$printServerName);
 				break;
 			case "XLS":
@@ -2681,7 +2693,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	* @see init()
 	*/
 	
-	function displayEditScreen()	{	   
+	function displayEditScreen()	{	  
+		error_log(__METHOD__);
 		// We handle here Edit mode or Preview Mode
 		// Edit Mode : User can edit fields
 		// Preview Mode : user can only see fields	
@@ -2789,7 +2802,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			// <CBY>
 			$this->markerArray['###REC_UID###']=$this->recUid;
 			//if ($GLOBALS['TSFE']->loginUser || $this->aCAuth($origArr))	{	// Must be logged in OR be authenticated by the aC code in order to edit
-			if (($GLOBALS['TSFE']->loginUser &&  $this->conf['requireLogin']) || ( $this->aCAuth($origArr)&& $this->conf['requireLogin'])||!$this->conf['requireLogin'])	{	
+			if (($GLOBALS['TSFE']->loginUser &&  $this->conf['requireLogin']) || ( $this->aCAuth($origArr)&& $this->conf['requireLogin'])||!$this->conf['requireLogin'])	{
 				// Must be logged in OR be authenticated by the aC code in order to edit
 
 				// If the recUid selects a record.... (no check here)
@@ -2865,6 +2878,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 */
 	 
 	function displayEditForm($origArr,&$conf,$exporttype='',$print='',$printerName='',$printServerName='')	{
+		error_log(__METHOD__);
 		//We merge data with override values and eval values ...
 		$currentArr = array_merge($origArr,(array)$this->dataArr);
 		
@@ -2895,7 +2909,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		}
 		if ($this->conf['debug'])	debug('displayEditForm(): '.'###TEMPLATE_EDIT'.$this->previewLabel.'###',1);
 		$templateCode = $this->cObj->getSubpart($this->templateCode, '###TEMPLATE_EDIT'.$this->previewLabel.($exporttype?'_'.$exporttype:'').'###');
-
+		//@todo handle preview template correctly
+		if (!$templateCode) $templateCode = $this->cObj->getSubpart($this->templateCode, '###TEMPLATE_EDIT'.($exporttype?'_'.$exporttype:'').'###');
+		//error_log(__METHOD__.":".$this->previewLabel.($exporttype?'_'.$exporttype:'')."-".$templateCode);
 		$failure = t3lib_div::_GP('noWarnings')?'':$this->failure;
 		if (!$failure)	{$templateCode = $this->cObj->substituteSubpart($templateCode, '###SUB_REQUIRED_FIELDS_WARNING###', '');}
 		$templateCode = $this->removeRequired($templateCode,$failure);
@@ -2994,6 +3010,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				}
 			}	
 		}
+		$this->conf['reportmode']='edit';
+		error_log(__METHOD__.":".$this->conf['reportmode']);
 		switch ($exporttype)
 		{
 			case "CSV": 
