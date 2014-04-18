@@ -99,7 +99,7 @@ class tx_metafeedit extends  tslib_pibase {
 	 		$finalCacheDirectory = PATH_site . 'typo3temp/Cache/Reports/' . $conf['pluginId'] . '/';
 	 		
 	 		if (!is_dir($finalCacheDirectory)) {
-	 			error_log(__METHOD__.":$finalCacheDirectory");
+	 			//error_log(__METHOD__.":$finalCacheDirectory");
 	 			$this->createFinalCacheDirectory($finalCacheDirectory);
 	 		}
 	 		$this->cacheDirectory = $finalCacheDirectory;
@@ -111,7 +111,7 @@ class tx_metafeedit extends  tslib_pibase {
 	  */
 	 private function getTemplate($templateName,&$conf) {
 	 	$tpl='';
-	 	error_log(__METHOD__);
+	 	//error_log(__METHOD__);
 	 	if ($conf['general.']['tplCache']) {
 	 		$file=$this->cacheDirectory.$templateName.".".$conf['LLKey'].".tpl";
 	 		if (file_exists($file) ) {
@@ -126,11 +126,11 @@ class tx_metafeedit extends  tslib_pibase {
 	  * @param string $template
 	  */
 	 private function saveTemplate($templateName,$template,&$conf) {
-	 	error_log(__METHOD__);
+	 	//error_log(__METHOD__);
 	 	
 	 	if ($conf['general.']['tplCache']) {
 	 		$file=$this->cacheDirectory.$templateName.".".$conf['LLKey'].".tpl";
-	 		error_log(__METHOD__.'we save template :'.$file);
+	 		//error_log(__METHOD__.'we save template :'.$file);
 	 		return file_put_contents($file,$template);
 	 	}
 	 }
@@ -168,7 +168,7 @@ class tx_metafeedit extends  tslib_pibase {
 	*/
 	
   	function init(&$caller,&$conf)	{
-  		error_log(__METHOD__." start ================".$GLOBALS['TSFE']->lang);
+  		//error_log(__METHOD__." start ================".$GLOBALS['TSFE']->lang);
   		$this->initReportCache($conf);
 		$this->initialize($caller,$conf);
 		 
@@ -196,7 +196,7 @@ class tx_metafeedit extends  tslib_pibase {
 		}
 
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit USER_INT call done :']=$this->metafeeditlib->displaytime()." Seconds"; 
-		error_log(__METHOD__." end ================".$GLOBALS['TSFE']->lang);
+		//error_log(__METHOD__." end ================".$GLOBALS['TSFE']->lang);
 		/**** ADDS THE REQUIRED JAVASCRIPTS ****/
 		$content = $this->getJSBefore($conf).$content;
 		// XAJAX form handler. Must not be generated if we are in an ajax call.
@@ -246,7 +246,7 @@ class tx_metafeedit extends  tslib_pibase {
 	*/
 	
 	function initialize(&$caller,&$conf) {
-		error_log(__METHOD__." start ================".$GLOBALS['TSFE']->lang);
+		//error_log(__METHOD__." start ================".$GLOBALS['TSFE']->lang);
 		$this->caller = $caller;
 		$conf['caller']=&$caller; // 100 K
 		$this->metafeeditlib=$caller->metafeeditlib;
@@ -299,7 +299,7 @@ class tx_metafeedit extends  tslib_pibase {
 		/**** Init Robert Lemkes dateselectlib if it is loaded  ****/
 		if(t3lib_extmgm::isLoaded('rlmp_dateselectlib')) tx_rlmpdateselectlib::includeLib();
 		$this->conf=&$conf; // TODO : to be removed !!! CBY
-		error_log(__METHOD__." end ================".$GLOBALS['TSFE']->lang);
+		//error_log(__METHOD__." end ================".$GLOBALS['TSFE']->lang);
   	}
   	
   	/**
@@ -412,7 +412,7 @@ class tx_metafeedit extends  tslib_pibase {
 			$this->langHandler=t3lib_div::makeInstance('Tx_ArdMcm_Core_LanguageHandler');
 			//$langHandler->update();
 			$this->langHandler->loadLangFile(t3lib_extMgm::extPath($this->extKey).'locallang.xml',$this->extKey);
-			error_log(__METHOD__.":loaded file  ".t3lib_extMgm::extPath($this->extKey).'locallang.xml');
+			//error_log(__METHOD__.":loaded file  ".t3lib_extMgm::extPath($this->extKey).'locallang.xml');
 			$conf['LLKey']=$this->LLkey=$GLOBALS['LANG']->lang;
 			$this->processTSLanguageOverrides($conf);
 			// We handle ARD FRAMEWORK LANGUAGE OVERRIDES
@@ -634,14 +634,12 @@ class tx_metafeedit extends  tslib_pibase {
 	*/
 	
 	function getDefaultTemplate(&$conf)	{
-		
 		$nbCols = $this->piVars['nbCols'];
-		
 		if ($conf['generateTemplate']||$conf['general.']['tplCache']){ // We generate all templates
 			if ($conf['general.']['tplCache']) {
 				$tpl=$this->getTemplate('full',$conf);
 				if ($tpl) {
-					error_log(__METHOD__.'Used Cached Template');
+					//error_log(__METHOD__.'Used Cached Template');
 					return $tpl;
 				}
 			}
@@ -3104,13 +3102,14 @@ Your consultancy entry has been approved!
 	 * @param	[type]		$$conf: ...
 	 * @return	[type]		...
 	 */
-  function getRequiredAuthTemplate(&$conf) {
-	if ($conf['general.']['authTpl']) return '<!-- ###TEMPLATE_AUTH### begin -->'.$conf['general.']['authTpl'].'<!-- ###TEMPLATE_AUTH### end-->';
-	return '<!-- ###TEMPLATE_AUTH### begin -->
-	'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-auth').'">Authentification failed</h1>').'
-	<div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-auth').'">For some reason the authentication failed. </div>
-	<!-- ###TEMPLATE_AUTH### end-->';
-}
+	function getRequiredAuthTemplate(&$conf) {
+		if ($conf['general.']['authTpl']) return '<!-- ###TEMPLATE_AUTH### begin -->'.$conf['general.']['authTpl'].'<!-- ###TEMPLATE_AUTH### end-->';
+		return '<!-- ###TEMPLATE_AUTH### begin -->
+			'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-auth').'">Authentification failed</h1>').'
+			<div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-auth').'">'.$this->metafeeditlib->getLLFromLabel('login_required_message',$conf).'</div>
+			<!-- ###TEMPLATE_AUTH### end-->';
+	}
+
 
 	/**
 	 * [Describe function...]

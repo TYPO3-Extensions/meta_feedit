@@ -188,7 +188,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	*/
 	//function user_init($content,&$conf)	{
 	function user_init($content,$conf)	{
-		error_log(__METHOD__."start ================".$GLOBALS['TSFE']->lang);
+		//error_log(__METHOD__."start ================".$GLOBALS['TSFE']->lang);
 		$DEBUG='';
 
 	  	if ( $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector'] || is_array($conf['list.']['advancedSearchAjaxSelector.'])) {
@@ -203,6 +203,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			// We are called by USER_INT function ...
 			$this->metafeeditlib=t3lib_div::makeInstance('tx_metafeedit_lib');
 		}
+		//error_log(__METHOD__."start ================".$this->metafeeditlib->getMemoryUsage());
 		$this->metafeeditlib->feadminlib=&$this;
 		$this->metafeedit=t3lib_div::makeInstance('tx_metafeedit'); //CBY  WHY ????
 		//new export class  (do we need to load this here ?)...Only in export mode ...
@@ -247,10 +248,10 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 		// Getting the preview var
 		$this->preview = $this->conf['inputvar.']['preview'];
-		error_log(__METHOD__.":Preview");
+		//error_log(__METHOD__.":Preview");
 		// Preview mode is forced also if edit mode is disabled but edit preview mode active		
 		if (!$this->preview) $this->preview=$this->conf['disableEdit']&&$this->conf[$this->conf['inputvar.']['cmd'].'.']['preview'] && ($this->conf['inputvar.']['cmd']=='edit'|| $this->conf['inputvar.']['cmd']=='create');
-		error_log(__METHOD__.":$this->preview,   ".$this->conf['inputvar.']['cmd'].",". $this->conf[$this->conf['inputvar.']['cmd'].'.']['preview']);
+		//error_log(__METHOD__.":$this->preview,   ".$this->conf['inputvar.']['cmd'].",". $this->conf[$this->conf['inputvar.']['cmd'].'.']['preview']);
 		
 		// backURL is a given URL to return to when login is performed
 		// this should be a seperate function ...
@@ -577,6 +578,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		}
 		if ($this->failure && !$this->conf['blogData'])	{$this->preview=0;}	// No preview flag if a evaluation failure has occured
 		$this->previewLabel = ($this->preview || $this->conf['blogData'])? '_PREVIEW' : '';	// Setting preview label prefix.
+		//error_log(__METHOD__."DISPLAY======".$this->metafeeditlib->getMemoryUsage());
 		// *********************
 		// DISPLAY FORMS:
 		// ***********************
@@ -1976,7 +1978,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	*/
 	
 	function displayListScreen($TABLES,$DBSELECT,&$conf)	{
-		error_log(__METHOD__);
 		if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc displaylist start:']=$this->metafeeditlib->displaytime()." Seconds";
 		// Initialisation
 		$conf['cmdmode']='list';
@@ -2227,11 +2228,12 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$templateExport='';
 			
 			// List Item Loop  
-			error_log(__METHOD__.":llloop");
+			$x=0;
 			while(($menuRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) && ($exporttype || $lc<$nblines)) {
 				if (t3lib_extmgm::isLoaded('ard_mcm')) {
 					$this->langHandler->localizeRow($menuRow,$this->theTable);
 				}
+				
 				//we add php calculated fields here ...
 				$this->metafeeditlib->addPhpCalcFields($menuRow,$conf);
 				$nbrows++;
@@ -2251,8 +2253,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				//if ($this->performanceaudit) t3lib_div::devLog($conf['inputvar.']['cmd']." display Item List start :".$this->metafeeditlib->displaytime(), $this->extKey );
 	
 				// We get foreign table data if necessary (should be in the the sql query ...)
-	
-				$this->foreignTableSetup($conf,$menuRow,$this->markerArray);
+				//@todo we shouldn't need this anymore
+				///$this->foreignTableSetup($conf,$menuRow,$this->markerArray);
 	
 				// to be removed as soon as i find an alternative
 	
@@ -2268,7 +2270,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	
 				$groupByFields=$this->groupByHeader($conf,$tpl['GBFCode'].$tpl['GBCode'],$menuRow,$groupBy,$lastgroupBy,$evalGroupBy,$GrpByField,$lc,$gc,$i,$pagejump,$sql,false,$DEBUG);
 				if ($pagejump) break;
-	
 				// New cols 
 	
 				// here for compatibility reasons .... to be removed
@@ -2298,7 +2299,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				
 				$markerArray = $this->cObj->fillInMarkerArray($this->markerArray, $menuRow, '', TRUE, 'FIELD_', FALSE);
 				$markerArray = $this->metafeeditlib->setCObjects($conf,$this->markerArray,$tpl['itemElCode'],$menuRow,$markerArray,'ITEM_');
-	
+				//error_log(__METHOD__." Mem x $x ma: ".$this->metafeeditlib->getMemoryUsage());
+				
 				// MODIF CBY
 				// alternate template marker ...
 				$markerArray['###LIST-ROW-ALT###']=$nar;
@@ -2343,7 +2345,10 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				}
 				//if ($conf['performanceaudit']) t3lib_div::devLog($conf['inputvar.']['cmd']." display Item List end :".$this->metafeeditlib->displaytime(), $this->extKey );
 				// End of list item iteration
+				$x++;
 			}
+			
+			//error_log(__METHOD__." Mem x $x after moop: ".$this->metafeeditlib->getMemoryUsage());
 			if ($markerArray==null) $markerArray= array(); //TODO : this should not be here
 			if ($dispDir=='Down' && $col) {
 				$col=$this->cObj->substituteSubpart($tpl['itemColCode'], '###ITEM###', $col);
@@ -2363,7 +2368,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			
 			$groupByFields=$this->groupByHeader($conf,$tpl['GBFCode'].$tpl['GBCode'],$menuRow,$groupBy,$lastgroupBy,$evalGroupBy,$GrpByField,$lc,$gc,$i,$pagejump,$sql,true,$DEBUG);
 			$out.=$groupByFields;
-		
+			//error_log(__METHOD__." Mem x $x gbh2: ".$this->metafeeditlib->getMemoryUsage());
 			$wraparray=array();
 			if ($this->metafeeditlib->is_extent($conf['list.']['disabledLinkWrap'])) $wraparray['disabledLinkWrap']=$conf['list.']['disabledLinkWrap'];
 			if ($this->metafeeditlib->is_extent($conf['list.']['inactiveLinkWrap'])) $wraparray['inactiveLinkWrap']=$conf['list.']['inactiveLinkWrap'];
@@ -2433,31 +2438,31 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$content=$this->cObj->substituteMarker($content,'###ACTIONS-LIST-BOTTOM###',$this->metafeeditlib->getListBottomActions($conf,$this));
 			
 		}
-		error_log(__METHOD__.":adter");
+		//error_log(__METHOD__." Mem x $x bf sub: ".$this->metafeeditlib->getMemoryUsage());
 		// Call to user  marker function
 		if ($conf['list.']['userFunc_afterMark']) $this->userProcess_alt($conf['list.']['userFunc_afterMark'],$conf['list.']['userFunc_afterMark.'],array($conf['list.']['whereString']));
 		//t3lib_div::callUserFunction($conf['metafeedit.']['userFunc_afterInitConf'],$conf,$this);
 		if ($conf['userFunc_afterMark']) t3lib_div::callUserFunction($conf['metafeedit.']['userFunc_afterMark'],$conf,$this);
 		$content=$this->cObj->stdWrap(trim($this->cObj->substituteMarkerArray($content, $this->markerArray)),$conf['list.']['formWrap.'][$this->theTable.'.']);
-	
+		//error_log(__METHOD__." Mem x $x af sub: ".$this->metafeeditlib->getMemoryUsage());
 		//if (!$num) $content .= $this->cObj->substituteMarkerArray($this->metafeeditlib->getPlainTemplate($conf,$this->markerArray,'###TEMPLATE_EDITMENU_NOITEMS###'),$this->markerArray);
 	
 		$this->getListSums($conf,$sql,$content,$tpl,$DEBUG);
-		error_log(__METHOD__.":exporttype $exporttype");
+		//error_log(__METHOD__.":exporttype $exporttype");
 		switch ($exporttype)
 		{
 			case "CSV": 
 				$this->metafeeditexport->getCSV($content,$this);
 				break;
 			case "PDF": 
-				error_log(__METHOD__.":pdf");
+				//error_log(__METHOD__.":pdf");
 				$this->metafeeditexport->getPDF($content,$this,$print,$printerName,$printServerName);
 				break;
 			case "PDFTAB": 
 				$this->metafeeditexport->getPDFTAB($content,$this,$print,$printerName,$printServerName);
 				break;
 			case "PDFDET": 
-				error_log(__METHOD__.":pdfdet");
+				//error_log(__METHOD__.":pdfdet");
 				$this->metafeeditexport->getPDFDET($content,$this,$print,$printerName,$printServerName);
 				break;
 			case "XLS":
@@ -2538,7 +2543,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	function foreignTableSetup(&$conf,&$menuRow,&$markerArray) {	
 		// to be removed as soon as I find an alternative
 
-		if ($conf['foreignTables']) {					
+		if ($conf['foreignTables']) {
 			//MM not implemented
 			//Not MM
 			// We get foreign key data here (this is a bad way to do it !)?
@@ -2551,9 +2556,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				//TODO handle muliple relations here (a.b.c);
 				if ($FTable) {
 					if (!$conf['TCAN'][$conf['table']]['columns'][$FTRel]['config']['MM']) {
-								$FTUid=$menuRow[$FTRel];
+						$FTUid=$menuRow[$FTRel];
 					} else {
-					//$FTUids=$this->metafeeditlib->getMMUids($conf,$conf['table'],$FTRel,$menuRow);
+						//$FTUids=$this->metafeeditlib->getMMUids($conf,$conf['table'],$FTRel,$menuRow);
 					}	
 
 					// what if multiple ???
@@ -2694,7 +2699,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	*/
 	
 	function displayEditScreen()	{	  
-		error_log(__METHOD__);
+		//error_log(__METHOD__);
 		// We handle here Edit mode or Preview Mode
 		// Edit Mode : User can edit fields
 		// Preview Mode : user can only see fields	
@@ -2878,7 +2883,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 */
 	 
 	function displayEditForm($origArr,&$conf,$exporttype='',$print='',$printerName='',$printServerName='')	{
-		error_log(__METHOD__);
+		//error_log(__METHOD__);
 		//We merge data with override values and eval values ...
 		$currentArr = array_merge($origArr,(array)$this->dataArr);
 		
@@ -3011,7 +3016,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			}	
 		}
 		$this->conf['reportmode']='edit';
-		error_log(__METHOD__.":".$this->conf['reportmode']);
+		//error_log(__METHOD__.":".$this->conf['reportmode']);
 		switch ($exporttype)
 		{
 			case "CSV": 

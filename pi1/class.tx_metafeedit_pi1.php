@@ -56,13 +56,15 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 	*/
 	
 	function main($content='',$conf='',$configurationFile=''){
-		error_log(__METHOD__." start ================".$GLOBALS['TSFE']->lang);
+		//error_log(__METHOD__." start ================".$GLOBALS['TSFE']->lang);
 		$TTA[]=  "<br/>main Elapsed Time :".(microtime(true)-$GLOBALS['g_TT']).' s';
 		$DEBUG='';
 		//global $PAGES_TYPES;		
 		if (!defined ('PATH_typo3conf')) die ('Could not access this script directly!');	 
 		// Meta feedit library init
 		$this->metafeeditlib=t3lib_div::makeInstance('tx_metafeedit_lib');
+		//error_log(__METHOD__."main ================".$this->metafeeditlib->getMemoryUsage());
+		
 		$GLOBALS['TSFE']->includeTCA();
 		$this->pi_setPiVarDefaults();
 		$this->pi_initPIflexForm(); // Init FlexForm configuration for plugin
@@ -103,7 +105,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			// Assign the flexform data to a local variable for easier access
 			$piFlexForm=$flexForm=$this->cObj->data['pi_flexform'];
 		}
-		error_log(__METHOD__.":".$conf['includeLibs']);
+		//error_log(__METHOD__.":".$conf['includeLibs']);
 		//"includeLibs":"typo3conf\/ext\/meta_feedit\/pi1\/class.tx_metafeedit_pi1.php",
 		//"userFunc":"tx_metafeedit_pi1->main",
 		$versionArray=explode('.',phpversion());
@@ -208,7 +210,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
    			require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/Lib/PidHandler.php');
 			$pidHandler=t3lib_div::makeInstance('Tx_MetaFeedit_Lib_PidHandler');
 			$langHandler=t3lib_div::makeInstance('Tx_ArdMcm_Core_LanguageHandler');
-			error_log(__METHOD__.":".$GLOBALS['LANG']->lang);
+			//error_log(__METHOD__.":".$GLOBALS['LANG']->lang);
 			foreach($GLOBALS['TYPO3_CONF_VARS']['ARDDESKTOP']['extensionpids'] as $extension=>$extensionconf) {
 				$defaultpid=0;
 				//$root=$extensionconf['rootpid']?$extensionconf['rootpid']:$defaultpid;
@@ -257,7 +259,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		
 		// CBY : pluginId !!! must add flexformupdate here ...
 		$mfconf['general.']['pluginUid']=$this->cObj->data['uid'];
-		$pluginId=$mfconf['pluginId']=$lconf['pluginId']?$lconf['pluginId']:$this->cObj->data['uid'];	
+		$pluginId=$mfconf['pluginId']=$lconf['pluginId']?$lconf['pluginId']:(t3lib_div::_GP('config')?t3lib_div::_GP('config'):$this->cObj->data['uid']);	
 		
 		//echo json_encode($flexForm);
 		//$storeConf['lConf']=$lconf;
@@ -390,8 +392,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// advancedSearch
 		$mfconf['list.']['advancedSearchFields']=$this->correctFieldSets($lconf['advancedSearchFields']);
 		$mfconf['list.']['advancedSearch']=$lconf['advancedSearch'];
-		//error_log("____________________________0___________________________");
-		//error_log(print_r($conf['typoscript.'],true));
+
 		$mfconf['list.']['advancedSearch.']=$conf['advancedSearch.'];
 		$mfconf['list.']['advancedSearchConfig.']=$conf['advancedSearchConfig.'];
 		$mfconf['list.']['title']=$lconf['listTitle'];
@@ -849,6 +850,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// is this necessary ?
 		$GLOBALS["TSFE"]->fe_user->fetchSessionData();
 		$metafeeditvars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
+		//error_log(__METHOD__.':sgk '.print_r($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId],true));
 		if ($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['referer']) $mfconf['piVars']['referer'][$pluginId]=$metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['referer'];
 				
 		// We handle here all transmitted variables ....
@@ -895,7 +897,17 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['inputvar.']['blog']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'blog');
 		$mfconf['inputvar.']['doNotSave']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'doNotSave');
 		$mfconf['inputvar.']['submit']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'submit');
-		$mfconf['inputvar.']['advancedSearch']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'advancedSearch',true);
+		//error_log(__METHOD__.':bef '.print_r($mfconf['inputvar.']['advancedSearch'],true));
+		if ( $this->piVars['filter']) {
+			//External filter is given we generate advanced search if necessary
+			//error_log(__METHOD__.':external filter');
+			$mfconf['inputvar.']['advancedSearch']=$this->metafeeditlib->getAdvancedSearchFromFilter($mfconf);
+		} else {
+			//error_log(__METHOD__.': no filter');
+			$mfconf['inputvar.']['advancedSearch']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'advancedSearch',true);
+			
+		}
+		//error_log(__METHOD__.':advs '.print_r($mfconf['inputvar.']['advancedSearch'],true));
 		$mfconf['inputvar.']['pointer']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'pointer',false);
 		$mfconf['inputvar.']['sword']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'sword',true);
 		$mfconf['inputvar.']['sort']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'sort',true);
@@ -906,8 +918,9 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['inputvar.']['orderDir.']['dir']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'orderDir');
 		$resetsearch=$this->metafeeditlib->getMetaFeeditVar($mfconf,'reset');
 		$resetorderby=$this->metafeeditlib->getMetaFeeditVar($mfconf,'resetorderby');
-		$vars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
-		
+		//@todo can this be removed ?
+		//$vars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
+		//error_log(__METHOD__.':sgk '.print_r($vars[$GLOBALS['TSFE']->id][$pluginId],true));
 		//echo $pluginId;			
 		if ($resetsearch) {
 			unset($mfconf['list.']['forceSearch']);
@@ -920,6 +933,11 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			unset ( $_POST['tx_metafeedit']['advancedSearch']);
 			unset ( $this->piVars['advancedSearch']);
 			unset ($mfconf['piVars']['advancedSearch']);
+			//if ( $this->piVars['filter']) {
+				//External filter is given we generate advanced search if necessary
+				//error_log(__METHOD__.':external filter');
+				//$mfconf['inputvar.']['advancedSearch']=$this->metafeeditlib->getAdvancedSearchFromFilter($mfconf);
+			//}
 			unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sword']);
 			unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sortLetter']);
 			unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['advancedSearch']);
@@ -1002,6 +1020,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		}
 		
 		if (!is_array($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId])) $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]=$mfconf['inputvar.'];
+		//error_log(__METHOD__.':st '.print_r($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId],true));
 		$GLOBALS["TSFE"]->fe_user->setKey('ses','metafeeditvars',$metafeeditvars);
 		$GLOBALS["TSFE"]->fe_user->storeSessionData();
  		// We update backURL depending on configuration parameters =========================
@@ -1064,10 +1083,10 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// Performance Audit
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Meta feedit initialise done:']=$this->metafeeditlib->displaytime()." Seconds"; 
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 Conf metafeedit size Fin ']=strlen(serialize($mfconf))." Bytes"; 
-		error_log(__METHOD__."before init ================");
+		//error_log(__METHOD__."before init ================");
 		$content=$mthfeedit->init($this,$mfconf);
 		
-		error_log(__METHOD__."after init ================");
+		//error_log(__METHOD__."after init ================");
 		// Performance audit
 		if ($mfconf['performanceaudit']) $this->perfArray['Perf Pi1 End ']=$this->metafeeditlib->displaytime(); 
 		$mfconf['disablePrefixComment']=$GLOBALS['TSFE']->config['config']['disablePrefixComment'];

@@ -2114,13 +2114,71 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		}
 		return $specialConf;
 	}
-	
+	/**
+	 * We create list where from external filter definition
+	 * @param array $conf
+	 * @param array $sql
+	 */
+	function getFilter(&$conf,&$sql) {
+		$json=$conf['piVars']['filter'];
+		$filter=json_decode($json);
+		$externalFilter='';
+		if (count($filter)) {
+			$externalFilter.=' and (';
+			$first=true;
+			foreach($filter as $filterCriteria) {
+				$w=($filterCriteria->t?$filterCriteria->t.'.':'').$filterCriteria->f.' '.$filterCriteria->o.' '.$filterCriteria->v;
+				$externalFilter.=$first?$w:' and '.$w;
+				$first=false;
+			}
+			$externalFilter.=')';
+			$sql['where'].=$externalFilter;
+			$sql['externalFilter']=$externalFilter;
+			
+		}
+	}
+	/**
+	 * We create list where from external filter definition
+	 * @param array $conf
+	 * @param array $sql
+	 */
+	function getAdvancedSearchFromFilter(&$conf) {
+		$json=$conf['piVars']['filter'];
+		$filter=json_decode($json);
+		//error_log(__METHOD__.':f '.print_r($filter,true));
+		$advSearch=array();
+		if (count($filter)) {
+			$first=true;
+			foreach($filter as $filterCriteria) {
+				switch ($filterCriteria->o) {
+					case '=':
+					case 'like':
+						$advSearch[$filterCriteria->f]=str_replace(array("'","%"),array("",""), $filterCriteria->v);
+						break;
+					default:
+						//$w=($filterCriteria->t?$filterCriteria->t.'.':'').$filterCriteria->f.' '.$filterCriteria->o.' '.$filterCriteria->v;
+						if (is_array($advSearch[$filterCriteria->f])) {
+							$advSearch[$filterCriteria->f]['op']='>ts<';
+							$advSearch[$filterCriteria->f]['valsup']=$filterCriteria->v;
+						} else {
+							$advSearch[$filterCriteria->f]=array();
+							$advSearch[$filterCriteria->f]['op']=$filterCriteria->o;
+							$advSearch[$filterCriteria->f]['val']=$filterCriteria->v;
+						}
+						break;
+				}
+				$first=false;
+			}
+		}
+		//error_log(__METHOD__.':a '.print_r($advSearch,true));
+		return $advSearch;
+	}
 	/**
 	* getFieldSpecialConfFromType Gets the special RTE configurations in TCA  for a field of a record knowing it's type. The configuration is placed in the type array.
 	*
 	* @param	array $TCA	TCA configuration array of edited table
 	* @param 	string $fN		string the fieldname to get the configurations for
-	* @param	string $type t^pe value of record
+	* @param	string $type type value of record
 	* @return	array		the specialconf array
 	* @author christophe Balisky christophe@balisky.org
 	* @todo check if functions works on sublevel table fields...
@@ -2168,20 +2226,47 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			$vars=$vars[$GLOBALS['TSFE']->id];
 			if (is_array($vars[$pluginId])) $res[$pluginId]=$vars[$pluginId][$varname];
 		}
-
+		/*if ($varname=='advancedSearch') {
+			error_log(__METHOD__.":".$GLOBALS['TSFE']->id." - $pluginId ,".print_r($res[$pluginId],true));
+		}*/
 		// we look in the Get & post
-		if (t3lib_div::_GP($varname)) {
-			$res=t3lib_div::_GP($varname);
+		$gp=t3lib_div::_GP($varname);
+		if ($gp) {
+			if (is_array($res[$pluginId]) && is_array($gp)) {
+				$res[$pluginId]=array_merge($res[$pluginId],$gp);
+			} else {
+				$res=$gp;
+			}
 		}
-	  
+		/*if ($varname=='advancedSearch') {
+			error_log(__METHOD__.":_GP".$GLOBALS['TSFE']->id." - $pluginId ,".print_r($res,true));
+		}*/
 		// We look into the piVars
-	  
+	
 		if ($piVars[$varname]) {
-			$res=$piVars[$varname];
+			if (is_array($res[$pluginId]) && is_array($piVars[$varname][$pluginId])) {
+				/*if ($varname=='advancedSearch') {
+					error_log(__METHOD__.":-0".print_r($res[$pluginId],true));
+					error_log(__METHOD__.":-1".print_r($piVars[$varname][$pluginId],true));
+				}*/
+				
+				$res[$pluginId]=array_merge($res[$pluginId],$piVars[$varname][$pluginId]);
+				/*if ($varname=='advancedSearch') {
+					error_log(__METHOD__.":-3".print_r($res[$pluginId],true));
+				}*/
+			} else {
+				$res=$piVars[$varname];
+			}
 		}
-		// we check if typoscript override is present
+		/*if ($varname=='advancedSearch') {
+			error_log(__METHOD__.":piVars ".print_r($piVars,true));
+			error_log(__METHOD__.":piVars".$GLOBALS['TSFE']->id." - $pluginId ,".print_r($res,true));
+		}*/
+			// we check if typoscript override is present
 		if ($typoscript[$varname.'.']) $res=$typoscript[$varname.'.'];
-		 
+		/*if ($varname=='advancedSearch') {
+			error_log(__METHOD__.":typoscript".$GLOBALS['TSFE']->id." - $pluginId ,".print_r($res,true));
+		}*/
 		// we check variable against pluginId
 		if (is_array($res)) {
 			if (array_key_exists($pluginId,$res)) {
@@ -3981,11 +4066,22 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		$this->getRUJoin($conf,$sql);		
 		$this->getParentJoin($conf,$sql);
 		$this->getCalcFields($conf,$sql);
-
-		if ($conf['list.']['searchBox']) $this->getFullTextSearchWhere($conf,$sql,$markerArray);
-		if ($conf['list.']['alphabeticalSearch']) $this->getAlphabeticalSearchWhere($conf,$sql);
-		if ($conf['list.']['advancedSearch']) $this->getAdvancedSearchWhere($conf,$sql,$markerArray);
-		if ($conf['list.']['calendarSearch']) $this->getCalendarSearchWhere($conf,$sql);
+		// Filters
+		
+		if ($conf['piVars']['filter']) {
+			// Filter coming from extjs interface
+			$this->getFilter($conf,$sql);
+			if ($conf['list.']['searchBox']) $this->getFullTextSearchWhere($conf,$sql,$markerArray,false);
+			if ($conf['list.']['alphabeticalSearch']) $this->getAlphabeticalSearchWhere($conf,$sql,false);
+			if ($conf['list.']['advancedSearch']) $this->getAdvancedSearchWhere($conf,$sql,$markerArray,false);
+			if ($conf['list.']['calendarSearch']) $this->getCalendarSearchWhere($conf,$sql,false);
+		} else {
+	
+			if ($conf['list.']['searchBox']) $this->getFullTextSearchWhere($conf,$sql,$markerArray);
+			if ($conf['list.']['alphabeticalSearch']) $this->getAlphabeticalSearchWhere($conf,$sql);
+			if ($conf['list.']['advancedSearch']) $this->getAdvancedSearchWhere($conf,$sql,$markerArray);
+			if ($conf['list.']['calendarSearch']) $this->getCalendarSearchWhere($conf,$sql);
+		}
 		$this->getUserWhereString($conf,$sql);
 		
 		// MODIF CBY
@@ -4012,7 +4108,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			$sql['fromTables'].=$sql['join.'][$jT];
 		}
 		$conf['list.']['sql']=&$sql;
- 		if ($conf['debug.']['sql']) $DEBUG.="<br/>LIST SQL ARRAY <br/>".Tx_MetaFeedit_Lib_ViewArray::viewArray($sql);   
+ 		if ($conf['debug.']['sql']) $DEBUG.="<br/>LIST SQL ARRAY <br/><pre>".print_r($sql,true)."</pre>";   
 		return $sql;
 	}
 
@@ -4246,11 +4342,27 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	function getUserWhereString(&$conf,&$sql) {
 		$conf['parentObj']=&$this->feadminlib;
 		if ($conf['list.']['userFunc_afterWhere']) t3lib_div::callUserFunction($conf['list.']['userFunc_afterWhere'],$conf,$this->feadminlib);
-		error_log(__METHOD__.":conf[".$conf['cmdmode'] . "][whereString]:".$conf[$conf['cmdmode'] . '.']['whereString']);
+		//error_log(__METHOD__.":conf[".$conf['cmdmode'] . "][whereString]:".$conf[$conf['cmdmode'] . '.']['whereString']);
 		if ($conf[$conf['cmdmode'] . '.']['whereString'])	$sql['userWhereString']=' AND '.$conf[$conf['cmdmode'] . '.']['whereString'];
 		$sql['where'].= $sql['userWhereString'];
 	}
-
+	
+	/**
+	 * Returns current memory usage of php script
+	 * @return string
+	 */
+	function getMemoryUsage() {
+		$mem_usage = memory_get_usage(true);
+	
+		if ($mem_usage < 1024)
+			return $mem_usage." bytes";
+		elseif ($mem_usage < 1048576)
+			return round($mem_usage/1024,2)." kilobytes";
+		else
+			return round($mem_usage/1048576,2)." megabytes";
+	
+	}
+	
 	/**
 	* getAlphabeticalSearchWhere : Alphabetical Search Functions
 	*
@@ -4259,7 +4371,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	* @return	[type]		...
 	*/
 	
-	function getAlphabeticalSearchWhere(&$conf,&$sql) {
+	function getAlphabeticalSearchWhere(&$conf,&$sql,$updateWhere=true) {
 		$point=strpos($conf['table_label'],'.');
 		if ($point) {
 			$relArr=t3lib_div::trimexplode('.',$conf['table_label']);
@@ -4271,7 +4383,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		}
 		//$sql['alphabeticalWhere']=$conf['piVars']['sortLetter'][$conf['pluginId']]?' AND '.$Field." like '".$conf['piVars']['sortLetter'][$conf['pluginId']]."%' ":'';
 		$sql['alphabeticalWhere']=$conf['inputvar.']['sortLetter']?' AND '.$Field." like '".$conf['inputvar.']['sortLetter']."%' ":'';
-		$sql['where'].=$sql['alphabeticalWhere'];
+		if ($updateWhere) $sql['where'].=$sql['alphabeticalWhere'];
 	}
 	
 	/**
@@ -4282,7 +4394,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	* @return	[type]		...
 	*/
 	   
-	function getFullTextSearchWhere(&$conf,&$sql,&$markerArray) {
+	function getFullTextSearchWhere(&$conf,&$sql,&$markerArray,$updateWhere=true) {
 		//MODIF CBY
 		$this->feadminlib->internal['searchFieldList']='';	
 		$table=$conf['table'];
@@ -4302,7 +4414,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 
 		$markerArray['###FTSEARCHBOXVAL###']=$conf['inputvar.']['sword'];
 		$sql['fullTextWhere']=$this->cObj->searchWhere($conf['inputvar.']['sword'],$this->feadminlib->internal['searchFieldList'],$table);
-		$sql['where'].=$sql['fullTextWhere'];
+		if ($updateWhere) $sql['where'].=$sql['fullTextWhere'];
 	}
 	/**
 	* transformGroupByData : transforms data for groupByBreak Tests through ts configuration
@@ -4570,35 +4682,26 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	
 	function getOrderBy(&$conf,&$sql) {
 		$table=$conf['table'];
+		//error_log(__METHOD__.":".print_r($conf['list.'],true));
 		if ($conf['list.']['sortFields']){
-			//MODIF CBY list($this->internal['orderBy'], $this->internal['descFlag']) = explode(':', $this->piVars['sort']);
-			
-			//$conf['debug.']['debugString'].="<br> sort ### :".$conf['inputvar.']['sort'];
-			
 			list($this->feadminlib->internal['orderBy'], $this->feadminlib->internal['descFlag']) = explode(':', $conf['inputvar.']['sort']);
 			
-			//$conf['debug.']['debugString'].="<br> internal 0 ### :".$this->feadminlib->internal['descFlag']." ob :".$this->feadminlib->internal['orderBy'];
-
 			if ($this->feadminlib->internal['orderBy'])	{
 	  			$sql['orderBy'][] = $this->makeFieldAlias($conf['table'],$this->feadminlib->internal['orderBy'],$conf).($this->feadminlib->internal['descFlag']?' DESC':' ASC');
 			}
 		}
-		//MODIF CBY if ($conf['list.']['orderByFields'] && !$this->piVars['sort']){
-		if ($conf['list.']['orderByFields'] && !$conf['inputvar.']['sort']){
+		//error_log(__METHOD__.":1".print_r($sql['orderBy'],true));
+		if ($conf['list.']['orderByFields'] && (!$conf['inputvar.']['sort'] || !$conf['list.']['sortFields'])){
 			$orderByFields = explode(',', $conf['list.']['orderByFields']);
 			foreach($orderByFields as $fieldName) {
 				$fN2=t3lib_div::trimexplode(':',$fieldName);
 				$fieldName=$fN2[0];
 				$dir=" ".$fN2[1];
 				$fieldAlias = $this->makeFieldAlias($conf['table'],$fieldName,$conf);
-				/*if ($fN2[2]) {
-					$sql['orderBy'][] = $fieldName.$dir;
-				} else {
-					$sql['orderBy'][] = strpos($fieldName,'.')?$table.'_'.$fieldName.$dir:$table.'.'.$fieldName.$dir;
-				}*/
 				 $sql['orderBy'][]= $fieldAlias.$dir;
 			}
 		}
+		//error_log(__METHOD__.":2".print_r($sql['orderBy'],true));
 		if ($conf['list.']['orderByString']) {
 			$obsA=t3lib_div::trimexplode(',',$conf['list.']['orderByString']);
 			foreach($obsA as $ob) {
@@ -4658,7 +4761,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	}
 	/**
 	 * Returns human readable search filter
-	 * @param unknown_type $conf
+	 * @param array $conf
 	 */
 	function getHumanReadableSearchFilter(&$conf) {
 		// TODO  We get Search Filter here (MUST BE REPLACED by tag !!!!!)....
@@ -4666,7 +4769,8 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		//-- Should be put in fe_adminLib
 		$fulltext=$conf['inputvar.']['sword']?$this->getLL("fulltext_search",$conf).' = "'.$conf['inputvar.']['sword'].'"':'';
 		$obs=t3lib_div::trimexplode(':',$conf['inputvar.']['sort']);
-		$orderby=$obs[0]?$this->getLL("order_by",$conf).' '.$this->getLL($obs[0],$conf).' '.($obs[1]?$this->getLL("ascending",$conf):$this->getLL("descending",$conf)):'';
+		//error_log(__METHOD__.":".print_r($obs,true));
+		$orderby=$obs[0]?$this->getLL("order_by",$conf).' '.$this->getLL($conf['TCAN'][$conf['table']]['columns'][$obs[0]]['label'],$conf).' '.($obs[1]?$this->getLL("ascending",$conf):$this->getLL("descending",$conf)):'';
 		$filterArray=array();
 		$recherche='';
 		if ($fulltext) $filterArray[]=$fulltext;
@@ -4682,8 +4786,9 @@ class tx_metafeedit_lib implements t3lib_singleton {
 						if ($isset) {
 							switch($val['op']) {
 								case '><' :
+								case '>ts<' :
 									$recherche .= ($this->is_extent($val['val'])&&$this->is_extent($val['valsup']))?$val['val'].' &lt; '.$this->getLLFromLabel($ftA['fieldLabel'], $conf).' &gt; '.$val['valsup']:'';
-									break;
+									break;								
 								default:
 									$recherche .= $this->getLLFromLabel($ftA['fieldLabel'], $conf).' '.($this->is_extent($val)?$val['op'].' '.$val['val']:'');
 							}
@@ -4780,7 +4885,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	* @return	[type]		...
 	*/
 
-	function getAdvancedSearchWhere(&$conf,&$sql,&$markerArray) {
+	function getAdvancedSearchWhere(&$conf,&$sql,&$markerArray,$updateWhere=true) {
 		$fields=$conf['list.']['advancedSearchFields']?$conf['list.']['advancedSearchFields']:($conf['list.']['show_fields']?$conf['list.']['show_fields']:'');
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
 		foreach($fieldArray as $FN) {
@@ -4793,16 +4898,21 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		}
 		$table=$conf['table'];
 		$advancedSearch=$conf['inputvar.']['advancedSearch'];
-		//TODO a fiabiliser	
+		
+		//@TODO a fiabiliser	
+		
 		$GLOBALS["TSFE"]->fe_user->fetchSessionData();
 		$metafeeditvars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
 		$metafeeditvars[$GLOBALS['TSFE']->id][$conf['pluginId']]['advancedSearch']=$advancedSearch;
 		$GLOBALS["TSFE"]->fe_user->setKey('ses','metafeeditvars',$metafeeditvars);
 		$GLOBALS["TSFE"]->fe_user->storeSessionData();
+		
+		
 		$pluginId=$conf['pluginId'];
 		if ($conf['typoscript.'][$pluginId.'.']['advancedSearch.']) $advancedSearchDefault = $conf['typoscript.'][$pluginId.'.']['advancedSearch.'];
 		//error_log("_____________________1__________________________________");
 		//error_log(print_r($advancedSearchDefault,true));
+		//error_log(__METHOD__.':'.print_r($conf['inputvar.']['advancedSearch'],true));
 		if (is_array($advancedSearch) && is_array($advancedSearchDefault)) {
 			foreach($advancedSearch as $key=>$value) {
 				if ($advancedSearchDefault[$key.'.'] && is_array($advancedSearch[$key])) $advancedSearch[$key] = array_merge($advancedSearch[$key], $advancedSearchDefault[$key.'.']);
@@ -4810,6 +4920,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			}
 		}
 		elseif($advancedSearchDefault) {
+			//We handle search default values
 			$advancedSearch=array();
 			foreach($advancedSearchDefault as $key=>$value) {
 				$key = substr($key, 0, -1);
@@ -4866,7 +4977,6 @@ class tx_metafeedit_lib implements t3lib_singleton {
 					$my_op = $value['op'];
 					$my_val = $value['val'];
 					$my_valsup = $value['valsup'];
-					
 				} elseif (is_array($value['default.'])){
 					$my_op = $value['default.']['op'];
 					//TODO format date get default format
@@ -4901,7 +5011,6 @@ class tx_metafeedit_lib implements t3lib_singleton {
 				  			 $markerArray['###ASCHECKEDBETWEEN_'.$key.'###']='checked="checked"';
 
 								$d=explode('-',$valdatesup);
-								//$valsup = strtotime($d[2].'/'.$d[1].'/'.$d[0]);
 								$valsup=mktime(0,0,0,$d[1],$d[0],$d[2]);
 								//$sql['advancedWhere'].=" AND $table.$key between '$val' and '$valsup' ";
 								$sql['advancedWhere'].=" AND (".$curTable['tableAlias'].".".$curTable['fNiD']." between '$val' and '$valsup') ";
@@ -4921,6 +5030,9 @@ class tx_metafeedit_lib implements t3lib_singleton {
 								} elseif ($my_op=='>') {
 									$sql['advancedWhere'].=" AND (".$curTable['tableAlias'].".".$curTable['fNiD']." ".$my_op." '$val') ";
 									$markerArray['###ASCHECKEDSUP_'.$key.'###']='checked="checked"';
+								} elseif ($my_op=='in') {
+									$sql['advancedWhere'].=" AND (".$curTable['tableAlias'].".".$curTable['fNiD']." ".$my_op." $my_val) ";
+									//$markerArray['###ASCHECKEDSUP_'.$key.'###']='checked="checked"';
 								}
 							}
 						}
@@ -4929,11 +5041,11 @@ class tx_metafeedit_lib implements t3lib_singleton {
 				if (!$markerArray['###ASCHECKEDINF_'.$key.'###'] && !$markerArray['###ASCHECKEDSUP_'.$key.'###'] && !$markerArray['###ASCHECKEDBETWEEN_'.$key.'###']) $markerArray['###ASCHECKEDEQUAL_'.$key.'###']='checked="checked"';
 			}//end foreach..
 		}
-		$sql['where'].=$sql['advancedWhere'];
+		if ($updateWhere) $sql['where'].=$sql['advancedWhere'];
 	}		
 	
 	// calendarSearch
-	function getCalendarSearchWhere(&$conf,&$sql) {
+	function getCalendarSearchWhere(&$conf,&$sql,$updateWhere=true) {
 		$table=$conf['table'];
 		$calendarSearch=$conf['piVars']['calendarSearch'][$conf['pluginId']];
 		if (is_array($calendarSearch)) {
@@ -4977,7 +5089,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 				}
 
 		}
-		$sql['where'].=$sql['calendarWhere'];
+		if ($updateWhere) $sql['where'].=$sql['calendarWhere'];
 
 	}
 	
@@ -5073,6 +5185,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		if (is_array($conf['inputvar.']['advancedSearch'])) {	
 			$recherche=$this->getHumanReadableSearchFilter($conf);
 		}
+		//error_log(__METHOD__.":$title - $recherche");
 		return $title;
 
 	}
