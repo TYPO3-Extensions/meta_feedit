@@ -897,16 +897,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['inputvar.']['blog']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'blog');
 		$mfconf['inputvar.']['doNotSave']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'doNotSave');
 		$mfconf['inputvar.']['submit']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'submit');
-		//error_log(__METHOD__.':bef '.print_r($mfconf['inputvar.']['advancedSearch'],true));
-		if ( $this->piVars['filter']) {
-			//External filter is given we generate advanced search if necessary
-			//error_log(__METHOD__.':external filter');
-			$mfconf['inputvar.']['advancedSearch']=$this->metafeeditlib->getAdvancedSearchFromFilter($mfconf);
-		} else {
-			//error_log(__METHOD__.': no filter');
-			$mfconf['inputvar.']['advancedSearch']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'advancedSearch',true);
-			
-		}
+		
 		//error_log(__METHOD__.':advs '.print_r($mfconf['inputvar.']['advancedSearch'],true));
 		$mfconf['inputvar.']['pointer']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'pointer',false);
 		$mfconf['inputvar.']['sword']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'sword',true);
@@ -921,7 +912,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		//@todo can this be removed ?
 		//$vars=$GLOBALS["TSFE"]->fe_user->getKey('ses','metafeeditvars');
 		//error_log(__METHOD__.':sgk '.print_r($vars[$GLOBALS['TSFE']->id][$pluginId],true));
-		//echo $pluginId;			
+		//echo $pluginId;	
+		//error_log(__METHOD__."1:".print_r($mfconf['inputvar.']['advancedSearch'],true));
 		if ($resetsearch) {
 			unset($mfconf['list.']['forceSearch']);
 			unset ( $mfconf['inputvar.']['advancedSearch']);
@@ -933,21 +925,29 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			unset ( $_POST['tx_metafeedit']['advancedSearch']);
 			unset ( $this->piVars['advancedSearch']);
 			unset ($mfconf['piVars']['advancedSearch']);
-			//if ( $this->piVars['filter']) {
-				//External filter is given we generate advanced search if necessary
-				//error_log(__METHOD__.':external filter');
-				//$mfconf['inputvar.']['advancedSearch']=$this->metafeeditlib->getAdvancedSearchFromFilter($mfconf);
-			//}
 			unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sword']);
 			unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sortLetter']);
 			unset ( $metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['advancedSearch']);
 		}
+		
 		if ($resetorderby) {
 			unset ( $mfconf['inputvar.']['sort']);
 			unset ( $metafeeditvars[$pluginId]['sort']);
 			if (is_array($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId])) unset ($metafeeditvars[$GLOBALS['TSFE']->id][$pluginId]['sort']);
 			unset ( $_GET['tx_metafeedit']['resetorderby']);
 		}
+		// We handle external sql filter comming from extjs IHM for example
+		if ( $this->piVars['filter']) {
+			//External filter is given we generate advanced search if necessary
+			
+			$mfconf['inputvar.']['advancedSearch']=$this->metafeeditlib->getAdvancedSearchFromFilter($mfconf);
+			
+		} else {
+			//error_log(__METHOD__.': no filter');
+			$mfconf['inputvar.']['advancedSearch']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'advancedSearch',true);
+			
+		}
+		
 		// persistent variables :		
 
 		$mfconf['blogData']=$mfconf['inputvar.']['blog'];
@@ -979,7 +979,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 				}
 			}
 		}
-		
 		
 		// we handle back url here by calculating referer..
 		//9002 is page type if called through ajax

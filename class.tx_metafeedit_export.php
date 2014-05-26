@@ -30,6 +30,130 @@
 define('EURO',chr(128));
 
 if (t3lib_extMgm::isLoaded('fpdf')) require_once(t3lib_extMgm::extPath('fpdf').'class.tx_fpdf.php');
+require_once(dirname(__FILE__).'/lib/tcpdf/tcpdf_barcodes_2d.php');
+require_once(dirname(__FILE__).'/lib/tcpdf/tcpdf_barcodes_1d.php');
+class tx_metafeedit_2DBarcode extends TCPDF2DBarcode {
+	
+	
+	/**
+	 * 
+	 * @param unknown_type $w
+	 * @param unknown_type $h
+	 * @param unknown_type $color
+	 */
+	public function getBarcodeImage($w=3, $h=3, $color=array(0,0,0)) {
+		// calculate image size
+		//error_log(__METHOD__);
+		$width = ($this->barcode_array['num_cols'] * $w);
+		$height = ($this->barcode_array['num_rows'] * $h);
+		if (function_exists('imagecreate')) {
+			// GD library
+			$imagick = false;
+			$png = imagecreate($width, $height);
+			$bgcol = imagecolorallocate($png, 255, 255, 255);
+			imagecolortransparent($png, $bgcol);
+			$fgcol = imagecolorallocate($png, $color[0], $color[1], $color[2]);
+		} elseif (extension_loaded('imagick')) {
+			$imagick = true;
+			$bgcol = new imagickpixel('rgb(255,255,255');
+			$fgcol = new imagickpixel('rgb('.$color[0].','.$color[1].','.$color[2].')');
+			$png = new Imagick();
+			$png->newImage($width, $height, 'none', 'png');
+			$bar = new imagickdraw();
+			$bar->setfillcolor($fgcol);
+		} else {
+			return false;
+		}
+		// print barcode elements
+		$y = 0;
+		// for each row
+		for ($r = 0; $r < $this->barcode_array['num_rows']; ++$r) {
+			$x = 0;
+			// for each column
+			for ($c = 0; $c < $this->barcode_array['num_cols']; ++$c) {
+				if ($this->barcode_array['bcode'][$r][$c] == 1) {
+					// draw a single barcode cell
+					if ($imagick) {
+						$bar->rectangle($x, $y, ($x + $w - 1), ($y + $h - 1));
+					} else {
+						imagefilledrectangle($png, $x, $y, ($x + $w - 1), ($y + $h - 1), $fgcol);
+					}
+				}
+				$x += $w;
+			}
+			$y += $h;
+		}
+		$filename =  'typo3temp/Cache/Barcodes/2D' .uniqid() .'.png';
+		//error_log(__METHOD__.":$filename");
+		if ($imagick) {
+			$png->drawimage($bar);
+		} else {
+			imagepng($png,PATH_site .$filename);
+			imagedestroy($png);
+			return $filename;
+		}
+	}
+}
+class tx_metafeedit_1DBarcode extends TCPDFBarcode {
+
+
+	/**
+	 * Return a PNG image representation of barcode (requires GD or Imagick library).
+	 * @param $w (int) Width of a single bar element in pixels.
+	 * @param $h (int) Height of a single bar element in pixels.
+	 * @param $color (array) RGB (0-255) foreground color for bar elements (background is transparent).
+ 	 * @return image or false in case of error.
+ 	 * @public
+	 */
+	public function getBarcodePNG($w=2, $h=30, $color=array(0,0,0)) {
+		// calculate image size
+		$width = ($this->barcode_array['maxw'] * $w);
+		$height = $h;
+		if (function_exists('imagecreate')) {
+			// GD library
+			$imagick = false;
+			$png = imagecreate($width, $height);
+			$bgcol = imagecolorallocate($png, 255, 255, 255);
+			imagecolortransparent($png, $bgcol);
+			$fgcol = imagecolorallocate($png, $color[0], $color[1], $color[2]);
+		} elseif (extension_loaded('imagick')) {
+			$imagick = true;
+			$bgcol = new imagickpixel('rgb(255,255,255');
+			$fgcol = new imagickpixel('rgb('.$color[0].','.$color[1].','.$color[2].')');
+			$png = new Imagick();
+			$png->newImage($width, $height, 'none', 'png');
+			$bar = new imagickdraw();
+			$bar->setfillcolor($fgcol);
+		} else {
+			return false;
+		}
+		// print bars
+		$x = 0;
+		foreach ($this->barcode_array['bcode'] as $k => $v) {
+			$bw = round(($v['w'] * $w), 3);
+			$bh = round(($v['h'] * $h / $this->barcode_array['maxh']), 3);
+			if ($v['t']) {
+				$y = round(($v['p'] * $h / $this->barcode_array['maxh']), 3);
+				// draw a vertical bar
+				if ($imagick) {
+					$bar->rectangle($x, $y, ($x + $bw - 1), ($y + $bh - 1));
+				} else {
+					imagefilledrectangle($png, $x, $y, ($x + $bw - 1), ($y + $bh - 1), $fgcol);
+				}
+			}
+			$x += $bw;
+		}
+		$filename =  'typo3temp/Cache/Barcodes/1D' .uniqid() .'.png';
+		//error_log(__METHOD__.":$filename");
+		if ($imagick) {
+			$png->drawimage($bar);
+		} else {
+			imagepng($png,PATH_site .$filename);
+			imagedestroy($png);
+			return $filename;
+		}
+	}
+}
 
 class tx_metafeedit_pdf extends FPDF {
 	var $cellsize;
@@ -747,6 +871,7 @@ class tx_metafeedit_export {
 			}
 			$x++;
 		}
+		//error_log(__METHOD__.":".$this->rowHeight);
 		unset($r);
 		unset($cell);
 		
@@ -814,6 +939,7 @@ class tx_metafeedit_export {
 		$this->documentUnit='mm';
 		$this->pdf = new tx_metafeedit_pdf($this->documentOrientation, $this->documentUnit, $this->documentFormat);
 		$this->pdf->caller=&$this;
+		
 		// @todo general addfont function ...
 		$this->pdf->AddFont('3OF9','','3OF9.php');
 		$this->pdf->nofooter=$nofooter;
@@ -839,7 +965,6 @@ class tx_metafeedit_export {
 		$this->pdf->AddPage();
 		$this->pdf->SetDisplayMode('real','single');
 		
-		//$this->pdf->Cell(0,1,'','T',0,'C');
 		// We handle the header here 
 		//
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
@@ -851,19 +976,13 @@ class tx_metafeedit_export {
 			$this->pdf->SetFont('Helvetica','B',11);
 			$this->pdf->SetY(0);
 			$this->pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');	
-			/*$this->pdf->SetFont('Helvetica', '', 9);
-			$this->pdf->Cell(0,$this->headercellsize,utf8_decode(htmlspecialchars_decode($recherche)),0,0,'R');
-			$this->pdf->SetY(5);
-			$this->pdf->Cell(0,$this->headercellsize,$tri,0,0,'C');
-			*/
+			
 			$this->pdf->SetXY($this->pdf->leftmargin,6);
-			//$this->pdf->Ln();
 			
 			//We draw line under report title
 			$this->pdf->Cell(0,1,'','T',0,'C');
 			$this->pdf->Ln(2);	
 		}
-		
 		
 		$fs=9;
 		$cell=false;
@@ -874,12 +993,12 @@ class tx_metafeedit_export {
 		$alt=0;
 
 		// Content
-		// $this->pdf->setFillColor(125,125,125);
 		
 		$this->height = ($this->confTS[$this->pluginId.'.'][$cmd.'.']['height'])?$this->confTS[$this->pluginId.'.'][$cmd.'.']['height']:(($this->confTS['default.'][$cmd.'.']['height'])?$this->confTS['default.'][$cmd.'.']['height']:($this->pdf->cellsize?$this->pdf->cellsize:5)); // hauteur de la ligne pdf
 		$r=0;
 		// We print rows...
 		foreach($xml->tr as $row) {
+			$h=$this->rowHeight=$this->height;
 			if (@$row->spec['ap']) {
 				$this->pdf->addPage();
 			}
@@ -908,24 +1027,32 @@ class tx_metafeedit_export {
 			
 			// We print row cells ...
 			$x=0;
-			foreach($row->td as $col) {
-				$this->cellWidth=$size = ($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x];; //taille de la cellule 
-				$val = $this->getData($col);
-				if ($col->line==1) {
+			foreach($row->td as $cell) {
+				$this->cellWidth=($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x]; //taille de la cellule 
+				$val = $this->getData($cell);
+				//error_log(__METHOD__);
+				if ($cell->line==1) {
 					//We handle lines here
-					$this->pdf->Line($col->line['x1'], $col->line['y1'], $col->line['x2'], $col->line['y2']);
+					$this->pdf->Line($cell->line['x1'], $cell->line['y1'], $cell->line['x2'], $cell->line['y2']);
 				
-				} elseif ($col->rect==1) {
+				} elseif ($cell->rect==1) {
 					//We handle rectangles here
-					$this->pdf->Line($col->rect['x1'], $col->rect['y1'], $col->rect['x2'], $col->rect['y1']);
-					$this->pdf->Line($col->rect['x2'], $col->rect['y1'], $col->rect['x2'], $col->rect['y2']);
-					$this->pdf->Line($col->rect['x2'], $col->rect['y2'], $col->rect['x1'], $col->rect['y2']);
-					$this->pdf->Line($col->rect['x1'], $col->rect['y2'], $col->rect['x1'], $col->rect['y1']);
+					$this->pdf->Line($cell->rect['x1'], $cell->rect['y1'], $cell->rect['x2'], $cell->rect['y1']);
+					$this->pdf->Line($cell->rect['x2'], $cell->rect['y1'], $cell->rect['x2'], $cell->rect['y2']);
+					$this->pdf->Line($cell->rect['x2'], $cell->rect['y2'], $cell->rect['x1'], $cell->rect['y2']);
+					$this->pdf->Line($cell->rect['x1'], $cell->rect['y2'], $cell->rect['x1'], $cell->rect['y1']);
 					
-				} elseif ($col->img==1) {
+				} elseif ($cell->img==1) {
+					//error_log(__METHOD__.":img");
 					//We handle image cells here
-					$this->PDFDisplayimage($col);
+					$this->PDFDisplayImage($cell);
+				} elseif ($cell['bct']) {
+					//error_log(__METHOD__.":barcode");
+					//bct = bar code type
+					$this->PDFDisplayBarcode($cell);
+					//Bar codes
 				} else {
+					//error_log(__METHOD__.":else");
 					//We handle text cells here
 					switch($this->rowPos[$x]) {
 						case 'left' :
@@ -943,109 +1070,108 @@ class tx_metafeedit_export {
 				 	}
 				 	if (!$r) $p='L'; // So that column headers are always aligned left. 
 				 	
-				 	$this->cellX=$this->pdf->GetX();				 	
-					$w=$size;
-					$h=$this->rowHeight;
+				 	$this->cellX=$this->pdf->GetX();
+					
 				
 					$b=1;
-					if (isset($col->spec['b'])) $b=(int)$col->spec['b'];
-					if (isset($col->spec['h'])) $h=$col->spec['h'];
+					if (isset($cell->spec['b'])) $b=(int)$cell->spec['b'];
+					if (isset($cell->spec['h'])) $h=(int)$cell->spec['h'];
+					if ($h>$this->rowHeight) $this->rowHeight=$h;
 					
-					
-					if (isset($col->spec['w'])) $w=$col->spec['w'];
+					if (isset($cell->spec['w'])) $w=$cell->spec['w'];
 					
 					// We handle transparent cell
-					$fillText=isset($col->spec['bc']) && $col->spec['bc'] == ''?false:true;
-						
-					if (isset($col->spec['bc']) && $col->spec['bc'] != '') {
-						$bca=t3lib_div::trimexplode(',',$col->spec['bc']);
+					$fillText=isset($cell->spec['bc']) && $cell->spec['bc'] == ''?false:true;
+					//background color
+					if (isset($cell->spec['bc']) && $cell->spec['bc'] != '') {
+						$bca=t3lib_div::trimexplode(',',$cell->spec['bc']);
 						$this->pdf->setFillColor((int)$bca[0],(int)$bca[1],(int)$bca[2]);
 					}
-					
-					if (isset($col->spec['fc'])) {
-						$fca=t3lib_div::trimexplode(',',$col->spec['fc']);
+					//foreground color
+					if (isset($cell->spec['fc'])) {
+						$fca=t3lib_div::trimexplode(',',$cell->spec['fc']);
 						$this->pdf->setDrawColor($fca[0],$fca[1],$fca[2]);
 					}
-					if (isset($col->spec['tc'])) {
-						$tca=t3lib_div::trimexplode(',',$col->spec['tc']);
+					//text color
+					if (isset($cell->spec['tc'])) {
+						$tca=t3lib_div::trimexplode(',',$cell->spec['tc']);
 						$this->pdf->setTextColor($tca[0],$tca[1],$tca[2]);
 					}
+					//font size
 					$fs='';
-					if (isset($col->spec['fs'])) {
-						$fs=$col->spec['fs'];
+					if (isset($cell->spec['fs'])) {
+						$fs=$cell->spec['fs'];
 						$this->pdf->SetFontSize($fs);
 					}
+					//font weight
 					$fb='';
-					if (isset($col->spec['fb'])) {
-						$fb=$col->spec['fb'];
+					if (isset($cell->spec['fb'])) {
+						$fb=$cell->spec['fb'];
 					}
+					//before line
 					$bln=0;
-					if (isset($col->spec['bln'])) {
-						$bln=(int)$col->spec['bln'];
+					if (isset($cell->spec['bln'])) {
+						$bln=(int)$cell->spec['bln'];
 					}
+					//after line
 					$aln=0;
-					if (isset($col->spec['aln'])) {
-						$aln=(int)$col->spec['aln'];
+					if (isset($cell->spec['aln'])) {
+						$aln=(int)$cell->spec['aln'];
 					}
 					$l=0;
-					if (isset($col->spec['l'])) {
-						$l=(int)$col->spec['l'];
+					if (isset($cell->spec['l'])) {
+						$l=(int)$cell->spec['l'];
 					}
+					//font
 					$f='';
-					if (isset($col->spec['f'])) $f=$col->spec['f'];
+					if (isset($cell->spec['f'])) $f=$cell->spec['f'];
 					$this->pdf->SetFont($f,$fb,$fs);
-					if (isset($col->spec['x']) && isset($col->spec['y'])) {
-						$this->pdf->SetXY((float)$col->spec['x'],(float)$col->spec['y']);
-						
-						/*if (isset($col->spec['b'])  || isset($col->spec['bc']) ) {
-							//error_log(__METHOD__.":cell $utf8val , ".$this->pdf->NbLines($w, $utf8val));
-							$this->pdf->Cell($w,$h,$utf8val,$b,0,$p,$fillText);
-							 $cell=true;
-						} else {
-							//error_log(__METHOD__.":write $utf8val , ".$this->pdf->NbLines($w, $utf8val));
-							$this->pdf->Write($h,$utf8val);
-						}
-						$newX=(float)$col->spec['x']+(isset($col->spec['w'])?(float)$col->spec['w']:$this->pdf->GetStringWidth($val));
-						$this->pdf->SetXY((float)floor($newX),(float)$col->spec['y']);*/
-						$this->pdf->SetXY((float)$col->spec['x'],(float)$col->spec['y']);
-						$y = $this->pdf->getY();
-						$mx = $this->pdf->getX();
-						if ($b) $this->pdf->Rect($mx, $y, $w, $h,'FD');
-						$this->pdf->MultiCell($w,$this->height,$val,0,$p,0);
-						$this->pdf->SetXY($mx+$w,$y);
+					if (isset($cell->spec['x']) && isset($cell->spec['y'])) {
+						$this->pdf->SetXY((float)$cell->spec['x'],(float)$cell->spec['y']);
+						$this->pdf->SetXY((float)$cell->spec['x'],(float)$cell->spec['y']);
+						$this->cellY = $this->pdf->getY();
+						$this->cellX = $this->pdf->getX();
+						if ($b) $this->pdf->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD');
+						$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p,0);
+						$this->pdf->SetXY($this->cellX+$this->cellWidth,$this->cellY);
 						$this->rowYOffset = $this->pdf->getY()>$this->rowYOffset?$this->pdf->getY():$this->rowYOffset;
-					} else if (isset($col->spec['x'])) {
-						$this->pdf->SetX((float)$col->spec['x']);
-						$y = $this->pdf->getY();
-						$mx = $this->pdf->getX();
-						if ($b) $this->pdf->Rect($mx, $y, $w, $h,'FD');
-						$this->pdf->MultiCell($w,$this->height,$val,0,$p,0);
-						$this->pdf->SetXY($mx+$w,$y);
+					} else if (isset($cell->spec['x'])) {
+						$this->pdf->SetX((float)$cell->spec['x']);
+						$this->cellY = $this->pdf->getY();
+						$this->cellX = $this->pdf->getX();
+						if ($b) $this->pdf->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD');
+						$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p,0);
+						$this->pdf->SetXY($this->cellX+$this->cellWidth,$this->cellY);
 						$this->rowYOffset = $this->pdf->getY()>$this->rowYOffset?$this->pdf->getY():$this->rowYOffset;
 					} else {
-					
-						$mx = $this->pdf->getX();
-						$y = $this->pdf->getY();
+
+						$this->cellX = $this->pdf->getX();
+						$this->cellY = $this->pdf->getY();
 						if ($bln) $this->pdf->Ln($bln);
 						
-						if ($b) $this->pdf->Rect($mx, $y, $w, $h,'FD');
-						$this->pdf->MultiCell($w,$this->height,$val,0,$p,0);
-						
-						// We handle bigger cells !!!
-						$this->rowYOffset = $this->pdf->getY()>$this->rowYOffset?$this->pdf->getY():$this->rowYOffset;
-						
-						$cell=true;
+						//if ($b) $this->pdf->Rect($mx, $y, $w, $this->rowHeight,'FD');
+						if ($b) $this->pdf->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD');
+						$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p,0);
+					
 						if ($l) {
 							//We draw line
 							$this->pdf->Cell(0,$l,'','T',0,'C',0);
 						}
-						if ($aln) $this->pdf->Ln($aln);
-						$this->pdf->SetXY(($mx+$w),$y);
+						
+						// We handle bigger cells !!!
+						$this->rowYOffset = $this->pdf->getY()>$this->rowYOffset?$this->pdf->getY():$this->rowYOffset;
+						$this->pdf->SetXY(($this->cellX+$this->cellWidth),$this->cellY);
 					}
+					
+					if ($aln) {
+						$this->pdf->Ln($aln);
+						$this->rowYOffset = $this->pdf->getY()>$this->rowYOffset?$this->pdf->getY():$this->rowYOffset;
+					}
+					
 				}
 				$x++;
 			}
-			if ($cell) {
+			/*if ($cell) {
 				//$this->pdf->setFillColor(200,200,200);
 				$this->pdf->setFillColor(255,255,255);
 				if (@$row->spec['aln']) {
@@ -1057,7 +1183,12 @@ class tx_metafeedit_export {
 				$cell=false;
 			} else {
 				$this->pdf->Ln();
+// 			}*/
+			if (@$row->spec['aln']) {
+				//$this->pdf->Ln(@$row->spec['aln']);
+				$this->rowYOffset=$this->rowYOffset+$row->spec['aln'];
 			}
+			$this->pdf->setY($this->rowYOffset);
 			$this->pdf->setFillColor(255,255,255);
 			$r++;
 		}
@@ -1160,7 +1291,7 @@ class tx_metafeedit_export {
 		$this->lineWidth=0.3;
 		$this->pdf= new tx_metafeedit_pdf($this->documentOrientation, $this->documentUnit, $this->documentFormat);
 		$this->pdf->caller=&$this;
-
+		
 		//@TODO Handle typoscript here ...
 		
 		$this->pdf->bottommargin=9;
@@ -1190,6 +1321,7 @@ class tx_metafeedit_export {
 		//
 		$title =null;
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
+		//error_log(__METHOD__.":$title, $recherche");
 		if ($this->conf['inputvar.']['sortLetter']) $tri = '  Tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 		$this->pdf->SetFont('Helvetica','B',11);
 		
@@ -1273,14 +1405,14 @@ class tx_metafeedit_export {
 					 	} else {
 					 		if ($row->gb && $x==0) { 
 					 			$this->pdf->Cell($this->workWidth,$this->height,$val,1,0,$p,1);
-								$cell=true;
+								
 								$this->pdf->setX($this->cellX+$this->cellWidth);
 							} else {
 								$border=1;							
 								$this->cellY=$this->pdf->GetY();
 								$this->pdf->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD');
 								$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p);
-								$cell=true;
+								
 								$this->pdf->setXY($this->cellX+$this->cellWidth,$this->cellY);
 							}
 						}
@@ -1317,7 +1449,7 @@ class tx_metafeedit_export {
 				$rowHeight+=$this->imageHeight;
 			} else {
 				$rowHeight+= ceil( $this->pdf->GetStringWidth($elem->data) / $this->cellWidth )*$this->lineHeight;
-			}		
+			}
 		}
 		return $rowHeight;
 	}
@@ -1479,6 +1611,116 @@ class tx_metafeedit_export {
 		$this->pdf->setX($this->cellX+$this->cellWidth);
 	}
 	/**
+	 * 
+	 * @param unknown_type $cell
+	 */
+	function PDFDisplayBarcode($cell) {
+		
+		$val = $this->getData($cell);
+		//error_log(__METHOD__.":$val");
+		$bool1D=false;
+		$bool2D=false;
+		switch($cell['bct']) {
+			/**
+			 * 2D : RAW,RAW2, 'QRCODE,L','QRCODE,M','QRCODE,Q','QRCODE,H','DATAMATRIX','PDF417'
+			 * 1D : 'C39','C39E','C39E+','C93','C128','C128A','C128B','C128C','EAN2','EAN5','EAN8','EAN13','C39E+','CODABAR','I25','I25+','MSI','MSI+','S25','S25+','CODE11','KIX','RMS4CC','PLANET','POSTNET','UPCA','UPCE','IMB','PHARMA','PHARMA2T'
+			 */
+			
+			case 'QRH':
+				$bool2D=true;
+				// include 2D barcode class (search for installation path)
+				// set the barcode content and type
+				$barcodeobj = new tx_metafeedit_2DBarcode($val, 'QRCODE,H');
+				break;
+			case 'QRL':
+				$bool2D=true;
+				
+				// set the barcode content and type
+				$barcodeobj = new tx_metafeedit_2DBarcode($val, 'QRCODE,L');
+				break;
+			case 'QRM':
+				$bool2D=true;
+				// set the barcode content and type
+				$barcodeobj = new tx_metafeedit_2DBarcode($val, 'QRCODE,M');
+				break;
+			case 'DM':
+				$bool2D=true;
+				$barcodeobj = new tx_metafeedit_2DBarcode($val, 'DATAMATRIX');
+				
+				break;
+			case 'PDF417':
+				$barcodeobj = new tx_metafeedit_2DBarcode($val, 'PDF417');
+				break;
+				
+			case 'C128':	
+				$bool1D=true;	
+				// set the barcode content and type
+				$barcodeobj = new tx_metafeedit_1DBarcode($val, 'C128');
+				break;
+				
+		}
+		// output the barcode as PNG image
+		if ($bool2D) $imgPath=$barcodeobj->getBarcodeImage(6, 6, array(0,0,0));
+		if ($bool1D) $imgPath=$barcodeobj->getBarcodeImage(2, 30, array(0,0,0));
+		
+		$img='';
+		$this->cellX=isset($cell->spec['x'])?(float)$cell->spec['x']:$this->pdf->getX();
+		$this->cellY=$this->pdf->GetY();
+		if (isset($cell->spec['y'])) {
+			$this->pdf->SetY((float)$cell->spec['y']);
+		}
+		//Image border
+		$ib=0;
+		if ($cell->img['b']) $ib=1;
+	
+		$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
+		$this->pdf->setX($this->cellX);
+		
+		$imgData=$this->getDisplayImage($imgPath);
+		$img=$imgData['path'];
+		$imgInfo=$imgData['imginfo'];
+		//error_log(__METHOD__.":".print_r($imgData,true));
+	
+
+		if (is_array($imgInfo)) {
+			$w=$imgInfo[0];
+			$h=$imgInfo[1];
+			$ro=$w/$h;
+
+			$imgh=$this->rowHeight-(2*$this->lineWidth);
+			$imgx=$this->pdf->GetX()+$this->lineWidth;
+			$imgy=$this->pdf->GetY()+$this->lineWidth;
+			$imgw=$this->cellWidth;
+			$rd=$imgw/$imgh;
+			$px=$imgx;
+			$py=$imgy;
+			if ($ro<$rd) {
+				//height piority
+				$ph=$imgh;
+				$pw=$ro*$ph;
+				$px+=($imgw-$pw)/2;
+			} else {
+				// Width Priority
+				$pw=$imgw;
+				$ph=$pw/$ro;
+				$py+=($imgh-$ph)/2;
+			}
+			$this->pdf->Image($img,$px,$py,$pw,$ph);
+			//We calculate image width based on picture width/height ratio);
+			if ($imgh && !$imgw) {
+				$imgw=$imgh*($w/$h);
+			}
+			if ($ib) {
+				$this->pdf->Rect($imgx,$imgy,$imgw,$imgh);
+			}
+			// We erase barcode from disk
+			if (!$imgData['notfound']) unlink($imgData['path']);
+			$this->rowYOffset = ($imgy+$imgh)>$this->rowYOffset?($imgy+$imgh):$this->rowYOffset;
+		}
+
+		$this->pdf->setX($this->cellX+$this->cellWidth);
+	}
+	/**
 	 * Returns Image to be displayed and associated information
 	 * @param string $fullPathToImage
 	 * @return array
@@ -1494,6 +1736,7 @@ class tx_metafeedit_export {
 		} else {
 			//@todo handle broken image
 			$imgData['path']= PATH_site.'typo3conf/ext/meta_feedit/res/noimage.jpg';
+			$imgData['notfound']=true;
 			$imgData['imginfo']=getimagesize($imgData['path']);
 		}
 		return $imgData;

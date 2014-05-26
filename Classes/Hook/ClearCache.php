@@ -15,7 +15,7 @@ class Tx_MetaFeedit_Hook_ClearCache {
 			if( substr( $file, -1 ) == '/' )
 				$this->delTree( $file );
 			else
-				error_log(__METHOD__.":$file");
+				//error_log(__METHOD__.":$file");
 				unlink( $file );
 		}
 	
@@ -28,7 +28,7 @@ class Tx_MetaFeedit_Hook_ClearCache {
 	 */
 	public function postProc() {
 		$finalCacheDirectory = PATH_site . 'typo3temp/Cache/Reports/';
-		error_log(__METHOD__.":$finalCacheDirectory");
+		//error_log(__METHOD__.":$finalCacheDirectory");
 		//Security so that we don't delete "/"
 		if (strlen($finalCacheDirectory)>10) {
 			$this->delTree($finalCacheDirectory);

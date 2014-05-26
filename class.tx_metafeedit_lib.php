@@ -2226,9 +2226,6 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			$vars=$vars[$GLOBALS['TSFE']->id];
 			if (is_array($vars[$pluginId])) $res[$pluginId]=$vars[$pluginId][$varname];
 		}
-		/*if ($varname=='advancedSearch') {
-			error_log(__METHOD__.":".$GLOBALS['TSFE']->id." - $pluginId ,".print_r($res[$pluginId],true));
-		}*/
 		// we look in the Get & post
 		$gp=t3lib_div::_GP($varname);
 		if ($gp) {
@@ -2238,35 +2235,17 @@ class tx_metafeedit_lib implements t3lib_singleton {
 				$res=$gp;
 			}
 		}
-		/*if ($varname=='advancedSearch') {
-			error_log(__METHOD__.":_GP".$GLOBALS['TSFE']->id." - $pluginId ,".print_r($res,true));
-		}*/
 		// We look into the piVars
 	
 		if ($piVars[$varname]) {
 			if (is_array($res[$pluginId]) && is_array($piVars[$varname][$pluginId])) {
-				/*if ($varname=='advancedSearch') {
-					error_log(__METHOD__.":-0".print_r($res[$pluginId],true));
-					error_log(__METHOD__.":-1".print_r($piVars[$varname][$pluginId],true));
-				}*/
-				
 				$res[$pluginId]=array_merge($res[$pluginId],$piVars[$varname][$pluginId]);
-				/*if ($varname=='advancedSearch') {
-					error_log(__METHOD__.":-3".print_r($res[$pluginId],true));
-				}*/
 			} else {
 				$res=$piVars[$varname];
 			}
 		}
-		/*if ($varname=='advancedSearch') {
-			error_log(__METHOD__.":piVars ".print_r($piVars,true));
-			error_log(__METHOD__.":piVars".$GLOBALS['TSFE']->id." - $pluginId ,".print_r($res,true));
-		}*/
-			// we check if typoscript override is present
+		// we check if typoscript override is present
 		if ($typoscript[$varname.'.']) $res=$typoscript[$varname.'.'];
-		/*if ($varname=='advancedSearch') {
-			error_log(__METHOD__.":typoscript".$GLOBALS['TSFE']->id." - $pluginId ,".print_r($res,true));
-		}*/
 		// we check variable against pluginId
 		if (is_array($res)) {
 			if (array_key_exists($pluginId,$res)) {
@@ -3144,7 +3123,6 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		$labela=explode(':',$label);
 		$key=end($labela);
 		$label2=str_replace('.','_',end($labela));
-		//error_log(__METHOD__.":$key".print_r($conf['LOCAL_LANG']['langoverride'][$conf['LLkey']],true));
 		if ($conf['LOCAL_LANG']['langoverride'][$conf['LLkey']][$key]) {
 			//error_log(__METHOD__.":OVERRIDE1!");
 			return $conf['LOCAL_LANG']['langoverride'][$conf['LLkey']][$key];
@@ -4760,6 +4738,32 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		// AS Search end
 	}
 	/**
+	 * Transforms value into human readable format depending on TCA.
+	 * @param unknown_type $key
+	 * @param unknown_type $val
+	 * @param unknown_type $conf
+	 * @return string
+	 */
+	function getHumanReadableValue($key,$val,&$conf) {
+		$evals=t3lib_div::trimexplode(',',$conf['TCAN'][$conf['table']]['columns'][$key]['config']['eval']);
+		/*if ((in_array('date',$evals) || in_array('datetime',$evals)) && substr($conf[$fe_adminLib->conf['cmdKey']."."]["overrideValues."][$fN], 0, 3) == 'now') {
+			$dataArr[$_fN] = time() + 24 * 60 * 60 * intval(substr($conf[$fe_adminLib->conf['cmdKey']."."]["overrideValues."][$fN], 3));
+		}*/
+		$ret=$val;
+		if (in_array('date',$evals) ) {
+			$ret = strftime(($conf['dateformat']?$conf['dateformat']:($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%m-%e-%Y' :'%e-%m-%Y')),$val);
+		
+		}
+		if (in_array('time',$evals) ) {
+			$ret = strftime('%H:%M',$dataArr[$fN]);
+		
+		}
+		if(in_array('datetime',$evals)) {
+			$ret = strftime(($conf['datetimeformat']?$conf['datetimeformat']: ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat']? '%H:%M %m-%e-%Y' :'%H:%M %e-%m-%Y')),$val);
+		}
+		return $ret;
+	}
+	/**
 	 * Returns human readable search filter
 	 * @param array $conf
 	 */
@@ -4783,14 +4787,18 @@ class tx_metafeedit_lib implements t3lib_singleton {
 					$recherche='';
 					if (is_array($val)) {
 						$isset=($this->is_extent($val['op']) && ($this->is_extent($val['val'])||$this->is_extent($val['valsup'])));
+						$v1=$this->getHumanReadableValue($key,$val['val'],$conf);
+						$v2=$this->getHumanReadableValue($key,$val['valsup'],$conf);
+						
+						//error_log(__METHOD__.": $key, $v1, $v2".print_r($conf['TCAN'][$conf['table']]['columns'][$key],true));
 						if ($isset) {
 							switch($val['op']) {
 								case '><' :
 								case '>ts<' :
-									$recherche .= ($this->is_extent($val['val'])&&$this->is_extent($val['valsup']))?$val['val'].' &lt; '.$this->getLLFromLabel($ftA['fieldLabel'], $conf).' &gt; '.$val['valsup']:'';
+									$recherche .= ($this->is_extent($val['val'])&&$this->is_extent($val['valsup']))?$v1.' &lt; '.$this->getLLFromLabel($ftA['fieldLabel'], $conf).' &gt; '.$v2:'';
 									break;								
 								default:
-									$recherche .= $this->getLLFromLabel($ftA['fieldLabel'], $conf).' '.($this->is_extent($val)?$val['op'].' '.$val['val']:'');
+									$recherche .= $this->getLLFromLabel($ftA['fieldLabel'], $conf).' '.($this->is_extent($val)?$val['op'].' '.$v1:'');
 							}
 						}
 					} else {
@@ -5110,6 +5118,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	 
 	function getHeader(&$title, &$recherche, &$conf,$data=array()) {
 		//error_log(__METHOD__.":-------- ".$conf['inputvar.']['cmd']);
+		//error_log(__METHOD__."0:$title - $recherche".print_r($_GET,true));
 		$cmd=$conf['inputvar.']['cmd'];
 		if ($conf[$cmd.'.']['title']) {
 			$title=$this->getLLFromLabel($conf[$cmd.'.']['title'], $conf);
@@ -5182,10 +5191,12 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		$title=$this->cObj->substituteMarkerArray($title,$markerArray);
 		
 		if ($this->confTS[$this->pluginId.'.'][$cmd.'.']['soustitre']) $recherche = $this->confTS[$this->pluginId.'.'][$cmd.'.']['soustitre'];
-		if (is_array($conf['inputvar.']['advancedSearch'])) {	
+		//error_log(__METHOD__."0:$title - $recherche".print_r($conf['inputvar.'],true));
+		if (is_array($conf['inputvar.']['advancedSearch'])) {
+			//error_log(__METHOD__."1:$title - $recherche");
 			$recherche=$this->getHumanReadableSearchFilter($conf);
 		}
-		//error_log(__METHOD__.":$title - $recherche");
+		//error_log(__METHOD__."2:$title - $recherche");
 		return $title;
 
 	}

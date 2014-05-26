@@ -105,6 +105,15 @@ class tx_metafeedit extends  tslib_pibase {
 	 		$this->cacheDirectory = $finalCacheDirectory;
 	 	}
 	 }
+	 private function initBarcodeCache($conf) {
+	 	
+ 		$finalCacheDirectory = PATH_site . 'typo3temp/Cache/Barcodes/';
+ 
+ 		if (!is_dir($finalCacheDirectory)) {
+ 			//error_log(__METHOD__.":$finalCacheDirectory");
+ 			$this->createFinalCacheDirectory($finalCacheDirectory);
+ 		}
+	 }
 	 /**
 	  * 
 	  * @param string $templateName
@@ -170,6 +179,7 @@ class tx_metafeedit extends  tslib_pibase {
   	function init(&$caller,&$conf)	{
   		//error_log(__METHOD__." start ================".$GLOBALS['TSFE']->lang);
   		$this->initReportCache($conf);
+  		$this->initBarcodeCache($conf);
 		$this->initialize($caller,$conf);
 		 
 		if ($conf['performanceaudit']) $this->caller->perfArray['class.tx_metafeedit Init done :']=$this->metafeeditlib->displaytime()." Seconds"; 
