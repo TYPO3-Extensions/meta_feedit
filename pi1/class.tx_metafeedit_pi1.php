@@ -942,7 +942,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 			
 			$mfconf['inputvar.']['advancedSearch']=$this->metafeeditlib->getAdvancedSearchFromFilter($mfconf);
 			
-		} else {
+		//} else {
+		} elseif (!$resetsearch){
 			//error_log(__METHOD__.': no filter');
 			$mfconf['inputvar.']['advancedSearch']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'advancedSearch',true);
 			
