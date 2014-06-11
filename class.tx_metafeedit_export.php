@@ -1065,16 +1065,14 @@ class tx_metafeedit_export {
 					$this->pdf->Line($cell->rect['x1'], $cell->rect['y2'], $cell->rect['x1'], $cell->rect['y1']);
 					
 				} elseif ($cell->img==1) {
-					//error_log(__METHOD__.":img");
 					//We handle image cells here
 					$this->PDFDisplayImage($cell);
 				} elseif ($cell['bct']) {
-					//error_log(__METHOD__.":barcode");
+					//Bar codes
 					//bct = bar code type
 					$this->PDFDisplayBarcode($cell);
-					//Bar codes
+					
 				} else {
-					//error_log(__METHOD__.":else");
 					//We handle text cells here
 					switch($this->rowPos[$x]) {
 						case 'left' :
@@ -1420,7 +1418,6 @@ class tx_metafeedit_export {
 								$this->cellY=$this->pdf->GetY();
 								$this->pdf->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD');
 								$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p);
-								
 								$this->pdf->setXY($this->cellX+$this->cellWidth,$this->cellY);
 							}
 						}
@@ -1530,9 +1527,7 @@ class tx_metafeedit_export {
 	function PDFDisplayImage($cell) {
 		
 		$val = $this->getData($cell);
-		//error_log(___METHOD__.":data $val");
 		if (strpos($cell->data,'<img')!==false) {
-			//error_log(___METHOD__.":data img $cell->data");
 			try {
 				$img = new SimpleXMLElement($cell->data);
 			} catch (Exception $e) {
@@ -1540,7 +1535,6 @@ class tx_metafeedit_export {
 			};
 			$vala=array();
 			if ($img['src']) $vala[]=$img['src'];
-			//error_log(___METHOD__.":data img src :".$img['src']);
 			unset($xml);
 		} else {
 			$vala=t3lib_div::trimexplode(',',$val);
@@ -1552,14 +1546,12 @@ class tx_metafeedit_export {
 	 		$this->pdf->SetY((float)$cell->spec['y']);
 	 		$this->cellY=(float)$cell->spec['y'];
 	 	}
-	 	//$this->pdf->setFillColor(255,255,255);
 	 	//Image border
 	 	$ib=0;
 	 	if ($cell->img['b']) $ib=1;
-	 	if ($ib) {
-	 		//error_log(__METHOD__."cell:$this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight");
+	 	//if ($ib) {
 	 		$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
-	 	}
+	 	//}
 	 	$this->pdf->setX($this->cellX);
 		foreach($vala as $v) {
 			$imgData=$this->getDisplayImage($cell->img->dir?$cell->img->dir.'/'.$v:$v);
