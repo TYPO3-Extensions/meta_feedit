@@ -831,6 +831,12 @@ class tx_metafeedit_export {
 		$r=$row->td;
 		foreach ($r as $cell) {
 			$this->rowCellWidth[$x] =($this->confTS[$this->pluginId.'.']['list.'][$this->fields[$x].'.']['width'])?$this->confTS[$this->pluginId.'.']['list.'][$this->fields[$x].'.']['width']:(($this->confTS['default.']['list.'][$this->fields[$x].'.']['width'])?$this->confTS['default.']['list.'][$this->fields[$x].'.']['width']:$cell->size);
+			//error_log(__METHOD__.":".print_r($cell->img,true));
+			if ((float)$cell->img['w']>(float)$this->rowCellWidth[$x]) {
+				//error_log(__METHOD__.": img w ".$cell->img['w']);
+				$this->rowCellWidth[$x]=$cell->img['w'];
+			}
+			
 			if (!$this->rowCellWidth[$x] || $this->rowCellWidth[$x]=='' || $this->rowCellWidth[$x]=='*') {
 				$this->nbFreeCells++;
 				$this->rowCellWidth[$x]='*';
@@ -845,7 +851,7 @@ class tx_metafeedit_export {
 			$this->rowFreeCellWidth=($this->workWidth-$this->rowWidth)/$this->nbFreeCells;
 		}
 		
-		// If pdf object is not created we cannot calulat rowheights
+		// If pdf object is not created we cannot calulate rowheights
 		if (!is_object($this->pdf)) return;
 		// We calculate row height
 		$x=0;
@@ -906,6 +912,7 @@ class tx_metafeedit_export {
 			echo "============================<br>";
 			die();
 		};
+		//error_log(__METHOD__.":".str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		// Do we handle multiple media (default no)
 		$this->multipleMedia=$this->confTS[$this->pluginId.'.'][$cmd.'.']['multipleMedia']?$this->confTS[$this->pluginId.'.'][$cmd.'.']['multipleMedia']:($this->confTS['default.'][$cmd.'.']['multipleMedia']?$this->confTS['default.'][$cmd.'.']['multipleMedia']:false);
 		
@@ -914,7 +921,7 @@ class tx_metafeedit_export {
 		$this->documentOrientation='P';	// portrait
 		$this->documentHeight=297;
 		$this->documentWidth=210;
-		
+		$this->lineHeight=0;
 		$noheader=false;
 		$nofooter=false;
 
@@ -971,14 +978,13 @@ class tx_metafeedit_export {
 
 		//if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 		$pageHeight=$this->pdf->topmargin;
+		// We set grey color by default
 		$this->pdf->setFillColor(200,200,200);
 		if (!$noheader) {
 			$this->pdf->SetFont('Helvetica','B',11);
 			$this->pdf->SetY(0);
 			$this->pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');	
-			
 			$this->pdf->SetXY($this->pdf->leftmargin,6);
-			
 			//We draw line under report title
 			$this->pdf->Cell(0,1,'','T',0,'C');
 			$this->pdf->Ln(2);	
@@ -1030,6 +1036,22 @@ class tx_metafeedit_export {
 			foreach($row->td as $cell) {
 				$this->cellWidth=($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x]; //taille de la cellule 
 				$val = $this->getData($cell);
+				//background color
+				if (isset($cell->spec['bc']) && $cell->spec['bc'] != '') {
+					$bca=t3lib_div::trimexplode(',',$cell->spec['bc']);
+					error_log(__METHOD__.":".print_r($bca,true));
+					$this->pdf->setFillColor((int)$bca[0],(int)$bca[1],(int)$bca[2]);
+				}
+				//foreground color
+				if (isset($cell->spec['fc'])) {
+					$fca=t3lib_div::trimexplode(',',$cell->spec['fc']);
+					$this->pdf->setDrawColor($fca[0],$fca[1],$fca[2]);
+				}
+				//text color
+				if (isset($cell->spec['tc'])) {
+					$tca=t3lib_div::trimexplode(',',$cell->spec['tc']);
+					$this->pdf->setTextColor($tca[0],$tca[1],$tca[2]);
+				}
 				//error_log(__METHOD__);
 				if ($cell->line==1) {
 					//We handle lines here
@@ -1082,21 +1104,7 @@ class tx_metafeedit_export {
 					
 					// We handle transparent cell
 					$fillText=isset($cell->spec['bc']) && $cell->spec['bc'] == ''?false:true;
-					//background color
-					if (isset($cell->spec['bc']) && $cell->spec['bc'] != '') {
-						$bca=t3lib_div::trimexplode(',',$cell->spec['bc']);
-						$this->pdf->setFillColor((int)$bca[0],(int)$bca[1],(int)$bca[2]);
-					}
-					//foreground color
-					if (isset($cell->spec['fc'])) {
-						$fca=t3lib_div::trimexplode(',',$cell->spec['fc']);
-						$this->pdf->setDrawColor($fca[0],$fca[1],$fca[2]);
-					}
-					//text color
-					if (isset($cell->spec['tc'])) {
-						$tca=t3lib_div::trimexplode(',',$cell->spec['tc']);
-						$this->pdf->setTextColor($tca[0],$tca[1],$tca[2]);
-					}
+					
 					//font size
 					$fs='';
 					if (isset($cell->spec['fs'])) {
@@ -1540,14 +1548,18 @@ class tx_metafeedit_export {
 		$img='';
 	 	$this->cellX=isset($cell->spec['x'])?(float)$cell->spec['x']:$this->pdf->getX();
 	 	$this->cellY=$this->pdf->GetY();
-	 	if (isset($cell->spec['y'])) {				 		
+	 	if (isset($cell->spec['y'])) {
 	 		$this->pdf->SetY((float)$cell->spec['y']);
+	 		$this->cellY=(float)$cell->spec['y'];
 	 	}
+	 	//$this->pdf->setFillColor(255,255,255);
 	 	//Image border
 	 	$ib=0;
 	 	if ($cell->img['b']) $ib=1;
-	 	
-	 	$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
+	 	if ($ib) {
+	 		//error_log(__METHOD__."cell:$this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight");
+	 		$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
+	 	}
 	 	$this->pdf->setX($this->cellX);
 		foreach($vala as $v) {
 			$imgData=$this->getDisplayImage($cell->img->dir?$cell->img->dir.'/'.$v:$v);
@@ -1577,7 +1589,8 @@ class tx_metafeedit_export {
 				if (isset($cell->img['h'])) $imgh=(float)$cell->img['h']; //height override
 				if (isset($cell->img['w'])) $imgw=(float)$cell->img['w']; //width override
 				if (isset($cell->img['x'])) $imgx=(float)$cell->img['x']; //x override
-				if (isset($cell->img['y'])) $imgy=(float)$cell->imgimg['y']; //x override
+				if (isset($cell->img['y'])) $imgy=(float)$cell->img['y']; //y override
+				
 				$rd=$imgw/$imgh;
 				$px=$imgx;
 				$py=$imgy;
@@ -1592,6 +1605,7 @@ class tx_metafeedit_export {
 					$ph=$pw/$ro;
 					$py+=($imgh-$ph)/2;
 				}
+				
 				$this->pdf->Image($img,$px,$py,$pw,$ph);
 				//We calculate image width based on picture width/height ratio);
 				if ($imgh && !$imgw) {
@@ -1600,6 +1614,7 @@ class tx_metafeedit_export {
 				$w=$size;
 				if (isset($cell->spec['w'])) $w=$cell->spec['w'];
 				if ($ib) {
+					//error_log(__METHOD__.":$imgx, $imgy,w: $imgw, $imgh");
 					$this->pdf->Rect($imgx,$imgy,$imgw,$imgh);
 				}
 				
