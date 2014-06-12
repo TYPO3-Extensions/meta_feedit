@@ -830,7 +830,7 @@ class tx_metafeedit_export {
 		//bug https://bugs.php.net/bug.php?id=38604
 		$r=$row->td;
 		foreach ($r as $cell) {
-			$this->rowCellWidth[$x] =($this->confTS[$this->pluginId.'.']['list.'][$this->fields[$x].'.']['width'])?$this->confTS[$this->pluginId.'.']['list.'][$this->fields[$x].'.']['width']:(($this->confTS['default.']['list.'][$this->fields[$x].'.']['width'])?$this->confTS['default.']['list.'][$this->fields[$x].'.']['width']:$cell->size);
+			$this->rowCellWidth[$x] =(float)(($this->confTS[$this->pluginId.'.']['list.'][$this->fields[$x].'.']['width'])?$this->confTS[$this->pluginId.'.']['list.'][$this->fields[$x].'.']['width']:(($this->confTS['default.']['list.'][$this->fields[$x].'.']['width'])?$this->confTS['default.']['list.'][$this->fields[$x].'.']['width']:$cell->size));
 			//error_log(__METHOD__.":".print_r($cell->img,true));
 			if ((float)$cell->img['w']>(float)$this->rowCellWidth[$x]) {
 				//error_log(__METHOD__.": img w ".$cell->img['w']);
@@ -921,7 +921,7 @@ class tx_metafeedit_export {
 		$this->documentOrientation='P';	// portrait
 		$this->documentHeight=297;
 		$this->documentWidth=210;
-		$this->lineHeight=0;
+		$this->lineHeight=0.0;
 		$noheader=false;
 		$nofooter=false;
 
@@ -1034,12 +1034,12 @@ class tx_metafeedit_export {
 			// We print row cells ...
 			$x=0;
 			foreach($row->td as $cell) {
-				$this->cellWidth=($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x]; //taille de la cellule 
+				$this->cellWidth=(float)(($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x]); //taille de la cellule 
 				$val = $this->getData($cell);
 				//background color
 				if (isset($cell->spec['bc']) && $cell->spec['bc'] != '') {
 					$bca=t3lib_div::trimexplode(',',$cell->spec['bc']);
-					error_log(__METHOD__.":".print_r($bca,true));
+					//error_log(__METHOD__.":".print_r($bca,true));
 					$this->pdf->setFillColor((int)$bca[0],(int)$bca[1],(int)$bca[2]);
 				}
 				//foreground color
@@ -1309,7 +1309,7 @@ class tx_metafeedit_export {
 		
 		$this->workWidth=$this->documentWidth-$this->pdf->rightmargin-$this->pdf->leftmargin;
 		if ($this->nbFreeCells>0) {
-			$this->rowFreeCellWidth=($this->workWidth-$this->rowWidth)/$this->nbFreeCells;
+			$this->rowFreeCellWidth=(float)(($this->workWidth-$this->rowWidth)/$this->nbFreeCells);
 		}
 		
 		// do this only if cell size not set ...(
@@ -1378,7 +1378,7 @@ class tx_metafeedit_export {
 			// We handle cell content here
 			$x=0; //column counter
 			foreach($row->td as $cell) {
-				$this->cellWidth=($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x];
+				$this->cellWidth=(float) (($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x]);
 				if ($cell->img==1) {
 					// We handle image cells here...
 					$this->PDFDisplayimage($cell);
@@ -1550,7 +1550,11 @@ class tx_metafeedit_export {
 	 	$ib=0;
 	 	if ($cell->img['b']) $ib=1;
 	 	//if ($ib) {
-	 		$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
+	 	//error_log(__METHOD__.": cellWidth $this->cellWidth ".gettype($this->cellWidth));
+	 	//error_log(__METHOD__.": rowHeight $this->rowHeight ".gettype($this->rowHeight));
+	 	//error_log(__METHOD__.": cellX $this->cellX ".gettype($this->cellX));
+	 	//error_log(__METHOD__.": cellY $this->cellY ".gettype($this->cellY));
+	 	$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
 	 	//}
 	 	$this->pdf->setX($this->cellX);
 		foreach($vala as $v) {
@@ -1566,23 +1570,37 @@ class tx_metafeedit_export {
 				if ($imgi[3]) $img=$imgi[3];
 			}
 			//if files on linux / nt utf8 encoded 
-			
+			$imgw=0.0;
+			$imgh=0.0;
+			$imgx=0.0;
+			$imgy=0.0;
 			if (is_array($imgInfo)) {
 				$w=$imgInfo[0];
 				$h=$imgInfo[1];
 				$ro=$w/$h;
 				
-				$imgh=$this->height-(2*$this->lineWidth);
-				$imgx=$this->pdf->GetX()+$this->lineWidth;
-				$imgy=$this->pdf->GetY()+$this->lineWidth;
-				$imgw=$this->cellWidth;
-				
+				$imgh=(float)$this->height-(2*$this->lineWidth);
+				$imgx=(float)$this->pdf->GetX()+$this->lineWidth;
+				$imgy=(float)$this->pdf->GetY()+$this->lineWidth;
+				$imgw=(float)$this->cellWidth;
+				/*error_log(__METHOD__.": imgh $imgh ".gettype($imgh));
+				error_log(__METHOD__.": imgw  $imgw ".gettype($imgw));
+				error_log(__METHOD__.": imgx $imgx ".gettype($imgx));
+				error_log(__METHOD__.": imgy $imgy ".gettype($imgy));
+				*/
 				//$imgw=0;//We do not stretch image
 				if (isset($cell->img['h'])) $imgh=(float)$cell->img['h']; //height override
+				
+				
 				if (isset($cell->img['w'])) $imgw=(float)$cell->img['w']; //width override
+				
 				if (isset($cell->img['x'])) $imgx=(float)$cell->img['x']; //x override
 				if (isset($cell->img['y'])) $imgy=(float)$cell->img['y']; //y override
-				
+				/*error_log(__METHOD__.": imgh $imgh ".gettype($imgh));
+				error_log(__METHOD__.": imgw $imgw ".gettype($imgw));
+				error_log(__METHOD__.": imgx $imgx ".gettype($imgx));
+				error_log(__METHOD__.": imgy $imgy ".gettype($imgy));
+				*/
 				$rd=$imgw/$imgh;
 				$px=$imgx;
 				$py=$imgy;
@@ -1606,7 +1624,7 @@ class tx_metafeedit_export {
 				$w=$size;
 				if (isset($cell->spec['w'])) $w=$cell->spec['w'];
 				if ($ib) {
-					//error_log(__METHOD__.":$imgx, $imgy,w: $imgw, $imgh");
+					//error_log(__METHOD__.":img $imgx, $imgy,w: $imgw, $imgh");
 					$this->pdf->Rect($imgx,$imgy,$imgw,$imgh);
 				}
 				
@@ -1742,7 +1760,8 @@ class tx_metafeedit_export {
 			$imgData['path']=$fullPathToImage;
 		} else {
 			//@todo handle broken image
-			$imgData['path']= PATH_site.'typo3conf/ext/meta_feedit/res/noimage.jpg';
+			$imgData['path']= PATH_site.'typo3conf/ext/meta_feedit/Resources/Public/Images/no_user_picture.png';
+			//$imgData['path']= PATH_site.'typo3conf/ext/meta_feedit/res/noimage.jpg';
 			$imgData['notfound']=true;
 			$imgData['imginfo']=getimagesize($imgData['path']);
 		}
@@ -1912,7 +1931,7 @@ class tx_metafeedit_export {
 
 		if ($this->confTS[$this->pluginId.'.']['list.']['size']) $size = $this->confTS[$this->pluginId.'.']['list.']['size'];
 		else $size = $this->workWidth/$nbCols;			// taille de la colonne en cm selon l'orientation du PDF
-		$this->cellWidth=$size;
+		$this->cellWidth=(float)$size;
 		
 		if ($this->confTS[$this->pluginId.'.']['list.']['sizeh']) $sizeh = $this->confTS[$this->pluginId.'.']['list.']['sizeh'];
 		$sizeh = 5;			// 7 => hauteur d'une ligne,  *10 => pour avoir la taille en mm
