@@ -1753,7 +1753,15 @@ class tx_metafeedit_export {
 	
 	function getDisplayImage($relativePathToImage){
 		$imgData=array();
-		$fullPathToImage=PATH_site.utf8_decode($relativePathToImage);
+		// Image file names must be encoded in UTF-8 on disk.
+		//@todo what if photo original filenames are from windows ?
+		
+		$encoding = mb_detect_encoding($relativePathToImage, array('UTF-8','ISO-8859-1','windows-1252'), true);
+		if ($encoding !== 'UTF-8') {
+			$fullPathToImage=PATH_site.utf8_encode($relativePathToImage);
+		} else {
+			$fullPathToImage=PATH_site.$relativePathToImage;
+		}
 		$imgData['imginfo']=getimagesize($fullPathToImage);
 		
 		if (is_array($imgData['imginfo'])) {
