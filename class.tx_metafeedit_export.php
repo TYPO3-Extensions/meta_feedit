@@ -884,6 +884,25 @@ class tx_metafeedit_export {
 	}
 	
 	/**
+	 * Adds fonts to PDF
+	 */
+	function addFonts() {
+		$this->addFont('3OF9','','3OF9.php');
+		$this->addFont('verdana','','verdana.php');
+		$this->addFont('verdana','B','verdanab.php');
+		$this->addFont('verdana','I','verdanai.php');
+		$this->addFont('verdana','U','verdanaz.php');
+	}
+	
+	function addFont($font, $fontStyle, $fontFile)  {
+		try {
+			$this->pdf->AddFont($font,$fontStyle,$fontFile);
+		} catch (Exception $e) {
+			error_log(__METHOD__.":$font:$fontStyle:$fontFile :".$e->getMessage());
+		}
+	}
+	
+	/**
 	 * We handle here PDF file generation for detail ...
 	 * @param unknown_type $content
 	 * @param unknown_type $caller
@@ -946,9 +965,9 @@ class tx_metafeedit_export {
 		$this->documentUnit='mm';
 		$this->pdf = new tx_metafeedit_pdf($this->documentOrientation, $this->documentUnit, $this->documentFormat);
 		$this->pdf->caller=&$this;
-		
-		// @todo general addfont function ...
-		$this->pdf->AddFont('3OF9','','3OF9.php');
+		error_log(__METHOD__.":0");
+		$this->addFonts();
+		error_log(__METHOD__.":1");
 		$this->pdf->nofooter=$nofooter;
 		// TODO Handle typoscript here ...
 
@@ -997,7 +1016,7 @@ class tx_metafeedit_export {
 		$this->getFont($font);
 		$this->pdf->SetFont($font,'',$police);
 		$alt=0;
-
+		error_log(__METHOD__.":2");
 		// Content
 		
 		$this->height = ($this->confTS[$this->pluginId.'.'][$cmd.'.']['height'])?$this->confTS[$this->pluginId.'.'][$cmd.'.']['height']:(($this->confTS['default.'][$cmd.'.']['height'])?$this->confTS['default.'][$cmd.'.']['height']:($this->pdf->cellsize?$this->pdf->cellsize:5)); // hauteur de la ligne pdf
@@ -1047,7 +1066,7 @@ class tx_metafeedit_export {
 					$fca=t3lib_div::trimexplode(',',$cell->spec['fc']);
 					$this->pdf->setDrawColor($fca[0],$fca[1],$fca[2]);
 				}
-				//text color
+				//tc :text color
 				if (isset($cell->spec['tc'])) {
 					$tca=t3lib_div::trimexplode(',',$cell->spec['tc']);
 					$this->pdf->setTextColor($tca[0],$tca[1],$tca[2]);
@@ -1059,10 +1078,33 @@ class tx_metafeedit_export {
 				
 				} elseif ($cell->rect==1) {
 					//We handle rectangles here
-					$this->pdf->Line($cell->rect['x1'], $cell->rect['y1'], $cell->rect['x2'], $cell->rect['y1']);
-					$this->pdf->Line($cell->rect['x2'], $cell->rect['y1'], $cell->rect['x2'], $cell->rect['y2']);
-					$this->pdf->Line($cell->rect['x2'], $cell->rect['y2'], $cell->rect['x1'], $cell->rect['y2']);
-					$this->pdf->Line($cell->rect['x1'], $cell->rect['y2'], $cell->rect['x1'], $cell->rect['y1']);
+					$rectWidth = $cell->rect['x2'] - $cell->rect['x1'];
+					$rectHeight =  $cell->rect['y2'] - $cell->rect['y1'];
+					//sc: stroke color
+					//bc : backgrond color
+					//fc :foreground color
+					if ($cell->rect['sc'] && $cell->rect['bc']) {
+						$sca=t3lib_div::trimexplode(',',$cell->rect['sc']);
+						$this->pdf->setDrawColor($sca[0],$sca[1],$sca[2]);
+						$rectStyle = 'DF';
+					}
+					elseif ($cell->rect['bc']) {
+						$rectStyle = 'F';
+					}
+					else {
+						$rectStyle = 'D';
+					}
+					if (isset($cell->rect['bc'])) {
+						$bca=t3lib_div::trimexplode(',',$cell->rect['bc']);
+						$this->pdf->setFillColor((int)$bca[0],(int)$bca[1],(int)$bca[2]);
+					}
+					
+					if (isset($cell->rect['fc'])) {
+						$fca=t3lib_div::trimexplode(',',$cell->rect['fc']);
+						$this->pdf->setDrawColor($fca[0],$fca[1],$fca[2]);
+					}
+					
+					$this->pdf->Rect($cell->rect['x1'], $cell->rect['y1'], $rectWidth, $rectHeight, $rectStyle);
 					
 				} elseif ($cell->img==1) {
 					//We handle image cells here
@@ -1074,24 +1116,22 @@ class tx_metafeedit_export {
 					
 				} else {
 					//We handle text cells here
+					//ta : text alignment
+					if ($cell->spec['ta']) $this->rowPos[$x] = $cell->spec['ta'];
 					switch($this->rowPos[$x]) {
-						case 'left' :
-							$p='L';
-							break;
 						case 'right' :
-						  $p='R';
+							$p = 'R';
 							break;
 						case 'center' :
-						  $p='C';
+							$p = 'C';
 							break;
 						default :
-							$p='L';
+							$p = 'L';
 							break;
 				 	}
-				 	if (!$r) $p='L'; // So that column headers are always aligned left. 
-				 	
+				 	if (!$r) $p = 'L'; // So that column headers are always aligned left.
+
 				 	$this->cellX=$this->pdf->GetX();
-					
 				
 					$b=1;
 					if (isset($cell->spec['b'])) $b=(int)$cell->spec['b'];
@@ -1114,6 +1154,7 @@ class tx_metafeedit_export {
 					if (isset($cell->spec['fb'])) {
 						$fb=$cell->spec['fb'];
 					}
+
 					//before line
 					$bln=0;
 					if (isset($cell->spec['bln'])) {
@@ -1138,7 +1179,7 @@ class tx_metafeedit_export {
 						$this->cellY = $this->pdf->getY();
 						$this->cellX = $this->pdf->getX();
 						if ($b) $this->pdf->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD');
-						$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p,0);
+						$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p,false);
 						$this->pdf->SetXY($this->cellX+$this->cellWidth,$this->cellY);
 						$this->rowYOffset = $this->pdf->getY()>$this->rowYOffset?$this->pdf->getY():$this->rowYOffset;
 					} else if (isset($cell->spec['x'])) {
@@ -1199,8 +1240,16 @@ class tx_metafeedit_export {
 			$r++;
 		}
 		ob_clean();
+		error_log(__METHOD__.":12");
 		$this->pdf->generatePrintScript($print,$printer,$server);
-		$this->pdf->Output($caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf', 'I');
+		error_log(__METHOD__.":13");
+		try {
+			$this->pdf->Output($caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf', 'I');
+		} catch (Exception $e) {
+			error_log(__METHOD.":$e");
+			error_log(__METHOD__.":13.5");
+		}
+		error_log(__METHOD__.":14");
 		die;
 	}	
 
@@ -1297,7 +1346,7 @@ class tx_metafeedit_export {
 		$this->lineWidth=0.3;
 		$this->pdf= new tx_metafeedit_pdf($this->documentOrientation, $this->documentUnit, $this->documentFormat);
 		$this->pdf->caller=&$this;
-		
+		$this->addFonts();
 		//@TODO Handle typoscript here ...
 		
 		$this->pdf->bottommargin=9;
@@ -1547,15 +1596,11 @@ class tx_metafeedit_export {
 	 		$this->cellY=(float)$cell->spec['y'];
 	 	}
 	 	//Image border
-	 	$ib=0;
-	 	if ($cell->img['b']) $ib=1;
-	 	//if ($ib) {
-	 	//error_log(__METHOD__.": cellWidth $this->cellWidth ".gettype($this->cellWidth));
-	 	//error_log(__METHOD__.": rowHeight $this->rowHeight ".gettype($this->rowHeight));
-	 	//error_log(__METHOD__.": cellX $this->cellX ".gettype($this->cellX));
-	 	//error_log(__METHOD__.": cellY $this->cellY ".gettype($this->cellY));
-	 	$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
-	 	//}
+	 	$ib = 0;
+	 	if (isset($cell->img['b'])) $ib = (int)$cell->img['b'];
+	 	if ($ib) {
+			$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
+	 	}
 	 	$this->pdf->setX($this->cellX);
 		foreach($vala as $v) {
 			$imgData=$this->getDisplayImage($cell->img->dir?$cell->img->dir.'/'.$v:$v);
@@ -1622,6 +1667,7 @@ class tx_metafeedit_export {
 					$imgw=$imgh*($w/$h);
 				}
 				$w=$size;
+				//@todo why do we have two types of borders based on $ib ?
 				if (isset($cell->spec['w'])) $w=$cell->spec['w'];
 				if ($ib) {
 					//error_log(__METHOD__.":img $imgx, $imgy,w: $imgw, $imgh");
@@ -1696,7 +1742,7 @@ class tx_metafeedit_export {
 		}
 		//Image border
 		$ib=0;
-		if ($cell->img['b']) $ib=1;
+		if (isset($cell->img['b'])) $ib=(int)$cell->img['b'];
 	
 		$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
 		$this->pdf->setX($this->cellX);
@@ -1867,7 +1913,7 @@ class tx_metafeedit_export {
 		
 		$this->pdf = new tx_metafeedit_pdf($this->documentOrientation, $this->documentUnit, $this->documentFormat);
 		$this->pdf->caller=&$this;
-		
+		$this->addFonts();
 		$this->pdf->bottommargin=9;
 		$this->pdf->leftmargin=8;
 		$this->pdf->rightmargin=8;
