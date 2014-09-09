@@ -965,9 +965,8 @@ class tx_metafeedit_export {
 		$this->documentUnit='mm';
 		$this->pdf = new tx_metafeedit_pdf($this->documentOrientation, $this->documentUnit, $this->documentFormat);
 		$this->pdf->caller=&$this;
-		error_log(__METHOD__.":0");
+		
 		$this->addFonts();
-		error_log(__METHOD__.":1");
 		$this->pdf->nofooter=$nofooter;
 		// TODO Handle typoscript here ...
 
@@ -1016,7 +1015,6 @@ class tx_metafeedit_export {
 		$this->getFont($font);
 		$this->pdf->SetFont($font,'',$police);
 		$alt=0;
-		error_log(__METHOD__.":2");
 		// Content
 		
 		$this->height = ($this->confTS[$this->pluginId.'.'][$cmd.'.']['height'])?$this->confTS[$this->pluginId.'.'][$cmd.'.']['height']:(($this->confTS['default.'][$cmd.'.']['height'])?$this->confTS['default.'][$cmd.'.']['height']:($this->pdf->cellsize?$this->pdf->cellsize:5)); // hauteur de la ligne pdf
@@ -1240,16 +1238,12 @@ class tx_metafeedit_export {
 			$r++;
 		}
 		ob_clean();
-		error_log(__METHOD__.":12");
 		$this->pdf->generatePrintScript($print,$printer,$server);
-		error_log(__METHOD__.":13");
 		try {
 			$this->pdf->Output($caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf', 'I');
 		} catch (Exception $e) {
 			error_log(__METHOD.":$e");
-			error_log(__METHOD__.":13.5");
 		}
-		error_log(__METHOD__.":14");
 		die;
 	}	
 
