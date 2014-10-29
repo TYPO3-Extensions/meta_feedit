@@ -644,8 +644,10 @@ class tx_metafeedit extends  tslib_pibase {
 	*/
 	
 	function getDefaultTemplate(&$conf)	{
+		//error_log(__METHOD__.':'.$conf['piVars']['exporttype']);
 		$nbCols = $this->piVars['nbCols'];
 		if ($conf['generateTemplate']||$conf['general.']['tplCache']){ // We generate all templates
+			//error_log(__METHOD__.':cache'.$conf['piVars']['exporttype']);
 			if ($conf['general.']['tplCache']) {
 				$tpl=$this->getTemplate('full',$conf);
 				if ($tpl) {
@@ -653,10 +655,12 @@ class tx_metafeedit extends  tslib_pibase {
 					return $tpl;
 				}
 			}
+			
 			$template = $this->getRequiredTemplate($conf);
 			$template .= $this->getEmailTemplate($conf);
 			$template .= $this->getEditTemplate($conf);
 			$template .=  $this->getListTemplate($conf);
+			//error_log(__METHOD__.':l '.print_r($conf['list.'],true));
 			if ($conf['list.']['csv']) $template .= $this->getCSVTemplate($conf);
 			if ($conf['list.']['xls']) $template .=$this->getExcelTemplate($conf);
 			if ($conf['list.']['pdf']) $template .=  $this->getPDFTemplate($conf);
@@ -672,6 +676,7 @@ class tx_metafeedit extends  tslib_pibase {
 		} else {
 			$template = $this->getRequiredTemplate($conf);
 			$template .= $this->getEmailTemplate($conf);
+			//error_log(__METHOD__.':nocache'.$conf['inputvar.']['cmd']);
 			switch((string) $conf['inputvar.']['cmd']) {
 				case 'edit':
 					$template .= $this->getEditTemplate($conf);
@@ -688,6 +693,7 @@ class tx_metafeedit extends  tslib_pibase {
 					}
 					$template .= $this->getListTemplate($conf);
 					if ($conf['piVars']['exporttype']) {
+						//error_log(__METHOD__.':'.$conf['piVars']['exporttype']);
 						if ($conf['list.']['csv']) $template .=  $this->getCSVTemplate($conf);
 						if ($conf['list.']['excel']) $template .=  $this->getExcelTemplate($conf);
 						if ($conf['list.']['pdf']) $template .=  $this->getPDFTemplate($conf);
@@ -3320,11 +3326,12 @@ function getCSVTemplate(&$conf)
 
 /**
  * 
- * @param unknown_type $conf
+ * @param array $conf
  * @return string
  */
 function getExcelTemplate(&$conf)
 {
+	//error_log(__METHOD__);
 	$pluginId=$conf['pluginId'];
   if ($conf['list.']['TemplateExcel']) return '<!-- ###TEMPLATE_EDITMENU_EXCEL### begin -->'.$conf['list.']['TemplateExcel'].'<!-- ###TEMPLATE_EDITMENU_EXCEL### end -->';
 	$tmp='<!-- ###TEMPLATE_EDITMENU_EXCEL### begin --><?xml version="1.0" encoding="utf-8"?><table>';

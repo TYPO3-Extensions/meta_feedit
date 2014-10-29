@@ -846,6 +846,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
  
 	function getPlainTemplate(&$conf,&$markerArray,$key,$r='')	{
 		if ($conf['debug'])	debug('getPlainTemplate(): '.$key,1);
+		//error_log(__METHOD__.":($key)".print_r($conf['templateContent'],true));
 		$templateCode = $this->cObj->getSubpart($conf['templateContent'], $key);
 		$this->setCObjects($conf,$markerArray,$templateCode,is_array($r)?$r:array());
 		return  is_array($r)?$this->cObj->substituteMarkerArray($templateCode,is_array($r) ? $this->cObj->fillInMarkerArray($markerArray, $r, '', TRUE, 'FIELD_', $conf['general.']['xhtml']) : $markerArray):$templateCode;
@@ -2115,27 +2116,36 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		return $specialConf;
 	}
 	/**
+	 * 
+	 * @param unknown_type $filter
+	 * @param unknown_type $op
+	 */
+	function makeFilter($filter,$op='and') {
+		$sql='';
+		error_log(__METHOD__.":".print_r($filter,true));
+		if ($filter) {
+			error_log(__METHOD__.':0');
+			$jf=t3lib_div::makeInstance('Tx_ArdMcm_Backend_JsonFilter',$filter);
+			error_log(__METHOD__.':1');
+			$sql= $jf->toSQL();
+		}
+		error_log(__METHOD__.':'.$sql);
+		return $sql;
+	}
+	/**
 	 * We create list where from external filter definition
 	 * @param array $conf
 	 * @param array $sql
 	 */
 	function getFilter(&$conf,&$sql) {
 		$json=$conf['piVars']['filter'];
-		$filter=json_decode($json);
-		$externalFilter='';
-		if (count($filter)) {
-			$externalFilter.=' and (';
-			$first=true;
-			foreach($filter as $filterCriteria) {
-				$w=($filterCriteria->t?$filterCriteria->t.'.':'').$filterCriteria->f.' '.$filterCriteria->o.' '.$filterCriteria->v;
-				$externalFilter.=$first?$w:' and '.$w;
-				$first=false;
-			}
-			$externalFilter.=')';
-			$sql['where'].=$externalFilter;
-			$sql['externalFilter']=$externalFilter;
-			
-		}
+		//error_log(__METHOD__.":".$json);
+		$filter=json_decode($json,true);
+		//error_log(__METHOD__.":".print_r($filter,true));
+		$externalFilter=$this->makeFilter($filter);
+		$externalFilter=$externalFilter?' and ('.$externalFilter.')':'';
+		$sql['where'].=$externalFilter;
+		$sql['externalFilter']=$externalFilter;
 	}
 	/**
 	 * We create list where from external filter definition
@@ -4036,16 +4046,17 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			$sql['fieldArray'][]=$conf['table'].'.*';
 			$sql['fields.']['*.']['table']=$conf['table'];
 		}
-		
+		//error_log(__METHOD__.":01-".$sql['where']);
 		$this->getLockPidJoin($conf,$sql);
 		$this->getExtraFields($conf,$sql);		
-		$this->getOUJoin($conf,$sql);		
+		$this->getOUJoin($conf,$sql);
+		//error_log(__METHOD__.":05-".$sql['where']);
 		$this->getFUJoin($conf,$sql);		
 		$this->getRUJoin($conf,$sql);		
 		$this->getParentJoin($conf,$sql);
 		$this->getCalcFields($conf,$sql);
 		// Filters
-		
+		//error_log(__METHOD__.":09-".$sql['where']);
 		if ($conf['piVars']['filter']) {
 			// Filter coming from extjs interface
 			$this->getFilter($conf,$sql);
@@ -4060,6 +4071,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			if ($conf['list.']['advancedSearch']) $this->getAdvancedSearchWhere($conf,$sql,$markerArray);
 			if ($conf['list.']['calendarSearch']) $this->getCalendarSearchWhere($conf,$sql);
 		}
+		//error_log(__METHOD__.":1-".$sql['where']);
 		$this->getUserWhereString($conf,$sql);
 		
 		// MODIF CBY
@@ -4085,6 +4097,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		foreach($sql['joinTables'] as $jT) {
 			$sql['fromTables'].=$sql['join.'][$jT];
 		}
+		//error_log(__METHOD__.":1000-".$sql['where']);
 		$conf['list.']['sql']=&$sql;
  		if ($conf['debug.']['sql']) $DEBUG.="<br/>LIST SQL ARRAY <br/><pre>".print_r($sql,true)."</pre>";   
 		return $sql;
@@ -4894,6 +4907,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	*/
 
 	function getAdvancedSearchWhere(&$conf,&$sql,&$markerArray,$updateWhere=true) {
+		//error_log(__METHOD__.":0 -".$sql['where']." --- ".$sql['advancedWhere']);
 		$fields=$conf['list.']['advancedSearchFields']?$conf['list.']['advancedSearchFields']:($conf['list.']['show_fields']?$conf['list.']['show_fields']:'');
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
 		foreach($fieldArray as $FN) {
@@ -4959,7 +4973,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 						//@todo test if input/select, ....
 						switch ($conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type']) {
 							case 'input' :
-								$sql['advancedWhere'].=" AND $champ like '".addslashes($valeur)."%'"; 
+								$sql['advancedWhere'].=" AND $champ like '%".addslashes($valeur)."%'"; 
 								break;
 							case 'select' :
 							default :
@@ -5050,6 +5064,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			}//end foreach..
 		}
 		if ($updateWhere) $sql['where'].=$sql['advancedWhere'];
+		//error_log(__METHOD__.":1000 -".$sql['where']." --- ".$sql['advancedWhere']);
 	}		
 	
 	// calendarSearch

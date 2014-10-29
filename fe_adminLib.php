@@ -2011,6 +2011,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->metafeeditlib->getAdvancedSearchComboMarkerArray($conf,$this->markerArray);
 		//We get templates
 		$tpl=$this->prepareListTemplates($conf,$this->markerArray,$exporttype);
+		//error_log(__METHOD__.':tPL '.print_r($tpl,true));
 		//@region 
 		//@todo put this in a function
 		//$searchfieldsSet=$this->checkSearchCriteriae($conf,$this->markerArray);
@@ -2075,6 +2076,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	
 			//TODO add distinct or not through flexform ...
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']);
+			//error_log(__METHOD__.":".$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']));
 			if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList row count ',$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']),$DEBUG);
 			$num=$GLOBALS['TYPO3_DB']->sql_num_rows($res);	// If there are menu-items ...
 			$this->markerArray['###METAFEEDITNBROWS###']='<span class="nbrows">'.$this->metafeeditlib->getLL("nbrows",$this->conf).$num.'</span>';
@@ -2438,6 +2440,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$content=$this->cObj->substituteMarker($content,'###ACTIONS-LIST-BOTTOM###',$this->metafeeditlib->getListBottomActions($conf,$this));
 			
 		}
+		//error_log($content);
 		//error_log(__METHOD__." Mem x $x bf sub: ".$this->metafeeditlib->getMemoryUsage());
 		// Call to user  marker function
 		if ($conf['list.']['userFunc_afterMark']) $this->userProcess_alt($conf['list.']['userFunc_afterMark'],$conf['list.']['userFunc_afterMark.'],array($conf['list.']['whereString']));
@@ -2498,7 +2501,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						}
 					}
 				} else {
-					$fieldAlias=$this->metafeeditlib->makeFieldAlias($table,$fieldName,$conf);
+					$fieldAlias=$this->metafeeditlib->xeldAlias($table,$fieldName,$conf);
 					$sumSQLFields.=$sumSQLFields?",sum($fieldAlias) as 'sum_$fieldName'":"sum($fieldAlias) as 'sum_$fieldName'";
 				}
 			}

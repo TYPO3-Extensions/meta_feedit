@@ -419,7 +419,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		// Exports
 		$mfconf['list.']['pdf']=$lconf['pdf'];			// R�cup�re l'info de si la case est coch�e
 		$mfconf['list.']['csv']=$lconf['csv'];			
-		$mfconf['list.']['excel']=$lconf['excel'];
+		$mfconf['list.']['excel']=$mfconf['list.']['xls']=$lconf['excel'];
 		$mfconf['list.']['euros']=$lconf['euros']; // Deprecated
 		$mfconf['list.']['sumFields']=$lconf['sumFields'];
 		$mfconf['list.']['TemplatePDF']=$lconf['TemplatePDF'];
