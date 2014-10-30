@@ -1221,8 +1221,9 @@ class tx_metafeedit_export {
 	
 	
 	function Rect($x1, $y1, $rectWidth, $rectHeight, $rectStyle, $sw) {
-		$this->pdf->Rect($x1, $y1, $rectWidth, $rectHeight, $rectStyle);
-		if ($sw) {
+		//error_log(__METHOD__.": $rectStyle, $sw");
+		if (strpos($rectStyle,'F')!==false) $this->pdf->Rect($x1, $y1, $rectWidth, $rectHeight, "F");
+		if (strpos($rectStyle,'D')!==false && $sw) {
 			$this->pdf->SetLineWidth($sw);
 			$x2 = $x1 + $rectWidth;
 			$y2 = $y1 + $rectHeight;
@@ -1399,12 +1400,12 @@ class tx_metafeedit_export {
 					$this->pdf->setFillColor((int)$bca[0],(int)$bca[1],(int)$bca[2]);
 				}
 				//foreground color
-				if (isset($cell->spec['fc'])) {
+				if (isset($cell->spec['fc']) && $cell->spec['fc'] != '') {
 					$fca=t3lib_div::trimexplode(',',$cell->spec['fc']);
 					$this->pdf->setDrawColor($fca[0],$fca[1],$fca[2]);
 				}
 				//tc :text color
-				if (isset($cell->spec['tc'])) {
+				if (isset($cell->spec['tc']) && $cell->spec['tc'] != '') {
 					$tca=t3lib_div::trimexplode(',',$cell->spec['tc']);
 					$this->pdf->setTextColor($tca[0],$tca[1],$tca[2]);
 				}
@@ -1444,7 +1445,6 @@ class tx_metafeedit_export {
 					$this->PDFDisplayBarcode($cell);
 					
 				} else {
-					//error_log(__METHOD__."text bct :".$cell['bct']);
 					$this->PDFDisplayText($cell,$val);					
 				}
 				$x++;
@@ -1825,16 +1825,16 @@ class tx_metafeedit_export {
 		
 		$this->cellX=$this->pdf->GetX();
 		
-		$b=1;
-		if (isset($cell->spec['b'])) $b=(int)$cell->spec['b'];
+		$b=0;
+		if (isset($cell->spec['b'])) $b=(float)$cell->spec['b'];
 		if (isset($cell->spec['h'])) $this->h=(int)$cell->spec['h'];
 		if ($this->h>$this->rowHeight) $this->rowHeight=$this->h;
 		
 		if (isset($cell->spec['w'])) $w=$cell->spec['w'];
 		
 		// We handle transparent cell
-		$fillText=isset($cell->spec['bc']) && $cell->spec['bc'] == ''?false:true;
-		
+		$fillStyle=isset($cell->spec['bc'])?($cell->spec['bc'] == ''?'':'F'):'';
+		$fillStyle.=$b?(isset($cell->spec['fc'])?($cell->spec['fc'] == ''?'':'D'):''):'';
 		//font size
 		$fs='';
 		if (isset($cell->spec['fs'])) {
@@ -1872,17 +1872,7 @@ class tx_metafeedit_export {
 			$this->pdf->SetXY((float)$cell->spec['x'],(float)$cell->spec['y']);
 			$this->cellY = $this->pdf->getY();
 			$this->cellX = $this->pdf->getX();
-			// If text is too long
-			/*if (isset($cell->spec['tl']) && (string)$cell->spec['tl'] == 'reducesize') {
-				$widthBox = $this->cellWidth - $this->cellX;
-				$this->TextReduceSize($widthBox, $val, $fs);
-			}*/
-			if ($b) {
-				$this->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD',$b);
-			} else {
-				$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'F');
-			}
-			//error_log(__METHOD__.":fit=$fit, h $this->h, $this->height");
+			$this->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,$fillStyle,$b);
 			switch($fit){
 				case 'fix':
 					$this->pdf->ClippedMultiCell($this->cellWidth,$this->h,$this->height,$val,0,$p,false);
@@ -1904,7 +1894,7 @@ class tx_metafeedit_export {
 			$this->pdf->SetX((float)$cell->spec['x']);
 			$this->cellY = $this->pdf->getY();
 			$this->cellX = $this->pdf->getX();
-			if ($b) $this->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD',$b);
+			$this->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,$fillStyle,$b);
 			$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p,0);
 			$this->pdf->SetXY($this->cellX+$this->cellWidth,$this->cellY);
 			$this->rowYOffset = $this->pdf->getY()>$this->rowYOffset?$this->pdf->getY():$this->rowYOffset;
@@ -1912,14 +1902,12 @@ class tx_metafeedit_export {
 			$this->cellX = $this->pdf->getX();
 			$this->cellY = $this->pdf->getY();
 			if ($bln) $this->pdf->Ln($bln);
-			if ($b) $this->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD',$b);
+			$this->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,$fillStyle,$b);
 			$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p,0);
-		
 			if ($l) {
 				//We draw line
 				$this->pdf->Cell(0,$l,'','T',0,'C',0);
 			}
-		
 			// We handle bigger cells !!!
 			$this->rowYOffset = $this->pdf->getY()>$this->rowYOffset?$this->pdf->getY():$this->rowYOffset;
 			$this->pdf->SetXY(($this->cellX+$this->cellWidth),$this->cellY);
@@ -1958,7 +1946,7 @@ class tx_metafeedit_export {
 	 	}
 	 	//Image border
 	 	$ib = 0;
-	 	if (isset($cell->img['b'])) $ib = (int)$cell->img['b'];
+	 	if (isset($cell->img['b'])) $ib = (float)$cell->img['b'];
 	 	if ($ib) {
 			//$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
 			$this->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD',$ib);
@@ -2045,7 +2033,7 @@ class tx_metafeedit_export {
 				if (isset($cell->spec['w'])) $w=$cell->spec['w'];
 				if ($ib) {
 					//error_log(__METHOD__.":img $imgx, $imgy,w: $imgw, $imgh");
-					$this->Rect($imgx,$imgy,$imgw,$imgh,$ib);
+					$this->Rect($imgx,$imgy,$imgw,$imgh,"D",$ib);
 				}
 				
 				$this->rowYOffset = ($imgy+$imgh)>$this->rowYOffset?($imgy+$imgh):$this->rowYOffset;
@@ -3001,11 +2989,11 @@ class tx_metafeedit_export {
 	protected function TextFit2Width($widthBox, $text, $fontSize) {
 		//$widthBox = floor($widthBox);
 		while ($this->pdf->NbLines($widthBox, $text)>1 && $fontSize>1) {
-			error_log(__METHOD__.":$wText, $widthBox,$fontSize");
+			//error_log(__METHOD__.":$wText, $widthBox,$fontSize");
 			$fontSize=$fontSize-1;	
 			$this->pdf->SetFontSize($fontSize);
 		}
-		error_log(__METHOD__.":2 $wText, $widthBox,$fontSize");
+		//error_log(__METHOD__.":2 $wText, $widthBox,$fontSize");
 	}
 	/**
 	 * Reduce font size for text show in one box
@@ -3017,13 +3005,13 @@ class tx_metafeedit_export {
 		//$widthBox = floor($widthBox);
 		$rowHeight= $this->pdf->NbLines($widthBox, $text)*$lineHeight;
 		while ($rowHeight > $heightBox && $fontSize>1) {
-			error_log(__METHOD__.":$rowHeight, $heightBox,$fontSize");
+			//error_log(__METHOD__.":$rowHeight, $heightBox,$fontSize");
 			$fontSize=$fontSize-1;
 			
 			$this->pdf->SetFontSize($fontSize);
 			$rowHeight= $this->pdf->NbLines($widthBox, $text)*$lineHeight;
 		}
-		error_log(__METHOD__.":2 $rowHeight, $heightBox,$fontSize");
+		//error_log(__METHOD__.":2 $rowHeight, $heightBox,$fontSize");
 	}
 	
 
