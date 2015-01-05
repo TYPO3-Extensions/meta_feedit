@@ -1137,7 +1137,8 @@ class tx_metafeedit_export {
 		$this->rowCellWidth=array();
 		$this->rowPos=array();
 		$this->rowFreeCellWidth=0;
-		$this->rowHeight=$this->height;
+		//$this->rowHeight=$this->height;
+		$this->rowHeight=@$row->spec['rh']?(float)@$row->spec['rh']:$this->height;
 		$this->rowWidth=0;
 		$cellWidth=0;
 		$cellHeight=0;
@@ -1382,7 +1383,7 @@ class tx_metafeedit_export {
 		$this->r=0;
 		// We print rows...
 		foreach($xml->tr as $row) {
-			$this->h=$this->rowHeight=$this->height;
+			$this->h=$this->rowHeight=@$row->spec['rh']?(float)@$row->spec['rh']:$this->height;
 			if (@$row->spec['ap']) {
 				$this->pdf->addPage();
 			}
@@ -1677,7 +1678,10 @@ class tx_metafeedit_export {
 			foreach($row->td as $cell) {
 				$this->cellWidth=(float) (($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x]);
 				if ($cell->img==1) {
+					$this->cellX=$this->pdf->getX();
+					$this->cellY=$this->pdf->GetY();
 					// We handle image cells here...
+					$this->pdf->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD');
 					$this->PDFDisplayimage($cell);
 				} else {
 					// We handle text cells here..
@@ -1708,7 +1712,6 @@ class tx_metafeedit_export {
 					 	} else {
 					 		if ($row->gb && $x==0) { 
 					 			$this->pdf->Cell($this->workWidth,$this->height,$val,1,0,$p,1);
-								
 								$this->pdf->setX($this->cellX+$this->cellWidth);
 							} else {
 								$border=1;							
@@ -1848,7 +1851,7 @@ class tx_metafeedit_export {
 		
 		$b=0;
 		if (isset($cell->spec['b'])) $b=(float)$cell->spec['b'];
-		if (isset($cell->spec['h'])) $this->h=(int)$cell->spec['h'];
+		if (isset($cell->spec['h'])) $this->h=(float)$cell->spec['h'];
 		if ($this->h>$this->rowHeight) $this->rowHeight=$this->h;
 		
 		if (isset($cell->spec['w'])) $w=$cell->spec['w'];
@@ -1893,18 +1896,20 @@ class tx_metafeedit_export {
 			$this->pdf->SetXY((float)$cell->spec['x'],(float)$cell->spec['y']);
 			$this->cellY = $this->pdf->getY();
 			$this->cellX = $this->pdf->getX();
+			//error_log(__METHOD__."rect:$this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,$fillStyle,$b");
 			$this->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,$fillStyle,$b);
 			switch($fit){
 				case 'fix':
-					$this->pdf->ClippedMultiCell($this->cellWidth,$this->h,$this->height,$val,0,$p,false);
+					//error_log(__METHOD__.":$this->cellWidth,$this->h,$this->height,$val,0,$p,false");
+					$this->pdf->ClippedMultiCell($this->cellWidth,$this->h,$this->h,$val,0,$p,false);
 					break;
 				case 'fit2width':
 					$this->TextFit2Width($this->cellWidth, $val, $fs);
-					$this->pdf->ClippedMultiCell($this->cellWidth,$this->h,$this->height,$val,0,$p,false);
+					$this->pdf->ClippedMultiCell($this->cellWidth,$this->h,$this->h,$val,0,$p,false);
 					break;
 				case 'fit2box': 
-					$this->TextFit2Box($this->cellWidth,$this->h,$this->height, $val, $fs);
-					$this->pdf->ClippedMultiCell($this->cellWidth,$this->h,$this->height,$val,0,$p,false);
+					$this->TextFit2Box($this->cellWidth,$this->h,$this->h, $val, $fs);
+					$this->pdf->ClippedMultiCell($this->cellWidth,$this->h,$this->h,$val,0,$p,false);
 					//$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p,false);
 					break;
 			}
@@ -2271,7 +2276,7 @@ class tx_metafeedit_export {
 		if (isset($cell->spec['b'])) $ib=(int)$cell->spec['b'];
 		if ($ib) {
 			//$this->pdf->setX($this->cellX);
-			error_log(__METHOD__."x:$this->cellX  y:$this->cellY");
+			//error_log(__METHOD__."x:$this->cellX  y:$this->cellY");
 			//$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
 			$this->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD',$ib);
 		} else {
