@@ -873,7 +873,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	*/
 	
 	function getForeignTableFromField($fN, &$conf,$table='',&$sql=array()) {
-	  if (!$fN) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : empty field given for $table!";
+	  if (!$fN) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : empty field given for table '$table' !";
 		$ret = array();
 		$fNA = t3lib_div::trimexplode('.', $fN);
 		$fNiD = end($fNA);
@@ -2122,11 +2122,11 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	 */
 	function makeFilter($filter,$op='and') {
 		$sql='';
-		error_log(__METHOD__.":".print_r($filter,true));
+		//error_log(__METHOD__.":".print_r($filter,true));
 		if ($filter) {
-			error_log(__METHOD__.':0');
+			//error_log(__METHOD__.':0');
 			$jf=t3lib_div::makeInstance('Tx_ArdMcm_Backend_JsonFilter',$filter);
-			error_log(__METHOD__.':1');
+			//error_log(__METHOD__.':1');
 			$sql= $jf->toSQL();
 		}
 		error_log(__METHOD__.':'.$sql);
