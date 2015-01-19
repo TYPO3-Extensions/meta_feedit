@@ -260,9 +260,8 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 
 		// Uid to edit:		
 		if ($this->conf['inputvar.']['rU'] && $conf['inputvar.']['cmd']!='list') $this->recUid = $this->conf['inputvar.']['rU'];
-
 		// Fe User Fields
-	  
+	
 		$this->fUField = $this->conf['fUField']?$this->conf['fUField']:t3lib_div::_GP('fUField['.$this->conf['pluginId'].']');
 		$this->fUKeyField = $this->conf['fUKeyField']?$this->conf['fUKeyField']:t3lib_div::_GP('fUKeyField['.$this->conf['pluginId'].']');
 		$this->fU = $this->conf['fU']?$this->conf['fU']:t3lib_div::_GP('fU['.$this->conf['pluginId'].']');
@@ -438,6 +437,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// Incoming data.
 		if (!$this->recUid) $this->recUid=$this->dataArr[$this->conf['uidField']]?$this->dataArr[$this->conf['uidField']]:NULL;
 		$this->conf['recUid']=$this->recUid;
+
 		$this->markerArray['###REC_UID###'] = $this->recUid;
 		if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc Init done:']=$this->metafeeditlib->displaytime()." Seconds";
 		
@@ -1983,6 +1983,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$conf['cmdmode']='list';
 		$content='';
 		$DEBUG='';
+		
 		$distinct=$conf['general.']['useDistinct']?" distinct ":"";
 		$dispDir= $conf['list.']['displayDirection']?$conf['list.']['displayDirection']:'Right'; //-- this should be handled in template choice...
 		// Gestion des templates selon exporttype (can't this be done in Pi1 ?)
@@ -2036,11 +2037,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			if ($conf['inputvar.']['sortLetter']) $searchfieldsSet=true;
 			if (!$searchfieldsSet) $this->markerArray['###EVAL_ERROR###'].=$this->metafeeditlib->makeErrorMarker($conf,$this->cObj->substituteMarkerArray($this->metafeeditlib->getPlainTemplate($conf,$this->markerArray,'###TEMPLATE_LIST_NOSEARCHCRITERAE###'),$this->markerArray));
 		}
-		
 		if ($searchfieldsSet) {
 			// We build the SQL Query
 			$sql=$this->metafeeditlib->getListSQL($TABLES,$DBSELECT,$conf,$this->markerArray,$DEBUG);
-			
 			//@TODO : we get sort variable and sort direction from GET/POST Vars (should this not be  done in Pi1 ?)...hmm ...
 			$Arr=explode(',',$conf['list.']['show_fields']);
 			if ($conf['list.']['sortFields']){
@@ -2076,7 +2075,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	
 			//TODO add distinct or not through flexform ...
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']);
-			//error_log(__METHOD__.":".$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']));
+			if (!$res) {
+		 		die(__METHOD__.":Sql error : ".$GLOBALS['TYPO3_DB']->sql_error().', sql : '.$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']));
+			}
 			if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList row count ',$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']),$DEBUG);
 			$num=$GLOBALS['TYPO3_DB']->sql_num_rows($res);	// If there are menu-items ...
 			$this->markerArray['###METAFEEDITNBROWS###']='<span class="nbrows">'.$this->metafeeditlib->getLL("nbrows",$this->conf).$num.'</span>';
@@ -2102,6 +2103,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			if ($sql['groupBy']) {
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('mod(count(*),'.$nbe.') as moduloelts, count(*) as nbelts, ceiling(count(*)/'.$nbep.') as pages'.$sql['gbFields'].$sql['calcFieldsSql'].($sql['groupBy']?','.$conf['table'].'.*':''), $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql']);
 				if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList group by row count ',$GLOBALS['TYPO3_DB']->SELECTquery('mod(count(*),'.$nbe.') as moduloelts, count(*) as nbelts, ceiling(count(*)/'.$nbep.') as pages'.$sql['gbFields'].$sql['calcFieldsSql'].($sql['groupBy']?','.$conf['table'].'.*':''), $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql']),$DEBUG);
+				
 				$GBTA=array();
 				while($GbRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
 					$gbLabel=$GbRow[$GBFieldLabel];
@@ -2150,7 +2152,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					$mode=$GbRow['moduloelts'];
 				}	
 			}
-		
+			
 			if ($this->metafeeditlib->is_extent($conf['list.']['showFirstLast'])) $this->internal['showFirstLast']=$conf['list.']['showFirstLast'];
 			if ($this->metafeeditlib->is_extent($conf['list.']['pagefloat'])) $this->internal['pagefloat']=$conf['list.']['pagefloat'];
 			if ($this->metafeeditlib->is_extent($conf['list.']['showRange'])) $this->internal['showRange']=$conf['list.']['showRange'];
@@ -2178,7 +2180,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT));
 			if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList rows',$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql'].($exporttype?'':$LIMIT)),$DEBUG);
-			
 			// process variables
 	
 			$out='';	
@@ -2431,6 +2432,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			
 			if (!$num) $this->markerArray['###EVAL_ERROR###'].=$this->metafeeditlib->makeErrorMarker($conf,$this->cObj->substituteMarkerArray($this->metafeeditlib->getPlainTemplate($conf,$this->markerArray,'###TEMPLATE_EDITMENU_NOITEMS###'),$this->markerArray));
 		} else {
+			//echo "displayListScreen 2 $DEBUG";
 			$this->metafeeditlib->getAdvancedSearchWhere($conf,$sql,$this->markerArray);
 			//echo $tpl['templateCode'];
 			$content=$this->cObj->substituteSubpart($tpl['templateCode'], '###TEMPLATE_LIST_TABLEDATA###', '');
@@ -2440,7 +2442,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$content=$this->cObj->substituteMarker($content,'###ACTIONS-LIST-BOTTOM###',$this->metafeeditlib->getListBottomActions($conf,$this));
 			
 		}
-		//error_log($content);
+		//echo "displayListScreen 3 $DEBUG";
 		//error_log(__METHOD__." Mem x $x bf sub: ".$this->metafeeditlib->getMemoryUsage());
 		// Call to user  marker function
 		if ($conf['list.']['userFunc_afterMark']) $this->userProcess_alt($conf['list.']['userFunc_afterMark'],$conf['list.']['userFunc_afterMark.'],array($conf['list.']['whereString']));
@@ -2449,40 +2451,52 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$content=$this->cObj->stdWrap(trim($this->cObj->substituteMarkerArray($content, $this->markerArray)),$conf['list.']['formWrap.'][$this->theTable.'.']);
 		//error_log(__METHOD__." Mem x $x af sub: ".$this->metafeeditlib->getMemoryUsage());
 		//if (!$num) $content .= $this->cObj->substituteMarkerArray($this->metafeeditlib->getPlainTemplate($conf,$this->markerArray,'###TEMPLATE_EDITMENU_NOITEMS###'),$this->markerArray);
-	
+		//echo "displayListScreen 3.5 $DEBUG";
 		$this->getListSums($conf,$sql,$content,$tpl,$DEBUG);
-		//error_log(__METHOD__.":exporttype $exporttype");
-		switch ($exporttype)
-		{
-			case "CSV": 
-				$this->metafeeditexport->getCSV($content,$this);
-				break;
-			case "PDF": 
-				//error_log(__METHOD__.":pdf");
-				$this->metafeeditexport->getPDF($content,$this,$print,$printerName,$printServerName);
-				break;
-			case "PDFTAB": 
-				$this->metafeeditexport->getPDFTAB($content,$this,$print,$printerName,$printServerName);
-				break;
-			case "PDFDET": 
-				//error_log(__METHOD__.":pdfdet");
-				$this->metafeeditexport->getPDFDET($content,$this,$print,$printerName,$printServerName);
-				break;
-			case "XLS":
-			case "EXCEL": 
-				$this->metafeeditexport->getEXCEL($content,$this);
-				break;
+		//echo __METHOD__.":displayListScreen 4 ($DEBUG):".$this->isDebug($conf);
+		
+		if (!$DEBUG && !$this->isDebug($conf)) {
+			switch ($exporttype)
+			{
+				case "CSV": 
+					$this->metafeeditexport->getCSV($content,$this);
+					break;
+				case "PDF": 
+					$this->metafeeditexport->getPDF($content,$this,$print,$printerName,$printServerName);
+					break;
+				case "PDFTAB": 
+					$this->metafeeditexport->getPDFTAB($content,$this,$print,$printerName,$printServerName);
+					break;
+				case "PDFDET": 
+					$this->metafeeditexport->getPDFDET($content,$this,$print,$printerName,$printServerName);
+					break;
+				case "XLS":
+				case "EXCEL": 
+					$this->metafeeditexport->getEXCEL($content,$this);
+					break;
+			}
 		}
 		if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc displaylist end:']=$this->metafeeditlib->displaytime()." Seconds";
 		return $content.$DEBUG;
 	}
 	
-	
+	function isDebug($conf) {
+		return $conf['debug'] || 
+			$conf['debug.']['krumo']|| 
+			$conf['debug.']['sql']|| 
+			$conf['debug.']['markerArray']|| 
+			$conf['debug.']['langArray']|| 
+			$conf['debug.']['conf']|| 
+			$conf['debug.']['template']|| 
+			$conf['debug.']['vars']|| 
+			$conf['debug.']['tsfe'];
+	}
 
 	/* calculates Sum Footer
 	*/
 	
-	function getListSums(&$conf,&$sql,&$content,&$tpl,&$DEBUG) {	
+	function getListSums(&$conf,&$sql,&$content,&$tpl,&$DEBUG) {
+		//echo __METHOD__.":displayListScreen 0 $DEBUG";
 		if ($conf['list.']['sumFields']) {
 			$table=$conf['table'];
 			$sumFields = '';
@@ -2509,6 +2523,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			$sumSQLFields.=', count(*) as metafeeditnbelts';
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($sumSQLFields, $sql['fromTables'], '1 '.$sql['where']);
 			if ($conf['debug.']['sql']) $this->metafeeditlib->debug('DisplayList Sum SQL ',$GLOBALS['TYPO3_DB']->SELECTquery($sumSQLFields.$sql['gbFields'], $sql['fromTables'], '1 '.$sql['where']),$DEBUG);
+			//echo __METHOD__.":displayListScreen 5 $DEBUG";
 			$resu=$GLOBALS['TYPO3_DB']->sql_num_rows($res);
 			//We handle here multiple group bys ...
 			$value=array();
@@ -2702,7 +2717,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	*/
 	
 	function displayEditScreen()	{	  
-		//error_log(__METHOD__);
 		// We handle here Edit mode or Preview Mode
 		// Edit Mode : User can edit fields
 		// Preview Mode : user can only see fields	
@@ -2730,9 +2744,12 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('Edit or preview'=>'on'));
 			$uid=$this->dataArr[$this->conf['uidField']]?$this->dataArr[$this->conf['uidField']]:$this->recUid;
  			if ($this->conf['list.']['rUJoinField']=='uid' && $uid){
+ 				
 				if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('UIDFIELD'=>$this->conf['uidField'].' : '.$this->recUid));
 				if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('dataArr'=>$this->dataArr[$this->conf['uidField']]));
 				$origArr = $this->metafeeditlib->getRawRecord($this->theTable,$uid,$this->conf);
+				if (!$origArr) die(__METHOD__.":Detail mode and no id given for $this->theTable,$uid");
+				
 			}
 			
 			if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('editMode'=>'on'));
@@ -2843,7 +2860,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_NO_PERMISSIONS###');
 					}
 				} else { 
-
 					// If the recUid did not select a record, we display a menu of records. (eg. if no recUid)
 					// we check if list mode is allowed ...
 					if (!$this->conf['list'])	{	// If editing is enabled
@@ -2886,7 +2902,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	 */
 	 
 	function displayEditForm($origArr,&$conf,$exporttype='',$print='',$printerName='',$printServerName='')	{
-		//error_log(__METHOD__);
 		//We merge data with override values and eval values ...
 		$currentArr = array_merge($origArr,(array)$this->dataArr);
 		
