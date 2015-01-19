@@ -1099,7 +1099,7 @@ class tx_metafeedit_export {
 	 * Cleans data value for display
 	 * @param unknown_type $cell
 	 */
-	function getData($cell) {
+	function getData(SimpleXMLElement $cell) {
 		//$utf8val=utf8_decode($val);
 		//$result = preg_match("/(^[0-9]+([\.0-9]*))$/" , $val);
 		// Affichage du signe Euro sur l'export PDF //CBY nothing to do here !!
@@ -1241,7 +1241,6 @@ class tx_metafeedit_export {
 		}
 	}
 	
-	
 	function Rect($x1, $y1, $rectWidth, $rectHeight, $rectStyle, $sw) {
 		//error_log(__METHOD__.": $rectStyle, $sw");
 		if (strpos($rectStyle,'F')!==false) $this->pdf->Rect($x1, $y1, $rectWidth, $rectHeight, "F");
@@ -1281,7 +1280,7 @@ class tx_metafeedit_export {
 			if ($prePDFDETXMLFunction) {
 				eval($prePDFDETXMLFunction);
 			}
-			
+	
 			$postPDFDETXMLFunction=$this->conf[$cmd.'.']['postPDFDETXMLFunction'];
 			if ($postPDFDETXMLFunction) {
 				eval($postPDFDETXMLFunction);
@@ -1296,7 +1295,7 @@ class tx_metafeedit_export {
 		//error_log(__METHOD__.":".str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		// Do we handle multiple media (default no)
 		$this->multipleMedia=$this->confTS[$this->pluginId.'.'][$cmd.'.']['multipleMedia']?$this->confTS[$this->pluginId.'.'][$cmd.'.']['multipleMedia']:($this->confTS['default.'][$cmd.'.']['multipleMedia']?$this->confTS['default.'][$cmd.'.']['multipleMedia']:false);
-		
+	
 		$this->documentFormat=A4; //210 × 297
 		$this->documentUnit='mm';
 		$this->documentOrientation='P';	// portrait
@@ -1305,7 +1304,7 @@ class tx_metafeedit_export {
 		$this->lineHeight=0.0;
 		$noheader=false;
 		$nofooter=false;
-
+	
 		// We handle special settings here
 		foreach($xml->spec as $s) {
 			$noheader=$s['nh'];
@@ -1323,39 +1322,39 @@ class tx_metafeedit_export {
 			$this->documentHeight=210;
 			$this->documentWidth=297;
 		}
-		
+	
 		$this->documentUnit='mm';
 		$this->pdf = new tx_metafeedit_pdf($this->documentOrientation, $this->documentUnit, $this->documentFormat);
 		$this->pdf->caller=&$this;
-		
+	
 		$this->addFonts();
 		$this->pdf->nofooter=$nofooter;
 		// TODO Handle typoscript here ...
-
+	
 		$this->pdf->bottommargin=$marginbottom?$marginbottom:8;
 		$this->pdf->leftmargin=$marginleft?$marginleft:8;
 		$this->pdf->rightmargin=$marginright?$marginright:8;
 		$this->pdf->topmargin=$margintop?$margintop:8;
 		//$docWidth=$this->documentWidth-$this->pdf->leftmargin-$this->pdf->rightmargin;
 		// We calculate last cell size eventually
-		
+	
 		$this->workWidth=$this->documentWidth-$this->pdf->rightmargin-$this->pdf->leftmargin;
 		//$spaceLeft=$this->workWidth-$docWidth;
-		
+	
 		$this->footercellsize=7;
 		$this->headercellsize=7;
 		$this->cellsize=7;
-
+	
 		$this->pdf->AliasNbPages();
 		$this->pdf->setMargins($this->pdf->leftmargin,$this->pdf->topmargin,$this->pdf->rightpmargin);
 		$this->pdf->SetAutoPageBreak(1,$this->pdf->bottommargin);
 		$this->pdf->AddPage();
 		$this->pdf->SetDisplayMode('real','single');
-		
-		// We handle the header here 
+	
+		// We handle the header here
 		//
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
-
+	
 		//if ($this->conf['inputvar.']['sortLetter']) $tri = '  tri par la lettre: '.$this->conf['inputvar.']['sortLetter'];
 		$pageHeight=$this->pdf->topmargin;
 		// We set grey color by default
@@ -1363,22 +1362,22 @@ class tx_metafeedit_export {
 		if (!$noheader) {
 			$this->pdf->SetFont('Helvetica','B',11);
 			$this->pdf->SetY(0);
-			$this->pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');	
+			$this->pdf->Cell(0,$this->headercellsize,utf8_decode($title),0,0,'L');
 			$this->pdf->SetXY($this->pdf->leftmargin,6);
 			//We draw line under report title
 			$this->pdf->Cell(0,1,'','T',0,'C');
-			$this->pdf->Ln(2);	
+			$this->pdf->Ln(2);
 		}
-		
+	
 		$fs=9;
 		$cell=false;
-		// We set height and font	
+		// We set height and font
 		$this->getPolice($police);
 		$this->getFont($font);
 		$this->pdf->SetFont($font,'',$police);
-		$alt=0;
+		$alt=1;
 		// Content
-		
+		$this->pdf->setFillColor(255,255,255);
 		$this->height = ($this->confTS[$this->pluginId.'.'][$cmd.'.']['height'])?$this->confTS[$this->pluginId.'.'][$cmd.'.']['height']:(($this->confTS['default.'][$cmd.'.']['height'])?$this->confTS['default.'][$cmd.'.']['height']:($this->pdf->cellsize?$this->pdf->cellsize:5)); // hauteur de la ligne pdf
 		$this->r=0;
 		// We print rows...
@@ -1387,7 +1386,7 @@ class tx_metafeedit_export {
 			if (@$row->spec['ap']) {
 				$this->pdf->addPage();
 			}
-			// we change color 
+			// we change color
 			$x=0; //compteur des colonnes
 			if ($alt>1) {							// changement de couleur 1 ligne sur 2
 				$alt=0;
@@ -1396,7 +1395,7 @@ class tx_metafeedit_export {
 			$alt++;
 			$nbcols=count($row->td);
 			$this->rowYOffset=0;
-			
+	
 			if ($row->gb) {
 				$this->pdf->SetLineWidth(0.3);
 				$this->pdf->SetFont('Helvetica', 'B', 9);
@@ -1404,21 +1403,19 @@ class tx_metafeedit_export {
 				$this->pdf->SetLineWidth(0.2);
 				$this->pdf->SetFont('Helvetica', '', 9);
 			}
-			$ih=0;
+			
 			//We detect sizes
-
 			$this->calculateRowCellSizes($row);
 			$this->checkForPageBreak();
-			
+	
 			// We print row cells ...
 			$x=0;
 			foreach($row->td as $cell) {
-				$this->cellWidth=(float)(($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x]); //taille de la cellule 
+				$this->cellWidth=(float)(($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x]); //taille de la cellule
 				$val = $this->getData($cell);
 				//background color
 				if (isset($cell->spec['bc']) && $cell->spec['bc'] != '') {
 					$bca=t3lib_div::trimexplode(',',$cell->spec['bc']);
-					//error_log(__METHOD__.":".print_r($bca,true));
 					$this->pdf->setFillColor((int)$bca[0],(int)$bca[1],(int)$bca[2]);
 				}
 				//foreground color
@@ -1431,11 +1428,10 @@ class tx_metafeedit_export {
 					$tca=t3lib_div::trimexplode(',',$cell->spec['tc']);
 					$this->pdf->setTextColor($tca[0],$tca[1],$tca[2]);
 				}
-				//error_log(__METHOD__);
+		
 				if ($cell->line==1) {
 					//We handle lines here
 					$this->pdf->Line($cell->line['x1'], $cell->line['y1'], $cell->line['x2'], $cell->line['y2']);
-				
 				} elseif ($cell->rect==1) {
 					//We handle rectangles here
 					$rectWidth = $cell->rect['x2'] - $cell->rect['x1'];
@@ -1461,34 +1457,21 @@ class tx_metafeedit_export {
 					//We handle image cells here
 					$this->PDFDisplayImage($cell);
 				} elseif ($cell->spec['bct'] && $cell->spec['bct']!='none') {
-					//error_log(__METHOD__."bct :".$cell->spec['bct']);
 					//Bar codes
 					//bct = bar code type
 					$this->PDFDisplayBarcode($cell);
-					
 				} else {
-					$this->PDFDisplayText($cell,$val);					
+					$this->PDFDisplayText($cell,$val);
 				}
 				$x++;
 			}
-			/*if ($cell) {
-				//$this->pdf->setFillColor(200,200,200);
-				$this->pdf->setFillColor(255,255,255);
-				if (@$row->spec['aln']) {
-					//$this->pdf->Ln(@$row->spec['aln']);
-					$this->rowYOffset=$this->rowYOffset+$row->spec['aln'];
-				}
-				if ($this->rowYOffset) $this->pdf->SetXY($this->pdf->leftmargin,$this->rowYOffset);
-				$this->rowYOffset=0;
-				$cell=false;
-			} else {
-				$this->pdf->Ln();
-// 			}*/
+			$aln=0;
 			if (@$row->spec['aln']) {
-				//$this->pdf->Ln(@$row->spec['aln']);
 				$this->rowYOffset=$this->rowYOffset+$row->spec['aln'];
+				//$aln=@$row->spec['aln'];
 			}
 			$this->pdf->setY($this->rowYOffset);
+			//$this->pdf->setY($this->cellY+$this->rowHeight+$aln);
 			$this->pdf->setFillColor(255,255,255);
 			$this->r++;
 		}
@@ -1500,8 +1483,7 @@ class tx_metafeedit_export {
 			error_log(__METHOD.":$e");
 		}
 		die;
-	}	
-
+	}
 	/**
 	 * Create the final cache directory if it does not exist. This method
 	 * exists in TYPO3 v4 only.
@@ -1646,15 +1628,13 @@ class tx_metafeedit_export {
 		$this->getPolice($police);
 		$this->getFont($font);
 		$this->pdf->SetFont('Helvetica','',$police);
-		$alt=1;
-		
-		// Content 
+		$alt=0;
+		// Content
+		// Grey for headers 
 		$this->pdf->setFillColor(125,125,125);
-		$r=0;
+		$this->r=0;
 		$this->cellY=$this->pdf->GetY();
-		//error_log(__METHOD__." Mem 1: ".$caller->metafeeditlib->getMemoryUsage());
 		foreach($xml->tr as $row) {
-			//error_log(__METHOD__." Mem 2 - $r : ".$caller->metafeeditlib->getMemoryUsage());
 			$this->rowHeight=$this->height;
 			if ($row->gb) {
 				$this->pdf->SetLineWidth($this->lineWidth);
@@ -1666,13 +1646,13 @@ class tx_metafeedit_export {
 			//We calculate row height :
 			$this->calculateRowCellSizes($row);
 			$this->checkForPageBreak();
-			if ($alt>1) {							// changement de couleur 1 ligne sur 2
+			// line color alernating every 2 lines
+			if ($alt>1) { 
 				$alt=0;
 				$this->pdf->setFillColor(200,200,200);
 			}
 			$cell=false;
 			$alt++;
-			//error_log(__METHOD__." Mem 2 - $r : ".$caller->metafeeditlib->getMemoryUsage());
 			// We handle cell content here
 			$x=0; //column counter
 			foreach($row->td as $cell) {
@@ -1705,7 +1685,7 @@ class tx_metafeedit_export {
 								$p='L';
 								break;
 					 	}
-					 	if (!$r) $p='L'; // So that column headers are always aligned left. 
+					 	if (!$this->r) $p='L'; // So that column headers are always aligned left. 
 					 	
 					 	if ($row->gb && !strlen($val)) {
 					 		$this->pdf->setX($this->cellX+$this->cellWidth);
@@ -1729,7 +1709,7 @@ class tx_metafeedit_export {
 			$this->pdf->setY($this->cellY+$this->rowHeight);
 			//White
 			$this->pdf->setFillColor(255,255,255);
-			$r++;
+			$this->r++;
 			
 		}
 		//Convert to PDF
@@ -1800,7 +1780,8 @@ class tx_metafeedit_export {
 	}
 	/**
 	 * 
-	 * @param unknown_type $fullPathToImage
+	 *  @param string $fullPathToImage
+	 *  @param bool $displayEmptyImage
 	 */
 	function PDFTabDisplayImage($fullPathToImage,$displayEmptyImage=true){
 		$imginfo=getimagesize($fullPathToImage);
@@ -1822,9 +1803,27 @@ class tx_metafeedit_export {
 	}
 	/**
 	 * Displays text in cell
-	 * @param unknown_type $cell
+	 * ta : text alignment
+	 * b : border width (in mm)
+	 * h : height in mm
+	 * w : width in mm
+	 * bc : background color
+	 * fc : foreground color
+	 * fs : font size
+	 * fb : font boldness
+	 * f : font
+	 * aln : after line jump in mm
+	 * bln : before line jump in mm
+	 * l : ??? in mm
+	 * fit : how text fits in cell
+	 * x : x position in mm
+	 * y : y position in mm
+	 * t : table cell (inherits default table style : border 0.1 with current draw color, background with alternating colors) 
+	 * 
+	 * @param SimpleXMLElement $cell
+	 * @param string
 	 */
-	function PDFDisplayText($cell,$val) {
+	function PDFDisplayText(SimpleXMLElement $cell,$val) {
 		//We handle text cells here
 		//ta : text alignment
 		if ($cell->spec['ta']) $this->rowPos[$x] = $cell->spec['ta'];
@@ -1849,7 +1848,6 @@ class tx_metafeedit_export {
 		
 		$this->cellX=$this->pdf->GetX();
 		
-		$b=0;
 		if (isset($cell->spec['b'])) $b=(float)$cell->spec['b'];
 		if (isset($cell->spec['h'])) $this->h=(float)$cell->spec['h'];
 		if ($this->h>$this->rowHeight) $this->rowHeight=$this->h;
@@ -1859,6 +1857,12 @@ class tx_metafeedit_export {
 		// We handle transparent cell
 		$fillStyle=isset($cell->spec['bc'])?($cell->spec['bc'] == ''?'':'F'):'';
 		$fillStyle.=$b?(isset($cell->spec['fc'])?($cell->spec['fc'] == ''?'':'D'):''):'';
+		
+		
+		if (isset($cell['t']) && $cell['t']) {
+			if (!isset($cell->spec['b'])) $b=0.1;
+			if (!$fillStyle) $fillStyle="FD";
+		}
 		//font size
 		$fs='';
 		if (isset($cell->spec['fs'])) {
@@ -1875,6 +1879,7 @@ class tx_metafeedit_export {
 		$bln=0;
 		if (isset($cell->spec['bln'])) {
 			$bln=(int)$cell->spec['bln'];
+			$this->pdf->Ln($bln);
 		}
 		//after line
 		$aln=0;
@@ -1892,31 +1897,36 @@ class tx_metafeedit_export {
 		$fit='fit';
 		if (isset($cell->spec['fit'])) $fit=$cell->spec['fit'];
 		if (isset($cell->spec['x']) && isset($cell->spec['y'])) {
-			$this->pdf->SetXY((float)$cell->spec['x'],(float)$cell->spec['y']);
-			$this->pdf->SetXY((float)$cell->spec['x'],(float)$cell->spec['y']);
+			
+			$this->pdf->SetXY((float)$cell->spec['x'],(float)$cell->spec['y']+$bln);
+			//$this->pdf->SetXY((float)$cell->spec['x'],(float)$cell->spec['y']);
 			$this->cellY = $this->pdf->getY();
 			$this->cellX = $this->pdf->getX();
 			//error_log(__METHOD__."rect:$this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,$fillStyle,$b");
 			$this->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,$fillStyle,$b);
 			switch($fit){
-				case 'fix':
-					//error_log(__METHOD__.":$this->cellWidth,$this->h,$this->height,$val,0,$p,false");
-					$this->pdf->ClippedMultiCell($this->cellWidth,$this->h,$this->h,$val,0,$p,false);
-					break;
 				case 'fit2width':
+					//error_log(__METHOD__.": 0.2 >".$val);
 					$this->TextFit2Width($this->cellWidth, $val, $fs);
 					$this->pdf->ClippedMultiCell($this->cellWidth,$this->h,$this->h,$val,0,$p,false);
 					break;
 				case 'fit2box': 
+					//error_log(__METHOD__.": 0.3 >".$val);
 					$this->TextFit2Box($this->cellWidth,$this->h,$this->h, $val, $fs);
 					$this->pdf->ClippedMultiCell($this->cellWidth,$this->h,$this->h,$val,0,$p,false);
 					//$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p,false);
 					break;
+				default://	'fix':
+					//error_log(__METHOD__.":$this->cellWidth,$this->h,$this->height,$val,0,$p,false");
+					$this->pdf->ClippedMultiCell($this->cellWidth,$this->h,$this->h,$val,0,$p,false);
+					break;
+					
 			}
 			
 			$this->pdf->SetXY($this->cellX+$this->cellWidth,$this->cellY);
 			$this->rowYOffset = $this->pdf->getY()>$this->rowYOffset?$this->pdf->getY():$this->rowYOffset;
 		} else if (isset($cell->spec['x'])) {
+			//error_log(__METHOD__.":1 >".$val);
 			$this->pdf->SetX((float)$cell->spec['x']);
 			$this->cellY = $this->pdf->getY();
 			$this->cellX = $this->pdf->getX();
@@ -1927,7 +1937,7 @@ class tx_metafeedit_export {
 		} else {
 			$this->cellX = $this->pdf->getX();
 			$this->cellY = $this->pdf->getY();
-			if ($bln) $this->pdf->Ln($bln);
+			//error_log(__METHOD__.":$b, $bln,$fillStyle >".$val);
 			$this->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,$fillStyle,$b);
 			$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p,0);
 			if ($l) {
@@ -1948,7 +1958,7 @@ class tx_metafeedit_export {
 	 * Displays image in cell
 	 * @param unknown_type $cell
 	 */
-	function PDFDisplayImage($cell) {
+	function PDFDisplayImage(SimpleXMLElement $cell) {
 		
 		$val = $this->getData($cell);
 		if (strpos($cell->data,'<img')!==false) {
@@ -2073,7 +2083,7 @@ class tx_metafeedit_export {
 	 * 
 	 * @param unknown_type $cell
 	 */
-	function PDFDisplayBarcode($cell) {
+	function PDFDisplayBarcode(SimpleXMLElement $cell) {
 		
 		$val = $this->getData($cell);
 		//error_log(__METHOD__.":$val");
@@ -2274,6 +2284,10 @@ class tx_metafeedit_export {
 		//Image border
 		$ib=0;
 		if (isset($cell->spec['b'])) $ib=(int)$cell->spec['b'];
+		if (isset($cell['t'])) {
+			if (!isset($cell->spec['b'])) $ib=0.1;
+			//if (!$fillStyle) $fillStyle="FD";
+		}
 		if ($ib) {
 			//$this->pdf->setX($this->cellX);
 			//error_log(__METHOD__."x:$this->cellX  y:$this->cellY");
@@ -2290,8 +2304,6 @@ class tx_metafeedit_export {
 		$imgData=$this->getDisplayImage($imgPath);
 		$img=$imgData['path'];
 		$imgInfo=$imgData['imginfo'];
-		//error_log(__METHOD__.":".print_r($imgData,true));
-	
 
 		if (is_array($imgInfo)) {
 			$w=$imgInfo[0];

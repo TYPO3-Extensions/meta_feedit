@@ -1881,10 +1881,10 @@ class tx_metafeedit extends  tslib_pibase {
 									$img=1;
 									$dir=$conf['TCAN'][$masterTable]['columns'][$FN]['config']['uploadfolder'];
 								}							
-								$ret.='<td><data>'.$Lib.'</data><size>'.$sizeLib.'</size></td><td><data>'.$FCode.'</data><size>'.$size.'</size><img>'.$img.($dir?'<dir>'.$dir.'</dir>':'').'</img></td>';	
+								$ret.='<td t="1"><data>'.$Lib.'</data><size>'.$sizeLib.'</size></td><td t="1"><data>'.$FCode.'</data><size>'.$size.'</size><img>'.$img.($dir?'<dir>'.$dir.'</dir>':'').'</img></td>';	
 							} else {
 								// Pdf presentation ???
-								$ret.='<td><data>'.$Lib.'</data><size>'.$sizeLib.'</size></td><td><data>'.$FCode.'</data><size>'.$size.'</size></td>';	
+								$ret.='<td t="1"><data>'.$Lib.'</data><size>'.$sizeLib.'</size></td><td t="1"><data>'.$FCode.'</data><size>'.$size.'</size></td>';	
 							}
 					break;
 				  case 'csv' :
