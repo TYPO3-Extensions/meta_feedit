@@ -3275,26 +3275,30 @@ function getPDFTABTemplate(&$conf)
 
 function getCSVTemplate(&$conf)
 {
- 	$pluginId=$conf['pluginId'];
-  if ($conf['list.']['TemplateCSV']) return '<!-- ###TEMPLATE_EDITMENU_CSV### begin -->'.$conf['list.']['TemplateCSV'].'<!-- ###TEMPLATE_EDITMENU_CSV### end -->';
+	//error_log(__METHOD__.":>");
+	$pluginId=$conf['pluginId'];
+	if ($conf['list.']['TemplateCSV']) return '<!-- ###TEMPLATE_EDITMENU_CSV### begin -->'.$conf['list.']['TemplateCSV'].'<!-- ###TEMPLATE_EDITMENU_CSV### end -->';
 	$tmp='<!-- ###TEMPLATE_EDITMENU_CSV### begin -->';
-	$tmp.=  $GLOBALS['TSFE']->page['title'].chr(10);
+	//$tmp.=  $GLOBALS['TSFE']->page['title'].chr(10);
 	
 	// Si on a un champs de recherche ou un tri selon une certaine lettre
 	$cont = $conf['inputvar.']['advancedSearch'];	
-	if (is_array($conf['inputvar.']['advancedSearch'])) {		
+	
+	if (is_array($conf['inputvar.']['advancedSearch'])) {	
+		//error_log(__METHOD__.":".print_r($conf['inputvar.']['advancedSearch'],true));	
 		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
-			if($val) {
+			if($key && $val) {
 				$recherche .= ($recherche?', ':'').$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['label'], $conf).':';
 				$recherche .= $conf['inputvar.']['advancedSearch'][$key]['val']?$conf['inputvar.']['advancedSearch'][$key]['val']:$conf['inputvar.']['advancedSearch'][$key];
 			}
 		}
 		$tmp.=$recherche;
 	}
-	
+	//error_log(__METHOD__.":".$tmp);
 	if ($conf['inputvar.']['sortLetter'])
 	$tmp.= '  tri par la lettre: '.$conf['inputvar.']['sortLetter'];
 	$tmp.=($conf['list.']['nbCols']?'':$this->getListFields($conf,true)).chr(10).'<!-- ###ALLITEMS### begin -->';
+	
 	$GROUPBYFIELDS=$this->getGroupByFields($conf,true);
 	if ($conf['list.']['displayDirection']=='Down') {
 		$tmp.=$GROUPBYFIELDS;
@@ -3333,7 +3337,7 @@ function getExcelTemplate(&$conf)
 {
 	//error_log(__METHOD__);
 	$pluginId=$conf['pluginId'];
-  if ($conf['list.']['TemplateExcel']) return '<!-- ###TEMPLATE_EDITMENU_EXCEL### begin -->'.$conf['list.']['TemplateExcel'].'<!-- ###TEMPLATE_EDITMENU_EXCEL### end -->';
+	if ($conf['list.']['TemplateExcel']) return '<!-- ###TEMPLATE_EDITMENU_EXCEL### begin -->'.$conf['list.']['TemplateExcel'].'<!-- ###TEMPLATE_EDITMENU_EXCEL### end -->';
 	$tmp='<!-- ###TEMPLATE_EDITMENU_EXCEL### begin --><?xml version="1.0" encoding="utf-8"?><table>';
 	//$tmp.=  '<tr><td><data>'.$GLOBALS['TSFE']->page['title'].'</data><size>'.strlen($GLOBALS['TSFE']->page['title']).'</size></td>';
 	
@@ -3342,7 +3346,7 @@ function getExcelTemplate(&$conf)
 	$rec="";
 	if (is_array($conf['inputvar.']['advancedSearch'])) {	
 		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
-			if($val) {
+			if($key && $val) {
 				$rec .= ($rec?', ':'').$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['label'], $conf).':';
 				$rec .= $conf['inputvar.']['advancedSearch'][$key]['val']?$conf['inputvar.']['advancedSearch'][$key]['val']:$conf['inputvar.']['advancedSearch'][$key];
 			}

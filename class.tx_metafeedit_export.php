@@ -1092,7 +1092,7 @@ class tx_metafeedit_export {
 		$content= utf8_decode(str_replace('&euro;','Eur',str_replace('&nbsp;',' ',strip_tags($caller->metafeeditlib->T3StripComments($content)))));
 		//header("Content-length: ".strlen($content);
 		header('Content-disposition: attachment; filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.csv"');		
-		echo $content;
+		echo ($title?$title.chr(10):'').$content.chr(10).$recherche;
 		die;
 	}
 	/**

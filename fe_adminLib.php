@@ -1942,6 +1942,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		// template blocks
 		$tpl=array();
 		$tpl['templateCode'] = $this->metafeeditlib->getPlainTemplate($conf,$markerArray,'###TEMPLATE_EDITMENU'.($exporttype?'_'.$exporttype:'').'###');
+		//error_log(__METHOD__.':tPL2 '.print_r($tpl,true));
 		$tpl['allItemsCode'] = $this->cObj->getSubpart($tpl['templateCode'], '###ALLITEMS###');
 
 		$tpl['GBCode'] = $this->cObj->getSubpart($tpl['allItemsCode'], '###GROUPBYFIELDS###');
@@ -2459,6 +2460,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			switch ($exporttype)
 			{
 				case "CSV": 
+					//error_log(__METHOD__.":".$content);
 					$this->metafeeditexport->getCSV($content,$this);
 					break;
 				case "PDF": 
@@ -2472,6 +2474,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					break;
 				case "XLS":
 				case "EXCEL": 
+					//error_log($content);
 					$this->metafeeditexport->getEXCEL($content,$this);
 					break;
 			}
@@ -3037,7 +3040,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		//error_log(__METHOD__.":".$this->conf['reportmode']);
 		switch ($exporttype)
 		{
-			case "CSV": 
+			case "CSV":
 			$this->metafeeditexport->getCSV($content,$this);
 			break;
 			case "PDF": 
