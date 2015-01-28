@@ -2881,7 +2881,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 							$content=$this->displayListScreen($TABLES,$DBSELECT,$this->conf);
 					}
 				}
-			} else {	
+			} else {
 				// Finally this is if there is no login user. This must tell that you must login. Perhaps link to a page with create-user or login information.
 				$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_AUTH###');
 			}

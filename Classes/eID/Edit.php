@@ -32,6 +32,10 @@ $GLOBALS["TSFE"]->fe_user=$feUserObj;
 //$GLOBALS["TSFE"]->checkAlternativeIdMethods();
 //$GLOBALS["TSFE"]->clear_preview();
 $GLOBALS["TSFE"]->determineId();
+//error_log(print_r($GLOBALS["TSFE"]->fe_user,true));
+if (is_array($GLOBALS['TSFE']->fe_user->user)) {
+	$GLOBALS['TSFE']->loginUser = 1;
+}
 $GLOBALS["TSFE"]->initTemplate();
 $GLOBALS["TSFE"]->getConfigArray();	
 $TTA[]="<br/>eID before cObj creation Elapsed Time :".(microtime(true)-$GLOBALS['g_TT']).' s';
@@ -57,7 +61,6 @@ $content= $c->main('','',$configFile);
 $TTA[]="<br/>eID after meta call Elapsed Time :".(microtime(true)-$GLOBALS['g_TT']).' s';
 $scripts1=implode(chr(10),$GLOBALS['TSFE']->additionalHeaderData);
 $scripts2="";
-
 // We update  user int scripts here if necessary
 if ($GLOBALS['TSFE']->isINTincScript())	
 {
