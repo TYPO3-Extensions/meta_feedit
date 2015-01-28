@@ -873,7 +873,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	*/
 	
 	function getForeignTableFromField($fN, &$conf,$table='',&$sql=array()) {
-	  if (!$fN) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : empty field given for table '$table' !";
+	  if (!$fN && $conf['debug']) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : empty field given for table '$table' !";
 		$ret = array();
 		$fNA = t3lib_div::trimexplode('.', $fN);
 		$fNiD = end($fNA);
@@ -2129,7 +2129,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			//error_log(__METHOD__.':1');
 			$sql= $jf->toSQL();
 		}
-		error_log(__METHOD__.':'.$sql);
+		//error_log(__METHOD__.':'.$sql);
 		return $sql;
 	}
 	/**
