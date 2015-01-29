@@ -1080,7 +1080,12 @@ class tx_metafeedit_export {
 		// We handle the header here 
 		ob_clean();
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);		
-		
+		$markerArray=array();
+		$markerArray['###EXPORT_TITLE###']=$title;
+		$markerArray['###SEARCH_FILTER###']=$recherche;
+		$markerArray['###EXPORT_TITLE_SIZE###']=strlen($title);
+		$markerArray['###SEARCH_FILTER_SIZE###']=strlen($recherche);
+		$content=$caller->cObj->substituteMarkerArray($content,$markerArray);
 		header("Content-Type: application/csv; charEncoding=utf-8");
 		//header("Content-Encoding:utf-8");
 		//header("Content-Length: ".strlen($content);
@@ -1092,7 +1097,7 @@ class tx_metafeedit_export {
 		$content= utf8_decode(str_replace('&euro;','Eur',str_replace('&nbsp;',' ',strip_tags($caller->metafeeditlib->T3StripComments($content)))));
 		//header("Content-length: ".strlen($content);
 		header('Content-disposition: attachment; filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.csv"');		
-		echo ($title?$title.chr(10):'').$content.chr(10).$recherche;
+		echo $content;
 		die;
 	}
 	/**
@@ -2700,6 +2705,13 @@ class tx_metafeedit_export {
 		/** PHPExcel_Cell_AdvancedValueBinder */
 		require_once(t3lib_extMgm::extPath('meta_feedit').'/lib/PHPExcel/Cell/AdvancedValueBinder.php');
 		// Prepare content
+		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
+		$markerArray=array();
+		$markerArray['###EXPORT_TITLE###']=$title;
+		$markerArray['###SEARCH_FILTER###']=str_replace('\'','"',$recherche);
+		$markerArray['###EXPORT_TITLE_SIZE###']=strlen($title);
+		$markerArray['###SEARCH_FILTER_SIZE###']=2;//strlen($recherche);
+		$content=$caller->cObj->substituteMarkerArray($content,$markerArray);
 		try {
 			//error_log(__METHOD__.':'.str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
@@ -2735,7 +2747,7 @@ class tx_metafeedit_export {
 		else $this->documentOrientation=PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE;// paysage
 		// We handle the header here 
 		//
-		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);
+		
 		if (strlen($title)>31) $title=substr($title,0,31);
 		$user = '';
 		$user = $GLOBALS['TSFE']->fe_user->user[username];
@@ -2952,16 +2964,17 @@ class tx_metafeedit_export {
 				$x=0;
 				foreach($row->tf as $col) {
 					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->getStartColor()->setARGB("99999999");
+					/*$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFill()->getStartColor()->setARGB("99999999");
 					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
 					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
 					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
 					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+					*/
 					$objPHPExcel->getActiveSheet()->getStyle($c.$r)->getFont()->setBold(true);
 					$val = strip_tags($col->data);
-					//$objPHPExcel->getActiveSheet()->mergeCells($c.$r.':'.$c.'99');
+					$objPHPExcel->getActiveSheet()->mergeCells($c.$r.':Z'.$r);
 					$objPHPExcel->getActiveSheet()->getCell($c.$r)->setValueExplicit("".$val, PHPExcel_Cell_DataType::TYPE_STRING);
-					$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
+					//$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
 					$x++;
 					//$c++;
 					$r++;

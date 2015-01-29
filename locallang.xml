@@ -9,6 +9,9 @@
 			<label index="selectall">Select all</label>
 			<label index="deselectall">Deselect all</label>
 			<label index="total">Total</label>
+			<label index="exportdate">Date of export :</label>
+			<label index="exportedby">Exported by :</label>
+			<label index="exportfilter">Filter applied :</label>
 			<label index="pi1_title">FE Edition Meta</label>
 			<label index="pi1_plus_wiz_description">Adds a frontend form for submitting and editing of tables to your page</label>
 			<label index="back_label">Back</label>
@@ -215,6 +218,9 @@
 			<label index="selectall">Tout sélectionner</label>
 			<label index="deselectall">Tout déselectionner</label>
 			<label index="total">Total</label>
+			<label index="exportdate">Date de l'export :</label>
+			<label index="exportedby">Exporté par :</label>
+			<label index="exportfilter">Filtre appliqué :</label>
 			<label index="crdate">Date de création</label>
 			<label index="uid">identifiant unique</label>
 			<label index="sorting">index de tri</label>

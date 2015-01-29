@@ -1530,7 +1530,8 @@ class tx_metafeedit_lib implements t3lib_singleton {
 					} else {
 						if ($value === 'on' || $value === 1 || $value === '1') {
 							$dataArr[$_fN] = 1;
-							$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png" alt="checked"/>':$this->getLLFromLabel('check_yes',$conf);
+							//error_log(__METHOD__.":".$conf['piVars']['exporttype']);
+							$dataArr['EVAL_'.$_fN] = ($conf['cmdmode']=='list' && $conf['piVars']['exporttype']=='PDF')?'<img src="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/checked.png" alt="checked"/>':$this->getLLFromLabel('check_yes',$conf);
 						} else {
 							// No value, what should we do ?
 		
@@ -4792,12 +4793,19 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		$recherche='';
 		if ($fulltext) $filterArray[]=$fulltext;
 		if ($conf['inputvar.']['sortLetter'])  $filterArray[]=$this->getLL("filtre_lettre",$conf).' = "'.$conf['inputvar.']['sortLetter'].'"';
+		
+		if ($conf['piVars']['filter']) {
+			$jf=t3lib_div::makeInstance('Tx_ArdMcm_Backend_JsonFilter',$filter);
+			//error_log(__METHOD__.':1');
+			$recherche= $jf->toHuman();
+			//error_log(__METHOD__.":$recherche");
+		}
 		if (is_array($conf['inputvar.']['advancedSearch'])) {
 			foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
 				if($this->is_extent($val)) {
 					$tab=array();
 					$ftA=$this->getForeignTableFromField($key,$conf,'',$tab);
-					$recherche='';
+					//$recherche='';
 					if (is_array($val)) {
 						$isset=($this->is_extent($val['op']) && ($this->is_extent($val['val'])||$this->is_extent($val['valsup'])));
 						$v1=$this->getHumanReadableValue($key,$val['val'],$conf);
@@ -5216,7 +5224,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 
 	}
 	
-	function pi_wrapInBaseClass($str,$conf)	   {
+	function pi_wrapInBaseClass($str,$conf)	{
 		$content = '<div id="'.str_replace('_','-',$this->prefixId).'-'.$conf['pluginId'].'" class="'.str_replace('_','-',$this->prefixId).'">'.$str.'</div>';
 		if($conf['disablePrefixComment']) {
 			$content = '<!--BEGIN: Content of extension "'.$this->extKey.'", plugin "'.$this->prefixId.'"-->'.$content.'<!-- END: Content of extension "'.$this->extKey.'", plugin "'.$this->prefixId.'" -->';

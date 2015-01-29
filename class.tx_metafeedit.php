@@ -3280,25 +3280,8 @@ function getCSVTemplate(&$conf)
 	if ($conf['list.']['TemplateCSV']) return '<!-- ###TEMPLATE_EDITMENU_CSV### begin -->'.$conf['list.']['TemplateCSV'].'<!-- ###TEMPLATE_EDITMENU_CSV### end -->';
 	$tmp='<!-- ###TEMPLATE_EDITMENU_CSV### begin -->';
 	//$tmp.=  $GLOBALS['TSFE']->page['title'].chr(10);
-	
-	// Si on a un champs de recherche ou un tri selon une certaine lettre
-	$cont = $conf['inputvar.']['advancedSearch'];	
-	
-	if (is_array($conf['inputvar.']['advancedSearch'])) {	
-		//error_log(__METHOD__.":".print_r($conf['inputvar.']['advancedSearch'],true));	
-		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
-			if($key && $val) {
-				$recherche .= ($recherche?', ':'').$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['label'], $conf).':';
-				$recherche .= $conf['inputvar.']['advancedSearch'][$key]['val']?$conf['inputvar.']['advancedSearch'][$key]['val']:$conf['inputvar.']['advancedSearch'][$key];
-			}
-		}
-		$tmp.=$recherche;
-	}
-	//error_log(__METHOD__.":".$tmp);
-	if ($conf['inputvar.']['sortLetter'])
-	$tmp.= '  tri par la lettre: '.$conf['inputvar.']['sortLetter'];
+	$tmp.=  '###EXPORT_TITLE###'.chr(10);
 	$tmp.=($conf['list.']['nbCols']?'':$this->getListFields($conf,true)).chr(10).'<!-- ###ALLITEMS### begin -->';
-	
 	$GROUPBYFIELDS=$this->getGroupByFields($conf,true);
 	if ($conf['list.']['displayDirection']=='Down') {
 		$tmp.=$GROUPBYFIELDS;
@@ -3322,8 +3305,9 @@ function getCSVTemplate(&$conf)
 		$tmp.='<!--###SUM_FIELDS### end--->';
 		//$tmp.=$this->getSumFields($conf, true).'<!--###SUM_FIELDS### end--->';
 	}
-	$tmp.='"'.date('d/m/Y').'"'; //TODO: get default date format here !!!
-	$tmp.=';"   Utilisateur: '.str_replace('"','""',$GLOBALS['TSFE']->fe_user->user[username]).'";';
+	$tmp.='"'.$this->metafeeditlib->getLLFromLabel('exportdate',$conf).'";"'.date('d/m/Y').'";'.chr(10); //TODO: get default date format here !!!
+	$tmp.='"'.$this->metafeeditlib->getLLFromLabel('exportedby',$conf).'";"'.str_replace('"','""',$GLOBALS['TSFE']->fe_user->user[username]).'";'.chr(10);
+	$tmp.='"'.$this->metafeeditlib->getLLFromLabel('exportfilter',$conf).'";"###SEARCH_FILTER###";';
 	$tmp.='<!-- ###TEMPLATE_EDITMENU_CSV### end -->';
 	return $tmp;
 }
@@ -3339,24 +3323,9 @@ function getExcelTemplate(&$conf)
 	$pluginId=$conf['pluginId'];
 	if ($conf['list.']['TemplateExcel']) return '<!-- ###TEMPLATE_EDITMENU_EXCEL### begin -->'.$conf['list.']['TemplateExcel'].'<!-- ###TEMPLATE_EDITMENU_EXCEL### end -->';
 	$tmp='<!-- ###TEMPLATE_EDITMENU_EXCEL### begin --><?xml version="1.0" encoding="utf-8"?><table>';
-	//$tmp.=  '<tr><td><data>'.$GLOBALS['TSFE']->page['title'].'</data><size>'.strlen($GLOBALS['TSFE']->page['title']).'</size></td>';
+	//$tmp.=  '<tr><td><data>###EXPORT_TITLE###</data><size>###EXPORT_TITLE_SIZE###</size></td></tr>';
 	
-	$cont = $conf['inputvar.']['advancedSearch'];
-	$recherche="<tf><data>";
-	$rec="";
-	if (is_array($conf['inputvar.']['advancedSearch'])) {	
-		foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
-			if($key && $val) {
-				$rec .= ($rec?', ':'').$this->metafeeditlib->getLLFromLabel($conf['TCAN'][$conf['table']]['columns'][$key]['label'], $conf).':';
-				$rec .= $conf['inputvar.']['advancedSearch'][$key]['val']?$conf['inputvar.']['advancedSearch'][$key]['val']:$conf['inputvar.']['advancedSearch'][$key];
-			}
-		}
-	}
-	$recherche.=$rec;
-	if ($conf['inputvar.']['sortLetter'])
-	$recherche.= '  tri par la lettre: '.$conf['inputvar.']['sortLetter'];
-	$recherche.='</data><size>'.strlen($recherche).'</size></tf>';
-  // We generate table headers here 
+	// We generate table headers here 
 	//$tmp.='<tr bgcolor="D7D7D7">'.($conf['list.']['nbCols']?'':$this->getListFields($conf)).'</tr><!-- ###ALLITEMS### begin -->';
 	$tmp.='<tr>'.($conf['list.']['nbCols']?'':$this->getListFields($conf)).'</tr><!-- ###ALLITEMS### begin -->';
 	$GROUPBYFIELDS=$this->getGroupByFields($conf,true,'XLS');
@@ -3380,9 +3349,9 @@ function getExcelTemplate(&$conf)
 	$GROUPBYFOOTERFIELDS=$this->getGroupByFooterFields($conf,true,'XLS');
 	$tmp.=$GROUPBYFOOTERFIELDS.'<!-- ###ALLITEMS### end -->';
 	
-	$tmp.='<tr><tf><data>'.date('d/m/Y').'</data>';
-	$tmp.='</tf><tf><data>Utilisateur: '.$GLOBALS['TSFE']->fe_user->user[username];
-	$tmp.='</data></tf>'.$recherche.'</tr></table><!-- ###TEMPLATE_EDITMENU_EXCEL### end -->';
+	$tmp.='<tr><tf><data>'.$this->metafeeditlib->getLLFromLabel('exportdate',$conf).' '.date('d/m/Y').'</data>';
+	$tmp.='</tf><tf><data>'.$this->metafeeditlib->getLLFromLabel('exportedby',$conf).' '.$GLOBALS['TSFE']->fe_user->user[username];
+	$tmp.='</data></tf><tf><data>'.$this->metafeeditlib->getLLFromLabel('exportfilter',$conf).' ###SEARCH_FILTER###</data></tf></tr></table><!-- ###TEMPLATE_EDITMENU_EXCEL### end -->';
 	return $tmp;
 }  
 
