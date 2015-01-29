@@ -9,6 +9,7 @@
 			<label index="selectall">Select all</label>
 			<label index="deselectall">Deselect all</label>
 			<label index="total">Total</label>
+			<label index="actions">Actions</label>
 			<label index="exportdate">Date of export :</label>
 			<label index="exportedby">Exported by :</label>
 			<label index="exportfilter">Filter applied :</label>
@@ -218,6 +219,7 @@
 			<label index="selectall">Tout sélectionner</label>
 			<label index="deselectall">Tout déselectionner</label>
 			<label index="total">Total</label>
+			<label index="actions">Actions</label>
 			<label index="exportdate">Date de l'export :</label>
 			<label index="exportedby">Exporté par :</label>
 			<label index="exportfilter">Filtre appliqué :</label>
@@ -264,7 +266,6 @@
 			<label index="advanced_search_label">Recherche</label>
 			<label index="advanced_search_reset">Enlever critères de recherche</label>
 			<label index="order_by_reset">Enlever tri</label>
-			<label index="actions">Actions</label>
 			<label index="alphabetical_search_all">Tous</label>
 			<label index="edit_menu_header">Liste des éléments</label>
 			<label index="edit_menu_description">Modifiez ou consultez vos enregistrements ci dessous</label>

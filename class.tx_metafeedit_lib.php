@@ -2126,7 +2126,8 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		//error_log(__METHOD__.":".print_r($filter,true));
 		if ($filter) {
 			//error_log(__METHOD__.':0');
-			$jf=t3lib_div::makeInstance('Tx_ArdMcm_Backend_JsonFilter',$filter);
+			$jf=t3lib_div::makeInstance('Tx_ArdMcm_Backend_JsonFilter');
+			$jf->init($filter);
 			//error_log(__METHOD__.':1');
 			$sql= $jf->toSQL();
 		}
@@ -2144,6 +2145,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		$filter=json_decode($json,true);
 		//error_log(__METHOD__.":".print_r($filter,true));
 		$externalFilter=$this->makeFilter($filter);
+		//error_log(__METHOD__.":".$externalFilter);
 		$externalFilter=$externalFilter?' and ('.$externalFilter.')':'';
 		$sql['where'].=$externalFilter;
 		$sql['externalFilter']=$externalFilter;
@@ -4057,10 +4059,11 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		$this->getParentJoin($conf,$sql);
 		$this->getCalcFields($conf,$sql);
 		// Filters
-		//error_log(__METHOD__.":09-".$sql['where']);
+		//error_log(__METHOD__.":09-".print_r($sql,true));
 		if ($conf['piVars']['filter']) {
 			// Filter coming from extjs interface
 			$this->getFilter($conf,$sql);
+			//error_log(__METHOD__.":10-".print_r($sql,true));
 			if ($conf['list.']['searchBox']) $this->getFullTextSearchWhere($conf,$sql,$markerArray,false);
 			if ($conf['list.']['alphabeticalSearch']) $this->getAlphabeticalSearchWhere($conf,$sql,false);
 			if ($conf['list.']['advancedSearch']) $this->getAdvancedSearchWhere($conf,$sql,$markerArray,false);
@@ -4795,7 +4798,8 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		if ($conf['inputvar.']['sortLetter'])  $filterArray[]=$this->getLL("filtre_lettre",$conf).' = "'.$conf['inputvar.']['sortLetter'].'"';
 		
 		if ($conf['piVars']['filter']) {
-			$jf=t3lib_div::makeInstance('Tx_ArdMcm_Backend_JsonFilter',$filter);
+			$jf=t3lib_div::makeInstance('Tx_ArdMcm_Backend_JsonFilter');
+			$jf->init($conf['piVars']['filter']);
 			//error_log(__METHOD__.':1');
 			$recherche= $jf->toHuman();
 			//error_log(__METHOD__.":$recherche");
