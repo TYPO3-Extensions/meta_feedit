@@ -1693,8 +1693,8 @@ class tx_metafeedit_lib implements t3lib_singleton {
 								//		$whereClause .= ' AND '.$TCAFT['ctrl']['transOrigPointerField'].'=0';
 							}
 							$orClause = $orClause?" and (".$orClause.") ":"";
-	
-							$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table'], $whereClause.' '.$orClause);
+							if ($TCAFT['ctrl']['delete']) $orClause.=" and ".$TCAFT['ctrl']['delete']."=0";
+							$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $FT, $whereClause.' '.$orClause);
 							if ($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(), 'sql error');
 							$values = '';
 							$vals = array();
@@ -4155,7 +4155,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		$lField=$conf['inputvar.']['lField'];
 		if  ($lV && $lField) {	
 			$FT=$conf['TCAN'][$table]['columns'][$lField]['config']['foreign_table'];
-			if ($FT) {
+			if ($FT && ((int)$conf['TCAN'][$table]['columns'][$lField]['config']['maxitems'])>1) {
 				$mmTable=$conf['TCAN'][$table]['columns'][$lField]['config']['MM'];
 				if ($mmTable) {								
 					$ParentWhere.=" AND ".$mmTable.'.uid_local=\''.$lV.'\'';
