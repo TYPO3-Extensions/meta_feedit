@@ -190,7 +190,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	function user_init($content,$conf)	{
 		//error_log(__METHOD__."start ================".$GLOBALS['TSFE']->lang);
 		$DEBUG='';
-
+		//error_log(__METHOD__.":>>>".print_r($conf['LOCAL_LANG'],true));
 	  	if ( $conf['ajax.']['ajaxOn'] || $conf['list.']['advancedSearchAjaxSelector'] || is_array($conf['list.']['advancedSearchAjaxSelector.'])) {
 			$ajax = t3lib_div::makeInstance('tx_metafeedit_ajax');
 			$ajax->init($this,$conf);
@@ -2041,6 +2041,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		if ($searchfieldsSet) {
 			// We build the SQL Query
 			$sql=$this->metafeeditlib->getListSQL($TABLES,$DBSELECT,$conf,$this->markerArray,$DEBUG);
+			//error_log(__METHOD__.":".print_r($sql,true));
 			//@TODO : we get sort variable and sort direction from GET/POST Vars (should this not be  done in Pi1 ?)...hmm ...
 			$Arr=explode(',',$conf['list.']['show_fields']);
 			if ($conf['list.']['sortFields']){

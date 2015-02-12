@@ -348,6 +348,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		//$mfconf['fUField'][$lconf['pluginId']]=$conf[$lconf['pluginId'].'.']['fUField'];
 		
 		$mfconf['list.']['rowField']=$lconf['rowField'];
+		$mfconf['list.']['workflow']=$lconf['listWorkflow'];
 		$mfconf['list.']['nbAltRows']=$lconf['listAltRows'];
 		$mfconf['list.']['nobackbutton']=$conf['list.']['nobackbutton']?$conf['list.']['nobackbutton']:$lconf['listnobackbutton'];
 		$mfconf['list.']['colField']=$lconf['colField'];

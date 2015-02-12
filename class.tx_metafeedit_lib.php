@@ -3146,7 +3146,6 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			$ret=$conf['LOCAL_LANG'][$conf['LLkey']][$label2];
 		} else {
 			if ($this->langHandler) {
-				//error_log(__METHOD__.":LLHANDLER sL!!");
 				$ret=$this->langHandler->sL($label);
 			} else {
 				$ret=$GLOBALS['TSFE']->sL($label);
@@ -3994,6 +3993,8 @@ class tx_metafeedit_lib implements t3lib_singleton {
 				if (@array_key_exists($FTi,$conf['list.']['sqlcalcfields.'])) continue;
 				if (@array_key_exists($FTi,$conf['list.']['phpcalcfields.'])) continue;
 				// check if field is a relation to a foreign table (it has a '.' in it's name).
+				if (in_array ($FTi,array('STATE_uid','STATE_label','STATE_desc'))) continue;
+				//error_log($FTi);
 				if (strpos($FTi,'.')>0 )
 				{
 					// We get foreign table name ... (can we have more than one '.' in name ?
@@ -4043,12 +4044,14 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		$sql['DBSELECT']=$DBSELECT;
 		$sql['where']=$sql['DBSELECT'];
 		$this->getSQLFields($conf,$sql);
+		
 		// Default is *
 		if (!count($sql['fieldArray'])) {
 			$sql['fields']=$conf['table'].'.*';   // Field list (is * a field ???)
 			$sql['fieldArray'][]=$conf['table'].'.*';
 			$sql['fields.']['*.']['table']=$conf['table'];
 		}
+		$this->getStateFields($conf,$sql);
 		//error_log(__METHOD__.":01-".$sql['where']);
 		$this->getLockPidJoin($conf,$sql);
 		$this->getExtraFields($conf,$sql);		
@@ -4120,6 +4123,29 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			$sql['fieldArray'][]="$calcsql as '$field'";
 			$sql['calcFieldsSql'].=",$calcsql as '$field'"; // to be removed
 			$sql['calcfields'][]=$field; // to be removed
+		}
+	}
+	
+	/**
+	 * State fields : if workflow is specified we get state info
+	 *
+	 * @param	[type]		$$conf: ...
+	 * @param	[type]		$sql: ...
+	 * @return	[type]		...
+	 */
+	
+	function getStateFields(&$conf,&$sql,$table='') {
+		if ($conf['list.']['workflow']) {
+			$sql['joinTables'][]='SW';
+			$sql['join.']['SW']=' LEFT JOIN tx_metaworkflow_instance_state as SW on SW.instanceid=concat(\'tx_ardsgoc_domain_model_sgocobject_\','.$conf['table'].'.uid) AND SW.workflow='.(int)$conf['list.']['workflow'];
+			$sql['joinTables'][]='STATE';
+			$sql['join.']['STATE']=' LEFT JOIN '.tx_metaworkflow_state.' as STATE on STATE.uid=SW.stateid ';
+			$sql['joinTables'][]='tx_metaworkflow_state';
+			$sql['fieldArray'][]="STATE.uid as STATE_uid";
+			$sql['fieldArray'][]="STATE.label as STATE_label";
+			$sql['fieldArray'][]="STATE.description as STATE_desc";
+			//$sql['stateFieldsSql'].=",$calcsql as '$field'"; // to be removed
+			//$sql['statefields'][]=$field; // to be removed
 		}
 	}
 	

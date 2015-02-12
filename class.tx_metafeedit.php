@@ -450,14 +450,12 @@ class tx_metafeedit extends  tslib_pibase {
 			/**
 			 *
 			 */
-			
-			
-			
-			$conf['LLkey']=$this->LLkey;	   
 
+			$conf['LLkey']=$this->LLkey;	   
 			$conf['LOCAL_LANG']['default']=&$this->LOCAL_LANG['default'];
 			$conf['LOCAL_LANG'][$conf['LLkey']]=&$this->LOCAL_LANG[$conf['LLkey']];
 			$conf['LOCAL_LANG']['langoverride']=&$this->LOCAL_LANG['langoverride'];
+			
 			unset($conf['_LOCAL_LANG.']);
 	 		/**** Init language object (used for translation of labels) ****/
 			//$GLOBALS['TSFE']->initLLvars();
