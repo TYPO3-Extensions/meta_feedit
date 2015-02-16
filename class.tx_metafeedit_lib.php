@@ -3234,7 +3234,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	 * @return	boolean		...
 	 */	
 	function hasListActions($conf) {
-		return (!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions'] || $conf['list.']['batchactions']));
+		return (!$conf['no_action'] && ((($conf['disableEdit'] && $conf['edit.']['preview']) || !$conf['disableEdit']) || $conf['list.']['recordactions'] || $conf['list.']['batchactions'] || !$conf['disableDelete']));
 	}
 	//ACTIONS-LIST-LIB
 	/**
