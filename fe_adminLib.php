@@ -2076,6 +2076,9 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			// This counts the number of lines ...
 	
 			//TODO add distinct or not through flexform ...
+			if ($conf['list.']['whereStringFunction']) {
+				eval($conf['list.']['whereStringFunction']);
+			}
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']);
 			if (!$res) {
 		 		die(__METHOD__.":Sql error : ".$GLOBALS['TYPO3_DB']->sql_error().', sql : '.$GLOBALS['TYPO3_DB']->SELECTquery($distinct.$sql['fields'], $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having']));

@@ -883,6 +883,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$pidsearch[]="###rU###";
 		$pidreplace[]=$mfconf['inputvar.']['rU']=$this->metafeeditlib->getMetaFeeditVar($mfconf,'rU',true);
 		$mfconf['list.']['whereString']=str_replace($pidsearch,$pidreplace,$lconf['listWhereString']);
+		$mfconf['list.']['whereStringFunction']=$lconf['listWhereStringFunction'];
 		//error_log(__METHOD__.":".$mfconf['list.']['whereString'].",".print_r($pidsearch,true).",".print_r($pidreplace,true));
 		
 		
