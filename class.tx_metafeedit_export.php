@@ -529,7 +529,7 @@ class tx_metafeedit_pdf extends FPDF {
 	{
 		parent::Close();
 		// clean up tmp files
-		foreach($this->tmpFiles as $tmp) @unlink($tmp);
+		if (is_array($this->tmpFiles)) foreach($this->tmpFiles as $tmp) @unlink($tmp);
 	}
 	
 	/*******************************************************************************

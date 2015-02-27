@@ -236,7 +236,7 @@ class tx_metafeedit_sqlengine {
 		}
 		// multi_language
         if ($conf['TCAN'][$table]['ctrl']['languageField'] && $conf['TCAN'][$table]['ctrl']['transOrigPointerField']) {
-								       $ret .= ' AND '.$conf['TCAN'][$table]['ctrl']['transOrigPointerField'].'=0';
+								       $ret .= ' AND '.$table.'.'.$conf['TCAN'][$table]['ctrl']['transOrigPointerField'].'=0';
 	    }
 		return $ret;
 	}

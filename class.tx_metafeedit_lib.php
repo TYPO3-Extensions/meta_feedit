@@ -1005,7 +1005,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		}
 		// multi_language
 		if ($conf['TCAN'][$table]['ctrl']['languageField'] && $conf['TCAN'][$table]['ctrl']['transOrigPointerField']) {
-									   $ret .= ' AND '.$conf['TCAN'][$table]['ctrl']['transOrigPointerField'].'=0';
+									   $ret .= ' AND '.$table.'.'.$conf['TCAN'][$table]['ctrl']['transOrigPointerField'].'=0';
 		}
 		return $ret;
 	}
@@ -1667,7 +1667,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 						$label_alt = $conf['label_alt.'][$FT]?$conf['label_alt.'][$FT]:$conf['TCAN'][$FT]['ctrl']['label_alt'];
 	
 						$label_alt_force = $conf['label_alt_force.'][$FT]?$conf['label_alt_force.'][$FT]: $conf['TCAN'][$FT]['ctrl']['label_alt_force'];
-							
+						error_log(__METHOD__.":$fNiD $fN");
 						if ($dataArr[$fN]) {
 							if ($conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"] && $dataArr[$conf['uidField']]) {
 								// from mm-relation
@@ -1695,38 +1695,43 @@ class tx_metafeedit_lib implements t3lib_singleton {
 							$orClause = $orClause?" and (".$orClause.") ":"";
 							if ($TCAFT['ctrl']['delete']) $orClause.=" and ".$TCAFT['ctrl']['delete']."=0";
 							$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $FT, $whereClause.' '.$orClause);
-							if ($GLOBALS['TYPO3_DB']->sql_error()) debug($GLOBALS['TYPO3_DB']->sql_error(), 'sql error');
-							$values = '';
-							$vals = array();
-							$d = $this->cObj->data;
-							while ($resRow = mysql_fetch_assoc($res)) {
-								$this->cObj->start($resRow, $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']);
-								$resLabel = $resRow[$label];
-								$resLabel_alt = $resRow[$label_alt];
-								if ($statictable) {
-									$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
-									$resLabel = $this->getLL('language_'.$code, $conf);
-									if (!$resLabel ) {
-										$resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset);
+							error_log($orClause);
+							if ($res===false) {
+								debug(__METHOD__.':'.$GLOBALS['TYPO3_DB']->sql_error().':'.$GLOBALS['TYPO3_DB']->SELECTquery('*', $FT, $whereClause.' '.$orClause), 'sql error');
+								//error_log(__METHOD__.":".$GLOBALS['TYPO3_DB']->SELECTquery('*', $FT, $whereClause.' '.$orClause));
+							} else {
+								$values = '';
+								$vals = array();
+								$d = $this->cObj->data;
+								while ($resRow = mysql_fetch_assoc($res)) {
+									$this->cObj->start($resRow, $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']);
+									$resLabel = $resRow[$label];
+									$resLabel_alt = $resRow[$label_alt];
+									if ($statictable) {
+										$code = $resRow['lg_iso_2'].($resRrow['lg_country_iso_2']?'_'.$resRow['lg_country_iso_2']:'');
+										$resLabel = $this->getLL('language_'.$code, $conf);
+										if (!$resLabel ) {
+											$resLabel = $GLOBALS['TSFE']->csConv($resRow['lg_name_en'], $this->staticInfoCharset);
+										}
 									}
+									$resLabel = $this->cObj->stdWrap($resLabel, $conf['evalWrap.'][$_fN.'.']);
+									$resLabel_alt = $this->cObj->stdWrap($resLabel_alt, $conf['evalWrap.'][$_fN.'.']);
+									$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
+									$tempLabel = $tempLabel ? $tempLabel : $resLabel_alt;
+									$vals[] = $tempLabel;
 								}
-								$resLabel = $this->cObj->stdWrap($resLabel, $conf['evalWrap.'][$_fN.'.']);
-								$resLabel_alt = $this->cObj->stdWrap($resLabel_alt, $conf['evalWrap.'][$_fN.'.']);
-								$tempLabel = $label_alt_force ? $resLabel.', '.$resLabel_alt : $resLabel;
-								$tempLabel = $tempLabel ? $tempLabel : $resLabel_alt;
-								$vals[] = $tempLabel;
-							}
-							$this->cObj->start($d, $table);
-							$cc = count($vals);
-							$i = 0;
-							foreach($vals as $v) {
-								$i++;
-								if ($i == $cc && $cc > 1) {
-									$sep = $conf['evalLastSep.'][$fN]?$conf['evalLastSep.'][$fN]:',';
-								} else {
-									$sep = $conf['evalSep.'][$fN]?$conf['evalSep.'][$fN]:',';
+								$this->cObj->start($d, $table);
+								$cc = count($vals);
+								$i = 0;
+								foreach($vals as $v) {
+									$i++;
+									if ($i == $cc && $cc > 1) {
+										$sep = $conf['evalLastSep.'][$fN]?$conf['evalLastSep.'][$fN]:',';
+									} else {
+										$sep = $conf['evalSep.'][$fN]?$conf['evalSep.'][$fN]:',';
+									}
+									$values .= $values ? $sep . $v :$v;
 								}
-								$values .= $values ? $sep . $v :$v;
 							}
 						}
 					} elseif(count($conf['TCAN'][$table]['columns'][$fNiD]['config']['items'])) {
@@ -2836,7 +2841,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			} elseif($conf['TCAN'][$table]['columns'][$fN]['config']["MM"] && $uid) {  // from mm-relation
 				$mmTable = $conf['TCAN'][$table]['columns'][$fN]['config']['MM'];
 				$MMres = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$mmTable,$mmTable.'.uid_local=\''.$uid.'\'','', ' '.$mmTable.'.sorting ');
-				if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::field='.$fN);
+				if (mysql_error())	debug(array(mysql_error(),$query),'getFormFieldCode()::1field='.$fN);
 				$cnt=mysql_num_rows($MMres);
 				if($conf['debug'] && $cnt!=$rec[$fN]) debug("class.tx_metafeedit_lib.php::tx_metafeedit_lib->getSelectOptions(): Wrong number ($cnt<>".$rec[$fN].") of selections reached for  field $fN of table $table, mm:  $mmTable");
 				while($MMrow = mysql_fetch_assoc($MMres)) $uids[] = $MMrow["uid_foreign"];
@@ -2878,7 +2883,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$foreignTable,'1=1 '.$ef.' '.$whereClause);
 				if (mysql_error()) {
-					debug(array(mysql_error()),'getSelectOptions:field='.$fN);
+					debug(array(mysql_error()),'getSelectOptions:2field='.$fN);
 				}
 			}
 			
