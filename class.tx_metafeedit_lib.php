@@ -1667,7 +1667,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 						$label_alt = $conf['label_alt.'][$FT]?$conf['label_alt.'][$FT]:$conf['TCAN'][$FT]['ctrl']['label_alt'];
 	
 						$label_alt_force = $conf['label_alt_force.'][$FT]?$conf['label_alt_force.'][$FT]: $conf['TCAN'][$FT]['ctrl']['label_alt_force'];
-						error_log(__METHOD__.":$fNiD $fN");
+						//error_log(__METHOD__.":$fNiD $fN");
 						if ($dataArr[$fN]) {
 							if ($conf['TCAN'][$table]['columns'][$fNiD]['config']["MM"] && $dataArr[$conf['uidField']]) {
 								// from mm-relation
@@ -1695,7 +1695,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 							$orClause = $orClause?" and (".$orClause.") ":"";
 							if ($TCAFT['ctrl']['delete']) $orClause.=" and ".$TCAFT['ctrl']['delete']."=0";
 							$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $FT, $whereClause.' '.$orClause);
-							error_log($orClause);
+							//error_log($orClause);
 							if ($res===false) {
 								debug(__METHOD__.':'.$GLOBALS['TYPO3_DB']->sql_error().':'.$GLOBALS['TYPO3_DB']->SELECTquery('*', $FT, $whereClause.' '.$orClause), 'sql error');
 								//error_log(__METHOD__.":".$GLOBALS['TYPO3_DB']->SELECTquery('*', $FT, $whereClause.' '.$orClause));
