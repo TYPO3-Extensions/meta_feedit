@@ -427,8 +427,10 @@ class tx_metafeedit_pdf extends FPDF {
 				$type=substr($file,$pos+1);
 			}
 			$type=strtolower($type);
-			$mqr=get_magic_quotes_runtime();
-			set_magic_quotes_runtime(0);
+			if(version_compare(PHP_VERSION, '5.3.0', '<')){
+				$mqr=get_magic_quotes_runtime();
+				set_magic_quotes_runtime(0);
+			}
 			if($type=='jpg' || $type=='jpeg')
 				$info=$this->_parsejpg($file);
 			elseif($type=='png'){
@@ -443,7 +445,9 @@ class tx_metafeedit_pdf extends FPDF {
 					$this->Error('Unsupported image type: '.$type);
 				$info=$this->$mtd($file);
 			}
-			set_magic_quotes_runtime($mqr);
+			if(version_compare(PHP_VERSION, '5.3.0', '<')){
+				set_magic_quotes_runtime($mqr);
+			}
 	
 			if ($isMask){
 				$info['cs']="DeviceGray"; // try to force grayscale (instead of indexed)

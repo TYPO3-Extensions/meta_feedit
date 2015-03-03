@@ -1704,6 +1704,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 								$vals = array();
 								$d = $this->cObj->data;
 								while ($resRow = mysql_fetch_assoc($res)) {
+									if ($this->langHandler) $this->langHandler->localizeRow($resRow, $FT);
 									$this->cObj->start($resRow, $conf['TCAN'][$table]['columns'][$fNiD]['config']['foreign_table']);
 									$resLabel = $resRow[$label];
 									$resLabel_alt = $resRow[$label_alt];
