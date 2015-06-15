@@ -42,7 +42,7 @@ require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_ajax.php'
 require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_lib.php');
 require_once(t3lib_extMgm::extPath('meta_feedit').'class.tx_metafeedit_widgets.php');
 require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/Lib/ViewArray.php');
-require_once(t3lib_extMgm::extPath('div').'class.tx_div.php'); 
+//require_once(t3lib_extMgm::extPath('div').'class.tx_div.php'); 
 
 if(t3lib_extmgm::isLoaded('rtehtmlarea')) require_once(t3lib_extMgm::extPath('rtehtmlarea').'pi2/class.tx_rtehtmlarea_pi2.php');
 if(t3lib_extmgm::isLoaded('rlmp_dateselectlib')) require_once(t3lib_extMgm::extPath('rlmp_dateselectlib').'class.tx_rlmpdateselectlib.php');
@@ -311,7 +311,88 @@ class tx_metafeedit extends  tslib_pibase {
 		$this->conf=&$conf; // TODO : to be removed !!! CBY
 		//error_log(__METHOD__." end ================".$GLOBALS['TSFE']->lang);
   	}
+  	/**
+  	 * Check if the given extension key is within the loaded extensions
+  	 *
+  	 * The key can be given in the regular format or with underscores stripped.
+  	 *
+  	 * @param	string		extension key to check
+  	 * @return	boolean		is the key valid?
+  	 */
+  	function getValidKey($rawKey) {
+  		$uKeys = array_keys($this->getGlobal('TYPO3_LOADED_EXT'));
+  		foreach((array)$uKeys as $uKey) {
+  			if( str_replace('_', '', $uKey) == str_replace('_', '', $rawKey) ){
+  				$result =  $uKey;
+  			}
+  		}
+  		return $result ? $result : FALSE;
+  	}
   	
+  	
+  	/**
+  	 * Guess the key from the given information
+  	 *
+  	 * Guessing has the following order:
+  	 *
+  	 * 1. A KEY itself is tried.
+  	 *    <pre>
+  	 *     Example: my_extension
+  	 *    </pre>
+  	 * 2. A classnmae of the pattern tx_KEY_something_else is tried.
+  	 *    <pre>
+  	 *     Example: tx_myextension_view
+  	 *    </pre>
+  	 * 3. A full classname of the pattern ' * tx_KEY_something_else.php' is tried.
+  	 *    <pre>
+  	 *     Example: class.tx_myextension_view.php
+  	 *     Example: brokenPath/class.tx_myextension_view.php
+  	 *    </pre>
+  	 * 4. A path that starts with the KEY is tried.
+  	 *    <pre>
+  	 *     Example: my_extension/class.view.php
+  	 *    </pre>
+  	 *
+  	 * @param	string		the minimal necessary information (see 1-4)
+  	 * @return	string		the guessed key, FALSE if no result
+  	 */
+  	function guessKey($minimalInformation) {
+  		$info=trim($minimalInformation);
+  		$key = FALSE;
+  		if($info){
+  			// Can it be the key itself?
+  			if(!$key && preg_match('/^([A-Za-z_]*)$/', $info, $matches ) ) {
+  				$key = $matches[1];
+  				$key = $this->getValidKey($key);
+  			}
+  			// Is it a classname that contains the key?
+  			if(!$key && (preg_match('/^tx_([^_]*)(.*)$/', $info, $matches ) || preg_match('/^user_([^_]*)(.*)$/', $info, $matches )) ) {
+  				$key = $matches[1];
+  				$key = $this->getValidKey($key);
+  			}
+  			// Is there a full filename that contains the key in it?
+  			if(!$key && (preg_match('/^.*?tx_([^_]*)(.*)\.php$/', $info, $matches ) || preg_match('/^.*?user_([^_]*)(.*)\.php$/', $info, $matches )) ) {
+  				$key = $matches[1];
+  				$key = $this->getValidKey($key);
+  			}
+  			// Is it a path that starts with the key?
+  			if(!$key && $last = strstr('/',$info)) {
+  				$key = substr($info, 0, $last);
+  				$key = $this->getValidKey($key);
+  			}
+  		}
+  		return $key ? $key : FALSE;
+  	}
+  	
+  	/**
+  	 * Get a global variable
+  	 *
+  	 * @param string   The key of the global variable
+  	 * @return mixed   The global variable.
+  	 */
+  	function getGlobal($key) {
+  		return $GLOBALS[$key];
+  	}
   	/**
 	* LoadTCAs : Loads Tabel TCA with user overrides...
 	*
@@ -373,7 +454,7 @@ class tx_metafeedit extends  tslib_pibase {
 		//cmd load item proc func
 		foreach ($GLOBALS['TCA'][$this->table]['columns'] as $keyField => $fieldValues) {
 			if ($GLOBALS['TCA'][$this->table]['columns'][$keyField]["config"]["itemsProcFunc"]) {
-				$procExt = t3lib_extMgm::extPath(tx_div::guessKey($GLOBALS['TCA'][$this->table]['columns'][$keyField]["config"]["itemsProcFunc"]));
+				$procExt = t3lib_extMgm::extPath($this->guessKey($GLOBALS['TCA'][$this->table]['columns'][$keyField]["config"]["itemsProcFunc"]));
 				$procExtKey = explode('->', $GLOBALS['TCA'][$this->table]['columns'][$keyField]["config"]["itemsProcFunc"]);
 				if (is_array($procExtKey) && file_exists($procExt.'class.'.strtolower ($procExtKey[0]).'.php')) include_once($procExt.'class.'.strtolower ($procExtKey[0]).'.php');
 			}

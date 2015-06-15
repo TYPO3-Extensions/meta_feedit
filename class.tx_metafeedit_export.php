@@ -1544,6 +1544,17 @@ class tx_metafeedit_export {
 		}
 		try {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
+			$cmd=$this->conf['inputvar.']['cmd'];
+			//error_log(__METHOD__.$cmd.'yeaakjjj'.print_r($this->conf[$cmd.'.'],true));
+			$prePDFXMLFunction=$this->conf[$cmd.'.']['prePDFXMLFunction'];
+			if ($prePDFXMLFunction) {
+				eval($prePDFXMLFunction);
+			}
+			
+			$postPDFXMLFunction=$this->conf[$cmd.'.']['postPDFXMLFunction'];
+			if ($postPDFXMLFunction) {
+				eval($postPDFXMLFunction);
+			}
 		} catch (Exception $e) {
 			echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
 			die( __METHOD__.': Caught exception: '.  $e->getMessage().', maybe pdf export is not activated');
@@ -1785,6 +1796,7 @@ class tx_metafeedit_export {
 			// By default we only handle first media
 			if (!$this->multipleMedia) break;
 		}
+		//$imgHeight=120;
 		return $imgHeight;
 	}
 	/**
@@ -1996,13 +2008,14 @@ class tx_metafeedit_export {
 			//$this->pdf->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD');
 			$this->Rect($this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight,'FD',$ib);
 	 	}
-	 	
+	 	//error_log(__METHOD__.": -".print_r($cell->img,true));
 	 	$this->pdf->setX($this->cellX);
 	 	//error_log(__METHOD__.": bf $this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight");
 		foreach($vala as $v) {
 			$imgData=$this->getDisplayImage($cell->img->dir?$cell->img->dir.'/'.$v:$v);
 			$img=$imgData['path'];
 			$imgInfo=$imgData['imginfo'];
+			//error_log(__METHOD__.": -".print_r($imgData,true));
 			if ($cell->img['gh'] || $cell->img['gw'] || $cell->img['mh'] || $cell->img['mw'] ) {
 				if ($cell->img['gw'] ) $fileA['file.']['width']=(string)$cell->img['gw'] ;
 				if ($cell->img['gh'] ) $fileA['file.']['height']=(string)$cell->img['gh'];
@@ -2043,6 +2056,7 @@ class tx_metafeedit_export {
 				$pw=$imgw;
 				//$this->cellX,$this->cellY, $this->cellWidth, $this->rowHeight
 				$this->pdf->ClippingRect($px,$py,$pw,$ph);
+				//error_log(__METHOD__."fit: $px,$py,$pw,$ph, $fit");
 				switch($fit) {
 					case 'fit':
 						if ($ro<$rd) {

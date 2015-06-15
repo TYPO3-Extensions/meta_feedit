@@ -16,7 +16,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'category' => 'plugin',
 	'shy' => 0,
 	'version' => '0.1.14',
-	'dependencies' => 'cms,fpdf,div',
+	'dependencies' => 'cms,fpdf',
 	'conflicts' => '',
 	'priority' => '',
 	'loadOrder' => '',
@@ -36,7 +36,6 @@ $EM_CONF[$_EXTKEY] = array(
 		'depends' => array(
 			'cms' => '',
 			'fpdf' => '',
-			'div' => '',
 		),
 		'conflicts' => array(
 		),

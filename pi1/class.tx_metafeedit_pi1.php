@@ -428,6 +428,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['TemplatePDFTab']=$lconf['TemplatePDFTab'];
 		$mfconf['list.']['TemplateCSV']=$lconf['TemplateCSV'];
 		$mfconf['list.']['TemplateExcel']=$lconf['TemplateExcel'];
+		$mfconf['list.']['prePDFXMLFunction']=$lconf['listPrePDFXMLFunction'];
+		$mfconf['list.']['postPDFXMLFunction']=$lconf['listPostPDFXMLFunction'];
 		
 		
 		/*
