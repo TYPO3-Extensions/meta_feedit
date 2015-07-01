@@ -413,20 +413,21 @@ class tx_metafeedit_pdf extends FPDF {
 	*							   Public methods								 *
 	*																			  *
 	*******************************************************************************/
-	function Image($file,$x,$y,$w=0,$h=0,$type='',$link='', $isMask=false, $maskImg=0)
-	{
+	function Image($file,$x,$y,$w=0,$h=0,$type='',$link='', $isMask=false, $maskImg=0){
 		//Put an image on the page
-		if(!isset($this->images[$file]))
-		{
+		if(!isset($this->images[$file])){
 			//First use of image, get info
-			if($type=='')
-			{
+			if($type==''){
 				$pos=strrpos($file,'.');
 				if(!$pos)
 					$this->Error('Image file has no extension and no type was specified: '.$file);
 				$type=substr($file,$pos+1);
 			}
+			$imgInfo = getimagesize($file);
+			error_log(__METHOD__.print_r($imgInfo,true));
 			$type=strtolower($type);
+			$mimeType=explode('/',$imgInfo['mime']);
+			if (count($mimeType)==2) $type=$mimeType[1];
 			if(version_compare(PHP_VERSION, '5.3.0', '<')){
 				$mqr=get_magic_quotes_runtime();
 				set_magic_quotes_runtime(0);
@@ -436,9 +437,7 @@ class tx_metafeedit_pdf extends FPDF {
 			elseif($type=='png'){
 				$info=$this->_parsepng($file);
 				if ($info=='alpha') return $this->ImagePngWithAlpha($file,$x,$y,$w,$h,$link);
-			}
-			else
-			{
+			}else{
 				//Allow for additional formats
 				$mtd='_parse'.$type;
 				if(!method_exists($this,$mtd))
@@ -455,8 +454,7 @@ class tx_metafeedit_pdf extends FPDF {
 			$info['i']=count($this->images)+1;
 			if ($maskImg>0) $info['masked'] = $maskImg;###
 			$this->images[$file]=$info;
-		}
-		else
+		}else
 			$info=$this->images[$file];
 		//Automatic width and height calculation if needed
 		if($w==0 && $h==0)
