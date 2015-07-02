@@ -872,32 +872,44 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	* $ret['fNiD']='uid'
 	*/
 	
-	function getForeignTableFromField($fN, &$conf,$table='',&$sql=array()) {
-	  if (!$fN && $conf['debug']) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : empty field given for table '$table' !";
+	function getForeignTableFromField($fN, &$conf,$table='',&$sql=array(),$caller='') {
+	  if (!$fN && $conf['debug']) echo "<br>$caller>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : empty field given for table '$table' !";
 		$ret = array();
 		$fNA = t3lib_div::trimexplode('.', $fN);
 		$fNiD = end($fNA);
 		$ftable = $table?$table:$conf['table'];
 		$relTable=$ftable;
-		foreach ($fNA as $f) {
-			if ((strpos($f,'--fse--')!==false) || (strpos($f,'--fsb--')!==false)) continue;
-			$relTable=$ftable;
-			//ugly hack by CMD
-			if ($f!="sorting") {
-				if (!is_array($conf['TCAN'][$ftable]['columns'][$f]) && !$conf['list.']['sqlcalcfields.'][$fN] ) {
-					if ($conf['debug']) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : field  $f / $fN given does not exist in table $ftable ... InTable : $table! orig table :".$conf['table'];
+		//error_log(__METHOD__.":09-$fN".print_r($sql,true));
+		if ($sql['joinAliases'][$fN]) {
+			$relTable=$ftable=$sql['joinAliases'][$fN]['table'];
+			$ret['table'] = $sql['joinAliases'][$fN]['table'];
+			$ret['relTable'] =$sql['joinAliases'][$fN]['table'];
+			$ret['relTableAlias'] = $sql['joinAliases'][$fN]['tableAlias'];
+			$ret['tableAlias']= $sql['joinAliases'][$fN]['tableAlias'];
+			$ret['fieldLabel']=$conf['TCAN'][$ret['relTable']]['columns'][trim($fNiD)]['label']?$conf['TCAN'][$ret['relTable']]['columns'][trim($fNiD)]['label']:$fN;
+			$ret['fieldAlias']=$fN; //call makeFieldalias here ...
+			$ret['fNiD'] = $fNiD;
+		} else {
+			foreach ($fNA as $f) {
+				if ((strpos($f,'--fse--')!==false) || (strpos($f,'--fsb--')!==false)) continue;
+				$relTable=$ftable;
+				//ugly hack by CMD
+				if ($f!="sorting") {
+					if (!is_array($conf['TCAN'][$ftable]['columns'][$f]) && !$conf['list.']['sqlcalcfields.'][$fN] ) {
+						if ($conf['debug']) echo "<br>$caller>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : field  $f / $fN given does not exist in table $ftable ... InTable : $table! orig table :".$conf['table'];
+					}
+					if ($conf['TCAN'][$ftable]['columns'][$f]['config']['foreign_table']) $ftable = $conf['TCAN'][$ftable]['columns'][$f]['config']['foreign_table'];		   
 				}
-				if ($conf['TCAN'][$ftable]['columns'][$f]['config']['foreign_table']) $ftable = $conf['TCAN'][$ftable]['columns'][$f]['config']['foreign_table'];		   
 			}
+			$ret['table'] = $ftable?$ftable:$relTable; // if we found a foreign table we return it otherwhise table is main table..
+			$ret['relTable'] = $relTable; // if we found a foreign table we return otherwhise table is main table..
+			$ret['relTableAlias'] = $relTable; // TODO add alias calc here !!!
+			$ret['tableAlias']=($fNiD!=$fN?$sql['tableAliases'][$ret['table']][str_replace('.','_',str_replace('.'.$fNiD,'',$fN))]:$relTable);//$ret['table']);
+			$ret['fieldLabel']=$conf['TCAN'][$ret['relTable']]['columns'][trim($fNiD)]['label']?$conf['TCAN'][$ret['relTable']]['columns'][trim($fNiD)]['label']:$fN;
+			$ret['fieldAlias']=$fN; //call makeFieldalias here ...
+			$ret['fNiD'] = $fNiD;
 		}
 		
-		$ret['table'] = $ftable?$ftable:$relTable; // if we found a foreign table we return it otherwhise table is main table..
-		$ret['relTable'] = $relTable; // if we found a foreign table we return otherwhise table is main table..
-		$ret['relTableAlias'] = $relTable; // TODO add alias calc here !!!
-		$ret['tableAlias']=($fNiD!=$fN?$sql['tableAliases'][$ret['table']][str_replace('.','_',str_replace('.'.$fNiD,'',$fN))]:$relTable);//$ret['table']);
-		$ret['fieldLabel']=$conf['TCAN'][$ret['relTable']]['columns'][trim($fNiD)]['label']?$conf['TCAN'][$ret['relTable']]['columns'][trim($fNiD)]['label']:$fN;
-		$ret['fieldAlias']=$fN; //call makeFieldalias here ...
-		$ret['fNiD'] = $fNiD;
 		return $ret;
 	}
 	
@@ -930,7 +942,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 					$this->makeTypo3TCAForTable($confTcan,$ftable);
 				}
 				if (!is_array($confTcan[$ftable]['columns'][$f]) && !$conf['list.']['sqlcalcfields.'][$fN] ) {
-					if ($conf['debug']) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField : field  $f / $fN given does not exist in table $ftable ... InTable : $table! orig table :".$conf['table'];
+					if ($conf['debug']) echo "<br>ext:tx_meta_feedit:class.tx_metafeedit_lib.php:getForeignTableFromField2 : field  $f / $fN given does not exist in table $ftable ... InTable : $table! orig table :".$conf['table'];
 				}
 
 				if ($confTcan[$ftable]['columns'][$f]['config']['foreign_table']) $ftable =$confTcan[$ftable]['columns'][$f]['config']['foreign_table'];	
@@ -1453,7 +1465,8 @@ class tx_metafeedit_lib implements t3lib_singleton {
 				continue;
 			}
 			$tab=array();
-			$res = $intable?$this->getForeignTableFromField($fN, $conf,$intable,$tab):$this->getForeignTableFromField($fN, $conf,'',$tab);			
+			$this->getJoin($conf,$tab);
+			$res = $intable?$this->getForeignTableFromField($fN, $conf,$intable,$tab,__METHOD__):$this->getForeignTableFromField($fN, $conf,'',$tab,__METHOD__);			
 			$_fN=str_replace('.','_',$fN);
 			$dataArr[$_fN]=$dataArr[$fN]; // Why do we still do this, field names should have no '.'?
 			$table = $res['relTable']; //we get field sourcetable...
@@ -1618,6 +1631,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 								if (!$imgA['file'] ) $imgA['file'] = $imgT;
 								$imgA['altText']=$imgT;
 								$imgA['titleText']=trim(basename($imgT));
+								//error_log(__METHOD__.print_r($imgA,true));
 								$values .= $ATagB.$this->cObj->stdWrap($this->cObj->IMAGE($imgA), $conf['fileWrap.'][$fN.'.']).$ATagE;
 							}
 							// By defaullt we only handle first media
@@ -3654,9 +3668,9 @@ class tx_metafeedit_lib implements t3lib_singleton {
 				if (strpos($FTi,'.')>0)
 				{
 					// foreign relations
-					$FTAA=t3lib_div::trimexplode('.',$FTi);
+					/*$FTAA=t3lib_div::trimexplode('.',$FTi);
 					$FT=$FTAA[0];
-					$FN=$FTAA[1];
+					$FN=$FTAA[1];*/
 					$FTTA=$this->getTableAlias($sql,$FTi,$conf);
 				} else {
 					// master table fields  ...
@@ -3903,6 +3917,11 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		$joinField=$FTAA[$c];
 		$relTable=$conf['table']; //masterTable;
 		if (!$joinField) die('ext:meta_feedit:class.tx_metafeedit_lib.php:getTableAlias: No Join Field on '.$relTable.' :'.$field);
+		/*if ($conf['TCAN'][$joinField]) {
+			error_log(__METHOD__."$joinField is a table");
+		} else {
+			error_log(__METHOD__."$joinField is not a table");
+		}*/
 		//--
 		while ($p>0) {
 			$FTAA=t3lib_div::trimexplode('.',$FN);
@@ -4000,13 +4019,20 @@ class tx_metafeedit_lib implements t3lib_singleton {
 				if (@array_key_exists($FTi,$conf['list.']['phpcalcfields.'])) continue;
 				// check if field is a relation to a foreign table (it has a '.' in it's name).
 				if (in_array ($FTi,array('STATE_uid','STATE_label','STATE_desc'))) continue;
-				//error_log($FTi);
-				if (strpos($FTi,'.')>0 )
-				{
+				//we handle join fields otherwhere
+				if (strpos('join_',$FTi)===0) continue;
+				//join table fields
+				if ($sql['joinAliases'][$FTi]) {
+					//$sql['fields.'][$FTi.'.']['table']=$conf['table'];
+					//$sql['fieldArray'][]=$FTi;
+					continue;
+				}
+				// if '.' in field name, field is in foreign table
+				if (strpos($FTi,'.')>0 ){
 					// We get foreign table name ... (can we have more than one '.' in name ?
-					$FTAA=t3lib_div::trimexplode('.',$FTi);
-					$link=$FTAA[0];
-					$FN=$FTAA[1];
+					//$FTAA=t3lib_div::trimexplode('.',$FTi);
+					//$link=$FTAA[0];
+					//$FN=$FTAA[1];
 					$FTTA=$this->getTableAlias($sql,$FTi,$conf);
 				} else {
 					// These fields are form master table ($conf['table'])...
@@ -4049,6 +4075,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		$sql['joinTables'][]=$conf['table'];
 		$sql['DBSELECT']=$DBSELECT;
 		$sql['where']=$sql['DBSELECT'];
+		$this->getJoin($conf,$sql);
 		$this->getSQLFields($conf,$sql);
 		
 		// Default is *
@@ -4067,6 +4094,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		$this->getRUJoin($conf,$sql);		
 		$this->getParentJoin($conf,$sql);
 		$this->getCalcFields($conf,$sql);
+		
 		// Filters
 		//error_log(__METHOD__.":09-".print_r($sql,true));
 		if ($conf['piVars']['filter']) {
@@ -4150,6 +4178,43 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			$sql['fieldArray'][]="STATE.uid as STATE_uid";
 			$sql['fieldArray'][]="STATE.label as STATE_label";
 			$sql['fieldArray'][]="STATE.description as STATE_desc";
+			//$sql['stateFieldsSql'].=",$calcsql as '$field'"; // to be removed
+			//$sql['statefields'][]=$field; // to be removed
+		}
+	}
+	/**
+	 * Join
+	 *
+	 * @param	[type]		$$conf: ...
+	 * @param	[type]		$sql: ...
+	 * @return	[type]		...
+	 */
+	
+	function getJoin(&$conf,&$sql,$table='') {
+		if ($conf['joinTable']) {
+			$sql['joinTables'][]=$conf['joinTable'];
+			$sql['join.'][$conf['joinTable']]=' LEFT JOIN '.$conf['joinTable'].' ON '.$conf['joinOn'];
+			//error_log(__METHOD__.":".print_r($conf['list.']['joinFields'],true));
+			
+			
+			if ($conf['list.']['joinFields']) {
+				foreach(t3lib_div::trimexplode(',',$conf['list.']['joinFields']) as $joinField) {
+					
+					if ($joinField) {
+						$joinAlias='join_'.$conf['joinTable'].'_'.$joinField;
+						$sql['joinAliases'][$joinAlias]['field']=$joinField;
+						$sql['joinAliases'][$joinAlias]['table']=$conf['joinTable'];
+						$sql['joinAliases'][$joinAlias]['tableAlias']='join_'.$conf['joinTable'];
+						$sql['fieldArray'][]=$conf['joinTable'].'.'.$joinField.' as '.$joinAlias;
+					}
+				}
+			}
+			//$sql['joinTables'][]='STATE';
+			/*$sql['join.']['STATE']=' LEFT JOIN '.tx_metaworkflow_state.' as STATE on STATE.uid=SW.stateid ';
+			$sql['joinTables'][]='tx_metaworkflow_state';
+			$sql['fieldArray'][]="STATE.uid as STATE_uid";
+			$sql['fieldArray'][]="STATE.label as STATE_label";
+			$sql['fieldArray'][]="STATE.description as STATE_desc";*/
 			//$sql['stateFieldsSql'].=",$calcsql as '$field'"; // to be removed
 			//$sql['statefields'][]=$field; // to be removed
 		}
@@ -4769,7 +4834,8 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			foreach($fieldArray as $FN) {
 				$params=t3lib_div::trimExplode(";",$FN);
 				if ($params[0]!='--div--' && $params[0]!='--fse--' && $params[0]!='--fsb--') {
-					$curTable = $this->getForeignTableFromField($FN, $conf);
+					$tab=array();
+					$curTable = $this->getForeignTableFromField($FN, $conf,'',$tab,__METHOD__);
 					$type = $conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
 					switch((string)$type) {
 						case 'select':
@@ -4836,11 +4902,12 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			$recherche= $jf->toHuman();
 			//error_log(__METHOD__.":$recherche");
 		}
+		//error_log(__METHOD__.":".print_r($conf['inputvar.']['advancedSearch'],true));
 		if (is_array($conf['inputvar.']['advancedSearch'])) {
 			foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
 				if($this->is_extent($val)) {
 					$tab=array();
-					$ftA=$this->getForeignTableFromField($key,$conf,'',$tab);
+					$ftA=$this->getForeignTableFromField($key,$conf,'',$tab,__METHOD__);
 					//$recherche='';
 					if (is_array($val)) {
 						$isset=($this->is_extent($val['op']) && ($this->is_extent($val['val'])||$this->is_extent($val['valsup'])));
@@ -4859,7 +4926,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 							}
 						}
 					} else {
-						$curTable = $this->getForeignTableFromField($key, $conf,'',$sql);
+						$curTable = $this->getForeignTableFromField($key, $conf,'',$sql,__METHOD__);
 						$type=$conf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
 						switch ($type) {
 							//TODO handle multiple values...
@@ -5001,7 +5068,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		if (is_array($advancedSearch)) {
 			foreach($advancedSearch as $key=>$value) {
 				//add foreign table fields to advanced search
-				$curTable = $this->getForeignTableFromField($key, $conf,'',$sql);
+				$curTable = $this->getForeignTableFromField($key, $conf,'',$sql,__METHOD__);
 				//Typoscript retrieval
 				$valeur='';
 				if ($this->is_extent($value) && !is_array($value)) $valeur=$value;

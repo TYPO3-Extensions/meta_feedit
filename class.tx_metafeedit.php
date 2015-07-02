@@ -86,6 +86,10 @@ class tx_metafeedit extends  tslib_pibase {
 		  'itemFormElValue' => '',
 		  );
 	var $specConf = array();
+	/**
+	 * 
+	 * @var tx_metafeedit_lib
+	 */
 	var $metafeeditlib;
 	var $thisConfig = array();
 	var $RTEtypeVal = 'text';
@@ -432,8 +436,12 @@ class tx_metafeedit extends  tslib_pibase {
 		foreach ($lfields as $lf) {
 			if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
 		}
-		
-	   // We handle foreign tables of exta fields
+		// We handle foreign tables of joinFields
+		$lfields=t3lib_div::trimexplode(',',$conf['list.']['joinFields']);
+		foreach ($lfields as $lf) {
+			if ($lf && $conf['joinTable']) $FTs[$GLOBALS['TCA'][$conf['joinTable']]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$conf['joinTable']]['columns'][$lf]['config']['foreign_table'];
+		}
+	   // We handle foreign tables of extra fields
 		$lfields=t3lib_div::trimexplode(',',$conf['list.']['extraFields']);	
 		foreach ($lfields as $lf) {
 			if ($lf && $GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']) $FTs[$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table']]=$GLOBALS['TCA'][$this->table]['columns'][$lf]['config']['foreign_table'];
@@ -881,7 +889,7 @@ class tx_metafeedit extends  tslib_pibase {
 			
 				  $helpIcon = ($conf['show_help_icons'] ? '<div'.$this->caller->pi_classParam('form-help-icon').'>'.$this->helpIcon($fN).'</div>' : '');
 			 	  $tab=array();
-			 	  $res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab);
+			 	  $res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab,__METHOD__);
 			 	  $table=$res['relTable'];
 				  $fNiD=$res['fNiD'];
 					$masterTable=$cmd=='blog'?'tx_metafeedit_comments':$conf['table'];
@@ -983,7 +991,7 @@ class tx_metafeedit extends  tslib_pibase {
 			}
 			  } else {
 			$sql=array();
-			$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$sql);
+			$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$sql,__METHOD__);
 			$table=$res['relTable'];
 			$fNiD=$res['fNiD'];
 		  	$label = $this->metafeeditlib->getLLFromLabel($conf['TCAN'][$table]['columns'][$fNiD]['label'],$conf);
@@ -1089,7 +1097,8 @@ class tx_metafeedit extends  tslib_pibase {
 	$fN=trim($fN);
 	$masterTable=$cmd=='blog'?'tx_metafeedit_comments':$conf['table'];
 	$tab=array();
-	$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab);
+	$this->metafeeditlib->getJoin($conf,$tab,$masterTable);
+	$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab,__METHOD__);
 	$Lib=$this->metafeeditlib->getLLFromLabel($res['fieldLabel'],$conf);
 	//$fN=str_replace('.','_',$res['fieldAlias']); // is the str_replace necessary ?
 	
@@ -1283,7 +1292,7 @@ class tx_metafeedit extends  tslib_pibase {
 		
 		$table=$conf['table'];
 		$tab=array();
-		$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab);
+		$res=$this->metafeeditlib->getForeignTableFromField($fN,$conf,'',$tab,__METHOD__);
 		$Lib=$this->metafeeditlib->getLLFromLabel($res['fieldLabel'],$conf);
 		
 		$ftable=$res['relTable'];
@@ -1773,7 +1782,8 @@ class tx_metafeedit extends  tslib_pibase {
 				$masterTable = $conf['table'];
 				$size = $this->getSize($conf, $FN, $masterTable);
 				$tab=array();
-				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',$tab);	 
+				$this->metafeeditlib->getJoin($conf,$tab,$masterTable);
+				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',$tab,__METHOD__);	 
 				$Lib=$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf);
 				$href=$this->metafeeditlib->hsc($conf,$this->pi_linkTP_keepPIvars_url(array('sort' => $FN.':###SORT_DIR_'.$FN.'###'),1));
 				if(!$textmode) {
@@ -1831,7 +1841,8 @@ class tx_metafeedit extends  tslib_pibase {
 						break;
 					case 'csv' :
 						// No presentation data
-						$ret.='"'.str_replace('"','""',$FCode).'";';	
+						// enclosing csv data in "=""data""" forces excel not to parse data and treat everything as text
+						$ret.='"="'.'"'.str_replace('"','""',$FCode).'""";';	
 						break;
 					case 'xls' :
 						
@@ -1839,7 +1850,8 @@ class tx_metafeedit extends  tslib_pibase {
 									//$dir=$conf['TCAN'][$masterTable]['columns'][$FN]['config']['uploadfolder'];
 									$FCode='###FIELD_EVAL_'.$FN.'###';
 
-						}					
+						}
+						//$FCode='"=""'.$FCode.'"""';
 						if ($cols) {
 							$ret.=$type?$FCode:'<div class="'.$this->caller->pi_getClassName('list_table_field').' '.$this->caller->pi_getClassName('list_table_field_'.$FN).'">'.$FCode.'</div>';
 						} else {
@@ -2017,7 +2029,7 @@ class tx_metafeedit extends  tslib_pibase {
 				$masterTable = $conf['table'];
 				$sumarray=t3lib_div::trimexplode(',',$conf['list.']['sumFields']);
 				$tab=array();
-				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',$tab);			   
+				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',$tab,__METHOD__);			   
  				$Lib=$this->metafeeditlib->getLLFromLabel('total',$conf).' '.$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf).':';
 				$size = $this->getSize($conf, $_FN, $masterTable);
 				$total++;
@@ -2293,8 +2305,8 @@ class tx_metafeedit extends  tslib_pibase {
 		$tmp='<!-- ###TEMPLATE_EDITMENU### begin -->';
 		// TOP ACTIONS TAG	
 		$tmp.= '<table  class="tx-metafeedit-top-actions" style="width:100%"><tr><td align="left" valign="top">###ACTIONS-LIST-TOP###</td></tr></table>';
-		
-		$tmp.='<div'.$this->caller->pi_classParam('editmenu').'>'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-editmenu').'">'.$this->metafeeditlib->getHeader($this->metafeeditlib->getLL("edit_menu_header",$conf),$rech,$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_description",$conf).'</div>').' 
+		$title=$this->metafeeditlib->getLL("edit_menu_header",$conf);
+		$tmp.='<div'.$this->caller->pi_classParam('editmenu').'>'.($conf['no_header']?'':'<h1 class="'.$this->caller->pi_getClassName('header').' '.$this->caller->pi_getClassName('header-editmenu').'">'.$this->metafeeditlib->getHeader($title,$rech,$conf).'</h1><div class="'.$this->caller->pi_getClassName('message').' '.$this->caller->pi_getClassName('message-editmenu').'">'.$this->metafeeditlib->getLL("edit_menu_description",$conf).'</div>').' 
 		<div'.$this->caller->pi_classParam('error').'>###EVAL_ERROR###</div>
 		<div'.$this->caller->pi_classParam('editmenu-list').'>'.$this->getSearchBox($conf);
 		$tmp.='<!-- ###TEMPLATE_LIST_TABLEDATA### begin -->';
@@ -4032,32 +4044,33 @@ function getFormJs($formName,&$conf) {
 	 * @param	[type]		$conf: ...
 	 * @return	[type]		...
 	 */
-  function pi_loadLL($conf) {
-   // flatten the structure of labels overrides
-						if (is_array($conf)) {
-								$done = false;
-								$i = 0;
-								while(!$done && $i < 10) {
-										$done = true;
-										reset($conf);
-										while(list($k,$lA)=each($conf)) {
-												if (is_array($lA)) {
-														foreach($lA as $llK => $llV)	{
-																if (is_array($llV))	{
-																		foreach ($llV as $llK2 => $llV2) {
-																				$conf[$k][$llK . $llK2] = $llV2;
-																		}
-																		unset($conf[$k][$llK]);
-																		$done = false;
-																		++$i;
-																}
-														}
-												}
-										}
+ 	/*public function pi_loadLL($conf) {
+ 		error_log(__METHOD__.": ###### should never be called".print_r($conf,true));
+		// flatten the structure of labels overrides
+		if (is_array($conf)) {
+			$done = false;
+			$i = 0;
+			while(!$done && $i < 10) {
+				$done = true;
+				reset($conf);
+				while(list($k,$lA)=each($conf)) {
+					if (is_array($lA)) {
+						foreach($lA as $llK => $llV)	{
+							if (is_array($llV))	{
+								foreach ($llV as $llK2 => $llV2) {
+									$conf[$k][$llK . $llK2] = $llV2;
 								}
+								unset($conf[$k][$llK]);
+								$done = false;
+								++$i;
+							}
 						}
-			return $conf;
+					}
 				}
+			}
+		}
+		return $conf;
+	}*/
 
 	/**
 	 * [Describe function...]
@@ -4174,7 +4187,7 @@ function getFormJs($formName,&$conf) {
 					}
 					//We handle foreign tables in advanced search
 					$tab=array();
-					$curTable = $this->metafeeditlib->getForeignTableFromField($FN, $conf,'',$tab);
+					$curTable = $this->metafeeditlib->getForeignTableFromField($FN, $conf,'',$tab,__METHOD__);
 					$type =$TConf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['type'];
 					$evals=t3lib_div::trimexplode(',',$TConf['TCAN'][$curTable['relTable']]['columns'][$curTable['fNiD']]['config']['eval']);
 					

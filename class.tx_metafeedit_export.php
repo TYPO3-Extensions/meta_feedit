@@ -413,7 +413,7 @@ class tx_metafeedit_pdf extends FPDF {
 	*							   Public methods								 *
 	*																			  *
 	*******************************************************************************/
-	function Image($file,$x,$y,$w=0,$h=0,$type='',$link='', $isMask=false, $maskImg=0){
+	function Image($file,$x=Null,$y=Null,$w=0,$h=0,$type='',$link='', $isMask=false, $maskImg=0){
 		//Put an image on the page
 		if(!isset($this->images[$file])){
 			//First use of image, get info
@@ -940,7 +940,7 @@ class tx_metafeedit_pdf extends FPDF {
 	
 	# Decoder for RLE4 compression in windows bitmaps
 	# see http://msdn.microsoft.com/library/default.asp?url=/library/en-us/gdi/bitmaps_6x0u.asp
-		function rle4_decode ($str, $width){
+	function rle4_decode ($str, $width){
 		$w = floor($width/2) + ($width % 2);
 		$lineWidth = $w + (3 - ( ($width-1) / 2) % 4);
 		$pixels = array();
@@ -1098,6 +1098,7 @@ class tx_metafeedit_export {
 		
 		$content= utf8_decode(str_replace('&euro;','Eur',str_replace('&nbsp;',' ',strip_tags($caller->metafeeditlib->T3StripComments($content)))));
 		//header("Content-length: ".strlen($content);
+		//error_log(__METHOD__.$content);
 		header('Content-disposition: attachment; filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.csv"');		
 		echo $content;
 		die;
@@ -2918,12 +2919,12 @@ class tx_metafeedit_export {
 					 		//$this->pdf->setX($this->cellX+$size);
 					 	} else {
 					 		if ($row->gb && $x==0) { 
-								$objPHPExcel->getActiveSheet()->setCellValue($c.$r, "".$val);
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit($c.$r, "".$val, PHPExcel_Cell_DataType::TYPE_STRING);
 								$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
 							} else {
 								$border=1;
 								//if ($row->gb) $border=0;
-								$objPHPExcel->getActiveSheet()->setCellValue($c.$r, "".$val);
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit($c.$r, "".$val, PHPExcel_Cell_DataType::TYPE_STRING);
 								$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
 							}
 						}

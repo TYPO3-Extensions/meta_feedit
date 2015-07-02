@@ -430,6 +430,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['list.']['TemplateExcel']=$lconf['TemplateExcel'];
 		$mfconf['list.']['prePDFXMLFunction']=$lconf['listPrePDFXMLFunction'];
 		$mfconf['list.']['postPDFXMLFunction']=$lconf['listPostPDFXMLFunction'];
+		$mfconf['list.']['joinFields']=$lconf['listJoinFields'];
 		
 		
 		/*
@@ -646,6 +647,8 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['T3TableHomePidField']=$lconf['T3TableHomePidField'];
 		$mfconf['T3GroupUids']=$conf['T3GroupUids'];
 		$mfconf['foreignTables']=$lconf['foreignTables'];
+		$mfconf['joinTable']=$lconf['joinTable'];
+		$mfconf['joinOn']=$lconf['joinOn'];
 		$mfconf['idField']=$lconf['idField'];
 		$mfconf['recursive']=$lconf['recursive'];
 		$mfconf['parseValues']=$lconf['feparsevalues'];
