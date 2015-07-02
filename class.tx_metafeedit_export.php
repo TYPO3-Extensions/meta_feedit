@@ -424,7 +424,7 @@ class tx_metafeedit_pdf extends FPDF {
 				$type=substr($file,$pos+1);
 			}
 			$imgInfo = getimagesize($file);
-			error_log(__METHOD__.print_r($imgInfo,true));
+			//error_log(__METHOD__.print_r($imgInfo,true));
 			$type=strtolower($type);
 			$mimeType=explode('/',$imgInfo['mime']);
 			if (count($mimeType)==2) $type=$mimeType[1];
