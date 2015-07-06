@@ -424,7 +424,7 @@ class tx_metafeedit_pdf extends FPDF {
 				$type=substr($file,$pos+1);
 			}
 			$imgInfo = getimagesize($file);
-			//error_log(__METHOD__.print_r($imgInfo,true));
+			
 			$type=strtolower($type);
 			$mimeType=explode('/',$imgInfo['mime']);
 			if (count($mimeType)==2) $type=$mimeType[1];
@@ -1078,9 +1078,16 @@ class tx_metafeedit_export {
 	
 
 	// We handle here CSV file generation ...
-	function getCSV(&$content,&$caller) {
+	/**
+	 * 
+	 * @param string $content
+	 * @param unknown_type $caller
+	 * @param string $mode : 'output'(outputs file data on standard output and dies) or 'return' (output data is returned to caller)
+	 */
+	function getCSV(&$content,&$caller,$exportFile='') {
+		//error_log(__METHOD__.':'.$content);
 		// We handle the header here 
-		ob_clean();
+		
 		$caller->metafeeditlib->getHeader($title, $recherche, $this->conf);		
 		$markerArray=array();
 		$markerArray['###EXPORT_TITLE###']=$title;
@@ -1088,7 +1095,7 @@ class tx_metafeedit_export {
 		$markerArray['###EXPORT_TITLE_SIZE###']=strlen($title);
 		$markerArray['###SEARCH_FILTER_SIZE###']=strlen($recherche);
 		$content=$caller->cObj->substituteMarkerArray($content,$markerArray);
-		header("Content-Type: application/csv; charEncoding=utf-8");
+		
 		//header("Content-Encoding:utf-8");
 		//header("Content-Length: ".strlen($content);
 		//header("Content-type: application/force-download");
@@ -1099,13 +1106,22 @@ class tx_metafeedit_export {
 		$content= utf8_decode(str_replace('&euro;','Eur',str_replace('&nbsp;',' ',strip_tags($caller->metafeeditlib->T3StripComments($content)))));
 		//header("Content-length: ".strlen($content);
 		//error_log(__METHOD__.$content);
-		header('Content-disposition: attachment; filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.csv"');		
-		echo $content;
-		die;
+		ob_clean();
+		if ($exportFile) {
+			$retput=file_put_contents($exportFile, $content);
+			if ($retput===false)  {
+				throw new Exception(__METHOD__.":Could not create $exportFile");
+			}
+		} else {
+			header("Content-Type: application/csv; charEncoding=utf-8");
+			header('Content-disposition: attachment; filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.csv"');		
+			echo $content;
+			die;
+		}
 	}
 	/**
 	 * Cleans data value for display
-	 * @param unknown_type $cell
+	 * @param SimpleXMLElement $cell
 	 */
 	function getData(SimpleXMLElement $cell) {
 		//$utf8val=utf8_decode($val);
@@ -1273,14 +1289,15 @@ class tx_metafeedit_export {
 	}
 	/**
 	 * We handle here PDF file generation for detail ...
-	 * @param unknown_type $content
+	 * @param string $content
 	 * @param unknown_type $caller
 	 * @param unknown_type $print
-	 * @param unknown_type $printer
-	 * @param unknown_type $server
+	 * @param string $printer
+	 * @param string $server
+	 * @param string $exportFile : name of file to export to if called from CLI
 	 */
 	
-	function getPDFDET(&$content,&$caller,$print='',$printer='',$server='') {
+	function getPDFDET(&$content,&$caller,$print='',$printer='',$server='',$exportFile='') {
 		try {
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 			$cmd=$this->conf['inputvar.']['cmd'];
@@ -1484,11 +1501,15 @@ class tx_metafeedit_export {
 			$this->r++;
 		}
 		ob_clean();
-		$this->pdf->generatePrintScript($print,$printer,$server);
-		try {
-			$this->pdf->Output($caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf', 'I');
-		} catch (Exception $e) {
-			error_log(__METHOD.":$e");
+		if ($exportFile)  {
+			$content=$this->pdf->Output($exportFile, 'F');
+		} else {
+			$this->pdf->generatePrintScript($print,$printer,$server);
+			try {
+				$this->pdf->Output($caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf', 'I');
+			} catch (Exception $e) {
+				error_log(__METHOD.":$e");
+			}
 		}
 		die;
 	}
@@ -1524,8 +1545,9 @@ class tx_metafeedit_export {
 	 * @param string $print
 	 * @param string $printer
 	 * @param string $server
+	 * @param string $exportFile
 	 */
-	function getPDF(&$content,&$caller,$print='',$printer='',$server='') {
+	function getPDF(&$content,&$caller,$print='',$printer='',$server='',$exportFile='') {
 		//error_log(__METHOD__." Mem 0: ".$caller->metafeeditlib->getMemoryUsage());
 		if (!$content) {
 			die(__METHOD__.': No template for pdf mode, maybe pdf export is not activated');
@@ -1734,10 +1756,13 @@ class tx_metafeedit_export {
 		//Convert to PDF
 		$name=$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf';
 		ob_clean();
-		$this->pdf->generatePrintScript($print,$printer,$server);
-		$this->pdf->Output($name, 'I'); 
+		if ($exportFile)  {
+			$content=$this->pdf->Output($exportFile, 'F');
+		} else {
+			$this->pdf->generatePrintScript($print,$printer,$server);
+			$this->pdf->Output($name, 'I');
+		}
 		die;
-
 	}
 	/**
 	 * Calculate tab cell height
@@ -2448,11 +2473,12 @@ class tx_metafeedit_export {
 	}
 	/**
 	 * Tabular presentation for pdf
-	 * @param unknown_type $content
+	 * @param string $content
 	 * @param unknown_type $caller
 	 * @param unknown_type $print
+	 * @param string $exportFile : name of file to export to if called from CLI
 	 */
-	function getPDFTAB(&$content,&$caller,$print='') {
+	function getPDFTAB(&$content,&$caller,$print='',$exportFile='') {
 		//error_log(__METHOD__);
 		//$xml = new SimpleXMLElement($content);
 		try {
@@ -2483,7 +2509,6 @@ class tx_metafeedit_export {
 		$this->cellsize=7;
 		// Do we handle multiple media (default no)
 		$this->multipleMedia=$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']?$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']:($this->confTS['default.']['list.']['multipleMedia']?$this->confTS['default.']['list.']['multipleMedia']:false);
-		
 		
 		$this->pdf = new tx_metafeedit_pdf($this->documentOrientation, $this->documentUnit, $this->documentFormat);
 		$this->pdf->caller=&$this;
@@ -2681,18 +2706,27 @@ class tx_metafeedit_export {
 			}
 		
 		}*/
-		
 		ob_clean();
-		$name=$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf';
-		ob_clean();
-		$this->pdf->generatePrintScript($print,$printer,$server);
-		$this->pdf->Output($name, 'I');
+		if ($exportFile)  {
+			$content=$this->pdf->Output($exportFile, 'F');
+		} else {
+			$name=$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf';
+			$this->pdf->generatePrintScript($print,$printer,$server);
+			$this->pdf->Output($name, 'I');
+		}
 		die;
 	}
 		
 	// We handle here excel file generation
-	function getEXCEL(&$content,&$caller) {
-		//error_log(__METHOD__.':'.$content);
+	/**
+	 * 
+	 * @param string $content
+	 * @param unknown_type $caller
+	 * @param string $exportFile : name of file to export to if called from CLI
+	 * @return unknown
+	 */
+	function getEXCEL(&$content,&$caller,$exportFile='') {
+		//error_log(__METHOD__.':0'.$content);
 		$this->headerConf=array(
 			0=>array(
 				'size'=>16,
@@ -2729,6 +2763,7 @@ class tx_metafeedit_export {
 		$markerArray['###EXPORT_TITLE_SIZE###']=strlen($title);
 		$markerArray['###SEARCH_FILTER_SIZE###']=2;//strlen($recherche);
 		$content=$caller->cObj->substituteMarkerArray($content,$markerArray);
+		//error_log(__METHOD__);
 		try {
 			//error_log(__METHOD__.':'.str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
@@ -3017,11 +3052,16 @@ class tx_metafeedit_export {
 		//-----Create a Writer and output the file to the browser-----
 		$objWriter2007 = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 		ob_clean();
-		header('Content-Type: application/vnd.openXMLformats-officedocument.spreadsheetml.sheet');
-		header('Content-Disposition: attachment;filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.xlsx"');
-		header('Cache-Control: max-age=0');
-
-		$objWriter2007->save('php://output'); 
+		if ($exportFile) {
+			//we ouput to file
+			$objWriter2007->save($exportFile); 
+		}else{
+			//We output to browser
+			header('Content-Type: application/vnd.openXMLformats-officedocument.spreadsheetml.sheet');
+			header('Content-Disposition: attachment;filename="'.$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.xlsx"');
+			header('Cache-Control: max-age=0');
+			$objWriter2007->save('php://output');
+		}
 		die;
 	}
 
@@ -3064,7 +3104,7 @@ class tx_metafeedit_export {
 		//error_log(__METHOD__.":2 $wText, $widthBox,$fontSize");
 	}
 	/**
-	 * Reduce font size for text show in one box
+	 * Reduce font size for text shown in one box
 	 * @param int $widthBox
 	 * @param string $text
 	 * @param int $fontSize
@@ -3079,7 +3119,6 @@ class tx_metafeedit_export {
 			$this->pdf->SetFontSize($fontSize);
 			$rowHeight= $this->pdf->NbLines($widthBox, $text)*$lineHeight;
 		}
-		//error_log(__METHOD__.":2 $rowHeight, $heightBox,$fontSize");
 	}
 	
 
