@@ -416,17 +416,27 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			return '<div'.$conf['caller']->pi_classParam('error-cnt').'>'.$errorMsg.'</div>';
 		}
 
-		Function enleveaccents($chaine) {
+		function enleveaccents($chaine) {
 			$string = strtr($chaine, "àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ", "aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY");
 			return $string;
 		}
 
-		Function enleveaccentsetespaces($chaine) {
+		function enleveaccentsetespaces($chaine) {
 			$string = $this->enleveaccents($chaine);
 			$string = str_replace(' ', '', $string);
 			return $string;
 		}
-
+		/**
+		 * Replaces unallowed characters in fimename by '_'
+		 * based on info found here https://en.wikipedia.org/wiki/Filename
+		 * @param string $chaine
+		 * @return string
+		 */
+		function filterFileNameCharacters($chaine) {
+			$string = $this->enleveaccents($chaine);
+			$string = strtr($chaine, " ?<>|%*:./\\\"'", "_____________");
+			return $string;
+		}
 		/**
 		* [Describe function...]
 		*
