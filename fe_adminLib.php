@@ -140,6 +140,10 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	var $feData=array();
 	var $metafeeditlib;
 	var $metafeeditgrid;
+	/**
+	 * 
+	 * @var tx_metafeedit_export
+	 */
 	var $metafeeditexport;
 	var $print='';
 	var $exporttype=0;	
@@ -212,11 +216,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		
 		if (t3lib_extmgm::isLoaded('ard_mcm')) {
 			$this->langHandler = t3lib_div::makeInstance('Tx_ArdMcm_Core_LanguageHandler', null, 'ard_mcm');
-			//We force language update
-			//error_log(__METHOD__.":before force update ".$GLOBALS['TSFE']->lang);
-			//$this->langHandler->update();
-			//error_log(__METHOD__.": afterforce update ".$GLOBALS['TSFE']->lang);
-			//$GLOBALS['TSFE']->lang=$this->langHandler->getLang();
 		}
 		
 		// We should handle here all GET//POST//PIVARS ... should be in pi1
@@ -2013,7 +2012,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$this->metafeeditlib->getAdvancedSearchComboMarkerArray($conf,$this->markerArray);
 		//We get templates
 		$tpl=$this->prepareListTemplates($conf,$this->markerArray,$exporttype);
-		//error_log(__METHOD__.':tPL '.print_r($tpl,true));
+		//error_log(__METHOD__.':tPL '.$exporttype.'-'.print_r($tpl,true));
 		//@region 
 		//@todo put this in a function
 		//$searchfieldsSet=$this->checkSearchCriteriae($conf,$this->markerArray);
@@ -2356,7 +2355,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				$x++;
 			}
 			
-			//error_log(__METHOD__." Mem x $x after moop: ".$this->metafeeditlib->getMemoryUsage());
+			//(__METHOD__." Mem x $x after moop: ".$this->metafeeditlib->getMemoryUsage());
 			if ($markerArray==null) $markerArray= array(); //TODO : this should not be here
 			if ($dispDir=='Down' && $col) {
 				$col=$this->cObj->substituteSubpart($tpl['itemColCode'], '###ITEM###', $col);
@@ -2464,23 +2463,28 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			switch ($exporttype)
 			{
 				case "CSV": 
-					//error_log(__METHOD__.":".$content);
-					$this->metafeeditexport->getCSV($content,$this);
+					$this->metafeeditexport->getCSV($content,$this,$this->piVars['exportfile']);
 					break;
 				case "PDF": 
-					$this->metafeeditexport->getPDF($content,$this,$print,$printerName,$printServerName);
+					$this->metafeeditexport->getPDF($content,$this,$print,$printerName,$printServerName,$this->piVars['exportfile']);
 					break;
 				case "PDFTAB": 
-					$this->metafeeditexport->getPDFTAB($content,$this,$print,$printerName,$printServerName);
+					$this->metafeeditexport->getPDFTAB($content,$this,$print,$printerName,$printServerName,$this->piVars['exportfile']);
 					break;
 				case "PDFDET": 
-					$this->metafeeditexport->getPDFDET($content,$this,$print,$printerName,$printServerName);
+					$this->metafeeditexport->getPDFDET($content,$this,$print,$printerName,$printServerName,$this->piVars['exportfile']);
 					break;
 				case "XLS":
 				case "EXCEL": 
-					//error_log($content);
-					$this->metafeeditexport->getEXCEL($content,$this);
+					$this->metafeeditexport->getEXCEL($content,$this,$this->piVars['exportfile']);
 					break;
+			}
+		} else {
+			if ($this->piVars['exportfile']) {
+				$retput=file_put_contents($this->piVars['exportfile'].'.dbg', $DEBUG);
+				if ($retput===false)  {
+					throw new Exception(__METHOD__.":Could not create". $this->piVars['exportfile'].'.dbg');
+				}
 			}
 		}
 		if ($this->conf['performanceaudit']) $this->perfArray['fe_adminLib.inc displaylist end:']=$this->metafeeditlib->displaytime()." Seconds";
@@ -2830,13 +2834,11 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 					}
 				} 
 			}
-
 			// <CBY>
 			$this->markerArray['###REC_UID###']=$this->recUid;
 			//if ($GLOBALS['TSFE']->loginUser || $this->aCAuth($origArr))	{	// Must be logged in OR be authenticated by the aC code in order to edit
 			if (($GLOBALS['TSFE']->loginUser &&  $this->conf['requireLogin']) || ( $this->aCAuth($origArr)&& $this->conf['requireLogin'])||!$this->conf['requireLogin'])	{
 				// Must be logged in OR be authenticated by the aC code in order to edit
-
 				// If the recUid selects a record.... (no check here)
 				if ($this->conf['debug']) echo Tx_MetaFeedit_Lib_ViewArray::viewArray(array('EDIT'=>"No login"));
 			
@@ -2866,7 +2868,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						// Else display error, that you could not edit that particular record...	
 						$content = $this->metafeeditlib->getPlainTemplate($this->conf,$this->markerArray,'###TEMPLATE_NO_PERMISSIONS###');
 					}
-				} else { 
+				} else {
 					// If the recUid did not select a record, we display a menu of records. (eg. if no recUid)
 					// we check if list mode is allowed ...
 					if (!$this->conf['list'])	{	// If editing is enabled
@@ -2915,7 +2917,6 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		$arr=explode(',',$conf['fieldList']);
 		$pluginId=$conf['pluginId'];
 		$back_lnk = $this->conf['typoscript.'][$pluginId.'.']['edit.']['nobackbutton']?false:($this->conf['typoscript.']['default.']['edit.']['nobackbutton']?false:true);
-
 		foreach($arr as $key) {
 			if (in_array(substr($key,0,11),array('--div--;Tab','--fsb--;FSB','--fse--;FSE'))) continue;
 
@@ -3045,21 +3046,21 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 		switch ($exporttype)
 		{
 			case "CSV":
-			$this->metafeeditexport->getCSV($content,$this);
-			break;
+				$this->metafeeditexport->getCSV($content,$this,$this->piVars['exportfile']);
+				break;
 			case "PDF": 
-			$this->metafeeditexport->getPDF($content,$this,$print,$printerName,$printServerName);
-			break;
+				$this->metafeeditexport->getPDF($content,$this,$print,$printerName,$printServerName,$this->piVars['exportfile']);
+				break;
 			case "PDFTAB": 
-			$this->metafeeditexport->getPDFTAB($content,$this,$print,$printerName,$printServerName);
-			break;
+				$this->metafeeditexport->getPDFTAB($content,$this,$print,$printerName,$printServerName,$this->piVars['exportfile']);
+				break;
 			case "PDFDET": 
-			$this->metafeeditexport->getPDFDET($content,$this,$print,$printerName,$printServerName);
-			break;
+					$this->metafeeditexport->getPDFDET($content,$this,$print,$printerName,$printServerName,$this->piVars['exportfile']);
+				break;
 			case "XLS":
 			case "EXCEL": 
-			$this->metafeeditexport->getEXCEL($content,$this);
-			break;
+				$this->metafeeditexport->getEXCEL($content,$this,$this->piVars['exportfile']);
+				break;
 		}
 		
 		$content = $this->cObj->stdWrap($content,$this->conf['edit.']['formWrap.']);
