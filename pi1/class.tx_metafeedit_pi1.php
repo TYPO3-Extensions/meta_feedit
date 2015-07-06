@@ -134,7 +134,6 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 
 		// $lconf array : configuration from BE flexform
 		$lconf=$this->lconf;
-		
 		//error_log(__METHOD__.":lconf ".print_r($lconf,true));
 		//@todo Why on earth do I have to do this ?
 		if (!$lconf['fetable']) return '';
