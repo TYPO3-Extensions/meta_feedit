@@ -343,7 +343,7 @@ class tx_metafeedit extends  tslib_pibase {
   	 *    <pre>
   	 *     Example: my_extension
   	 *    </pre>
-  	 * 2. A classnmae of the pattern tx_KEY_something_else is tried.
+  	 * 2. A classname of the pattern tx_KEY_something_else is tried.
   	 *    <pre>
   	 *     Example: tx_myextension_view
   	 *    </pre>
@@ -782,7 +782,7 @@ class tx_metafeedit extends  tslib_pibase {
 					if ($conf['piVars']['exporttype']) {
 						//error_log(__METHOD__.':'.$conf['piVars']['exporttype']);
 						if ($conf['list.']['csv']) $template .=  $this->getCSVTemplate($conf);
-						if ($conf['list.']['excel']) $template .=  $this->getExcelTemplate($conf);
+						if ($conf['list.']['xls']) $template .=  $this->getExcelTemplate($conf);
 						if ($conf['list.']['pdf']) $template .=  $this->getPDFTemplate($conf);
 						if ($conf['list.']['pdf']) $template .= $this->getPDFTABTemplate($conf);
 						//if ($conf['grid.']['csv']) $template .= array_search('getGridCSVTemplate',$callerMethods) || array_search('getGridCSVTemplate',$callerMethods)?  $this->caller->getGridCSVTemplate($conf) : $this->getGridCSVTemplate($conf);
@@ -3443,9 +3443,9 @@ function getExcelTemplate(&$conf)
 	$tmp.='<tr><tf><data>'.$this->metafeeditlib->getLLFromLabel('exportdate',$conf).' '.date('d/m/Y').'</data>';
 	$tmp.='</tf><tf><data>'.$this->metafeeditlib->getLLFromLabel('exportedby',$conf).' '.$GLOBALS['TSFE']->fe_user->user[username];
 	$tmp.='</data></tf><tf><data>'.$this->metafeeditlib->getLLFromLabel('exportfilter',$conf).' ###SEARCH_FILTER###</data></tf></tr></table><!-- ###TEMPLATE_EDITMENU_EXCEL### end -->';
+	//error_log(__METHOD__.':'.$tmp);
 	return $tmp;
-}  
-
+}
 
 function getGridPDFTemplate(&$conf) {
 
