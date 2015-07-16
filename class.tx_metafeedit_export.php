@@ -1230,31 +1230,39 @@ class tx_metafeedit_export {
 	 */
 	function addFonts() {
 		$this->addFont('3OF9','','3OF9.php');
-		$this->addFont('verdana','','verdana.php');
-		$this->addFont('verdana','B','verdanab.php');
-		$this->addFont('verdana','I','verdanai.php');
-		$this->addFont('verdana','U','verdanaz.php');
 		$this->addFont('baskerville','','baskerville.php');
 		$this->addFont('baskerville','B','baskervilleb.php');
 		$this->addFont('baskerville','I','baskervillei.php');
+		$this->addFont('calibri','','calibri.php');
+		$this->addFont('calibri','I','calibrii.php');
+		$this->addFont('calibri','B','calibrib.php');
+		$this->addFont('calibri','BI','calibribi.php');
 		$this->addFont('cursive','','cursive.php');
 		$this->addFont('cursive','B','cursiveb.php');
+		$this->addFont('georgia','','georgia.php');
+		$this->addFont('georgia','I','georgiai.php');
+		$this->addFont('georgia','B','georgiab.php');
+		$this->addFont('georgia','BI','georgiabi.php');
 		$this->addFont('monospace','','monospace.php');
 		$this->addFont('monospace','B','monospaceb.php');
-		$this->addFont('serif','','serif.php');
-		$this->addFont('serif','B','serifb.php');
-		$this->addFont('serif','I','serifi.php');
-		$this->addFont('serif','BI','serifbi.php');
 		$this->addFont('sans-serif','','sans-serif.php');
 		$this->addFont('sans-serif','B','sans-serifb.php');
 		$this->addFont('sans-serif','I','sans-serifi.php');
 		$this->addFont('sans-serif','BI','sans-serifbi.php');
+		$this->addFont('serif','','serif.php');
+		$this->addFont('serif','B','serifb.php');
+		$this->addFont('serif','I','serifi.php');
+		$this->addFont('serif','BI','serifbi.php');
+		$this->addFont('tahoma','','tahoma.php');
+		$this->addFont('tahoma','B','tahomab.php');
 		$this->addFont('times','','times.php');
 		$this->addFont('times','B','timesb.php');
 		$this->addFont('times','I','timesi.php');
 		$this->addFont('times','BI','timesbi.php');
-		$this->addFont('tahoma','','tahoma.php');
-		$this->addFont('tahoma','B','tahomab.php');
+		$this->addFont('verdana','','verdana.php');
+		$this->addFont('verdana','B','verdanab.php');
+		$this->addFont('verdana','I','verdanai.php');
+		$this->addFont('verdana','U','verdanaz.php');
 	}
 	
 	function addFont($font, $fontStyle, $fontFile)  {
