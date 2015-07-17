@@ -292,7 +292,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 							return $retVal;
 							break;
 						//We get data from session array
-						//si type session alors on retourne la clef trouv� dans la session
+						//si type session alors on retourne la clef trouvée dans la session
 						case 'ses':
 							list($pluginId, $field) = t3lib_div::trimExplode('|', $key);
 							if ($field=='') {
@@ -2147,22 +2147,26 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		return $specialConf;
 	}
 	/**
-	 * 
+	 * Modifies sql array according to transmitted json filter
 	 * @param unknown_type $filter
 	 * @param unknown_type $op
 	 */
-	function makeFilter($filter,$op='and') {
-		$sql='';
-		//error_log(__METHOD__.":".print_r($filter,true));
+	function makeFilter($filter,$op='and',&$sql) {
+		$externalFilter='';
 		if ($filter) {
-			//error_log(__METHOD__.':0');
 			$jf=t3lib_div::makeInstance('Tx_ArdMcm_Backend_JsonFilter');
 			$jf->init($filter);
-			//error_log(__METHOD__.':1');
-			$sql= $jf->toSQL();
+			// Weadd joins if necessary
+			foreach($jf->getJoins() as $alias=>$join) {
+				$sql['joinTables'][]=$alias;
+				$sql['join.'][$alias]=$join;
+			}
+			$externalFilter= $jf->getWhere();
 		}
-		//error_log(__METHOD__.':'.$sql);
-		return $sql;
+		$externalFilter=$externalFilter?' and ('.$externalFilter.')':'';
+		$sql['where'].=$externalFilter;
+		$sql['externalFilter']=$externalFilter;
+		return $sql['where'];
 	}
 	/**
 	 * We create list where from external filter definition
@@ -2174,11 +2178,8 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		//error_log(__METHOD__.":".$json);
 		$filter=json_decode($json,true);
 		//error_log(__METHOD__.":".print_r($filter,true));
-		$externalFilter=$this->makeFilter($filter);
+		$this->makeFilter($filter,'and',$sql);
 		//error_log(__METHOD__.":".$externalFilter);
-		$externalFilter=$externalFilter?' and ('.$externalFilter.')':'';
-		$sql['where'].=$externalFilter;
-		$sql['externalFilter']=$externalFilter;
 	}
 	/**
 	 * We create list where from external filter definition
