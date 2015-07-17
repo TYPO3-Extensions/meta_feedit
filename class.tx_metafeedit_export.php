@@ -1227,6 +1227,7 @@ class tx_metafeedit_export {
 	
 	/**
 	 * Adds fonts to PDF
+	 * @deprecated we now use $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['fpdf']['fonts']
 	 */
 	function addFonts() {
 		$this->addFont('3OF9','','3OF9.php');
@@ -1267,7 +1268,7 @@ class tx_metafeedit_export {
 	
 	function addFont($font, $fontStyle, $fontFile)  {
 		try {
-			$this->pdf->AddFont($font,$fontStyle,$fontFile);
+			$this->pdf->AddFont($font,$fontStyle,$fontFile,t3lib_extMgm::extPath('meta_feedit').'Resources/Private/Fonts/'.$fontFile);
 		} catch (Exception $e) {
 			error_log(__METHOD__.":$font:$fontStyle:$fontFile :".$e->getMessage());
 		}
@@ -1360,7 +1361,7 @@ class tx_metafeedit_export {
 		$this->pdf = new tx_metafeedit_pdf($this->documentOrientation, $this->documentUnit, $this->documentFormat);
 		$this->pdf->caller=&$this;
 	
-		$this->addFonts();
+		//$this->addFonts();
 		$this->pdf->nofooter=$nofooter;
 		// TODO Handle typoscript here ...
 	
@@ -1626,7 +1627,7 @@ class tx_metafeedit_export {
 		$this->lineWidth=0.3;
 		$this->pdf= new tx_metafeedit_pdf($this->documentOrientation, $this->documentUnit, $this->documentFormat);
 		$this->pdf->caller=&$this;
-		$this->addFonts();
+		//$this->addFonts();
 		//@TODO Handle typoscript here ...
 		
 		$this->pdf->bottommargin=9;
@@ -2520,7 +2521,7 @@ class tx_metafeedit_export {
 		
 		$this->pdf = new tx_metafeedit_pdf($this->documentOrientation, $this->documentUnit, $this->documentFormat);
 		$this->pdf->caller=&$this;
-		$this->addFonts();
+		//$this->addFonts();
 		$this->pdf->bottommargin=9;
 		$this->pdf->leftmargin=8;
 		$this->pdf->rightmargin=8;
