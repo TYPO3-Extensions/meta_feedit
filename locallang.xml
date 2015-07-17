@@ -26,6 +26,7 @@
 			<label index="grid_rows_cols">Rows / Cols </label>
 			<label index="grid_header">Data Grid</label>
 			<label index="crdate">Creation date</label>
+			<label index="tstamp">Modification date</label>
 			<label index="uid">Unique Identifier</label>
 			<label index="pid">Page ID</label>
 			<label index="sorting">Sorting Index</label>
@@ -129,6 +130,7 @@
 			<label index="grid_rows_cols">Zeilen / Spalten </label>
 			<label index="grid_header">Data Grid</label>
 			<label index="crdate">Erstellungsdatum</label>
+			<label index="tstamp">Modificationdatum</label>
 			<label index="uid">Unique Identifier</label>
 			<label index="pid">Page ID</label>
 			<label index="sorting">Sorting Index</label>
