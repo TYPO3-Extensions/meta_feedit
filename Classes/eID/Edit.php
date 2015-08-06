@@ -8,6 +8,7 @@ require_once(t3lib_extMgm::extPath('meta_feedit').'pi1/class.tx_metafeedit_pi1.p
 require_once(t3lib_extMgm::extPath('meta_feedit').'Classes/eID/Tools.php');
 
 ob_end_flush();
+//error_log('Edit.php');
 if (!$GLOBALS['g_TT']) $GLOBALS['g_TT']=microtime(true);
 $TTA=array();
 $TTA[]="<br/>eID Elapsed Time :".(microtime(true)-$GLOBALS['g_TT']).' s';
@@ -72,4 +73,11 @@ if ($GLOBALS['TSFE']->isINTincScript())
 
 echo '<html><head><link href="'.t3lib_extMgm::siteRelPath('meta_feedit').'res/css/meta_feedit.css" rel="stylesheet" type="text/css"/>'.$scripts1.$scripts2.'</head><body>'.$content.'</body></html>';
 unset($c);
+//We handle uniqueId cookie to inform client that load has succeeded
+/*$uniqueId=t3lib_div::_GP('uniqueid');
+if ($uniqueId) {
+	$uniqueIdArray=explode('*',$uniqueId);
+	//error_log('Edit :'.print_r($uniqueIdArray,true));
+	setcookie($uniqueIdArray[0], $uniqueIdArray[1], time()+3600);
+}*/
 ?>
