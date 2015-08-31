@@ -1842,7 +1842,8 @@ class tx_metafeedit extends  tslib_pibase {
 					case 'csv' :
 						// No presentation data
 						// enclosing csv data in "=""data""" forces excel not to parse data and treat everything as text
-						$ret.='"="'.'"'.str_replace('"','""',$FCode).'""";';	
+						//$ret.='"="'.'"'.str_replace('"','""',$FCode).'""";';	
+						$ret.='"'.str_replace('"','""',$FCode).'";';
 						break;
 					case 'xls' :
 						
