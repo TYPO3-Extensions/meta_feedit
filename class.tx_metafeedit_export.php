@@ -1209,12 +1209,14 @@ class tx_metafeedit_export {
 					$cellWidth = ($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x];
 					if (isset($cell->spec['w'])) $cellWidth=$cell->spec['w'];
 					$nblines=$this->pdf->NbLines($cellWidth, $val);
+					error_log(__METHOD__.": $val - $cellWidth - $nblines	");
 					if ($nblines*$this->height>$this->rowHeight) $this->rowHeight=$nblines*$this->height;
 					unset($cellWidth);
 				}
 			}
 			$x++;
 		}
+		if ($this->rowWidth>$this->maxRowWidth)  $this->maxRowWidth=$this->rowWidth;
 		//error_log(__METHOD__.":".$this->rowHeight);
 		unset($r);
 		unset($cell);
@@ -1575,6 +1577,7 @@ class tx_metafeedit_export {
 			file_put_contents($file,str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		}
 		try {
+			error_log(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 			$cmd=$this->conf['inputvar.']['cmd'];
 			//error_log(__METHOD__.$cmd.'yeaakjjj'.print_r($this->conf[$cmd.'.'],true));
@@ -1597,7 +1600,7 @@ class tx_metafeedit_export {
 			$this->fields[$x]=str_replace('.','_',$this->fields[$x]);
 			$x++;
 		}
-		
+		$this->rowWidth=$this->maxRowWidth=$this->workWidth=0;
 		$this->footercellsize=7;
 		$this->headercellsize=7;
 		$this->cellsize=5;
@@ -1613,7 +1616,7 @@ class tx_metafeedit_export {
 		$multipleMedia=$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']?$this->confTS[$this->pluginId.'.']['list.']['multipleMedia']:($this->confTS['default.']['list.']['multipleMedia']?$this->confTS['default.']['list.']['multipleMedia']:false);
 		// Page size is 21 x 29.7- reduced to 20 to preserve margin.
 		
-		$this->workWidth=0;
+		
 		$this->documentFormat=A4; //210 × 297
 		$this->documentUnit='mm';
 		$this->documentHeight=210;
@@ -1687,6 +1690,7 @@ class tx_metafeedit_export {
 		$this->r=0;
 		$this->cellY=$this->pdf->GetY();
 		foreach($xml->tr as $row) {
+			//error_log("new row $r, X:".$this->pdf->getX()."-Y:".$this->pdf->getY()."/cellY:$this->cellY");
 			$this->rowHeight=$this->height;
 			if ($row->gb) {
 				$this->pdf->SetLineWidth($this->lineWidth);
@@ -1708,6 +1712,7 @@ class tx_metafeedit_export {
 			// We handle cell content here
 			$x=0; //column counter
 			foreach($row->td as $cell) {
+				
 				$this->cellWidth=(float) (($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x]);
 				if ($cell->img==1) {
 					$this->cellX=$this->pdf->getX();
@@ -1738,15 +1743,21 @@ class tx_metafeedit_export {
 								break;
 					 	}
 					 	if (!$this->r) $p='L'; // So that column headers are always aligned left. 
-					 	
+					 	// We handle group by field
+					 	//error_log('###'.$val);
 					 	if ($row->gb && !strlen($val)) {
+					 		//error_log('###GB0');
 					 		$this->pdf->setX($this->cellX+$this->cellWidth);
 					 	} else {
-					 		if ($row->gb && $x==0) { 
-					 			$this->pdf->Cell($this->workWidth,$this->height,$val,1,0,$p,1);
+					 		if ($row->gb && $x==0) {
+					 			error_log('###GB1 : '.$val);
+					 			$this->cellY=$this->pdf->GetY();
+					 			//Grouby by header/footer is in first celle of row.
+					 			$this->pdf->Cell($this->maxRowWidth,$this->rowHeight,$val,1,0,$p,1);
 								$this->pdf->setX($this->cellX+$this->cellWidth);
 							} else {
-								$border=1;							
+								error_log('###GB2 : '.$val." h:$this->height rh:$this->rowHeight");
+								$border=1;
 								$this->cellY=$this->pdf->GetY();
 								$this->pdf->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD');
 								$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p);
@@ -1762,7 +1773,6 @@ class tx_metafeedit_export {
 			//White
 			$this->pdf->setFillColor(255,255,255);
 			$this->r++;
-			
 		}
 		//Convert to PDF
 		$name=$caller->metafeeditlib->enleveaccentsetespaces(date("Ymdhms-").$title).'.pdf';
@@ -2794,7 +2804,7 @@ class tx_metafeedit_export {
 		$content=$caller->cObj->substituteMarkerArray($content,$markerArray);
 		//error_log(__METHOD__);
 		try {
-			//error_log(__METHOD__.':'.str_replace('</data>',']]></datax>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
+			error_log(__METHOD__.':'.str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		} catch (Exception $e) {
 			echo str_replace("'","\'",str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))));
@@ -2982,6 +2992,8 @@ class tx_metafeedit_export {
 					 	if ($row->gb && !strlen($val)) {
 					 		//$this->pdf->setX($this->cellX+$size);
 					 	} else {
+					 		//handle colspans
+					 		
 					 		if ($row->gb && $x==0) { 
 								$objPHPExcel->getActiveSheet()->setCellValueExplicit($c.$r, "".$val, PHPExcel_Cell_DataType::TYPE_STRING);
 								$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
@@ -2991,6 +3003,17 @@ class tx_metafeedit_export {
 								$objPHPExcel->getActiveSheet()->setCellValueExplicit($c.$r, "".$val, PHPExcel_Cell_DataType::TYPE_STRING);
 								$maxwidth[$c]=strlen("".$val)*10>$maxwidth[$c]?strlen("".$val)*10:$maxwidth[$c];
 							}
+							//handle colspans
+							if ($col->attributes()->colspan>0) {
+								$c2=$c;
+								$colspan=(int)$col->attributes()->colspan;
+								while ($colspan>1) {
+									$c2++;
+									$colspan--;
+								}
+								$c=$c2;
+								$c--;
+							} 
 						}
 					}
 					if ($c>$maxcol) $maxcol=$c;
@@ -3064,7 +3087,7 @@ class tx_metafeedit_export {
 			$bgcolor="FFFFFFFF";
 			$r++;
 			//Detect out of memory
-			error_log(__METHOD__.": row $r, mem ".$caller->metafeeditlib->getMemoryUsage().',ini'.ini_get('memory_limit'));
+			//error_log(__METHOD__.": row $r, mem ".$caller->metafeeditlib->getMemoryUsage().',ini'.ini_get('memory_limit'));
 			
 		}
 		

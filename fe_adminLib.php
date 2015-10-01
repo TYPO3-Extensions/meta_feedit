@@ -2274,7 +2274,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				
 				// group by  field handling 
 				$pagejump=0;
-	
+				//error_log(__METHOD__.": -".print_r($tpl,true));
 				$groupByFields=$this->groupByHeader($conf,$tpl['GBFCode'].$tpl['GBCode'],$menuRow,$groupBy,$lastgroupBy,$evalGroupBy,$GrpByField,$lc,$gc,$i,$pagejump,$sql,false,$DEBUG);
 				if ($pagejump) break;
 				// New cols 

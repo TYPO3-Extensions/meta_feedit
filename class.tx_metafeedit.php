@@ -2013,16 +2013,16 @@ class tx_metafeedit extends  tslib_pibase {
 	* @return	string		$ret : html code
 	*/
 
-	function getEditSumFields($prefix,&$conf,&$count, $textmode=false, $type='',$actFlag=FALSE)
-	{
+	function getEditSumFields($prefix,&$conf,&$count, $textmode=false, $type='',$actFlag=FALSE){
 		$fields=$conf['list.']['show_fields']?$conf['list.']['show_fields']:$this->id_field;
 		$fieldArray=array_unique(t3lib_div::trimExplode(",",$fields));
 		$firstemptycell='###FIRSTEMPTYCELL###';
 		$count=0;
 		$total=0;
 		$ret=($type=='PDF'||$type=='XLS')?'<gb>0</gb><sum>1</sum>':'';
-		//$ret.=$actFlag?'<td>###FIRSTEMPTYCELL###</td>':'';
 		$fc=0;
+		$nbcells=0;
+		$cellsize=0;
 		foreach($fieldArray as $FN) {
 			$params=explode(';',$FN);
 			if ($params[0]!='--div--' && $params[0]!='--fse--' && $params[0]!='--fsb--' ) {
@@ -2033,20 +2033,29 @@ class tx_metafeedit extends  tslib_pibase {
 				$ftA=$this->metafeeditlib->getForeignTableFromField($FN,$conf,'',$tab,__METHOD__);			   
  				$Lib=$this->metafeeditlib->getLLFromLabel('total',$conf).' '.$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf).':';
 				$size = $this->getSize($conf, $_FN, $masterTable);
+				
+				
 				$total++;
 				if (!in_array($_FN,$sumarray) && !in_array($FN,$sumarray)) {// If field is not a sum field ...
+					//error_log("#0 total : $total, count : $count field $_FN");
 					if ($textmode){
-						$ret.=($actFlag&&$firstemptycell)?'<td>###FIRSTEMPTYCELL###</td>':'';
+						
+						/*$ret.=($actFlag&&$firstemptycell)?'<td>###FIRSTEMPTYCELL###</td>':'';
 						if ($type && $type!='html')	{
 							$ret .= '<td><data>'.($firstemptycell?$firstemptycell:'').'</data><size>'.$size.'</size></td>';
 						} else 								// Empty cell for CSV
 							$ret.= ($firstemptycell?$firstemptycell:'').';';
-						if ($firstemptycell) $firstemptycell='';
+						if ($firstemptycell) $firstemptycell='';*/
 					} else	{							// Empty cell for html
+						//error_log('#0 '.$fc);
 						$fc++;
-					}					
+					}
+					$nbcells++;
+					$cellsize+=$size;
+					//error_log("#0 nbcells : $nbcells, cellsize : $cellsize field $_FN");
 				} else {// Field is a sum field
 					$mfn=in_array($FN,$sumarray)?$FN:$_FN;
+					//error_log(__METHOD__.": -$FN  tm $textmode");
 					if (!$textmode)	{// Not text mode only
 						if ($fc) {
 							$count+=$fc+$actFlag;
@@ -2060,18 +2069,59 @@ class tx_metafeedit extends  tslib_pibase {
 						if ($firstemptycell) $firstemptycell='';
 						$ret.='<td '.($conf['list.']['align.'][$mfn]?'align="'.$conf['list.']['align.'][$mfn].'"':'').'>'.'###'.$prefix.'_FIELD_'.$mfn.'###</td>';
 					} else  {
-						if ($type && $type!='html') 						// Fichier PDF, EXcel 
+						if ($type && $type!='html') {						// Fichier PDF, Excel 
+							if ($nbcells) {
+								if ($firstemptycell) {
+									$ret .= '<td colspan="'.($nbcells+$actFlag).'"><data>'.$firstemptycell.'</data><size>'.$cellsize.'</size></td>';
+									$firstemptycell='';
+								} else {
+									$ret.='<td colspan="'.($nbcells).'"></td>';
+								}
+								/*$ret.=($actFlag&&$firstemptycell)?'<td>###FIRSTEMPTYCELL###</td>':'';
+								 if ($type && $type!='html')	{
+								$ret .= '<td><data>'.($firstemptycell?$firstemptycell:'').'</data><size>'.$size.'</size></td>';
+								} else 								// Empty cell for CSV
+								$ret.= ($firstemptycell?$firstemptycell:'').';';
+								if ($firstemptycell) $firstemptycell='';*/
+								//$ret.='<td colspan="'.($fc+$actFlag).'">'.($firstemptycell?$firstemptycell:'').'</td>';
+							}
 							$ret.='<td><data>###'.$prefix.'_FIELD_'.$mfn.'###</data><size>'.$size.'</size></td>';
-						else 
+							$count=$total;
+							
+						} else {
+							//CSV
+							while ($nbcells>0) {
+								if ($firstemptycell) {
+									$ret.="\"$firstemptycell\";";
+									$nbcells--;
+									$firstemptycell='';
+									continue;
+								}
+								$ret.="\"\";";
+								$nbcells--;
+							}
+						
 							//CSV 
-							$ret.=$Lib.'###'.$prefix.'_FIELD_'.$mfn.'###;';
+							$ret.='###'.$prefix.'_FIELD_'.$mfn.'###;';
+						}
+						$nbcells=0;
+						$cellsize=0;
 					}
 					$fc=0;
 				}
 			}
 		}	
 		$total+=$actFlag;
-		if ($count <$total) $ret.='<td colspan="'.($total-$count).'"/>';
+		//error_log(__METHOD__.": - $count <$total");
+		if ($count <$total) {
+			if ($firstemptycell) {
+				//$ret.='<td colspan="'.($nbcells+$actFlag).'">###FIRSTEMPTYCELL###</td>';
+				$ret .= '<td colspan="'.($total-$count).'"><data>'.$firstemptycell.'</data><size>'.$cellsize.'</size></td>';
+				$firstemptycell='';
+			} else {
+				$ret.='<td colspan="'.($total-$count).'"/>';
+			}
+		}
 		return $ret;
 	} 
 	
@@ -2268,7 +2318,7 @@ class tx_metafeedit extends  tslib_pibase {
 					$sum='<!--###FOOTERSUM_FIELDS### begin -->'.$this->getEditSumFields('FOOTERSUM_'.$fN,$conf,$count, $textmode, $exporttype,$hasActions);
 					$sum.='<!--###FOOTERSUM_FIELDS### end -->';
 					$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$div);
-					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr>1<gb>'.($lvl+1).'</gb><gbf>'.($lvl+1).'</gbf>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'">').$sum.($textmode?($exporttype?'</tr>':chr(10)):'</tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
+					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>'.($lvl+1).'</gb><gbf>'.($lvl+1).'</gbf>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'">').$sum.($textmode?($exporttype?'</tr>':chr(10)):'</tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
 				} else {
 					$GROUPBYFIELDS='<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### start -->'.($textmode?($exporttype?'<tr><gb>'.($lvl+1).'</gb><gbf>'.($lvl+1).'</gbf><td><data>':''):'<tr class="'.$this->caller->pi_getClassName('footer').' '.$this->caller->pi_getClassName('groupBy-lvl-'.$lvl).'"><td colspan="'.($conf['list.']['nbCols']?($conf['list.']['nbCols']+$hasActions):$nbf).'" >').$div.($textmode?($exporttype?'</data><size>'.$size.'</size></td></tr>':chr(10)):'</td></tr>').'<!-- ###GROUPBYFOOTERFIELD_'.$fN.'### end -->'.$GROUPBYFIELDS;
 				}
@@ -3394,7 +3444,7 @@ function getCSVTemplate(&$conf)
 		$sum=$this->cObj->substituteMarker($sum, '###FIRSTEMPTYCELL###',$this->metafeeditlib->getLLFromLabel('total',$conf).($conf['list.']['totalCount']?' (###SUM_FIELD_metafeeditnbelts###)':''));
 		
 		$tmp.='<!--###SUM_FIELDS### begin--->'.$sum.chr(10);
-		$tmp.='<!--###SUM_FIELDS### end--->';
+		$tmp.='<!--###SUM_FIELDS### end--->'.chr(10);
 		//$tmp.=$this->getSumFields($conf, true).'<!--###SUM_FIELDS### end--->';
 	}
 	$tmp.='"'.$this->metafeeditlib->getLLFromLabel('exportdate',$conf).'";"'.date('d/m/Y').'";'.chr(10); //TODO: get default date format here !!!
