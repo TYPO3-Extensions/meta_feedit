@@ -4229,6 +4229,26 @@ class tx_metafeedit_lib implements t3lib_singleton {
 			//$sql['stateFieldsSql'].=",$calcsql as '$field'"; // to be removed
 			//$sql['statefields'][]=$field; // to be removed
 		}
+		//error_log(__METHOD__.": -".print_r($conf,true));
+		if ($conf['joins']) {
+			
+			foreach($conf['joins'] as $alias=>$join) {
+				$sql['joinTables'][]=$join['table'];
+				$sql['join.'][$join['table']]=' LEFT JOIN '.$join['table'].' as '.$alias.' ON '.$join['on'];
+				//error_log(__METHOD__.":".print_r($conf['list.']['joinFields'],true));
+				if ($join['fields']) {
+					foreach(t3lib_div::trimexplode(',',$join['fields']) as $joinField) {
+						if ($joinField) {
+							$joinAlias='join_'.$alias.'_'.$joinField;
+							$sql['joinAliases'][$joinAlias]['field']=$joinField;
+							$sql['joinAliases'][$joinAlias]['table']=$join['table'];
+							$sql['joinAliases'][$joinAlias]['tableAlias']='join_'.$join['table'];
+							$sql['fieldArray'][]=$conf['joinTable'].'.'.$joinField.' as '.$joinAlias;
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -4916,6 +4936,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		//error_log(__METHOD__.":".print_r($conf['inputvar.']['advancedSearch'],true));
 		if (is_array($conf['inputvar.']['advancedSearch'])) {
 			foreach ($conf['inputvar.']['advancedSearch'] as $key => $val) {
+				if (!$key) continue;
 				if($this->is_extent($val)) {
 					$tab=array();
 					$ftA=$this->getForeignTableFromField($key,$conf,'',$tab,__METHOD__);
@@ -5078,7 +5099,9 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		}
 		if (is_array($advancedSearch)) {
 			foreach($advancedSearch as $key=>$value) {
+				if (!$key) continue;
 				//add foreign table fields to advanced search
+				//error_log($key);
 				$curTable = $this->getForeignTableFromField($key, $conf,'',$sql,__METHOD__);
 				//Typoscript retrieval
 				$valeur='';

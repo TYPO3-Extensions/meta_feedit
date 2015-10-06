@@ -2034,7 +2034,6 @@ class tx_metafeedit extends  tslib_pibase {
  				$Lib=$this->metafeeditlib->getLLFromLabel('total',$conf).' '.$this->metafeeditlib->getLLFromLabel($ftA['fieldLabel'],$conf).':';
 				$size = $this->getSize($conf, $_FN, $masterTable);
 				
-				
 				$total++;
 				if (!in_array($_FN,$sumarray) && !in_array($FN,$sumarray)) {// If field is not a sum field ...
 					//error_log("#0 total : $total, count : $count field $_FN");

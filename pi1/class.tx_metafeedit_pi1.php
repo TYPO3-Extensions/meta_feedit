@@ -647,6 +647,7 @@ class tx_metafeedit_pi1 extends tslib_pibase {
 		$mfconf['T3GroupUids']=$conf['T3GroupUids'];
 		$mfconf['foreignTables']=$lconf['foreignTables'];
 		$mfconf['joinTable']=$lconf['joinTable'];
+		$mfconf['joins']=$lconf['joins'];
 		$mfconf['joinOn']=$lconf['joinOn'];
 		$mfconf['idField']=$lconf['idField'];
 		$mfconf['recursive']=$lconf['recursive'];

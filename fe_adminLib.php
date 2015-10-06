@@ -2103,7 +2103,12 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			}
 			
 			// Group by calculations
-			
+			$fNA=t3lib_div::trimexplode(',',$conf['list.']['groupByFieldBreaks']);
+			//$groupBy Array initialisation
+			$groupBy=array();
+			foreach($fNA as $fN) {
+				$groupBy[$fN]=null;
+			}
 			if ($sql['groupBy']) {
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('mod(count(*),'.$nbe.') as moduloelts, count(*) as nbelts, ceiling(count(*)/'.$nbep.') as pages'.$sql['gbFields'].$sql['calcFieldsSql'].($sql['groupBy']?','.$conf['table'].'.*':''), $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql']);
 				if ($conf['debug.']['sql']) $this->metafeeditlib->debug('displayList group by row count ',$GLOBALS['TYPO3_DB']->SELECTquery('mod(count(*),'.$nbe.') as moduloelts, count(*) as nbelts, ceiling(count(*)/'.$nbep.') as pages'.$sql['gbFields'].$sql['calcFieldsSql'].($sql['groupBy']?','.$conf['table'].'.*':''), $sql['fromTables'], '1 '.$sql['where'].$sql['groupBy'].$sql['having'].$sql['orderBySql']),$DEBUG);
@@ -2275,7 +2280,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				// group by  field handling 
 				$pagejump=0;
 				//error_log(__METHOD__.": -".print_r($tpl,true));
-				$groupByFields=$this->groupByHeader($conf,$tpl['GBFCode'].$tpl['GBCode'],$menuRow,$groupBy,$lastgroupBy,$evalGroupBy,$GrpByField,$lc,$gc,$i,$pagejump,$sql,false,$DEBUG);
+				$groupByFields=$this->groupByHeader($conf,$tpl['GBFCode'].$tpl['GBCode'],$menuRow,$groupBy,$lastgroupBy,$evalGroupBy,$GrpByField,$lc,$gc,$i,$pagejump,$sql,false,$DEBUG,$nbrows);
 				if ($pagejump) break;
 				// New cols 
 	
@@ -2373,7 +2378,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			
 			// Add last group by totals :
 			
-			$groupByFields=$this->groupByHeader($conf,$tpl['GBFCode'].$tpl['GBCode'],$menuRow,$groupBy,$lastgroupBy,$evalGroupBy,$GrpByField,$lc,$gc,$i,$pagejump,$sql,true,$DEBUG);
+			$groupByFields=$this->groupByHeader($conf,$tpl['GBFCode'].$tpl['GBCode'],$menuRow,$groupBy,$lastgroupBy,$evalGroupBy,$GrpByField,$lc,$gc,$i,$pagejump,$sql,true,$DEBUG,$nbrows);
 			$out.=$groupByFields;
 			//error_log(__METHOD__." Mem x $x gbh2: ".$this->metafeeditlib->getMemoryUsage());
 			$wraparray=array();
@@ -2622,14 +2627,31 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 	/**
 	 * groupByHeader : generates Group By Header if necessary
 	 *
-	 * @return	string		HTML content
+	 * If group by value has changed  :
+	 * - Starts by displaying preceding group by total if necessary
+	 * - then displays current groupby header
 	 * @see init()
+	 * @param unknown $conf
+	 * @param unknown $GBCode
+	 * @param unknown $menuRow
+	 * @param unknown $groupBy
+	 * @param unknown $lastgroupBy
+	 * @param unknown $evalGroupBy
+	 * @param unknown $GrpByField
+	 * @param unknown $lc
+	 * @param unknown $gc
+	 * @param unknown $i
+	 * @param unknown $pagejump
+	 * @param unknown $sql
+	 * @param bool $end
+	 * @param arrray  $DEBUG
+	 * @param int $nbrow  processed row number
+	 * @return string HTML content
 	 */
-	 
-	function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$lastgroupBy,&$evalGroupBy,$GrpByField,&$lc,&$gc,&$i,&$pagejump,&$sql,$end=false,&$DEBUG) {
+	function groupByHeader(&$conf,$GBCode,$menuRow,&$groupBy,&$lastgroupBy,&$evalGroupBy,$GrpByField,&$lc,&$gc,&$i,&$pagejump,&$sql,$end=false,&$DEBUG,$nbrow) {
 		// group by  field handling
+		//if ($end) return;
 		$GBmarkerArray=array();
-
 		$groupByFields="";
 		$gbflag=0;
 		$newGroupBy=array();
@@ -2641,15 +2663,18 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 				//if ($conf['list.']['hiddenGroupByField.'][$fN]) continue;
 
 				$GBmarkerArray['###GROUPBY_'.$fN.'###']="";
-				if (($groupBy[$fN]!=$this->metafeeditlib->transformGroupByData($fN,$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN],$conf) || $end)  && !$conf['list.']['hiddenGroupByField.'][$fN]) {
+				//error_log(__METHOD__.": -".$groupBy[$fN]."!==".$this->metafeeditlib->transformGroupByData($fN,$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN],$conf));
+				if (($groupBy[$fN]!==$this->metafeeditlib->transformGroupByData($fN,$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN],$conf) || $end)  && !$conf['list.']['hiddenGroupByField.'][$fN]) {
 					// Group by field change !
 					$GBmarkerArray['###FOOTERSUM_'.$fN.'_FIELD_metafeeditnbelts###']='';
-					if ($evalGroupBy[$fN]) {
+					//error_log(__METHOD__.": aa- $nbrow : ".$evalGroupBy[$fN]);
+					if ($nbrow>1) {
+						
 						$GBmarkerArray['###GROUPBYFOOTER_'.$fN.'###']=$evalGroupBy[$fN]; 
 						$this->metafeeditlib->getGroupByFooterSums($conf,'FOOTERSUM',$GBmarkerArray,$fN,$sql,$lastgroupBy,$end,$DEBUG);
 					} else {
-					   $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFOOTERFIELD_'.$fN.'###','');
-					}	 	
+						$GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFOOTERFIELD_'.$fN.'###','');
+					}
 					$std=$menuRow[$fN];
 
 					// Default we get value from std group by field ...
@@ -2686,21 +2711,18 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 						if ($gbf==$fN) $resetgbf=TRUE;
 					}
 				} else {
-						// we clear unused group bys 
-					 $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFIELD_'.$fN.'###','');
-					 $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFOOTERFIELD_'.$fN.'###','');
+					// we clear unused group bys 
+					$GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFIELD_'.$fN.'###','');
+					$GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFOOTERFIELD_'.$fN.'###','');
 				}
 				// We clear next group by if end of list is reached
 				if ($end) $GBCode=$this->cObj->substituteSubpart($GBCode, '###GROUPBYFIELD_'.$fN.'###','');
-
 			}
 			foreach($newGroupBy as $fN=>$val) {
 				$groupBy[$fN]=$this->metafeeditlib->transformGroupByData($fN,$val,$conf);
 				//$lastgroupBy[$fN]=$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN];
 				$lastgroupBy[$fN]=$this->metafeeditlib->transformGroupByData($fN,$menuRow[$GrpByField[$fN]?$GrpByField[$fN]:$fN],$conf);
-				
 			}
-				
 		}
 		if ($gbflag) {
 			$groupByFields=$this->cObj->substituteMarkerArray($GBCode, $GBmarkerArray);
@@ -2717,6 +2739,7 @@ class tx_metafeedit_user_feAdmin extends tslib_pibase	{
 			if ($gc>1 && $dispDir=='Right') $lc++;
 			$i=0; // pour fin de ligne
 		}
+		//error_log(__METHOD__."end: -".print_r($groupByFields,true));  
 		return $groupByFields;
 	}
 
