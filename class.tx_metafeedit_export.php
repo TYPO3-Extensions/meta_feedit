@@ -1209,7 +1209,7 @@ class tx_metafeedit_export {
 					$cellWidth = ($this->rowCellWidth[$x]=='*')?$this->rowFreeCellWidth:$this->rowCellWidth[$x];
 					if (isset($cell->spec['w'])) $cellWidth=$cell->spec['w'];
 					$nblines=$this->pdf->NbLines($cellWidth, $val);
-					error_log(__METHOD__.": $val - $cellWidth - $nblines	");
+					//error_log(__METHOD__.": $val - $cellWidth - $nblines	");
 					if ($nblines*$this->height>$this->rowHeight) $this->rowHeight=$nblines*$this->height;
 					unset($cellWidth);
 				}
