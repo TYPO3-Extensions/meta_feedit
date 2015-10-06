@@ -1577,7 +1577,7 @@ class tx_metafeedit_export {
 			file_put_contents($file,str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 		}
 		try {
-			error_log(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
+			//error_log(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 			$xml = new SimpleXMLElement(str_replace('</data>',']]></data>',str_replace('<data>','<data><![CDATA[',str_replace('&euro;','E',str_replace('&nbsp;',' ',$caller->metafeeditlib->T3StripComments($content))))));
 			$cmd=$this->conf['inputvar.']['cmd'];
 			//error_log(__METHOD__.$cmd.'yeaakjjj'.print_r($this->conf[$cmd.'.'],true));
@@ -1745,25 +1745,25 @@ class tx_metafeedit_export {
 					 	if (!$this->r) $p='L'; // So that column headers are always aligned left. 
 					 	// We handle group by field
 					 	//error_log('###'.$val);
-					 	if ($row->gb && !strlen($val)) {
+					 	/*if ($row->gb && !strlen($val)) {
 					 		//error_log('###GB0');
 					 		$this->pdf->setX($this->cellX+$this->cellWidth);
-					 	} else {
+					 	} else {*/
 					 		if ($row->gb && $x==0) {
-					 			error_log('###GB1 : '.$val);
+					 			//error_log('###GB1 : '.$val);
 					 			$this->cellY=$this->pdf->GetY();
 					 			//Grouby by header/footer is in first celle of row.
 					 			$this->pdf->Cell($this->maxRowWidth,$this->rowHeight,$val,1,0,$p,1);
 								$this->pdf->setX($this->cellX+$this->cellWidth);
 							} else {
-								error_log('###GB2 : '.$val." h:$this->height rh:$this->rowHeight");
+								//error_log('###GB2 : '.$val." h:$this->height rh:$this->rowHeight");
 								$border=1;
 								$this->cellY=$this->pdf->GetY();
 								$this->pdf->Rect($this->cellX, $this->cellY, $this->cellWidth, $this->rowHeight,'FD');
 								$this->pdf->MultiCell($this->cellWidth,$this->height,$val,0,$p);
 								$this->pdf->setXY($this->cellX+$this->cellWidth,$this->cellY);
 							}
-						}
+						//}
 					}
 				}
 				$x++;
