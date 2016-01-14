@@ -4463,11 +4463,22 @@ class tx_metafeedit_lib implements t3lib_singleton {
 	*/
 	
 	function getUserWhereString(&$conf,&$sql) {
+		
+		// Old way we get where from function declared in typoscript and defined in included lib
 		$conf['parentObj']=&$this->feadminlib;
 		if ($conf['list.']['userFunc_afterWhere']) t3lib_div::callUserFunction($conf['list.']['userFunc_afterWhere'],$conf,$this->feadminlib);
 		//error_log(__METHOD__.":conf[".$conf['cmdmode'] . "][whereString]:".$conf[$conf['cmdmode'] . '.']['whereString']);
+		$sql['userWhereString']='';
 		if ($conf[$conf['cmdmode'] . '.']['whereString'])	$sql['userWhereString']=' AND '.$conf[$conf['cmdmode'] . '.']['whereString'];
-		$sql['where'].= $sql['userWhereString'];
+		// New way we eval PHP from report json
+		$where='';
+		$whereUserFunction=$conf[$conf['cmdmode'].'.']['whereUserFunction'];
+		if ($whereUserFunction) {
+			eval($whereUserFunction);
+			if ($where) $sql['userWhereString']=$sql['userWhereString']?$sql['userWhereString'].' AND '.$where:$where;
+		}
+		
+		if ($sql['userWhereString']) $sql['where'].= $sql['where']?' AND '.$sql['userWhereString']:$sql['userWhereString'];
 	}
 	
 	/**

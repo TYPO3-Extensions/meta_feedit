@@ -65,7 +65,7 @@ class Tx_MetaFeedit_Cli_Export extends Tx_ArdMcm_Cli_Batch {
 	 * @see Tx_ArdMcm_Cli_Batch::initialize()
 	 */
 	public function initialize() {
-		error_log(__METHOD__);
+		//error_log(__METHOD__);
 		//$this->pkiLib = t3lib_div::makeInstance('Tx_ArdPki_Lib_Pki');
 		if ($_COOKIE[t3lib_beUserAuth::getCookieName()]) {
 			require_once(PATH_t3lib . 'class.t3lib_timetrack.php');
