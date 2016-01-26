@@ -4469,7 +4469,7 @@ class tx_metafeedit_lib implements t3lib_singleton {
 		if ($conf['list.']['userFunc_afterWhere']) t3lib_div::callUserFunction($conf['list.']['userFunc_afterWhere'],$conf,$this->feadminlib);
 		//error_log(__METHOD__.":conf[".$conf['cmdmode'] . "][whereString]:".$conf[$conf['cmdmode'] . '.']['whereString']);
 		$sql['userWhereString']='';
-		if ($conf[$conf['cmdmode'] . '.']['whereString'])	$sql['userWhereString']=' AND '.$conf[$conf['cmdmode'] . '.']['whereString'];
+		if ($conf[$conf['cmdmode'] . '.']['whereString'])	$sql['userWhereString']=$conf[$conf['cmdmode'] . '.']['whereString'];
 		// New way we eval PHP from report json
 		$where='';
 		$whereUserFunction=$conf[$conf['cmdmode'].'.']['whereUserFunction'];
